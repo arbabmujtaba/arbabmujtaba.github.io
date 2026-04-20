@@ -150,6 +150,8 @@
          SECTION 3 — PORTFOLIO / WORKS
     ══════════════════════════════ -->
     <section id="projects" class="portfolio-section reveal" aria-labelledby="portfolio-heading">
+
+      <!-- Header row: intro left, featured project right -->
       <div class="portfolio-header container">
         <div class="portfolio-intro">
           <p class="eyebrow">— Portfolio</p>
@@ -158,9 +160,9 @@
           <a class="cta-link" href="https://github.com/arbabmujtaba" target="_blank" rel="noopener">Explore more <span aria-hidden="true">→</span></a>
         </div>
 
-        <!-- Featured project card -->
+        <!-- Featured project -->
         <article class="project-featured">
-          <div class="project-featured-label">
+          <div class="project-label">
             <span class="project-name">Attendance System.</span>
             <span class="project-tags">Java · MySQL</span>
           </div>
@@ -171,11 +173,11 @@
         </article>
       </div>
 
-      <!-- Remaining project grid -->
+      <!-- 2-column project grid — NO border-radius on tiles -->
       <div class="portfolio-grid container">
 
         <article class="project-tile">
-          <div class="project-tile-label">
+          <div class="project-label">
             <span class="project-name">Network Simulator.</span>
             <span class="project-tags">Python · Networking</span>
           </div>
@@ -185,7 +187,7 @@
         </article>
 
         <article class="project-tile">
-          <div class="project-tile-label">
+          <div class="project-label">
             <span class="project-name">Kashmiri AI Assistant.</span>
             <span class="project-tags">AI · NLP</span>
           </div>
@@ -196,7 +198,7 @@
         </article>
 
         <article class="project-tile">
-          <div class="project-tile-label">
+          <div class="project-label">
             <span class="project-name">DSP Surround.</span>
             <span class="project-tags">C++ · Audio</span>
           </div>
@@ -207,12 +209,64 @@
         </article>
 
         <article class="project-tile">
-          <div class="project-tile-label">
+          <div class="project-label">
             <span class="project-name">MoodMix — Spatial Audio.</span>
             <span class="project-tags">DSP · ML</span>
           </div>
           <figure class="project-thumb">
             <img src="MoodMix.png" alt="MoodMix Spatial Audio DSP" loading="lazy">
+          </figure>
+        </article>
+
+        <article class="project-tile">
+          <div class="project-label">
+            <span class="project-name">SpecWars.</span>
+            <span class="project-tags">React · Node.js</span>
+          </div>
+          <figure class="project-thumb project-thumb--placeholder">
+            <div class="thumb-placeholder">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="12" width="56" height="36" rx="3"/><path d="M20 48l-4 8M44 48l4 8M16 56h32"/><path d="M26 30l6-6 6 6M32 24v16"/></svg>
+              <span>SpecWars</span>
+            </div>
+          </figure>
+        </article>
+
+        <article class="project-tile">
+          <div class="project-label">
+            <span class="project-name">Spotify Backend.</span>
+            <span class="project-tags">Node.js · Express · MongoDB</span>
+          </div>
+          <figure class="project-thumb project-thumb--placeholder">
+            <div class="thumb-placeholder">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="32" cy="32" r="28"/><circle cx="32" cy="32" r="18"/><circle cx="32" cy="32" r="8"/><path d="M14 24c6-4 18-6 28 0M14 40c6 4 18 6 28 0"/></svg>
+              <span>Spotify Backend</span>
+            </div>
+          </figure>
+        </article>
+
+        <article class="project-tile">
+          <div class="project-label">
+            <span class="project-name">DAVV Login Portal.</span>
+            <span class="project-tags">PHP · MySQL</span>
+          </div>
+          <figure class="project-thumb project-thumb--placeholder">
+            <div class="thumb-placeholder">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="8" y="8" width="48" height="48" rx="3"/><path d="M8 22h48"/><circle cx="32" cy="38" r="8"/><path d="M32 30v4M29 37l3-3 3 3"/></svg>
+              <span>DAVV Login Portal</span>
+            </div>
+          </figure>
+        </article>
+
+        <article class="project-tile">
+          <div class="project-label">
+            <span class="project-name">GeoProject.</span>
+            <span class="project-tags">Python · Geospatial</span>
+          </div>
+          <figure class="project-thumb project-thumb--placeholder">
+            <div class="thumb-placeholder">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="32" cy="32" r="28"/><path d="M4 32h56M32 4c-8 6-12 16-12 28s4 22 12 28M32 4c8 6 12 16 12 28s-4 22-12 28"/></svg>
+              <span>GeoProject</span>
+            </div>
           </figure>
         </article>
 
@@ -231,7 +285,7 @@
         <ul class="skill-list" role="list">
           <li class="skill-item">
             <span class="skill-date">Java</span>
-            <span class="skill-title">Swing · JDBC · OOP Patterns</span>
+            <span class="skill-title">Swing · JDBC · OOP · Desktop Apps</span>
             <a class="skill-arrow" href="#projects" aria-label="See Java projects">→</a>
           </li>
           <li class="skill-item">
@@ -240,14 +294,34 @@
             <a class="skill-arrow" href="#projects" aria-label="See Python projects">→</a>
           </li>
           <li class="skill-item">
-            <span class="skill-date">Web</span>
-            <span class="skill-title">HTML · CSS · JavaScript</span>
-            <a class="skill-arrow" href="#projects" aria-label="See web projects">→</a>
+            <span class="skill-date">PHP</span>
+            <span class="skill-title">Server-side · MySQL · Login Systems</span>
+            <a class="skill-arrow" href="#projects" aria-label="See PHP projects">→</a>
           </li>
           <li class="skill-item">
-            <span class="skill-date">DSP</span>
-            <span class="skill-title">C++ · Audio Engineering · Spatial Sound</span>
-            <a class="skill-arrow" href="#projects" aria-label="See DSP projects">→</a>
+            <span class="skill-date">React</span>
+            <span class="skill-title">Components · Hooks · Frontend Apps</span>
+            <a class="skill-arrow" href="#projects" aria-label="See React projects">→</a>
+          </li>
+          <li class="skill-item">
+            <span class="skill-date">Node.js</span>
+            <span class="skill-title">Express · REST APIs · MongoDB · MERN</span>
+            <a class="skill-arrow" href="#projects" aria-label="See Node projects">→</a>
+          </li>
+          <li class="skill-item">
+            <span class="skill-date">TypeScript</span>
+            <span class="skill-title">Typed JS · Interfaces · Scalable Code</span>
+            <a class="skill-arrow" href="#projects" aria-label="See TypeScript projects">→</a>
+          </li>
+          <li class="skill-item">
+            <span class="skill-date">C++</span>
+            <span class="skill-title">DSP · Audio Engineering · Spatial Sound</span>
+            <a class="skill-arrow" href="#projects" aria-label="See C++ projects">→</a>
+          </li>
+          <li class="skill-item">
+            <span class="skill-date">Networking</span>
+            <span class="skill-title">LoRaWAN · Packet Simulation · Topologies</span>
+            <a class="skill-arrow" href="#projects" aria-label="See Networking projects">→</a>
           </li>
         </ul>
       </div>
