@@ -505,7 +505,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   margin: 0;
   flex: 1;
   overflow: hidden;
-  min-height: 200px;
+  min-height: 140px;
   display: block;
   position: relative;
 }
@@ -537,7 +537,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /* Every card in the grid gets a bottom border */
 .portfolio-grid .project-card {
   border-bottom: 1px solid var(--border);
-  min-height: 280px;
+  min-height: 200px;
 }
 
 /* Right-column cards already have border-left from .project-card;
@@ -778,60 +778,78 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 /* ═══════════════════════════════════════════════════
-   SECTION 4b — BLOG POSTS
+   SECTION 4b — BLOG: MySelf
    ═══════════════════════════════════════════════════ */
-.blog-posts-section {
-  background: var(--bg);
+.blog-myself-section {
+  background: var(--bg-deep);
   padding-block: var(--section-v);
   border-top: 1px solid var(--border);
 }
 
-.blog-posts-inner {
+.blog-myself-inner {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 0 5rem;
   align-items: start;
 }
 
-.blog-posts-header { padding-top: .5rem; }
+.blog-myself-header { padding-top: .5rem; }
 
-.blog-posts-list { margin-top: 0; }
-
-.blog-post-item {
-  display: grid;
-  grid-template-columns: 9rem 1fr auto;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 1.35rem 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background .2s;
-}
-.blog-post-item:first-child { border-top: 1px solid var(--border); }
-.blog-post-item:hover .blog-post-title { color: var(--amber); }
-
-.blog-date {
-  font-size: .72rem;
-  color: var(--muted);
-  letter-spacing: .04em;
-  white-space: nowrap;
+.blog-myself-content {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
 }
 
-.blog-post-title {
-  font-size: .95rem;
-  font-weight: 600;
+.blog-myself-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--amber), var(--amber-dim));
+}
+
+.blog-myself-meta {
+  margin-bottom: 1rem;
+}
+
+.blog-myself-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
   color: var(--white);
-  line-height: 1.4;
-  transition: color .2s;
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
 }
 
-.blog-arrow {
-  color: var(--amber);
-  font-size: 1.1rem;
-  flex-shrink: 0;
-  transition: transform .2s;
+.blog-myself-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--off-white);
 }
-.blog-post-item:hover .blog-arrow { transform: translateX(5px); }
+
+.blog-myself-body p {
+  margin-bottom: 1.5rem;
+}
+
+.blog-myself-body p:last-child {
+  margin-bottom: 0;
+}
+
+.blog-myself-body blockquote {
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--amber);
+  border-left: 3px solid var(--amber);
+  padding-left: 1rem;
+  margin: 2rem 0;
+  font-weight: 500;
+}
 
 /* ═══════════════════════════════════════════════════
    RESPONSIVE
@@ -880,7 +898,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
   .blog-section         { grid-template-columns: 1fr; }
   .blog-left            { border-right: none; border-bottom: 1px solid var(--border); }
-  .blog-posts-inner     { grid-template-columns: 1fr; gap: 2rem; }
+  .blog-myself-inner     { grid-template-columns: 1fr; gap: 2rem; }
   .blog-post-item       { grid-template-columns: 7rem 1fr auto; }
 
   .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -908,9 +926,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .service-card { padding: 1.5rem 1.25rem 2rem; }
   .skill-item   { grid-template-columns: 3.5rem 1fr auto; }
 
-  .blog-post-item {
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
+  .blog-myself-content {
+    padding: 1.5rem;
+    margin-top: 1.5rem;
   }
-  .blog-date { grid-column: 1 / -1; font-size: .68rem; }
 }
