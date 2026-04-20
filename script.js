@@ -230,7 +230,7 @@ if (accentLine) {
 }
 
 /* ── 11. PROJECT TILE — TILT ON HOVER ───────────── */
-const projectTiles = document.querySelectorAll('.project-tile, .project-featured');
+const projectTiles = document.querySelectorAll('.project-card');
 
 projectTiles.forEach(tile => {
   tile.addEventListener('mousemove', e => {
@@ -359,7 +359,7 @@ if (window.matchMedia('(pointer: fine)').matches) {
   })();
 
   /* Grow on interactive elements */
-  document.querySelectorAll('a, button, .service-card, .project-tile, .project-featured, .dot').forEach(el => {
+  document.querySelectorAll('a, button, .service-card, .project-card, .dot, .blog-post-item').forEach(el => {
     el.addEventListener('mouseenter', () => {
       Object.assign(cursor.style, { width: '28px', height: '28px', opacity: '.5' });
     });
@@ -368,3 +368,13 @@ if (window.matchMedia('(pointer: fine)').matches) {
     });
   });
 }
+
+/* ── 16. PROJECT CARD — click via data-href ─────── */
+document.querySelectorAll('.project-card[data-href]').forEach(card => {
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', e => {
+    if (e.target.closest('a')) return; /* let real links pass through */
+    const url = card.dataset.href;
+    if (url && url !== '#') window.open(url, '_blank', 'noopener');
+  });
+});

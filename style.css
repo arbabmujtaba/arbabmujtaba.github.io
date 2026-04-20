@@ -430,141 +430,133 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .portfolio-section {
   background: var(--bg);
   padding-top: var(--section-v);
-  padding-bottom: 0;
 }
 
-/* Header row: intro left + featured project right */
-.portfolio-header {
+/*
+  portfolio-inner is the single layout root.
+  NO .container here — we want cards to bleed
+  edge-to-edge with only the intro text padded.
+*/
+.portfolio-inner {
+  width: 100%;
+}
+
+/* ── Top row: intro (padded) + featured card ── */
+.portfolio-top {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 0 4rem;
-  align-items: stretch;
-  margin-bottom: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  /* NO gap — cards touch with border lines only */
+  gap: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .portfolio-intro {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: var(--section-v);
+  padding: var(--section-v) var(--pad-x);
+  /* max out at same left-pad as .container */
+  padding-left: max(var(--pad-x), calc((100vw - var(--container)) / 2 + var(--pad-x)));
 }
 
-/* ── Shared label bar (used on featured + tiles) ── */
+/* ── Shared card ── */
+.project-card {
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0;           /* absolutely sharp — no border-radius anywhere */
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .3s;
+}
+.project-card:hover { background: #3a3c55; }
+
+/* ── Label bar ── */
 .project-label {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: .9rem 1.25rem;
+  padding: .85rem 1.25rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  gap: 1rem;
 }
 
 .project-name {
-  font-size: .9rem;
+  font-size: .875rem;
   font-weight: 700;
   color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .project-tags {
-  font-size: .75rem;
+  font-size: .72rem;
   color: var(--muted);
   white-space: nowrap;
-  margin-left: 1rem;
+  flex-shrink: 0;
 }
 
-/* ── Featured project (top-right, full height of header row) ── */
-.project-featured {
-  background: var(--bg-card);
-  overflow: hidden;
-  border-radius: 0;          /* sharp — no rounded corners */
-  display: flex;
-  flex-direction: column;
-  border-left: 1px solid var(--border);
-}
-
-.project-featured .project-thumb {
-  flex: 1;
-  margin: 0;
-  overflow: hidden;
-  min-height: 220px;
-}
-
-/* ── Thumb shared ── */
+/* ── Thumb ── */
 .project-thumb {
   margin: 0;
+  flex: 1;
   overflow: hidden;
+  min-height: 200px;
   display: block;
+  position: relative;
 }
 
 .project-thumb img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform .55s var(--ease), filter .55s;
-  filter: brightness(.88);
+  filter: brightness(.82) saturate(.9);
+  transition: transform .6s var(--ease), filter .6s;
 }
-.project-featured:hover .project-thumb img,
-.project-tile:hover .project-thumb img {
-  transform: scale(1.04);
-  filter: brightness(1);
+.project-card:hover .project-thumb img {
+  transform: scale(1.05);
+  filter: brightness(1) saturate(1);
 }
 
-/* ── Grid of remaining project tiles ── */
+/* ── Main 2-col grid — all subsequent cards ── */
 .portfolio-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  /* 1px gaps rendered as background showing through */
-  gap: 1px;
-  background: var(--border);
-  /* sits flush below the header — no extra margin */
-  margin-top: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* gap: 0 — dividers are borders on each card */
+  gap: 0;
+  border-top: 1px solid var(--border);
 }
 
-.project-tile {
-  background: var(--bg-card);
-  overflow: hidden;
-  border-radius: 0;          /* sharp — matches reference */
-  display: flex;
-  flex-direction: column;
+/* Every card in the grid gets a bottom border */
+.portfolio-grid .project-card {
+  border-bottom: 1px solid var(--border);
+  min-height: 280px;
 }
 
-.project-tile .project-thumb {
-  height: 220px;
-  flex: none;
+/* Right-column cards already have border-left from .project-card;
+   left-column cards sit at the page edge so we override */
+.portfolio-grid .project-card:nth-child(odd) {
+  border-left: none;
+  /* give them the same left-padding as the intro text */
+  padding-left: 0;
+}
+.portfolio-grid .project-card:nth-child(odd) .project-label {
+  padding-left: max(var(--pad-x), calc((100vw - var(--container)) / 2 + var(--pad-x)));
+}
+.portfolio-grid .project-card:nth-child(odd) .project-thumb {
+  /* thumb itself doesn't need the extra padding — image is full-width */
 }
 
-.project-tile .project-thumb img {
-  height: 100%;
-}
-
-/* ── Placeholder thumb (projects without a screenshot) ── */
-.project-thumb--placeholder {
-  height: 220px;
-  background: var(--bg-deep);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.thumb-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .75rem;
-  color: var(--muted);
-}
-
-.thumb-placeholder svg {
-  opacity: .45;
-}
-
-.thumb-placeholder span {
-  font-size: .78rem;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  opacity: .5;
+/* Right-column edge: pad to match .container right edge */
+.portfolio-grid .project-card:nth-child(even) .project-label {
+  padding-right: max(var(--pad-x), calc((100vw - var(--container)) / 2 + var(--pad-x)));
 }
 
 /* ═══════════════════════════════════════════════════
@@ -786,6 +778,62 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 /* ═══════════════════════════════════════════════════
+   SECTION 4b — BLOG POSTS
+   ═══════════════════════════════════════════════════ */
+.blog-posts-section {
+  background: var(--bg);
+  padding-block: var(--section-v);
+  border-top: 1px solid var(--border);
+}
+
+.blog-posts-inner {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0 5rem;
+  align-items: start;
+}
+
+.blog-posts-header { padding-top: .5rem; }
+
+.blog-posts-list { margin-top: 0; }
+
+.blog-post-item {
+  display: grid;
+  grid-template-columns: 9rem 1fr auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .2s;
+}
+.blog-post-item:first-child { border-top: 1px solid var(--border); }
+.blog-post-item:hover .blog-post-title { color: var(--amber); }
+
+.blog-date {
+  font-size: .72rem;
+  color: var(--muted);
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.blog-post-title {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.4;
+  transition: color .2s;
+}
+
+.blog-arrow {
+  color: var(--amber);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: transform .2s;
+}
+.blog-post-item:hover .blog-arrow { transform: translateX(5px); }
+
+/* ═══════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════ */
 
@@ -806,14 +854,36 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   }
   .hero-right { order: 3; padding-left: 0; padding-top: 1.5rem; }
 
-  .services-top        { grid-template-columns: 1fr; gap: 2.5rem; }
-  .service-cards        { grid-template-columns: 1fr; gap: 0; }
-  .portfolio-header     { grid-template-columns: 1fr; gap: 0; }
-  .portfolio-header .project-featured { border-left: none; border-top: 1px solid var(--border); }
-  .portfolio-grid       { grid-template-columns: 1fr; }
+  .services-top   { grid-template-columns: 1fr; gap: 2.5rem; }
+  .service-cards  { grid-template-columns: 1fr; gap: 0; }
+
+  /* Portfolio: stack intro above featured card */
+  .portfolio-top  { grid-template-columns: 1fr; }
+  .portfolio-top .project-card {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .portfolio-intro {
+    padding-left: var(--pad-x);
+    padding-right: var(--pad-x);
+  }
+  /* Grid: single column on tablet */
+  .portfolio-grid { grid-template-columns: 1fr; }
+  .portfolio-grid .project-card:nth-child(even) .project-label {
+    padding-right: var(--pad-x);
+  }
+  .portfolio-grid .project-card:nth-child(odd) .project-label {
+    padding-left: var(--pad-x);
+  }
+  /* All cards get left border on single-col */
+  .portfolio-grid .project-card { border-left: none; }
+
   .blog-section         { grid-template-columns: 1fr; }
   .blog-left            { border-right: none; border-bottom: 1px solid var(--border); }
-  .contact-grid         { grid-template-columns: 1fr; gap: 2.5rem; }
+  .blog-posts-inner     { grid-template-columns: 1fr; gap: 2rem; }
+  .blog-post-item       { grid-template-columns: 7rem 1fr auto; }
+
+  .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
 }
 
 /* Mobile */
@@ -833,8 +903,14 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .nav-list.open { display: flex; }
   .nav-link { font-size: 1.25rem; }
 
-  .hero-title { font-size: clamp(2.8rem, 15vw, 4.5rem); }
-  .stats-row  { gap: 2rem; }
+  .hero-title   { font-size: clamp(2.8rem, 15vw, 4.5rem); }
+  .stats-row    { gap: 2rem; }
   .service-card { padding: 1.5rem 1.25rem 2rem; }
-  .skill-item { grid-template-columns: 3.5rem 1fr auto; }
+  .skill-item   { grid-template-columns: 3.5rem 1fr auto; }
+
+  .blog-post-item {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+  }
+  .blog-date { grid-column: 1 / -1; font-size: .68rem; }
 }

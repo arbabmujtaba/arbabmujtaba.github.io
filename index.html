@@ -151,126 +151,131 @@
     ══════════════════════════════ -->
     <section id="projects" class="portfolio-section reveal" aria-labelledby="portfolio-heading">
 
-      <!-- Header row: intro left, featured project right -->
-      <div class="portfolio-header container">
-        <div class="portfolio-intro">
-          <p class="eyebrow">— Portfolio</p>
-          <h2 id="portfolio-heading" class="section-heading">All Creative Works,<br>Selected projects.</h2>
-          <p class="muted">A mix of desktop apps, network tools, and audio experiments.</p>
-          <a class="cta-link" href="https://github.com/arbabmujtaba" target="_blank" rel="noopener">Explore more <span aria-hidden="true">→</span></a>
+      <!-- Full-width wrapper — no .container so grid edges bleed flush -->
+      <div class="portfolio-inner">
+
+        <!-- Top: intro text (left) + featured card (right) -->
+        <div class="portfolio-top">
+          <div class="portfolio-intro">
+            <p class="eyebrow">— Portfolio</p>
+            <h2 id="portfolio-heading" class="section-heading">All Creative Works,<br>Selected projects.</h2>
+            <p class="muted">A mix of desktop apps, network tools, and audio experiments.</p>
+            <a class="cta-link" href="https://github.com/arbabmujtaba" target="_blank" rel="noopener">Explore more <span aria-hidden="true">→</span></a>
+          </div>
+
+          <article class="project-card" data-href="https://github.com/arbabmujtaba">
+            <div class="project-label">
+              <span class="project-name">Attendance System.</span>
+              <span class="project-tags">Java · MySQL</span>
+            </div>
+            <figure class="project-thumb">
+              <img src="https://user-images.githubusercontent.com/74867463/144262662-b7fbe66e-5c4c-46fb-8bab-9cf3121c2032.png"
+                   alt="Attendance Management System" loading="lazy">
+            </figure>
+          </article>
         </div>
 
-        <!-- Featured project -->
-        <article class="project-featured">
-          <div class="project-label">
-            <span class="project-name">Attendance System.</span>
-            <span class="project-tags">Java · MySQL</span>
-          </div>
-          <figure class="project-thumb">
-            <img src="https://user-images.githubusercontent.com/74867463/144262662-b7fbe66e-5c4c-46fb-8bab-9cf3121c2032.png"
-                 alt="Attendance Management System screenshot" loading="lazy">
-          </figure>
-        </article>
-      </div>
+        <!-- Main grid — 2 columns, flush edge-to-edge -->
+        <div class="portfolio-grid">
 
-      <!-- 2-column project grid — NO border-radius on tiles -->
-      <div class="portfolio-grid container">
-
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">Network Simulator.</span>
-            <span class="project-tags">Python · Networking</span>
-          </div>
-          <figure class="project-thumb">
-            <img src="network.png" alt="Network Simulator screenshot" loading="lazy">
-          </figure>
-        </article>
-
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">Kashmiri AI Assistant.</span>
-            <span class="project-tags">AI · NLP</span>
-          </div>
-          <figure class="project-thumb">
-            <img src="https://i.pinimg.com/736x/2c/01/16/2c011666a56fa646531ca99dd41e8e79.jpg"
-                 alt="Kashmiri AI chatbot" loading="lazy">
-          </figure>
-        </article>
-
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">DSP Surround.</span>
-            <span class="project-tags">C++ · Audio</span>
-          </div>
-          <figure class="project-thumb">
-            <img src="https://rdphysics.com/wp-content/uploads/2021/06/SennheisermodDSP-1.jpg"
-                 alt="DSP Surround for Headphones" loading="lazy">
-          </figure>
-        </article>
-
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">MoodMix — Spatial Audio.</span>
-            <span class="project-tags">DSP · ML</span>
-          </div>
-          <figure class="project-thumb">
-            <img src="MoodMix.png" alt="MoodMix Spatial Audio DSP" loading="lazy">
-          </figure>
-        </article>
-
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">SpecWars.</span>
-            <span class="project-tags">React · Node.js</span>
-          </div>
-          <figure class="project-thumb project-thumb--placeholder">
-            <div class="thumb-placeholder">
-              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="12" width="56" height="36" rx="3"/><path d="M20 48l-4 8M44 48l4 8M16 56h32"/><path d="M26 30l6-6 6 6M32 24v16"/></svg>
-              <span>SpecWars</span>
+          <article class="project-card" data-href="https://github.com/arbabmujtaba">
+            <div class="project-label">
+              <span class="project-name">Network Simulator.</span>
+              <span class="project-tags">Python · Networking</span>
             </div>
-          </figure>
-        </article>
+            <figure class="project-thumb">
+              <!-- Network / server room visual -->
+              <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"
+                   alt="Network Simulator" loading="lazy">
+            </figure>
+          </article>
 
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">Spotify Backend.</span>
-            <span class="project-tags">Node.js · Express · MongoDB</span>
-          </div>
-          <figure class="project-thumb project-thumb--placeholder">
-            <div class="thumb-placeholder">
-              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="32" cy="32" r="28"/><circle cx="32" cy="32" r="18"/><circle cx="32" cy="32" r="8"/><path d="M14 24c6-4 18-6 28 0M14 40c6 4 18 6 28 0"/></svg>
-              <span>Spotify Backend</span>
+          <article class="project-card" data-href="https://kashmiri-ai-646412719553.us-west1.run.app/">
+            <div class="project-label">
+              <span class="project-name">Kashmiri AI Assistant.</span>
+              <span class="project-tags">AI · NLP</span>
             </div>
-          </figure>
-        </article>
+            <figure class="project-thumb">
+              <!-- Kashmir mountains — fits the theme perfectly -->
+              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
+                   alt="Kashmiri AI Assistant" loading="lazy">
+            </figure>
+          </article>
 
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">DAVV Login Portal.</span>
-            <span class="project-tags">PHP · MySQL</span>
-          </div>
-          <figure class="project-thumb project-thumb--placeholder">
-            <div class="thumb-placeholder">
-              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="8" y="8" width="48" height="48" rx="3"/><path d="M8 22h48"/><circle cx="32" cy="38" r="8"/><path d="M32 30v4M29 37l3-3 3 3"/></svg>
-              <span>DAVV Login Portal</span>
+          <article class="project-card" data-href="#">
+            <div class="project-label">
+              <span class="project-name">DSP Surround.</span>
+              <span class="project-tags">C++ · Audio Engineering</span>
             </div>
-          </figure>
-        </article>
+            <figure class="project-thumb">
+              <!-- Studio headphones / audio gear -->
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"
+                   alt="DSP Surround for Headphones" loading="lazy">
+            </figure>
+          </article>
 
-        <article class="project-tile">
-          <div class="project-label">
-            <span class="project-name">GeoProject.</span>
-            <span class="project-tags">Python · Geospatial</span>
-          </div>
-          <figure class="project-thumb project-thumb--placeholder">
-            <div class="thumb-placeholder">
-              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="32" cy="32" r="28"/><path d="M4 32h56M32 4c-8 6-12 16-12 28s4 22 12 28M32 4c8 6 12 16 12 28s-4 22-12 28"/></svg>
-              <span>GeoProject</span>
+          <article class="project-card" data-href="https://github.com/arbabmujtaba/MoodMix">
+            <div class="project-label">
+              <span class="project-name">MoodMix — Spatial Audio.</span>
+              <span class="project-tags">DSP · Machine Learning</span>
             </div>
-          </figure>
-        </article>
+            <figure class="project-thumb">
+              <!-- Sound waves / equaliser visual -->
+              <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80"
+                   alt="MoodMix Spatial Audio DSP" loading="lazy">
+            </figure>
+          </article>
 
-      </div>
+          <article class="project-card" data-href="https://github.com/arbabmujtaba/Specwars">
+            <div class="project-label">
+              <span class="project-name">SpecWars.</span>
+              <span class="project-tags">React · Node.js</span>
+            </div>
+            <figure class="project-thumb">
+              <!-- Gaming / competitive tech visual -->
+              <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80"
+                   alt="SpecWars" loading="lazy">
+            </figure>
+          </article>
+
+          <article class="project-card" data-href="https://github.com/arbabmujtaba/MERNBackend">
+            <div class="project-label">
+              <span class="project-name">Spotify Backend.</span>
+              <span class="project-tags">Node.js · Express · MongoDB</span>
+            </div>
+            <figure class="project-thumb">
+              <!-- Vinyl / music atmosphere -->
+              <img src="https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=800&q=80"
+                   alt="Spotify Backend" loading="lazy">
+            </figure>
+          </article>
+
+          <article class="project-card" data-href="https://github.com/arbabmujtaba/PHP">
+            <div class="project-label">
+              <span class="project-name">DAVV Login Portal.</span>
+              <span class="project-tags">PHP · MySQL</span>
+            </div>
+            <figure class="project-thumb">
+              <!-- University / login / auth visual -->
+              <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80"
+                   alt="DAVV Login Portal" loading="lazy">
+            </figure>
+          </article>
+
+          <article class="project-card" data-href="https://github.com/arbabmujtaba/GeoProject">
+            <div class="project-label">
+              <span class="project-name">GeoProject.</span>
+              <span class="project-tags">Python · Geospatial</span>
+            </div>
+            <figure class="project-thumb">
+              <!-- Satellite / map / geographic data -->
+              <img src="https://images.unsplash.com/photo-1446776858070-70c3d5ed6758?w=800&q=80"
+                   alt="GeoProject" loading="lazy">
+            </figure>
+          </article>
+
+        </div><!-- /portfolio-grid -->
+      </div><!-- /portfolio-inner -->
     </section>
 
     <!-- ══════════════════════════════
@@ -340,6 +345,43 @@
         </div>
       </div>
 
+    </section>
+
+    <!-- ══════════════════════════════
+         SECTION 4b — BLOG
+    ══════════════════════════════ -->
+    <section id="blog" class="blog-posts-section reveal" aria-labelledby="blog-heading">
+      <div class="blog-posts-inner container">
+        <div class="blog-posts-header">
+          <p class="eyebrow">— Blog</p>
+          <h2 id="blog-heading" class="section-heading">What's new?<br>My thoughts &amp; notes.</h2>
+        </div>
+
+        <ul class="blog-posts-list" role="list">
+          <!-- Blog post — paragraph you'll send goes here as data-body -->
+          <li class="blog-post-item" id="blog-post-1">
+            <div class="blog-post-meta">
+              <span class="blog-date">Coming soon · Blog</span>
+            </div>
+            <span class="blog-post-title">Your paragraph will appear here</span>
+            <a class="blog-arrow" href="#blog-post-1" aria-label="Read post">→</a>
+          </li>
+          <li class="blog-post-item">
+            <div class="blog-post-meta">
+              <span class="blog-date">Apr 2026 · Dev</span>
+            </div>
+            <span class="blog-post-title">Building a DSP chain from scratch — what I learnt</span>
+            <a class="blog-arrow" href="#" aria-label="Read post">→</a>
+          </li>
+          <li class="blog-post-item">
+            <div class="blog-post-meta">
+              <span class="blog-date">Mar 2026 · Networking</span>
+            </div>
+            <span class="blog-post-title">LoRaWAN at a university scale — challenges &amp; wins</span>
+            <a class="blog-arrow" href="#" aria-label="Read post">→</a>
+          </li>
+        </ul>
+      </div>
     </section>
 
     <!-- ══════════════════════════════
