@@ -4,13 +4,14 @@ import { ArrowRight } from 'lucide-react';
 interface ExploreArrowProps {
   label?: string;
   onClick?: () => void;
-  direction?: 'right' | 'down' | 'up-right';
+  direction?: 'right' | 'down' | 'up-right' | 'up';
 }
 
 export default function ExploreArrow({ label = "Explore deeper", onClick, direction = 'right' }: ExploreArrowProps) {
   const getRotation = () => {
     switch (direction) {
       case 'down': return 90;
+      case 'up': return -90;
       case 'up-right': return -45;
       case 'right': default: return 0;
     }
@@ -33,12 +34,12 @@ export default function ExploreArrow({ label = "Explore deeper", onClick, direct
              hover: { opacity: 1, scale: 1.5 }
            }}
            transition={{ duration: 0.5, ease: "easeOut" }}
-           className="absolute inset-0 bg-white/10 blur-xl rounded-full"
+           className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full"
         />
         <motion.div
            variants={{
              rest: { backgroundColor: "transparent", borderColor: "rgba(63, 63, 70, 0.4)" },
-             hover: { backgroundColor: "rgba(255, 255, 255, 0.05)", borderColor: "rgba(255, 255, 255, 0.2)" }
+             hover: { backgroundColor: "rgba(249, 115, 22, 0.1)", borderColor: "rgba(249, 115, 22, 0.4)" }
            }}
            transition={{ duration: 0.4 }}
            className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-zinc-700/40 flex items-center justify-center relative z-10 backdrop-blur-sm"
@@ -48,7 +49,7 @@ export default function ExploreArrow({ label = "Explore deeper", onClick, direct
               rest: { x: 0, y: 0 },
               hover: { 
                 x: direction === 'right' ? 3 : direction === 'up-right' ? 2 : 0,
-                y: direction === 'down' ? 3 : direction === 'up-right' ? -2 : 0 
+                y: direction === 'down' ? 3 : direction === 'up' ? -3 : direction === 'up-right' ? -2 : 0 
               }
             }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}

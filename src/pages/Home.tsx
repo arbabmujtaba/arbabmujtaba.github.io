@@ -132,19 +132,19 @@ export default function Home({ setView }: HomeProps) {
         {/* Cinematic Reveal Component */}
         <CinematicReveal containerRef={containerRef} />
 
-        {/* Storytelling Section 1: Philosophy */}
+        {/* Storytelling Section 1: Identity */}
         <StorySection containerRef={containerRef} index={0}>
           <div className="flex flex-col md:flex-row gap-12 md:gap-24 py-12 md:py-24">
             <div className="md:w-1/3">
-               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-6">Philosophy</h2>
-               <span className="block w-8 h-[1px] bg-zinc-700"></span>
+               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-6">Identity</h2>
+               <span className="block w-8 h-[1px] bg-orange-500/50"></span>
             </div>
             <div className="md:w-2/3 max-w-2xl">
                <p className="font-serif text-2xl md:text-3xl lg:text-4xl text-zinc-200 leading-[1.4] mb-8">
-                 I believe in building software that outlasts the hype cycle. Tools that feel responsive, systems that scale predictably, and interfaces that respect the user's attention.
+                 Computer Engineering Student at IET DAVV, Indore. Based in Jammu & Kashmir, India.
                </p>
                <p className="font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed">
-                 My work exists at the intersection of systems engineering and digital craft. Through a blend of rigorous backend architecture and meticulous frontend execution, I create digital environments that are as robust as they are refined.
+                 I build systems, collect stories, and capture moments. This space serves as a personal digital archive—a quiet room to index the different facets of my work and life.
                </p>
             </div>
           </div>
@@ -157,11 +157,11 @@ export default function Home({ setView }: HomeProps) {
             <div className="group cursor-pointer flex flex-col" onClick={() => setView('portfolio')}>
                <div className="aspect-[4/3] bg-zinc-900 border border-zinc-800/50 mb-8 overflow-hidden relative">
                  <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/20 to-transparent group-hover:scale-105 transition-transform duration-1000"></div>
-                 <div className="absolute bottom-6 left-6 font-mono text-[10px] text-zinc-500 tracking-widest">01 // VISUAL_ENGINE</div>
+                 <div className="absolute bottom-6 left-6 font-mono text-[10px] text-orange-500/80 tracking-[0.3em] uppercase">01 // Builder</div>
                </div>
                <h3 className="font-serif text-3xl text-zinc-200 mb-4 group-hover:text-white transition-colors">Portfolio</h3>
                <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed mb-6 max-w-sm">
-                 A curated selection of technical work. Distributed systems, web architectures, and interactive experiences.
+                 A curated selection of technical work. Emphasizing precision, performance, and digital craft.
                </p>
                <ExploreArrow label="Explore Work" direction="up-right" onClick={() => setView('portfolio')} />
             </div>
@@ -169,11 +169,11 @@ export default function Home({ setView }: HomeProps) {
             <div className="group cursor-pointer flex flex-col mt-0 md:mt-24" onClick={() => setView('journal')}>
                <div className="aspect-[3/4] bg-zinc-900 border border-zinc-800/50 mb-8 overflow-hidden relative">
                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-zinc-900/50 group-hover:opacity-80 transition-opacity duration-1000"></div>
-                 <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center font-serif italic text-4xl text-zinc-800 blur-[0.5px]">Journal</span>
+                 <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center font-serif italic text-4xl text-zinc-800 blur-[0.5px]">Human</span>
                </div>
-               <h3 className="font-serif text-3xl text-zinc-200 mb-4 group-hover:text-white transition-colors">Written Thoughts</h3>
+               <h3 className="font-serif text-3xl text-zinc-200 mb-4 group-hover:text-white transition-colors">Journal</h3>
                <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed mb-6 max-w-sm">
-                 Essays, technical notes, and observations. Documenting the learning process and architectural decisions.
+                 Personal thoughts, notes, and observations. Documenting the learning process and human experience.
                </p>
                <ExploreArrow label="Read Entries" direction="up-right" onClick={() => setView('journal')} />
             </div>
@@ -186,15 +186,15 @@ export default function Home({ setView }: HomeProps) {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 py-12 md:py-24">
             
             <div className="md:col-span-5 flex flex-col justify-center">
-              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-4">Laboratory</h2>
-              <h3 className="font-serif text-4xl text-zinc-200 mb-6 font-light">The Workshop.</h3>
+              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-4">Engineer</h2>
+              <h3 className="font-serif text-4xl text-zinc-200 mb-6 font-light">Tech Notes.</h3>
               <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed mb-10">
-                A structured index of ongoing technical explorations, experiments, and unfinished side-projects. This is where I go to break things and understand how they work under the hood.
+                A structured index of ongoing technical explorations, experiments, and unfinished side-projects. Documenting the engineering process and breaking things under the hood.
               </p>
               <ExploreArrow label="Enter Lab" direction="up-right" onClick={() => setView('tech')} />
             </div>
 
-            <div className="md:col-span-7 group cursor-pointer relative" onClick={() => setView('photography')}>
+            <div className="md:col-span-7 group cursor-pointer relative mt-8 md:mt-0" onClick={() => setView('photography')}>
               <div className="aspect-[16/9] bg-zinc-900 border border-zinc-800/50 overflow-hidden">
                 <img 
                   src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1600&q=80" 
@@ -203,8 +203,8 @@ export default function Home({ setView }: HomeProps) {
                 />
               </div>
               <div className="absolute top-6 left-6 text-white/80">
-                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-300 drop-shadow-md">Photography</h2>
-                <h3 className="font-serif text-2xl mt-1 drop-shadow-md">The Archive</h3>
+                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 drop-shadow-md">Artist</h2>
+                <h3 className="font-serif text-2xl mt-1 drop-shadow-md text-zinc-100">Photography</h3>
               </div>
             </div>
 
@@ -214,7 +214,7 @@ export default function Home({ setView }: HomeProps) {
         {/* Section 4: Collection */}
         <StorySection containerRef={containerRef} index={3}>
           <div className="text-center group cursor-pointer flex flex-col items-center justify-center py-12 md:py-32" onClick={() => setView('collection')}>
-             <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-6 block">Ongoing</span>
+             <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-6 block">Curator</span>
              <h3 className="font-serif text-4xl md:text-5xl lg:text-6xl text-zinc-300 mb-12 italic group-hover:text-white transition-colors">The Collection</h3>
              <ExploreArrow label="View Archive" direction="right" onClick={() => setView('collection')} />
           </div>

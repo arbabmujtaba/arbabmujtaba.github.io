@@ -4,20 +4,26 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 
 const favorites = [
-
   {
-    title: "The First Snow",
+    title: "Chasing the First Light",
     caption: "Winter 2023",
-    description: "Pahalgam, Kashmir. A quiet morning immediately after the season's first snowfall.",
+    description: "Pahalgam, Kashmir. A quiet morning immediately after the season's first snowfall. The light was transient and cold.",
     image: "https://images.unsplash.com/photo-1626084610114-17183e84a2ca?auto=format&fit=crop&w=2400&q=80",
     meta: { camera: "Fuji X-T4", lens: "35MM F/1.4", settings: "1/500s ISO200" }
+  },
+  {
+    title: "Quiet Intersections",
+    caption: "Autumn 2024",
+    description: "Lost in the alleys of Tokyo. A testament to finding stillness in the middle of chaos.",
+    image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=2400&q=80",
+    meta: { camera: "Sony A7III", lens: "50MM F/1.8", settings: "1/200s ISO800" }
   }
 ];
 
 const photoSections = [
   {
     title: "Life",
-    description: "Photographs connected to daily life and personal moments.",
+    description: "Observations from the ordinary. Textures of the everyday.",
     photos: [
       { id: 1, src: "https://images.unsplash.com/photo-1544144433-d50aff500b91?auto=format&fit=crop&w=800&q=80", alt: "Coffee on table" },
       { id: 2, src: "https://images.unsplash.com/photo-1510525009512-ad7fc13eefab?auto=format&fit=crop&w=800&q=80", alt: "Workspace" },
@@ -26,7 +32,7 @@ const photoSections = [
   },
   {
     title: "Connected",
-    description: "Photographs connected to stories, memories, people, or experiences.",
+    description: "Stories, faces, and the invisible threads between people.",
     photos: [
       { id: 4, src: "https://images.unsplash.com/photo-1525286102598-6415bf3721fb?auto=format&fit=crop&w=800&q=80", alt: "Street market" },
       { id: 5, src: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=80", alt: "People interacting" },
@@ -35,29 +41,35 @@ const photoSections = [
   },
   {
     title: "Travel",
-    description: "Photographs from different places and journeys.",
+    description: "Journeys outward to journey inward. Places that left a mark.",
     photos: [
-      { id: 7, src: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80", alt: "Tokyo neon" },
-      { id: 8, src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", alt: "Dolomites mountains" },
-      { id: 9, src: "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=800&q=80", alt: "Kashmir valley" },
+      { id: 7, src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", alt: "Dolomites mountains" },
+      { id: 8, src: "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=800&q=80", alt: "Kashmir valley" },
+      { id: 9, src: "https://images.unsplash.com/photo-1483728642387-6c3ba6c6af5f?auto=format&fit=crop&w=800&q=80", alt: "Mountain paths" },
     ]
   }
 ];
 
 const behindTheShot = [
   {
-    title: "Chasing the First Light",
-    subtitle: "A visual essay on early mornings in the Himalayas.",
+    title: "The Patience of Snow",
+    subtitle: "Waiting hours for the storm to break in the mountains.",
     readTime: "4 min read",
     image: "https://images.unsplash.com/photo-1483728642387-6c3ba6c6af5f?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    title: "Faces of the Old City",
-    subtitle: "Documenting the shifting culture of street vendors.",
+    title: "Translating Silence",
+    subtitle: "How to photograph quiet spaces without disturbing them.",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1525286102598-6415bf3721fb?auto=format&fit=crop&w=1200&q=80"
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80"
   }
 ];
+
+const gearConfig = {
+  Cameras: ["Sony A7III // Primary System", "Fuji X-T4 // Everyday Carry", "Nikon F3 // 35mm Analog"],
+  Lenses: ["Sigma 24-70mm F2.8 Art", "Sony 35mm F1.4 GM", "Fujinon 56mm F1.2"],
+  Tools: ["Kodak Portra 400", "Black Pro-Mist 1/4", "Capture One Pro"]
+};
 
 export default function Photography() {
   return (
@@ -75,7 +87,7 @@ export default function Photography() {
         <div className="mb-24 mt-12 md:mt-24 max-w-4xl">
           <motion.p 
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center"
+            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-6 flex items-center"
           >
             Things I've Captured
           </motion.p>
@@ -89,7 +101,7 @@ export default function Photography() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed"
           >
-            A collection of moments gathered over the years. This is less of a portfolio and more of a personal visual diary, focusing on light, daily experiences, and the quiet spaces between noise.
+            A collection of moments gathered over the years. This is less of a portfolio and more of a personal visual diary, focusing on memories, people, and the stories carried within light.
           </motion.div>
         </div>
 
@@ -108,21 +120,21 @@ export default function Photography() {
                 <p className="font-sans text-sm text-zinc-400 font-light mt-2">The most meaningful frames.</p>
               </div>
             </div>
-            <div className="lg:col-span-9 space-y-24">
+            <div className="lg:col-span-9 space-y-24 mt-8 lg:mt-0">
               {favorites.map((photo, idx) => (
                  <div key={idx}>
                     <ParallaxImage 
                       src={photo.image}
                       alt={photo.title}
-                      className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-6 group-hover:border-zinc-700 transition-colors"
+                      className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover:border-orange-500/30 transition-colors"
                       imageClassName="grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
                     />
-                    <div className="mt-6 flex flex-col md:flex-row justify-between items-start gap-4">
-                      <div>
-                        <h3 className="font-serif text-xl text-zinc-200">{photo.title}</h3>
-                        <p className="font-sans text-xs text-zinc-500 mt-1 font-light tracking-wide">{photo.caption} — {photo.description}</p>
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                      <div className="max-w-md">
+                        <h3 className="font-serif text-2xl text-zinc-200 mb-2">{photo.title}</h3>
+                        <p className="font-sans text-sm text-zinc-500 font-light leading-relaxed">{photo.caption} — {photo.description}</p>
                       </div>
-                      <div className="text-left md:text-right font-sans text-[10px] uppercase tracking-widest text-zinc-600 font-light space-y-1">
+                      <div className="text-left md:text-right font-sans text-[10px] uppercase tracking-widest text-zinc-600 font-light space-y-1 mt-4 md:mt-0">
                         <p>{photo.meta.camera}</p>
                         <p>{photo.meta.lens}</p>
                         <p>{photo.meta.settings}</p>
@@ -148,19 +160,20 @@ export default function Photography() {
                 <div className="lg:col-span-3">
                   <div className="sticky top-24">
                     <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">{section.title}</h2>
-                    <p className="font-sans text-sm text-zinc-400 font-light">{section.description}</p>
+                    <p className="font-sans text-sm text-zinc-400 font-light pr-4">{section.description}</p>
                   </div>
                 </div>
                 
-                <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {section.photos.map((photo) => (
-                    <div key={photo.id} className="relative aspect-[3/4] overflow-hidden border border-zinc-800/50 bg-zinc-900 group cursor-pointer">
+                <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8 lg:mt-0">
+                  {section.photos.map((photo, pIdx) => (
+                    <div key={photo.id} className={`relative overflow-hidden border border-zinc-800/50 bg-zinc-900 group cursor-pointer ${pIdx === 2 ? 'sm:col-span-2 aspect-[21/9]' : 'aspect-[3/4]'}`}>
                        <ParallaxImage 
                          src={photo.src} 
                          alt={photo.alt}
                          className="w-full h-full"
                          imageClassName="grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
                        />
+                       <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
                     </div>
                   ))}
                 </div>
@@ -179,29 +192,66 @@ export default function Photography() {
           <div className="lg:col-span-3">
             <div className="sticky top-24">
               <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">Behind The Shot</h2>
-              <p className="font-sans text-sm text-zinc-400 font-light">The stories, technical challenges, and context behind selected frames.</p>
+              <p className="font-sans text-sm text-zinc-400 font-light pr-4">Stories and context behind selected frames.</p>
             </div>
           </div>
           
-          <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
+          <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:mt-0">
             {behindTheShot.map((story, idx) => (
               <article key={idx} className="group cursor-pointer block">
-                <ParallaxImage 
-                  src={story.image}
-                  alt={story.title}
-                  className="w-full aspect-[16/10] bg-zinc-900 mb-8 border border-zinc-800/50"
-                  imageClassName="opacity-80 group-hover:opacity-100 transition-opacity duration-700"
-                />
+                <div className="relative overflow-hidden mb-6 border border-zinc-800/50">
+                  <ParallaxImage 
+                    src={story.image}
+                    alt={story.title}
+                    className="w-full aspect-[16/10] bg-zinc-900"
+                    imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700"
+                  />
+                  <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
+                </div>
                 <div className="flex flex-col gap-4">
                   <div>
                     <h3 className="font-serif text-2xl text-zinc-200 mb-3">{story.title}</h3>
-                    <p className="font-sans text-sm text-zinc-400 font-light">{story.subtitle}</p>
+                    <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{story.subtitle}</p>
                   </div>
-                  <div>
-                    <ExploreArrow label="Read Notes" direction="up-right" />
+                  <div className="mt-2">
+                    <ExploreArrow label="Read Journal" direction="up-right" />
                   </div>
                 </div>
               </article>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Gear */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-24 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-zinc-800/80 pt-12"
+        >
+          <div className="lg:col-span-3">
+             <div className="sticky top-24">
+              <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">The Tools</h2>
+              <p className="font-sans text-sm text-zinc-400 font-light pr-4">What's in the bag.</p>
+             </div>
+          </div>
+          <div className="lg:col-span-9 mt-8 lg:mt-0 grid grid-cols-1 sm:grid-cols-3 gap-12">
+            {Object.entries(gearConfig).map(([category, items]) => (
+               <div key={category}>
+                 <div className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-6 flex items-center gap-3">
+                   {category === 'Cameras' ? <Camera className="w-3.5 h-3.5" /> : category === 'Lenses' ? <Aperture className="w-3.5 h-3.5" /> : <Focus className="w-3.5 h-3.5" />}
+                   {category}
+                 </div>
+                 <ul className="space-y-4">
+                   {items.map((item, idx) => (
+                     <li key={idx} className="font-sans text-sm text-zinc-300 font-light tracking-wide flex items-baseline">
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-800 mr-3 inline-block shrink-0"></span>
+                        {item}
+                     </li>
+                   ))}
+                 </ul>
+               </div>
             ))}
           </div>
         </motion.div>

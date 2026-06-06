@@ -17,7 +17,7 @@ export default function App() {
   const [view, setView] = useState('home');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-800 via-teal-700 to-cyan-900 text-white flex flex-col relative box-border selection:bg-white/30">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30">
       {/* Noise Texture Overlay */}
       <div
         className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
@@ -30,16 +30,15 @@ export default function App() {
       <div className="flex-grow m-3 md:m-6 lg:m-8 border border-zinc-800/50 relative z-10 flex flex-col overflow-hidden">
         
         {/* Header containing Name and Navigation */}
-        <header className="flex flex-col md:flex-row justify-between items-start pt-8 px-6 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-8">
+        <header className="flex w-full justify-between items-start pt-8 px-6 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: view === 'home' ? 0 : 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="font-serif text-[4rem] sm:text-[6rem] md:text-[7rem] lg:text-[9rem] tracking-tighter text-zinc-100 cursor-pointer hover:text-white transition-colors leading-[0.85] z-50 mix-blend-difference"
+            className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-4 md:mt-8 ${view === 'home' ? 'pointer-events-none' : ''}`}
             onClick={() => setView('home')}
           >
-            Arbab<br className="hidden md:block" />
-            <span className="md:ml-[0.5em] italic text-zinc-300">Mujtaba.</span>
+            Arbab <span className="italic text-orange-500/80">Mujtaba.</span>
           </motion.div>
           
           <div className="pt-4 md:pt-8 z-50">

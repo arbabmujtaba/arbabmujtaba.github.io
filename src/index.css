@@ -20,11 +20,11 @@
 }
 
 body {
-  @apply bg-emerald-800 text-white font-sans antialiased overflow-x-hidden;
+  @apply bg-zinc-950 text-zinc-100 font-sans antialiased overflow-x-hidden;
 }
 
 ::selection {
-  @apply bg-white/30 text-white;
+  @apply bg-orange-500/30 text-zinc-100;
 }
 
 /* Custom Cinematic Scrollbar */
