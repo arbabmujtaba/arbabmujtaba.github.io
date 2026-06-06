@@ -12,6 +12,7 @@ import Journal from './pages/Journal';
 import Tech from './pages/Tech';
 import Photography from './pages/Photography';
 import Collection from './pages/Collection';
+import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 
 export default function App() {
   const [view, setView] = useState('home');
@@ -54,8 +55,9 @@ export default function App() {
           {view === 'tech' && <Tech key="tech" />}
           {view === 'photography' && <Photography key="photography" />}
           {view === 'collection' && <Collection key="collection" />}
-          {/* Add other views gracefully falling back or remaining empty if not implemented yet */}
         </AnimatePresence>
+
+        <FloatingMagicalArrow />
         
         {/* Decorative corner accents */}
         <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-zinc-500/30"></div>

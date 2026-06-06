@@ -5,6 +5,8 @@ import Hero from '../components/Hero';
 import ScrollIndicator from '../components/ScrollIndicator';
 import ExploreArrow from '../components/ExploreArrow';
 
+import Footer from '../components/Footer';
+
 interface HomeProps {
   setView: (view: string) => void;
   key?: string;
@@ -220,9 +222,7 @@ export default function Home({ setView }: HomeProps) {
           </div>
         </StorySection>
 
-        {/* Optional trailing space so the last element can cleanly slide to center */}
-        <div className="h-[20vh] w-full" />
-
+        <Footer />
       </div>
     </motion.div>
   );

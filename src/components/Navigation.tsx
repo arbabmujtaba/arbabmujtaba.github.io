@@ -32,11 +32,17 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
             onClick={() => setView(item.id)}
             className="group flex flex-col md:flex-row md:items-center cursor-pointer overflow-hidden items-end"
           >
-            <span className={`text-zinc-600 md:mr-6 font-light text-[9px] transform transition-transform duration-500 ease-out md:group-hover:-translate-x-3 mb-1 md:mb-0 ${isActive ? 'text-zinc-400' : ''}`}>
+            <span className={`text-zinc-600 md:mr-6 font-light text-[9px] transform transition-transform duration-500 ease-out md:group-hover:-translate-x-3 mb-1 md:mb-0 ${isActive ? 'text-orange-500/80' : ''}`}>
               {item.num}
             </span>
-            <span className={`transition-colors duration-500 ease-out tracking-[0.25em] ${isActive ? 'text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-300'}`}>
+            <span className={`transition-colors duration-500 ease-out tracking-[0.2em] relative ${isActive ? 'text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-300'}`}>
               {item.label}
+              {isActive && (
+                <motion.div 
+                  layoutId="nav-indicator"
+                  className="absolute -right-4 top-[40%] w-1.5 h-1.5 rounded-full bg-orange-500 hidden md:block"
+                />
+              )}
             </span>
           </motion.div>
         );

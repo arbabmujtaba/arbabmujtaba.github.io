@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
+import Footer from '../components/Footer';
 import { Disc3 } from 'lucide-react';
 
 const journalSections = [
@@ -59,22 +60,27 @@ export default function Journal() {
       <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-5xl mx-auto">
         
         {/* Hero Section */}
-        <div className="mb-24 mt-12 md:mt-24 max-w-3xl">
+        <div className="mb-32 mt-12 md:mt-32 max-w-4xl relative">
+          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[8rem] md:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
+            JOURNAL
+          </div>
           <motion.p 
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-6"
+            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 relative z-10 flex items-center gap-4"
           >
-            Things I've Lived
+            <span>Home</span>
+            <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
+            <span>Journal</span>
           </motion.p>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="font-serif text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tight"
+            className="font-serif font-medium text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
           >
-            Journal.
+            Journal
           </motion.h1>
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed"
+            className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
           >
             A personal archive of thoughts, late-night reflections, and milestones. Writing as a tool for figuring things out and finding stability in the noise of creating something real.
           </motion.div>
@@ -195,9 +201,7 @@ export default function Journal() {
            <ExploreArrow label="Explore Deeper" direction="down" />
         </div>
 
-        {/* Footer spacing */}
-        <div className="h-16" />
-
+        <Footer />
       </div>
     </motion.div>
   );
