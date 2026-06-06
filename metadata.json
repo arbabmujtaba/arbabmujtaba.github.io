@@ -1,0 +1,6 @@
+{
+  "name": "Arbab Mujtaba · Archive",
+  "description": "Minimalist digital archive and editorial personal homepage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
