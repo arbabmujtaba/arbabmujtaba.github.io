@@ -17,7 +17,7 @@ export default function App() {
   const [view, setView] = useState('home');
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col relative box-border selection:bg-zinc-800">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-800 via-teal-700 to-cyan-900 text-white flex flex-col relative box-border selection:bg-white/30">
       {/* Noise Texture Overlay */}
       <div
         className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
