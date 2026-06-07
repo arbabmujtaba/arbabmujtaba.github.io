@@ -1,7 +1,11 @@
-import { motion } from 'motion/react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Monitor, Cpu, BookOpen, Music, Glasses, Layers, Disc3, Clock, Compass, Terminal, Code2 } from 'lucide-react';
 import ExploreArrow from '../components/ExploreArrow';
 import Footer from '../components/Footer';
+import ContentModal from '../components/ContentModal';
+import { getCollectionEntries } from '../lib/cms';
+import { CollectionEntry } from '../types';
 
 const timelineMilestones = [
   { year: "2024", title: "Scale & Architecture", desc: "Leading advanced projects in real-time interactions with Node.js and React. Deep diving into backend optimization." },
@@ -19,21 +23,46 @@ const uses = {
   "Favorite Setups": ["Single Ultrawide Monitor", "Blank Keycaps", "Warm Desk Lamp", "Notebook & Pen"]
 };
 
-const influences = [
-  { name: "Less, but better", category: "Idea", desc: "Dieter Rams' design philosophy. Applied to engineering, photography, and the architecture of life." },
-  { name: "The Pragmatic Programmer", category: "Book", desc: "Andrew Hunt & David Thomas. Fundamentally changed how I approach building robust systems." },
-  { name: "In Praise of Shadows", category: "Book", desc: "Jun'ichirō Tanizaki. Understanding aesthetics, subtlety, and the beauty of analog imperfection." },
-  { name: "The Pursuit of Quietness", category: "Idea", desc: "Finding stillness and clarity in an increasingly loud and connected world." }
-];
-
-const music = [
-  { album: "I Told You Things", artist: "Gracie Abrams", year: "2023" },
-  { album: "Good Riddance", artist: "Gracie Abrams", year: "2023" },
-  { album: "Peripheral Vision", artist: "Turnover", year: "2015" },
-  { album: "Selected Ambient Works", artist: "Aphex Twin", year: "1992" },
-];
-
 export default function Collection() {
+  const [selectedEntry, setSelectedEntry] = useState<CollectionEntry | null>(null);
+
+  // Load from CMS dynamically
+  const entries = useMemo(() => getCollectionEntries(), []);
+
+  // Filter books and inspirations
+  const inspirations = useMemo(() => {
+    const dynamicItems = entries.filter(e => e.category === 'Inspirations' || e.category === 'Books');
+    if (dynamicItems.length > 0) return dynamicItems;
+
+    // Fallbacks
+    return [
+      {
+        title: "Less, but better",
+        category: "Inspirations" as const,
+        description: "Dieter Rams' design philosophy. Applied to engineering, photography, and the architecture of life.",
+        body: "Weniger, aber besser."
+      },
+      {
+        title: "The Pragmatic Programmer",
+        category: "Books" as const,
+        description: "Andrew Hunt & David Thomas. Fundamentally changed how I approach building robust systems.",
+        body: "Care about your craft."
+      }
+    ];
+  }, [entries]);
+
+  // Filter music
+  const dynamicMusic = useMemo(() => {
+    const dynamicItems = entries.filter(e => e.category === 'Music');
+    if (dynamicItems.length > 0) return dynamicItems;
+
+    return [
+      { title: "Selected Ambient Works", description: "Aphex Twin", category: "Music" as const, body: "1992 Electronic Classic." },
+      { title: "I Told You Things", description: "Gracie Abrams", category: "Music" as const, body: "2023 Indie Pop Classic." },
+      { title: "Peripheral Vision", description: "Turnover", category: "Music" as const, body: "2015 Shoegaze Classic." }
+    ];
+  }, [entries]);
+
   return (
     <motion.div
       key="collection"
@@ -88,9 +117,9 @@ export default function Collection() {
           <div className="relative border-l border-zinc-800/50 pl-8 md:pl-12 space-y-16 py-4 max-w-4xl">
             {timelineMilestones.map((milestone, idx) => (
               <div key={idx} className="relative group">
-                <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-zinc-950 border-2 border-zinc-700 group-hover:border-orange-500/80 transition-colors"></div>
+                <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-[#0a0a09] border-2 border-zinc-700 group-hover:border-orange-500 transition-colors"></div>
                 <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-8 mb-3">
-                  <span className="font-mono text-sm md:text-base text-orange-500/80 shrink-0">{milestone.year}</span>
+                  <span className="font-mono text-sm md:text-base text-orange-500 shrink-0">{milestone.year}</span>
                   <h3 className="font-serif text-2xl md:text-3xl text-zinc-200">{milestone.title}</h3>
                 </div>
                 <p className="font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed md:ml-[4.5rem]">
@@ -112,7 +141,7 @@ export default function Collection() {
           >
             <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 02 — Uses & Gear</h2>
-              <Terminal className="w-4 h-4 text-orange-500/80" strokeWidth={1} />
+              <Terminal className="w-4 h-4 text-orange-500" strokeWidth={1} />
             </div>
 
             <div className="space-y-12">
@@ -124,8 +153,8 @@ export default function Collection() {
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
                     {items.map((item, idx) => (
                       <li key={idx} className="group flex items-baseline border-b border-zinc-800/30 pb-3">
-                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-orange-500/80 transition-colors mr-3 shrink-0"></span>
-                        <span className="font-sans text-sm font-light text-zinc-300">{item}</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-850 group-hover:bg-orange-500 transition-colors mr-3 shrink-0"></span>
+                        <span className="font-sans text-sm font-light text-zinc-350">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -144,23 +173,31 @@ export default function Collection() {
           >
             <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 03 — Inspirations</h2>
-              <Compass className="w-4 h-4 text-orange-500/80" strokeWidth={1} />
+              <Compass className="w-4 h-4 text-orange-500" strokeWidth={1} />
             </div>
 
             <ul className="space-y-10">
-              {influences.map((influence, idx) => (
-                <li key={idx} className="group flex flex-col gap-3">
+              {inspirations.map((influence, idx) => (
+                <li 
+                  key={idx} 
+                  onClick={() => {
+                    if (influence.body) {
+                      setSelectedEntry(influence as CollectionEntry);
+                    }
+                  }}
+                  className={`group flex flex-col gap-3 ${influence.body ? 'cursor-pointer' : ''}`}
+                >
                   <div className="flex justify-between items-start">
-                     <span className="font-serif text-xl md:text-2xl text-zinc-200 group-hover:text-white transition-colors">{influence.name}</span>
-                     <span className="font-sans text-[9px] uppercase tracking-widest text-orange-500/80 shrink-0 mt-2 ml-4 px-2 py-1 bg-orange-500/10 rounded-sm">{influence.category}</span>
+                     <span className="font-serif text-xl md:text-2xl text-zinc-200 group-hover:text-orange-100 transition-colors">{influence.title}</span>
+                     <span className="font-sans text-[9px] uppercase tracking-widest text-orange-500 shrink-0 mt-2 ml-4 px-2 py-1 bg-orange-500/10 rounded-sm">{influence.category}</span>
                   </div>
-                  <span className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{influence.desc}</span>
+                  <span className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{influence.description}</span>
                 </li>
               ))}
             </ul>
             
             <div className="mt-16 bg-zinc-900/30 border border-zinc-800/50 p-6 md:p-8 flex flex-col md:flex-row items-start gap-6">
-                <Layers className="w-5 h-5 text-orange-500/80 shrink-0 mt-1" strokeWidth={1} />
+                <Layers className="w-5 h-5 text-orange-500 shrink-0 mt-1" strokeWidth={1} />
                 <div>
                    <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-3">Curator's Note</span>
                    <p className="font-sans text-sm text-zinc-300 font-light leading-relaxed italic">
@@ -170,7 +207,6 @@ export default function Collection() {
             </div>
           </motion.div>
         </div>
-
 
         {/* Audio Archive */}
         <motion.div 
@@ -185,19 +221,25 @@ export default function Collection() {
             <Disc3 className="w-4 h-4 text-orange-500/80 animate-[spin_4s_linear_infinite]" strokeWidth={1} />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-            {music.map((track, idx) => (
-              <div key={idx} className="group cursor-pointer">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {dynamicMusic.map((track, idx) => (
+              <div 
+                key={idx} 
+                onClick={() => {
+                  if (track.body) setSelectedEntry(track as CollectionEntry);
+                }}
+                className={`group ${track.body ? 'cursor-pointer' : ''}`}
+              >
                   <div className="aspect-square bg-zinc-900 border border-zinc-800/50 mb-6 relative overflow-hidden group-hover:border-orange-500/40 transition-colors">
                     <div className="absolute inset-0 bg-gradient-to-tr from-zinc-900 via-zinc-800/20 to-zinc-900"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-12 h-12 rounded-full border border-zinc-700/50 group-hover:scale-110 group-hover:border-orange-500/50 transition-all duration-700"></div>
                     </div>
                   </div>
-                  <h3 className="font-serif text-lg text-zinc-200 mb-2 truncate" title={track.album}>{track.album}</h3>
+                  <h3 className="font-serif text-lg text-zinc-200 mb-2 truncate" title={track.title}>{track.title}</h3>
                   <div className="flex justify-between items-center">
-                    <span className="font-sans text-xs text-zinc-500 font-light truncate max-w-[70%]">{track.artist}</span>
-                    <span className="font-mono text-[9px] text-zinc-600 shrink-0">{track.year}</span>
+                    <span className="font-sans text-xs text-zinc-500 font-light truncate max-w-[70%]">{track.description}</span>
+                    <span className="font-mono text-[9px] text-zinc-600 shrink-0">{track.category}</span>
                   </div>
               </div>
             ))}
@@ -210,7 +252,20 @@ export default function Collection() {
 
         <Footer />
       </div>
+
+      {/* Dynamic Collection Modal */}
+      <AnimatePresence>
+        {selectedEntry && (
+          <ContentModal 
+            isOpen={!!selectedEntry}
+            onClose={() => setSelectedEntry(null)}
+            title={selectedEntry.title}
+            category={selectedEntry.category}
+            excerpt={selectedEntry.description}
+            body={selectedEntry.body}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
-

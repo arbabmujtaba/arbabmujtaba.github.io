@@ -1,27 +1,14 @@
-import { motion } from 'motion/react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Camera, Aperture, Focus } from 'lucide-react';
 import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
+import ContentModal from '../components/ContentModal';
+import { getPhotographyEntries } from '../lib/cms';
+import { PhotographyEntry } from '../types';
 
-const favorites = [
-  {
-    title: "Chasing the First Light",
-    caption: "Winter 2023",
-    description: "Pahalgam, Kashmir. A quiet morning immediately after the season's first snowfall. The light was transient and cold.",
-    image: "https://images.unsplash.com/photo-1626084610114-17183e84a2ca?auto=format&fit=crop&w=2400&q=80",
-    meta: { camera: "Fuji X-T4", lens: "35MM F/1.4", settings: "1/500s ISO200" }
-  },
-  {
-    title: "Quiet Intersections",
-    caption: "Autumn 2024",
-    description: "Lost in the alleys of Tokyo. A testament to finding stillness in the middle of chaos.",
-    image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=2400&q=80",
-    meta: { camera: "Sony A7III", lens: "50MM F/1.8", settings: "1/200s ISO800" }
-  }
-];
-
-const photoSections = [
+const defaultPhotoSections = [
   {
     title: "Life",
     description: "Observations from the ordinary. Textures of the everyday.",
@@ -51,28 +38,28 @@ const photoSections = [
   }
 ];
 
-const behindTheShot = [
-  {
-    title: "The Patience of Snow",
-    subtitle: "Waiting hours for the storm to break in the mountains.",
-    readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1483728642387-6c3ba6c6af5f?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "Translating Silence",
-    subtitle: "How to photograph quiet spaces without disturbing them.",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80"
-  }
-];
-
 const gearConfig = {
-  Cameras: ["Sony A7III // Primary System", "Fuji X-T4 // Everyday Carry", "Nikon F3 // 35mm Analog"],
-  Lenses: ["Sigma 24-70mm F2.8 Art", "Sony 35mm F1.4 GM", "Fujinon 56mm F1.2"],
-  Tools: ["Kodak Portra 400", "Black Pro-Mist 1/4", "Capture One Pro"]
+  "Cameras": ["Sony A7III // Primary System", "Fuji X-T4 // Everyday Carry", "Nikon F3 // 35mm Analog"],
+  "Lenses": ["Sigma 24-70mm F2.8 Art", "Sony 35mm F1.4 GM", "Fujinon 56mm F1.2"],
+  "Tools": ["Kodak Portra 400", "Black Pro-Mist 1/4", "Capture One Pro"]
 };
 
 export default function Photography() {
+  const [selectedPhoto, setSelectedPhoto] = useState<PhotographyEntry | null>(null);
+
+  // Load from CMS
+  const allPhotos = useMemo(() => getPhotographyEntries(), []);
+
+  // Filter dynamic favorites
+  const favorites = useMemo(() => {
+    return allPhotos.filter(p => p.category === 'Favorites');
+  }, [allPhotos]);
+
+  // Behind the shot entries
+  const behindTheShot = useMemo(() => {
+    return allPhotos.filter(p => p.category === 'Behind The Shot' || p.category === 'Life' || p.category === 'Travel');
+  }, [allPhotos]);
+
   return (
     <motion.div
       key="photography"
@@ -111,50 +98,55 @@ export default function Photography() {
           </motion.div>
         </div>
 
-        {/* Favorites */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-32 group border-t border-zinc-800/80 pt-12"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-            <div className="lg:col-span-3">
-              <div className="sticky top-24">
-                <h2 className="font-serif text-3xl md:text-4xl text-zinc-200">Favorites</h2>
-                <p className="font-sans text-sm text-zinc-400 font-light mt-2">The most meaningful frames.</p>
+        {/* Favorites dynamic section */}
+        {favorites.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-32 group border-t border-zinc-800/80 pt-12"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+              <div className="lg:col-span-3">
+                <div className="sticky top-24">
+                  <h2 className="font-serif text-3xl md:text-4xl text-zinc-200">Favorites</h2>
+                  <p className="font-sans text-sm text-zinc-400 font-light mt-2">The most meaningful frames.</p>
+                </div>
+              </div>
+              <div className="lg:col-span-9 space-y-24 mt-8 lg:mt-0">
+                {favorites.map((photo, idx) => (
+                   <div 
+                     key={idx} 
+                     onClick={() => setSelectedPhoto(photo)}
+                     className="cursor-pointer group/photo"
+                   >
+                      <ParallaxImage 
+                        src={photo.coverImage}
+                        alt={photo.title}
+                        className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover/photo:border-orange-500/35 transition-colors"
+                        imageClassName="grayscale-[20%] group-hover/photo:grayscale-0 transition-all duration-1000 scale-105 group-hover/photo:scale-100"
+                      />
+                      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                        <div className="max-w-md">
+                          <h3 className="font-serif text-2xl text-zinc-200 mb-2 group-hover/photo:text-orange-200 transition-colors">{photo.title}</h3>
+                          <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{photo.description}</p>
+                        </div>
+                        <div className="text-left md:text-right font-mono text-[9px] uppercase tracking-widest text-zinc-500 font-light space-y-1 mt-4 md:mt-0">
+                          <p>Sony A7III / Fuji X-T4</p>
+                          <p>Dynamic Creative Capture</p>
+                        </div>
+                      </div>
+                   </div>
+                ))}
               </div>
             </div>
-            <div className="lg:col-span-9 space-y-24 mt-8 lg:mt-0">
-              {favorites.map((photo, idx) => (
-                 <div key={idx}>
-                    <ParallaxImage 
-                      src={photo.image}
-                      alt={photo.title}
-                      className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover:border-orange-500/30 transition-colors"
-                      imageClassName="grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
-                    />
-                    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                      <div className="max-w-md">
-                        <h3 className="font-serif text-2xl text-zinc-200 mb-2">{photo.title}</h3>
-                        <p className="font-sans text-sm text-zinc-500 font-light leading-relaxed">{photo.caption} — {photo.description}</p>
-                      </div>
-                      <div className="text-left md:text-right font-sans text-[10px] uppercase tracking-widest text-zinc-600 font-light space-y-1 mt-4 md:mt-0">
-                        <p>{photo.meta.camera}</p>
-                        <p>{photo.meta.lens}</p>
-                        <p>{photo.meta.settings}</p>
-                      </div>
-                    </div>
-                 </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* Life, Connected, Travel Grids */}
         <div className="space-y-32 mb-32">
-           {photoSections.map((section, idx) => (
+           {defaultPhotoSections.map((section, idx) => (
              <motion.section 
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
@@ -172,12 +164,12 @@ export default function Photography() {
                 
                 <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8 lg:mt-0">
                   {section.photos.map((photo, pIdx) => (
-                    <div key={photo.id} className={`relative overflow-hidden border border-zinc-800/50 bg-zinc-900 group cursor-pointer ${pIdx === 2 ? 'sm:col-span-2 aspect-[21/9]' : 'aspect-[3/4]'}`}>
+                    <div key={photo.id} className={`relative overflow-hidden border border-zinc-850 bg-zinc-900 group cursor-pointer ${pIdx === 2 ? 'sm:col-span-2 aspect-[21/9]' : 'aspect-[3/4]'}`}>
                        <ParallaxImage 
                          src={photo.src} 
                          alt={photo.alt}
                          className="w-full h-full"
-                         imageClassName="grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                         imageClassName="grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
                        />
                        <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
                     </div>
@@ -187,46 +179,52 @@ export default function Photography() {
            ))}
         </div>
 
-        {/* Behind The Shot */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-32 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-zinc-800/80 pt-12"
-        >
-          <div className="lg:col-span-3">
-            <div className="sticky top-24">
-              <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">Behind The Shot</h2>
-              <p className="font-sans text-sm text-zinc-400 font-light pr-4">Stories and context behind selected frames.</p>
+        {/* Dynamic Behind The Shot */}
+        {behindTheShot.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-32 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-zinc-800/80 pt-12"
+          >
+            <div className="lg:col-span-3">
+              <div className="sticky top-24">
+                <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">Behind The Shot</h2>
+                <p className="font-sans text-sm text-zinc-400 font-light pr-4">Stories and context behind selected frames.</p>
+              </div>
             </div>
-          </div>
-          
-          <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:mt-0">
-            {behindTheShot.map((story, idx) => (
-              <article key={idx} className="group cursor-pointer block">
-                <div className="relative overflow-hidden mb-6 border border-zinc-800/50">
-                  <ParallaxImage 
-                    src={story.image}
-                    alt={story.title}
-                    className="w-full aspect-[16/10] bg-zinc-900"
-                    imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700"
-                  />
-                  <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
-                </div>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <h3 className="font-serif text-2xl text-zinc-200 mb-3">{story.title}</h3>
-                    <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{story.subtitle}</p>
+            
+            <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:mt-0">
+              {behindTheShot.map((photo, idx) => (
+                <article 
+                  key={idx} 
+                  onClick={() => setSelectedPhoto(photo)}
+                  className="group cursor-pointer block"
+                >
+                  <div className="relative overflow-hidden mb-6 border border-zinc-850">
+                    <ParallaxImage 
+                      src={photo.coverImage}
+                      alt={photo.title}
+                      className="w-full aspect-[16/10] bg-zinc-900"
+                      imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
                   </div>
-                  <div className="mt-2">
-                    <ExploreArrow label="Read Journal" direction="up-right" />
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <h3 className="font-serif text-2xl text-zinc-200 mb-3 group-hover:text-amber-100 transition-colors">{photo.title}</h3>
+                      <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed line-clamp-2">{photo.description}</p>
+                    </div>
+                    <div className="mt-2">
+                      <ExploreArrow label="Read Journal" direction="up-right" />
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </motion.div>
+                </article>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Gear */}
         <motion.div 
@@ -245,13 +243,13 @@ export default function Photography() {
           <div className="lg:col-span-9 mt-8 lg:mt-0 grid grid-cols-1 sm:grid-cols-3 gap-12">
             {Object.entries(gearConfig).map(([category, items]) => (
                <div key={category}>
-                 <div className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-6 flex items-center gap-3">
+                 <div className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 flex items-center gap-3">
                    {category === 'Cameras' ? <Camera className="w-3.5 h-3.5" /> : category === 'Lenses' ? <Aperture className="w-3.5 h-3.5" /> : <Focus className="w-3.5 h-3.5" />}
                    {category}
                  </div>
                  <ul className="space-y-4">
                    {items.map((item, idx) => (
-                     <li key={idx} className="font-sans text-sm text-zinc-300 font-light tracking-wide flex items-baseline">
+                     <li key={idx} className="font-sans text-sm text-zinc-400 font-light tracking-wide flex items-baseline">
                         <span className="w-1.5 h-1.5 rounded-full bg-zinc-800 mr-3 inline-block shrink-0"></span>
                         {item}
                      </li>
@@ -264,6 +262,27 @@ export default function Photography() {
 
         <Footer />
       </div>
+
+      {/* Photography Immersive Case Study detail */}
+      <AnimatePresence>
+        {selectedPhoto && (
+          <ContentModal 
+            isOpen={!!selectedPhoto}
+            onClose={() => setSelectedPhoto(null)}
+            title={selectedPhoto.title}
+            category={selectedPhoto.category}
+            date={new Date(selectedPhoto.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+            coverImage={selectedPhoto.coverImage}
+            excerpt={selectedPhoto.description}
+            body={selectedPhoto.story}
+            metadata={{
+              galleryImages: Array.isArray(selectedPhoto.galleryImages) 
+                ? selectedPhoto.galleryImages.map(img => typeof img === 'string' ? img : Object.values(img)[0] as string)
+                : []
+            }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

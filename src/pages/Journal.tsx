@@ -1,53 +1,57 @@
-import { motion } from 'motion/react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
+import ContentModal from '../components/ContentModal';
+import { getJournalEntries } from '../lib/cms';
+import { JournalEntry } from '../types';
 import { Disc3 } from 'lucide-react';
 
-const journalSections = [
-  {
-    title: "Life",
-    description: "Personal experiences, daily observations, and reflections on the passage of time.",
-    entries: [
-      { title: "The Art of Slowing Down", date: "12 Oct 2024", readTime: "5 min" },
-      { title: "A Return to Basics", date: "04 May 2023", readTime: "8 min" },
-    ]
-  },
-  {
-    title: "People",
-    description: "Stories about meaningful people, conversations, and the impact of relationships.",
-    entries: [
-      { title: "Coffee with an Old Friend", date: "18 Aug 2024", readTime: "4 min" },
-      { title: "Mentorship and Growth", date: "22 Feb 2024", readTime: "6 min" },
-    ]
-  },
-  {
-    title: "Travel",
-    description: "Trips, places, memories, and observations from wandering.",
-    entries: [
-      { title: "Coffee, Code, and Tokyo", date: "28 Sep 2024", readTime: "8 min" },
-      { title: "Autumn in Kyoto", date: "05 Nov 2023", readTime: "12 min" },
-    ]
-  },
-  {
-    title: "Thoughts",
-    description: "Ideas, reflections, and lessons learned through building and breaking things.",
-    entries: [
-      { title: "Designing for Durability", date: "14 Aug 2024", readTime: "6 min" },
-      { title: "The Value of Deep Work", date: "10 Jan 2024", readTime: "7 min" },
-    ]
-  },
-  {
-    title: "Milestones",
-    description: "Important moments, achievements, and turning points in the journey.",
-    entries: [
-      { title: "Launching the New Architecture", date: "01 Dec 2024", readTime: "5 min" },
-      { title: "One Year Solo", date: "15 Jul 2023", readTime: "10 min" },
-    ]
-  }
-];
+const categoryDescriptions: Record<string, string> = {
+  "Life": "Personal experiences, daily observations, and reflections on the passage of time.",
+  "People": "Stories about meaningful people, conversations, and the impact of relationships.",
+  "Travel": "Trips, places, memories, and observations from wandering.",
+  "Thoughts": "Ideas, reflections, and lessons learned through building and breaking things.",
+  "Milestones": "Important moments, achievements, and turning points in the journey."
+};
+
+const categoryTitles = ["Life", "People", "Travel", "Thoughts", "Milestones"];
 
 export default function Journal() {
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+
+  // Load entries dynamically from markdown
+  const entries = useMemo(() => getJournalEntries(), []);
+
+  // Isolate featured essay (slug: growing-up) or default to the most recent entry
+  const featuredEntry = useMemo(() => {
+    const found = entries.find(e => e.slug === 'growing-up');
+    return found || entries[0] || null;
+  }, [entries]);
+
+  // List of other posts grouped by category
+  const groupedCategories = useMemo(() => {
+    // Filter out featured post from the general list
+    const remaining = entries.filter(e => !featuredEntry || e.slug !== featuredEntry.slug);
+    
+    return categoryTitles.map(cat => {
+      const catEntries = remaining.filter(e => e.category === cat);
+      return {
+        title: cat,
+        description: categoryDescriptions[cat] || "Reflections and stories within this space.",
+        entries: catEntries
+      };
+    }).filter(group => group.entries.length > 0); // Only show categories with entries
+  }, [entries, featuredEntry]);
+
+  // Calculate read time based on body length
+  const getReadTime = (body: string) => {
+    const wordCount = body.trim().split(/\s+/).length;
+    const time = Math.ceil(wordCount / 200);
+    return `${time} min`;
+  };
+
   return (
     <motion.div
       key="journal"
@@ -87,73 +91,66 @@ export default function Journal() {
         </div>
 
         {/* Featured Story */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-32 cursor-pointer relative"
-        >
-          <div className="border border-zinc-800/80 bg-zinc-900/40 p-8 md:p-12 lg:p-16 relative overflow-hidden group">
-             {/* Background Image / Texture overlay */}
-             <div className="absolute inset-0 opacity-10 mix-blend-overlay group-hover:opacity-20 transition-opacity duration-1000">
-               <ParallaxImage 
-                 src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80"
-                 alt="Night sky"
-                 className="w-full h-full object-cover"
-               />
-             </div>
-             
-             <div className="relative z-10 flex flex-col md:flex-row gap-12 lg:gap-24">
-                <div className="md:w-3/5">
-                  <div className="flex items-center gap-4 mb-8">
-                    <span className="font-sans text-[9px] uppercase tracking-widest text-orange-500/80">Featured Entry</span>
-                    <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-                    <span className="font-sans text-[9px] uppercase tracking-widest text-zinc-500">Vol. 01</span>
+        {featuredEntry && (
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => setSelectedEntry(featuredEntry)}
+            className="mb-32 cursor-pointer relative"
+          >
+            <div className="border border-zinc-800/80 bg-zinc-900/40 p-8 md:p-12 lg:p-16 relative overflow-hidden group">
+               {/* Background Image / Texture overlay */}
+               <div className="absolute inset-0 opacity-10 mix-blend-overlay group-hover:opacity-20 transition-opacity duration-1000">
+                 <ParallaxImage 
+                   src={featuredEntry.coverImage || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80"}
+                   alt={featuredEntry.title}
+                   className="w-full h-full object-cover"
+                 />
+               </div>
+               
+               <div className="relative z-10 flex flex-col md:flex-row gap-12 lg:gap-24">
+                  <div className="md:w-3/5">
+                    <div className="flex items-center gap-4 mb-8">
+                      <span className="font-sans text-[9px] uppercase tracking-widest text-orange-500">Featured Entry</span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+                      <span className="font-sans text-[9px] uppercase tracking-widest text-zinc-500">Vol. 01</span>
+                    </div>
+                    
+                    <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl text-zinc-100 leading-[1.15] mb-6">
+                      {featuredEntry.title}
+                    </h3>
+                    
+                    <article className="space-y-6 font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed mb-10">
+                      <p>{featuredEntry.excerpt}</p>
+                    </article>
+                    
+                    <div className="flex items-center gap-6 mt-8 p-4 border border-zinc-800/50 bg-zinc-950/50 w-max rounded-sm">
+                       <Disc3 className="w-8 h-8 text-orange-500 animate-[spin_5s_linear_infinite]" strokeWidth={1} />
+                       <div className="flex flex-col">
+                          <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-1">On Rotation</span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="font-serif italic text-zinc-200">I Told You Things</span>
+                            <span className="font-sans text-xs text-zinc-500">— Gracie Abrams</span>
+                          </div>
+                       </div>
+                    </div>
                   </div>
-                  
-                  <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl text-zinc-100 leading-[1.15] mb-6">
-                    Growing Up,
-                    <br />
-                    <span className="italic font-light text-zinc-400">Figuring Out</span>
-                  </h3>
-                  
-                  <article className="space-y-6 font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed mb-10">
-                    <p>
-                      There's a strange dichotomy in being an engineering student. On one hand, you're constantly building systems—learning how to create structure, logic, and predictability out of thin air. On the other, your twenties feel like the exact opposite: unstructured, chaotic, and deeply unpredictable.
-                    </p>
-                    <p>
-                      Late nights turn into early mornings, accompanied by glowing screens and the quiet hum of a compiler. It's in these quiet hours that the search for purpose feels the loudest. We are all trying to build a meaningful life, oscillating between the desire for unbridled freedom and the innate need for stability.
-                    </p>
-                    <p>
-                      I think part of the journey is realizing that creating something real—whether it's software that outlives its author, or a life that feels authentic—requires abandoning the blueprint every once in a while. Music becomes the companion. Solitude becomes the workshop.
-                    </p>
-                  </article>
-                  
-                  <div className="flex items-center gap-6 mt-8 p-4 border border-zinc-800/50 bg-zinc-950/50 w-max rounded-sm">
-                     <Disc3 className="w-8 h-8 text-orange-500/80 animate-[spin_5s_linear_infinite]" strokeWidth={1} />
-                     <div className="flex flex-col">
-                        <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-1">On Rotation</span>
-                        <div className="flex items-baseline gap-2">
-                          <span className="font-serif italic text-zinc-200">I Told You Things</span>
-                          <span className="font-sans text-xs text-zinc-500">— Gracie Abrams</span>
-                        </div>
+
+                  <div className="md:w-2/5 flex flex-col justify-end">
+                     <div className="mt-8 md:mt-0 flex flex-col items-start lg:items-end w-full">
+                       <ExploreArrow label="Read Full Essay" direction="up-right" />
                      </div>
                   </div>
-                </div>
-
-                <div className="md:w-2/5 flex flex-col justify-end">
-                   <div className="mt-8 md:mt-0 flex flex-col items-start lg:items-end w-full">
-                     <ExploreArrow label="Read Full Essay" direction="down-right" />
-                   </div>
-                </div>
-             </div>
-          </div>
-        </motion.div>
+               </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Journal Sections */}
         <div className="space-y-32 mb-32">
-          {journalSections.map((section, idx) => (
+          {groupedCategories.map((section, idx) => (
             <motion.section 
               key={idx}
               initial={{ opacity: 0, y: 30 }}
@@ -173,36 +170,59 @@ export default function Journal() {
               </div>
 
               <div className="lg:col-span-8 space-y-4 md:space-y-8">
-                {section.entries.map((entry, entryIdx) => (
-                  <article key={entryIdx} className="group cursor-pointer flex flex-col md:flex-row justify-between md:items-center py-6 border-b border-zinc-800/30 hover:border-orange-500/30 transition-colors gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-500">{entry.date}</span>
-                        <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                        <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-600 hidden sm:block">{entry.readTime} read</span>
+                {section.entries.map((entry, entryIdx) => {
+                  const formattedDate = new Date(entry.date).toLocaleDateString('en-US', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                  });
+                  return (
+                    <article 
+                      key={entryIdx} 
+                      onClick={() => setSelectedEntry(entry)}
+                      className="group cursor-pointer flex flex-col md:flex-row justify-between md:items-center py-6 border-b border-zinc-800/30 hover:border-orange-500/30 transition-colors gap-4"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                          <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-500">{formattedDate}</span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
+                          <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-600 hidden sm:block">{getReadTime(entry.body)} read</span>
+                        </div>
+                        <h3 className="font-serif text-xl md:text-2xl text-zinc-300 group-hover:text-white transition-colors duration-300">
+                          {entry.title}
+                        </h3>
                       </div>
-                      <h3 className="font-serif text-xl md:text-2xl text-zinc-300 group-hover:text-white transition-colors duration-300">{entry.title}</h3>
-                    </div>
-                    <div className="mt-2 md:mt-0 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-4 group-hover:translate-x-0 duration-500 hidden md:block">
-                      <ExploreArrow direction="right" label="Explore" />
-                    </div>
-                    {/* Mobile arrow */}
-                    <div className="md:hidden mt-2">
-                       <ExploreArrow direction="right" label="Explore" />
-                    </div>
-                  </article>
-                ))}
+                      <div className="mt-2 md:mt-0 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-4 group-hover:translate-x-0 duration-500 hidden md:block">
+                        <ExploreArrow direction="right" label="Explore" />
+                      </div>
+                      {/* Mobile arrow */}
+                      <div className="md:hidden mt-2">
+                         <ExploreArrow direction="right" label="Explore" />
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </motion.section>
           ))}
         </div>
 
-        <div className="flex justify-center mt-16 mb-24">
-           <ExploreArrow label="Explore Deeper" direction="down" />
-        </div>
-
         <Footer />
       </div>
+
+      {/* Dynamic Content Overlay Modal */}
+      <AnimatePresence>
+        {selectedEntry && (
+          <ContentModal 
+            isOpen={!!selectedEntry}
+            onClose={() => setSelectedEntry(null)}
+            title={selectedEntry.title}
+            category={selectedEntry.category}
+            date={new Date(selectedEntry.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+            coverImage={selectedEntry.coverImage}
+            excerpt={selectedEntry.excerpt}
+            body={selectedEntry.body}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

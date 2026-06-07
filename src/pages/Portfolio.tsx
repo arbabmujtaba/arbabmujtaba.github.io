@@ -1,64 +1,11 @@
-import { motion } from 'motion/react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
-
-const engineeringProjects = [
-  {
-    title: "Student Attendance Management System",
-    desc: "A desktop application designed to manage student attendance records efficiently. Includes database integration and a graphical user interface.",
-    tags: ["Java", "MySQL", "Swing"],
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "Network Simulator",
-    desc: "A custom network simulation tool built to model packet transfers, network topologies, and routing algorithms.",
-    tags: ["Python", "Networking"],
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "Kashmiri AI Assistant",
-    desc: "An experimental natural language processing model focusing on interpreting and generating conversational Kashmiri.",
-    tags: ["AI", "NLP"],
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "DSP Surround",
-    desc: "An audio engineering project utilizing C++ to process digital signals and simulate spatial surround sound environments.",
-    tags: ["C++", "Audio Engineering"],
-    image: "https://images.unsplash.com/photo-1618609377866-634612ce6240?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "MoodMix",
-    desc: "An intelligent music discovery tool that leverages machine learning to curate playlists based on real-time spatial audio features and DSP.",
-    tags: ["DSP", "Machine Learning", "Spatial Audio"],
-    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "SpecWars",
-    desc: "A dynamic web-based application utilizing React and Node.js for real-time interactions.",
-    tags: ["React", "Node.js"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "Spotify Backend",
-    desc: "A full-scale backend infrastructure replicating core Spotify features, managing robust REST APIs and database handling.",
-    tags: ["Node.js", "Express", "MongoDB"],
-    image: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "DAVV Login Portal",
-    desc: "A secure authentication portal developed for university administration, integrating session management and relational database structures.",
-    tags: ["PHP", "MySQL"],
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    title: "GeoProject",
-    desc: "A geospatial analysis tool using Python to parse, visualize, and calculate insights from complex geographical datasets.",
-    tags: ["Python", "Geospatial"],
-    image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=80"
-  }
-];
+import ContentModal from '../components/ContentModal';
+import { getPortfolioProjects } from '../lib/cms';
+import { PortfolioProject } from '../types';
 
 const technicalSkills = [
   { category: "Java", items: ["Swing", "JDBC", "OOP", "Desktop Applications"] },
@@ -72,6 +19,11 @@ const technicalSkills = [
 ];
 
 export default function Portfolio() {
+  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+
+  // Load from CMS dynamically
+  const projects = useMemo(() => getPortfolioProjects(), []);
+
   return (
     <motion.div
       key="portfolio"
@@ -125,33 +77,44 @@ export default function Portfolio() {
           </div>
 
           <div className="space-y-24 md:space-y-32 mb-32">
-            {engineeringProjects.map((project, idx) => (
-              <div key={idx} className="group flex flex-col lg:flex-row gap-8 lg:gap-16">
-                <div className="lg:w-[45%] order-2 lg:order-1 flex flex-col justify-center">
-                  <span className="font-sans text-[9px] text-orange-500/80 mb-4 tracking-[0.2em] font-light">0{idx + 1}</span>
-                  <h3 className="font-serif text-3xl md:text-4xl text-zinc-100 mb-6">{project.title}</h3>
-                  <p className="font-sans text-zinc-400 text-sm font-light leading-relaxed mb-8 max-w-md">
-                    {project.desc}
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    {project.tags.map(tag => (
-                      <span key={tag} className="font-sans text-[9px] uppercase tracking-widest text-zinc-500 border border-zinc-800 px-3 py-1 bg-zinc-900/30">{tag}</span>
-                    ))}
+            {projects.map((project, idx) => {
+              // Extract string array tags
+              const tags: string[] = Array.isArray(project.techStack) 
+                ? project.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
+                : [];
+
+              return (
+                <div 
+                  key={idx} 
+                  onClick={() => setSelectedProject(project)}
+                  className="group flex flex-col lg:flex-row gap-8 lg:gap-16 cursor-pointer"
+                >
+                  <div className="lg:w-[45%] order-2 lg:order-1 flex flex-col justify-center">
+                    <span className="font-sans text-[9px] text-orange-500 mb-4 tracking-[0.2em] font-light">0{idx + 1}</span>
+                    <h3 className="font-serif text-3xl md:text-4xl text-zinc-100 mb-6 group-hover:text-amber-100 transition-colors">{project.title}</h3>
+                    <p className="font-sans text-zinc-400 text-sm font-light leading-relaxed mb-8 max-w-md">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map((tag, tagIdx) => (
+                        <span key={tagIdx} className="font-sans text-[9px] uppercase tracking-widest text-zinc-500 border border-zinc-850 px-3 py-1 bg-zinc-900/30">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="lg:w-[55%] order-1 lg:order-2">
+                    <div className="aspect-[4/3] bg-zinc-900 border border-zinc-800/50 relative overflow-hidden flex items-center justify-center group-hover:border-orange-500/30 transition-colors duration-700">
+                      <ParallaxImage 
+                        src={project.projectImage}
+                        alt={project.title}
+                        className="w-full h-full opacity-60 mix-blend-luminosity"
+                        imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-tr from-zinc-950/80 to-transparent pointer-events-none"></div>
+                    </div>
                   </div>
                 </div>
-                <div className="lg:w-[55%] order-1 lg:order-2">
-                  <div className="aspect-[4/3] bg-zinc-900 border border-zinc-800/50 relative overflow-hidden flex items-center justify-center group-hover:border-orange-500/30 transition-colors duration-700">
-                    <ParallaxImage 
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full opacity-60 mix-blend-luminosity"
-                      imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-zinc-950/80 to-transparent pointer-events-none"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="border-t border-zinc-800/80 pt-16 mt-32 mb-24">
@@ -178,6 +141,28 @@ export default function Portfolio() {
 
         <Footer />
       </div>
+
+      {/* Immersive overlay metadata viewer */}
+      <AnimatePresence>
+        {selectedProject && (
+          <ContentModal 
+            isOpen={!!selectedProject}
+            onClose={() => setSelectedProject(null)}
+            title={selectedProject.title}
+            category="Case Study"
+            coverImage={selectedProject.projectImage}
+            excerpt={selectedProject.description}
+            body={selectedProject.body}
+            metadata={{
+              githubLink: selectedProject.githubLink,
+              liveLink: selectedProject.liveLink,
+              techStack: Array.isArray(selectedProject.techStack) 
+                ? selectedProject.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
+                : []
+            }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -1,15 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, Database, Server, Cpu, Cpu as Microchip, Network, Code2, Headphones, Activity, ArrowRight, ChevronDown } from 'lucide-react';
-import ExploreArrow from '../components/ExploreArrow';
 import Footer from '../components/Footer';
-
-const techNews = [
-  { title: "The rise of local-first software architecture", date: "2026.06.02", category: "Architecture" },
-  { title: "React compiler and the end of manual memoization", date: "2026.05.15", category: "React" },
-  { title: "Transitioning toward memory-safe languages in systems", date: "2026.04.10", category: "Systems" },
-  { title: "Advancements in LLM context windows", date: "2026.03.22", category: "Artificial Intelligence" }
-];
+import ContentModal from '../components/ContentModal';
+import { getTechEntries } from '../lib/cms';
+import { TechEntry } from '../types';
 
 const techILike = {
   "Ecosystems": ["TypeScript", "Java", "Python", "C++"],
@@ -17,74 +12,6 @@ const techILike = {
   "Systems": ["Linux", "MySQL", "MongoDB", "LoRaWAN"],
   "Domains": ["Networking", "DSP", "Audio Engineering", "AI"]
 };
-
-const buildLogs = [
-  {
-    id: "log-1",
-    title: "Simulating Network Topologies",
-    category: "Networking",
-    tags: ["Python", "Networking", "Systems"],
-    status: "Active",
-    date: "2026.05.10",
-    story: "Building a custom network simulation tool to model packet transfers, network topologies, and routing algorithms. The core challenge was implementing a reliable transmission protocol over an unreliable simulated medium without bottlenecking the main execution thread.",
-    diagram: `
-  [Node A] --(Simulated Link)--> [Router] --(Lossy Medium)--> [Node B]
-     |                              |                            |
-     |---[ Buffer ]                 |---[ Routing Table ]        |---[ Reassembly ]
-     |---[ Retransmission ]         |---[ Congestion Ctrl]       |---[ ACK Queue ]
-    `
-  },
-  {
-    id: "log-2",
-    title: "Real-time DSP Surround Engine",
-    category: "Audio Engineering",
-    tags: ["C++", "DSP", "Spatial Audio"],
-    status: "Completed",
-    date: "2026.03.05",
-    story: "An exploration into processing digital signals using C++ to simulate spatial surround sound environments. We had to dig deep into Fast Fourier Transforms (FFT) and Head-Related Transfer Functions (HRTF) to create a convincing spatial illusion using just stereo headphones.",
-    diagram: `
-   [Input Signal] ----> [ FFT ] ----> [ HRTF Convolution ] ----> [ IFFT ] ----> [ Output L/R ]
-                          |                     ^                                  ^
-                          |                     |                                  |
-                          +---> [ Analyzer ] ---+                                  |
-                                                                                   |
-   [Spatial Metadata] -------------------------------------------------------------+
-    `
-  },
-  {
-    id: "log-3",
-    title: "Java Swing Persistence Layer",
-    category: "Systems",
-    tags: ["Java", "MySQL", "Swing"],
-    status: "Archived",
-    date: "2025.11.20",
-    story: "Architecting a desktop application for student attendance. The goal was to build a robust GUI using Java Swing while maintaining a highly normalized MySQL database structure. Implementing an event-driven architecture decoupled the UI from the database transactions.",
-    diagram: `
-  [ Swing GUI ] <---> [ Action Listeners ] <---> [ Service Layer ]
-                                                        |
-                                                        v
-  [ MySQL DB ]  <------------------------------> [ JDBC DAO Layer ]
-    `
-  },
-  {
-    id: "log-4",
-    title: "Event Loop Optimizations",
-    category: "Programming",
-    tags: ["Node.js", "Express", "Backend"],
-    status: "Active",
-    date: "2026.02.14",
-    story: "Addressing event loop blockage in heavy REST APIs. By offloading complex data transformations and machine learning inference tasks to worker threads, we managed to stabilize the latency for concurrent requests.",
-    diagram: `
-  [ Main Thread (Event Loop) ] ---> [ Task Route ] ---> | Non-Blocking | ---> [ Response ]
-        |
-        +-- (Heavy Task) --> [ Worker Thread Pool ]
-                                   |
-                             [ Computation ]
-                                   |
-        <----- (Result) -----------+
-    `
-  }
-];
 
 const experiments = [
   { title: "Kashmiri AI Assistant", tag: "Artificial Intelligence", preview: "Training experimental NLP models to interpret and generate conversational Kashmiri." },
@@ -95,12 +22,25 @@ const experiments = [
 
 export default function Tech() {
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<TechEntry | null>(null);
 
-  const toggleLog = (id: string) => {
-    if (expandedLog === id) {
+  // Load from Decap CMS
+  const logs = useMemo(() => getTechEntries(), []);
+
+  // Filter for tech news section dynamically based on category
+  const techNews = useMemo(() => {
+    return logs.slice(0, 4).map(l => ({
+      title: l.title,
+      date: new Date(l.date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      category: l.category
+    }));
+  }, [logs]);
+
+  const toggleLog = (slug: string) => {
+    if (expandedLog === slug) {
       setExpandedLog(null);
     } else {
-      setExpandedLog(id);
+      setExpandedLog(slug);
     }
   };
 
@@ -158,73 +98,74 @@ export default function Tech() {
             </div>
             
             <div className="space-y-6">
-              {buildLogs.map((log) => (
-                <div key={log.id} className="border border-zinc-800/40 bg-zinc-900/20 overflow-hidden transition-colors hover:border-zinc-700/50">
-                  <div 
-                    onClick={() => toggleLog(log.id)}
-                    className="p-6 md:p-8 cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-6"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="font-sans text-[10px] uppercase tracking-widest text-orange-500/80">{log.category}</span>
-                        <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-                        <span className="font-mono text-[10px] text-zinc-500">{log.date}</span>
+              {logs.map((log) => {
+                const formattedDate = new Date(log.date).toLocaleDateString('en-US', {
+                  year: 'numeric', month: '2-digit', day: '2-digit'
+                }).replace(/\//g, '.');
+
+                return (
+                  <div key={log.slug} className="border border-zinc-850 bg-zinc-900/10 overflow-hidden transition-colors hover:border-zinc-800/80">
+                    <div 
+                      onClick={() => toggleLog(log.slug)}
+                      className="p-6 md:p-8 cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-6"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="font-sans text-[10px] uppercase tracking-widest text-orange-500">{log.category}</span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-800"></span>
+                          <span className="font-mono text-[10px] text-zinc-500">{formattedDate}</span>
+                        </div>
+                        <h3 className="font-serif text-2xl text-zinc-200 group-hover:text-white transition-colors">{log.title}</h3>
                       </div>
-                      <h3 className="font-serif text-2xl text-zinc-200">{log.title}</h3>
+                      <div className="flex items-center gap-6">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedEntry(log);
+                          }}
+                          className="font-sans text-[10px] uppercase tracking-widest border border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900 px-3 py-1.5 text-zinc-300 rounded-sm hover:border-orange-500/30 transition-all cursor-pointer"
+                        >
+                          Deep Read Link
+                        </button>
+                        <div className={`transform transition-transform duration-300 ${expandedLog === log.slug ? 'rotate-180' : ''}`}>
+                          <ChevronDown className="w-5 h-5 text-zinc-500" />
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2">
-                         <span className={`w-1.5 h-1.5 rounded-full ${
-                           log.status === 'Active' ? 'bg-orange-500 animate-pulse' : 
-                           log.status === 'Completed' ? 'bg-zinc-500' : 'bg-zinc-700'
-                         }`}></span>
-                         <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-400">{log.status}</span>
-                      </div>
-                      <div className={`transform transition-transform duration-300 ${expandedLog === log.id ? 'rotate-180' : ''}`}>
-                        <ChevronDown className="w-5 h-5 text-zinc-500" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <AnimatePresence>
-                    {expandedLog === log.id && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden border-t border-zinc-800/40"
-                      >
-                        <div className="p-6 md:p-8 bg-zinc-950/50">
-                          <div className="mb-8">
-                            <h4 className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 mb-4">Implementation Story</h4>
-                            <p className="font-sans text-sm lg:text-base text-zinc-400 font-light leading-relaxed">
-                              {log.story}
-                            </p>
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 mb-4">System Diagram</h4>
-                            <div className="p-6 bg-zinc-900 border border-zinc-800/50 overflow-x-auto custom-scrollbar">
-                              <pre className="font-mono text-[10px] sm:text-xs text-orange-500/70 leading-relaxed">
-                                {log.diagram}
-                              </pre>
+                    
+                    <AnimatePresence>
+                      {expandedLog === log.slug && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                          className="overflow-hidden border-t border-zinc-850"
+                        >
+                          <div className="p-6 md:p-8 bg-zinc-950/30">
+                            <div className="mb-4">
+                              <h4 className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 mb-4">Implementation Snapshot</h4>
+                              <p className="font-sans text-sm lg:text-base text-zinc-400 font-light leading-relaxed">
+                                {log.excerpt}
+                              </p>
+                            </div>
+                            
+                            <div className="mt-6">
+                              <button 
+                                onClick={() => setSelectedEntry(log)}
+                                className="font-sans text-xs text-orange-500 hover:text-orange-400 font-semibold group flex items-center gap-1 cursor-pointer"
+                              >
+                                View full story detail and code diagrams
+                                <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                              </button>
                             </div>
                           </div>
-                          
-                          <div className="mt-8 flex flex-wrap gap-3">
-                            {log.tags.map(tag => (
-                              <span key={tag} className="font-sans text-[9px] uppercase tracking-widest text-zinc-500 border border-zinc-800 px-3 py-1 bg-zinc-900/30">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
             </div>
           </motion.section>
 
@@ -242,10 +183,10 @@ export default function Tech() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {experiments.map((note, idx) => (
-                <div key={idx} className="group cursor-pointer border border-zinc-800/40 bg-zinc-900/20 p-8 flex flex-col hover:border-orange-500/30 transition-colors">
+                <div key={idx} className="group border border-zinc-850 bg-zinc-900/10 p-8 flex flex-col hover:border-orange-500/20 transition-colors">
                    <div className="flex justify-between items-center mb-6">
                      <span className="px-3 py-1 border border-zinc-800 bg-zinc-950/50 text-orange-500/70 font-sans text-[9px] uppercase tracking-widest">{note.tag}</span>
-                     <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100 group-hover:-rotate-45" />
+                     <ArrowRight className="w-4 h-4 text-zinc-650 group-hover:text-zinc-300 transition-colors -rotate-45" />
                    </div>
                    <h3 className="font-serif text-2xl text-zinc-200 mb-4">{note.title}</h3>
                    <p className="font-sans text-sm text-zinc-500 font-light leading-relaxed mt-auto">{note.preview}</p>
@@ -266,16 +207,16 @@ export default function Tech() {
             >
               <div className="flex items-center gap-4 border-b border-zinc-800/80 pb-6 mb-8">
                 <Activity className="w-5 h-5 text-orange-500/80" strokeWidth={1.5} />
-                <h2 className="font-serif text-2xl text-zinc-200">Tech News</h2>
+                <h2 className="font-serif text-2xl text-zinc-200">Tech Logs</h2>
               </div>
               <div className="flex flex-col gap-4">
                 {techNews.map((news, idx) => (
-                  <div key={idx} className="group cursor-pointer border border-zinc-800/40 bg-zinc-900/10 p-5 hover:bg-zinc-900/40 hover:border-zinc-700 transition-colors">
+                  <div key={idx} className="border border-zinc-850 bg-zinc-900/10 p-5 transition-colors">
                     <div className="flex justify-between items-center mb-3">
                       <span className="font-sans text-[9px] uppercase tracking-widest text-zinc-500">{news.category}</span>
                       <span className="font-mono text-[9px] text-zinc-600">{news.date}</span>
                     </div>
-                    <h3 className="font-sans text-sm md:text-base text-zinc-300 group-hover:text-zinc-100 transition-colors leading-relaxed">{news.title}</h3>
+                    <h3 className="font-sans text-sm md:text-base text-zinc-300 leading-relaxed">{news.title}</h3>
                   </div>
                 ))}
               </div>
@@ -313,7 +254,7 @@ export default function Tech() {
                   </div>
                 ))}
               </div>
-            </motion.section>
+             </motion.section>
 
           </div>
 
@@ -321,7 +262,21 @@ export default function Tech() {
 
         <Footer />
       </div>
+
+      {/* Dynamic Overlay detail */}
+      <AnimatePresence>
+        {selectedEntry && (
+          <ContentModal 
+            isOpen={!!selectedEntry}
+            onClose={() => setSelectedEntry(null)}
+            title={selectedEntry.title}
+            category={selectedEntry.category}
+            date={new Date(selectedEntry.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+            excerpt={selectedEntry.excerpt}
+            body={selectedEntry.body}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
-

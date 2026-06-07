@@ -1,0 +1,88 @@
+backend:
+  name: github
+  repo: arbabandjones/portfolio
+  branch: main
+
+# Enable local development proxy support
+local_backend: true
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "journal"
+    label: "Journal"
+    folder: "content/journal"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Date", name: "date", widget: "date" }
+      - { label: "Category", name: "category", widget: "select", options: ["Life", "People", "Travel", "Thoughts", "Milestones"] }
+      - { label: "Cover Image", name: "coverImage", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "tech"
+    label: "Tech Logs"
+    folder: "content/tech"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Date", name: "date", widget: "date" }
+      - { label: "Category", name: "category", widget: "select", options: ["Tech News", "Things I Like", "Build Logs", "Experiments", "Linux", "Networking", "Programming"] }
+      - { label: "Cover Image", name: "coverImage", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "photography"
+    label: "Photography"
+    folder: "content/photography"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Date", name: "date", widget: "date" }
+      - { label: "Category", name: "category", widget: "select", options: ["Favorites", "Life", "Connected", "Travel", "Behind The Shot", "Gear"] }
+      - { label: "Cover Image", name: "coverImage", widget: "image" }
+      - { label: "Gallery Images", name: "galleryImages", widget: "list", field: { label: "Image", name: "image", widget: "image" } }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Story", name: "story", widget: "markdown" }
+
+  - name: "collection"
+    label: "Collections"
+    folder: "content/collection"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Category", name: "category", widget: "select", options: ["Uses", "Music", "Books", "Gear", "Timeline", "Inspirations", "Favorites"] }
+      - { label: "Cover Image", name: "coverImage", widget: "image", required: false }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "portfolio"
+    label: "Portfolio Projects"
+    folder: "content/portfolio"
+    create: true
+    slug: "{{slug}}"
+    format: "frontmatter"
+    fields:
+      - { label: "Project Name", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Tech Stack", name: "techStack", widget: "list", field: { label: "Tech", name: "tech", widget: "string" } }
+      - { label: "GitHub Link", name: "githubLink", widget: "string", required: false }
+      - { label: "Live Link", name: "liveLink", widget: "string", required: false }
+      - { label: "Project Image", name: "projectImage", widget: "image" }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false }
+      - { label: "Body", name: "body", widget: "markdown" }
