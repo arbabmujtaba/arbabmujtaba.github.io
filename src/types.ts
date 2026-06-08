@@ -24,7 +24,7 @@ export interface PhotographyEntry {
   date: string;
   category: "Favorites" | "Life" | "Connected" | "Travel" | "Behind The Shot" | "Gear";
   coverImage: string;
-  galleryImages: string[] | { image: string }[];
+  galleryImages: string[];
   description: string;
   story: string;
 }
@@ -42,7 +42,7 @@ export interface PortfolioProject {
   title: string; // "Project Name" mapped to title for consistency
   slug: string;
   description: string;
-  techStack: string[] | { tech: string }[];
+  techStack: string[];
   githubLink?: string;
   liveLink?: string;
   projectImage: string;

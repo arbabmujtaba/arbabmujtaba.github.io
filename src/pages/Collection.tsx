@@ -4,6 +4,7 @@ import { Monitor, Cpu, BookOpen, Music, Glasses, Layers, Disc3, Clock, Compass, 
 import ExploreArrow from '../components/ExploreArrow';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
+import EditButton from '../components/EditButton';
 import { getCollectionEntries } from '../lib/cms';
 import { CollectionEntry } from '../types';
 
@@ -185,8 +186,26 @@ export default function Collection() {
                       setSelectedEntry(influence as CollectionEntry);
                     }
                   }}
-                  className={`group flex flex-col gap-3 ${influence.body ? 'cursor-pointer' : ''}`}
+                  className={`relative group flex flex-col gap-3 ${influence.body ? 'cursor-pointer' : ''}`}
                 >
+                  {influence.slug && (
+                    <EditButton
+                      item={{
+                        type: 'collection',
+                        slug: influence.slug,
+                        filePath: `/content/collection/${influence.slug}.md`,
+                        title: influence.title,
+                        data: {
+                          title: influence.title,
+                          slug: influence.slug,
+                          category: influence.category,
+                          coverImage: influence.coverImage,
+                          description: influence.description,
+                        },
+                        body: influence.body,
+                      }}
+                    />
+                  )}
                   <div className="flex justify-between items-start">
                      <span className="font-serif text-xl md:text-2xl text-zinc-200 group-hover:text-orange-100 transition-colors">{influence.title}</span>
                      <span className="font-sans text-[9px] uppercase tracking-widest text-orange-500 shrink-0 mt-2 ml-4 px-2 py-1 bg-orange-500/10 rounded-sm">{influence.category}</span>
@@ -228,8 +247,25 @@ export default function Collection() {
                 onClick={() => {
                   if (track.body) setSelectedEntry(track as CollectionEntry);
                 }}
-                className={`group ${track.body ? 'cursor-pointer' : ''}`}
+                className={`relative group ${track.body ? 'cursor-pointer' : ''}`}
               >
+                {track.slug && (
+                  <EditButton
+                    item={{
+                      type: 'collection',
+                      slug: track.slug,
+                      filePath: `/content/collection/${track.slug}.md`,
+                      title: track.title,
+                      data: {
+                        title: track.title,
+                        slug: track.slug,
+                        category: track.category,
+                        description: track.description,
+                      },
+                      body: track.body,
+                    }}
+                  />
+                )}
                   <div className="aspect-square bg-zinc-900 border border-zinc-800/50 mb-6 relative overflow-hidden group-hover:border-orange-500/40 transition-colors">
                     <div className="absolute inset-0 bg-gradient-to-tr from-zinc-900 via-zinc-800/20 to-zinc-900"></div>
                     <div className="absolute inset-0 flex items-center justify-center">

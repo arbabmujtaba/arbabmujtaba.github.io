@@ -28,7 +28,9 @@ export default function EditButton({ item }: EditButtonProps) {
   return (
     <motion.button
       initial={{ opacity: 0, scale: 0.8 }}
-      whileHover={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ opacity: 1, scale: 1.05 }}
+      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       onClick={handleEdit}
       className="absolute -top-3 -right-3 z-30 bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full shadow-lg transition-colors"
       title="Edit this content"

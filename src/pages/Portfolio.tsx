@@ -80,15 +80,16 @@ export default function Portfolio() {
           <div className="space-y-24 md:space-y-32 mb-32">
             {projects.map((project, idx) => {
               // Extract string array tags
-              const tags: string[] = Array.isArray(project.techStack) 
-                ? project.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
-                : [];
+              const tags: string[] = project.techStack || [];
 
               return (
                 <div 
                   key={idx} 
                   onClick={() => setSelectedProject(project)}
+                  onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(project)}
                   className="group flex flex-col lg:flex-row gap-8 lg:gap-16 cursor-pointer relative"
+                  role="button"
+                  tabIndex={0}
                 >
                   <EditButton 
                     item={{
@@ -176,9 +177,7 @@ export default function Portfolio() {
             metadata={{
               githubLink: selectedProject.githubLink,
               liveLink: selectedProject.liveLink,
-              techStack: Array.isArray(selectedProject.techStack) 
-                ? selectedProject.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
-                : []
+              techStack: selectedProject.techStack || []
             }}
           />
         )}

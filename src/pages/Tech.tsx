@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, Database, Server, Cpu, Cpu as Microchip, Network, Code2, Headphones, Activity, ArrowRight, ChevronDown } from 'lucide-react';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
+import EditButton from '../components/EditButton';
 import { getTechEntries } from '../lib/cms';
 import { TechEntry } from '../types';
 
@@ -104,7 +105,24 @@ export default function Tech() {
                 }).replace(/\//g, '.');
 
                 return (
-                  <div key={log.slug} className="border border-zinc-850 bg-zinc-900/10 overflow-hidden transition-colors hover:border-zinc-800/80">
+                  <div key={log.slug} className="relative border border-zinc-850 bg-zinc-900/10 overflow-hidden transition-colors hover:border-zinc-800/80">
+                    <EditButton
+                      item={{
+                        type: 'tech',
+                        slug: log.slug,
+                        filePath: `/content/tech/${log.slug}.md`,
+                        title: log.title,
+                        data: {
+                          title: log.title,
+                          slug: log.slug,
+                          date: log.date,
+                          category: log.category,
+                          coverImage: log.coverImage,
+                          excerpt: log.excerpt,
+                        },
+                        body: log.body,
+                      }}
+                    />
                     <div 
                       onClick={() => toggleLog(log.slug)}
                       className="p-6 md:p-8 cursor-pointer flex flex-col md:flex-row justify-between md:items-center gap-6"

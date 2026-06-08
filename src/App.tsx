@@ -16,6 +16,20 @@ import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import { AdminProvider } from './context/AdminContext';
 import AdminAuthModal from './components/AdminAuthModal';
 import EditModal from './components/EditModal';
+import { useAdmin } from './context/AdminContext';
+
+function GlobalEditBanner() {
+  const { isAuthenticated } = useAdmin();
+  if (!isAuthenticated) return null;
+
+  return (
+    <div className="fixed bottom-24 right-6 z-[120] pointer-events-none">
+      <div className="rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-100 px-4 py-2 text-xs uppercase tracking-[0.3em] font-semibold backdrop-blur-sm shadow-lg shadow-black/20">
+        Admin edit mode active
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [view, setView] = useState('home');
@@ -62,6 +76,7 @@ export default function App() {
           </AnimatePresence>
 
           <FloatingMagicalArrow />
+          <GlobalEditBanner />
           
           {/* Decorative corner accents */}
           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-zinc-500/30"></div>
