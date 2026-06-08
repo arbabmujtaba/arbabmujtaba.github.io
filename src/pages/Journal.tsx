@@ -4,7 +4,6 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
-import EditButton from '../components/EditButton';
 import { getJournalEntries } from '../lib/cms';
 import { JournalEntry } from '../types';
 import { Disc3 } from 'lucide-react';
@@ -179,25 +178,8 @@ export default function Journal() {
                     <article 
                       key={entryIdx} 
                       onClick={() => setSelectedEntry(entry)}
-                      className="group cursor-pointer flex flex-col md:flex-row justify-between md:items-center py-6 border-b border-zinc-800/30 hover:border-orange-500/30 transition-colors gap-4 relative"
+                      className="group cursor-pointer flex flex-col md:flex-row justify-between md:items-center py-6 border-b border-zinc-800/30 hover:border-orange-500/30 transition-colors gap-4"
                     >
-                      <EditButton 
-                        item={{
-                          type: 'journal',
-                          slug: entry.slug,
-                          filePath: `/content/journal/${entry.slug}.md`,
-                          title: entry.title,
-                          data: {
-                            title: entry.title,
-                            slug: entry.slug,
-                            date: entry.date,
-                            category: entry.category,
-                            coverImage: entry.coverImage,
-                            excerpt: entry.excerpt,
-                          },
-                          body: entry.body,
-                        }}
-                      />
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-3">
                           <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-500">{formattedDate}</span>

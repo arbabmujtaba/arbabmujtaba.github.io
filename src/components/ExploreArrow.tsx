@@ -20,10 +20,7 @@ export default function ExploreArrow({ label = "Explore deeper", onClick, direct
   return (
     <motion.div 
       className="group inline-flex items-center gap-4 cursor-pointer"
-      onClick={(event) => {
-        event.stopPropagation();
-        onClick?.();
-      }}
+      onClick={onClick}
       whileHover="hover"
       initial="rest"
     >

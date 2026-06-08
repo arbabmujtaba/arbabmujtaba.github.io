@@ -2,69 +2,143 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, Sparkle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+// Get and sort the unique scroll target offsets within the scrollable container
+const getScrollTargets = (container: HTMLElement) => {
+  const targets: number[] = [0];
+  
+  // Direct children of the scroll container
+  const directChildren = Array.from(container.children);
+  directChildren.forEach(child => {
+    const htmlChild = child as HTMLElement;
+    if (htmlChild.offsetHeight > 100) {
+      targets.push(htmlChild.offsetTop);
+    }
+  });
+
+  // Query nested logical sections or elements
+  const customElements = Array.from(container.querySelectorAll('section, article, .border-t, [class*="section"]'));
+  customElements.forEach(el => {
+    const htmlEl = el as HTMLElement;
+    if (htmlEl.offsetHeight > 100) {
+      targets.push(htmlEl.offsetTop);
+    }
+  });
+
+  // Sort and filter duplicate/overlapping scroll target values
+  const sorted = Array.from(new Set(targets))
+    .map(t => Math.round(t))
+    .sort((a, b) => a - b);
+
+  const uniqueTargets: number[] = [];
+  sorted.forEach(t => {
+    if (uniqueTargets.length === 0) {
+      uniqueTargets.push(t);
+    } else {
+      const last = uniqueTargets[uniqueTargets.length - 1];
+      if (t - last > 120) {
+        uniqueTargets.push(t);
+      }
+    }
+  });
+
+  // Append maxScroll if not already closely present
+  const maxScroll = container.scrollHeight - container.clientHeight;
+  if (maxScroll > 0 && !uniqueTargets.some(t => Math.abs(t - maxScroll) < 100)) {
+    uniqueTargets.push(maxScroll);
+  }
+
+  return uniqueTargets.sort((a, b) => a - b);
+};
+
 export default function FloatingMagicalArrow() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isScrollable, setIsScrollable] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
+    const updateScrollState = () => {
+      // Find the active, currently displayed scroll container in the viewport
+      const container = Array.from(document.querySelectorAll('.custom-scrollbar')).find(
+        el => el.getBoundingClientRect().width > 0
+      ) as HTMLElement | null;
+
+      if (container) {
+        const maxScroll = container.scrollHeight - container.clientHeight;
+        setIsScrollable(maxScroll > 50);
+        setIsAtBottom(container.scrollTop >= maxScroll - 45);
+      } else {
+        setIsScrollable(false);
+        setIsAtBottom(false);
+      }
+    };
+
     const handleScroll = (e: Event) => {
       const target = e.target as HTMLElement;
       if (target && target.classList && target.classList.contains('custom-scrollbar')) {
-        if (target.scrollHeight - target.scrollTop <= target.clientHeight + 200) {
-          setIsVisible(false);
-        } else {
-          setIsVisible(true);
-        }
+        const maxScroll = target.scrollHeight - target.clientHeight;
+        setIsScrollable(maxScroll > 50);
+        setIsAtBottom(target.scrollTop >= maxScroll - 45);
       }
     };
 
+    // Use capturing event listener to intercept all scroll events inside custom-scrollbar elements
     window.addEventListener('scroll', handleScroll, true);
-    
-    // Initial check
-    setTimeout(() => {
-      const container = document.querySelector('.custom-scrollbar');
-      if (container) {
-        if (container.scrollHeight <= container.clientHeight + 200) {
-          setIsVisible(false);
-        } else {
-          setIsVisible(true);
-        }
-      }
-    }, 500);
+
+    // Periodically sweep the DOM to keep scroll controls synchronized with dynamically loaded contents
+    const interval = setInterval(updateScrollState, 400);
+    updateScrollState();
 
     return () => {
       window.removeEventListener('scroll', handleScroll, true);
+      clearInterval(interval);
     };
   }, []);
 
-  const scrollDown = () => {
-    const container = document.querySelector('.custom-scrollbar') as HTMLElement | null;
+  const scrollDown = (e: React.MouseEvent) => {
+    // Avoid double events or bubbles
+    e.stopPropagation();
+    e.preventDefault();
+
+    const container = Array.from(document.querySelectorAll('.custom-scrollbar')).find(
+      el => el.getBoundingClientRect().width > 0
+    ) as HTMLElement | null;
+
     if (!container) return;
 
-    const sections = Array.from(container.querySelectorAll<HTMLElement>('.story-section'));
-    const currentScroll = container.scrollTop;
-    const nextSection = sections.find(section => section.offsetTop > currentScroll + 20);
+    const scrollTop = container.scrollTop;
+    const maxScroll = container.scrollHeight - container.clientHeight;
 
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Scroll to top if we're already at the bottom
+    if (scrollTop >= maxScroll - 45) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    // Get the unique list of section boundary targets
+    const targets = getScrollTargets(container);
+    // Find first target past current scrolling position with 15px fractional buffer
+    const nextTarget = targets.find(t => t > scrollTop + 15);
+
+    if (nextTarget !== undefined) {
+      container.scrollTo({ top: nextTarget, behavior: 'smooth' });
+    } else {
+      container.scrollTo({ top: maxScroll, behavior: 'smooth' });
+    }
   };
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isScrollable && (
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 30, scale: 0.8 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-6 md:bottom-12 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-none"
+          className="fixed bottom-6 md:bottom-12 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-auto"
         >
           <motion.button
             onClick={scrollDown}
-            className="relative group flex items-center justify-center outline-none pointer-events-auto cursor-pointer"
+            className="relative group flex items-center justify-center outline-none pointer-events-auto cursor-pointer border-0 bg-transparent p-0"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
             initial="rest"
             whileHover="hover"
             animate="animate"
@@ -108,17 +182,11 @@ export default function FloatingMagicalArrow() {
               }}
             />
 
-            {/* Icon Group */}
+            {/* Icon Group - Rotates dynamically 180 degrees when isAtBottom is reached */}
             <motion.div
-              variants={{
-                rest: { y: 0 },
-                hover: { y: 10 },
-                animate: { 
-                  y: [0, 8, 0], 
-                  transition: { repeat: Infinity, duration: 2.5, ease: "easeInOut" } 
-                }
-              }}
-              className="relative z-10 text-amber-200 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)] group-hover:text-amber-100 group-hover:drop-shadow-[0_0_20px_rgba(251,191,36,1)] transition-all duration-300 flex items-center justify-center"
+              animate={{ rotate: isAtBottom ? 180 : 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+              className="relative z-10 text-amber-200 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)] group-hover:text-amber-100 group-hover:drop-shadow-[0_0_20px_rgba(251,191,36,1)] transition-all duration-300 flex items-center justify-center pointer-events-none"
             >
               <Sparkle className="absolute -top-2 -right-4 w-4 h-4 md:w-5 md:h-5 text-amber-300 animate-pulse opacity-70 drop-shadow-[0_0_8px_rgba(251,191,36,1)]" />
               <Sparkle className="absolute -bottom-1 -left-3 w-3 h-3 text-amber-400 animate-bounce opacity-50 delay-700 drop-shadow-[0_0_5px_rgba(251,191,36,1)]" />

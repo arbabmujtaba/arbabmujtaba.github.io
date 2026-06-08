@@ -5,7 +5,6 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
-import EditButton from '../components/EditButton';
 import { getPhotographyEntries } from '../lib/cms';
 import { PhotographyEntry } from '../types';
 
@@ -120,26 +119,8 @@ export default function Photography() {
                    <div 
                      key={idx} 
                      onClick={() => setSelectedPhoto(photo)}
-                     className="relative cursor-pointer group/photo"
+                     className="cursor-pointer group/photo"
                    >
-                      <EditButton
-                        item={{
-                          type: 'photography',
-                          slug: photo.slug,
-                          filePath: `/content/photography/${photo.slug}.md`,
-                          title: photo.title,
-                          data: {
-                            title: photo.title,
-                            slug: photo.slug,
-                            date: photo.date,
-                            category: photo.category,
-                            coverImage: photo.coverImage,
-                            description: photo.description,
-                            galleryImages: photo.galleryImages,
-                          },
-                          body: photo.story || '',
-                        }}
-                      />
                       <ParallaxImage 
                         src={photo.coverImage}
                         alt={photo.title}
@@ -219,26 +200,8 @@ export default function Photography() {
                 <article 
                   key={idx} 
                   onClick={() => setSelectedPhoto(photo)}
-                  className="relative group cursor-pointer block"
+                  className="group cursor-pointer block"
                 >
-                <EditButton
-                  item={{
-                    type: 'photography',
-                    slug: photo.slug,
-                    filePath: `/content/photography/${photo.slug}.md`,
-                    title: photo.title,
-                    data: {
-                      title: photo.title,
-                      slug: photo.slug,
-                      date: photo.date,
-                      category: photo.category,
-                      coverImage: photo.coverImage,
-                      description: photo.description,
-                      galleryImages: photo.galleryImages,
-                    },
-                    body: photo.story || '',
-                  }}
-                />
                   <div className="relative overflow-hidden mb-6 border border-zinc-850">
                     <ParallaxImage 
                       src={photo.coverImage}
