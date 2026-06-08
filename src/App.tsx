@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
@@ -12,10 +12,27 @@ import Journal from './pages/Journal';
 import Tech from './pages/Tech';
 import Photography from './pages/Photography';
 import Collection from './pages/Collection';
+import Admin from './pages/Admin';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 
 export default function App() {
-  const [view, setView] = useState('home');
+  const [view, setView] = useState(() => {
+    if (window.location.pathname === '/admin') return 'admin';
+    return 'home';
+  });
+
+  // Keep routing synchronized if path parameters differ
+  useEffect(() => {
+    const handleLocationChange = () => {
+      if (window.location.pathname === '/admin') {
+        setView('admin');
+      } else {
+        setView('home');
+      }
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30">
@@ -31,21 +48,23 @@ export default function App() {
       <div className="flex-grow m-3 md:m-6 lg:m-8 border border-zinc-800/50 relative z-10 flex flex-col overflow-hidden">
         
         {/* Header containing Name and Navigation */}
-        <header className="flex w-full justify-between items-start pt-8 px-6 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-8">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: view === 'home' ? 0 : 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-4 md:mt-8 ${view === 'home' ? 'pointer-events-none' : ''}`}
-            onClick={() => setView('home')}
-          >
-            Arbab <span className="italic text-orange-500/80">Mujtaba.</span>
-          </motion.div>
-          
-          <div className="pt-4 md:pt-8 z-50">
-            <Navigation activeView={view} setView={setView} />
-          </div>
-        </header>
+        {view !== 'admin' && (
+          <header className="flex w-full justify-between items-start pt-8 px-6 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: view === 'home' ? 0 : 1, y: 0 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+              className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-4 md:mt-8 ${view === 'home' ? 'pointer-events-none' : ''}`}
+              onClick={() => setView('home')}
+            >
+              Arbab <span className="italic text-orange-500/80">Mujtaba.</span>
+            </motion.div>
+            
+            <div className="pt-4 md:pt-8 z-50">
+              <Navigation activeView={view} setView={setView} />
+            </div>
+          </header>
+        )}
 
         {/* Main Content Area Routing */}
         <AnimatePresence mode="wait">
@@ -55,9 +74,10 @@ export default function App() {
           {view === 'tech' && <Tech key="tech" />}
           {view === 'photography' && <Photography key="photography" />}
           {view === 'collection' && <Collection key="collection" />}
+          {view === 'admin' && <Admin key="admin" setView={setView} />}
         </AnimatePresence>
 
-        <FloatingMagicalArrow />
+        {view !== 'admin' && <FloatingMagicalArrow />}
         
         {/* Decorative corner accents */}
         <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-zinc-500/30"></div>
