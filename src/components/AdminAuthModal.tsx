@@ -10,15 +10,12 @@ export default function AdminAuthModal() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  if (isAdminMode && isAuthenticated) return null;
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // Verify token by making a test request to GitHub API
       const response = await fetch('https://api.github.com/user', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -30,9 +27,9 @@ export default function AdminAuthModal() {
         throw new Error('Invalid GitHub token');
       }
 
-      // Store token in sessionStorage (not localStorage for security)
       sessionStorage.setItem('github-token', token);
       setIsAuthenticated(true);
+      setIsAdminMode(true);
       setToken('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -44,25 +41,31 @@ export default function AdminAuthModal() {
   const handleToggleAdmin = () => {
     if (!isAdminMode) {
       setIsAdminMode(true);
+    } else if (isAdminMode && !isAuthenticated) {
+      setIsAdminMode(false);
+      setToken('');
+      setError('');
     } else {
       setIsAuthenticated(false);
       setIsAdminMode(false);
       sessionStorage.removeItem('github-token');
       setToken('');
+      setError('');
     }
   };
 
   return (
-    <motion.button
-      onClick={handleToggleAdmin}
-      className="fixed bottom-6 right-6 z-[150] bg-orange-500/10 border border-orange-500/30 text-orange-500 p-3 rounded-full hover:bg-orange-500/20 transition-all duration-300 flex items-center justify-center hover:scale-110"
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
-      title={isAdminMode && isAuthenticated ? 'Exit admin mode' : 'Enter admin mode'}
-    >
-      <Lock size={20} />
+    <div className="fixed bottom-6 right-6 z-[150]">
+      <motion.button
+        onClick={handleToggleAdmin}
+        className={`w-12 h-12 rounded-full border text-orange-500 transition-all duration-300 flex items-center justify-center ${isAuthenticated ? 'bg-orange-500/20 border-orange-500/40 hover:bg-orange-500/30' : 'bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20'}`}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        title={isAuthenticated ? 'Exit admin mode' : 'Open admin login'}
+      >
+        <Lock size={20} />
+      </motion.button>
 
-      {/* Admin Login Modal */}
       {isAdminMode && !isAuthenticated && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -112,7 +115,13 @@ export default function AdminAuthModal() {
           </form>
         </motion.div>
       )}
-    </motion.button>
+
+      {isAuthenticated && (
+        <div className="absolute bottom-full mb-4 right-0 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-green-400 shadow-xl">
+          Admin unlocked
+        </div>
+      )}
+    </div>
   );
 }
 
