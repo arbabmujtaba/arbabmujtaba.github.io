@@ -37,12 +37,19 @@ export default function FloatingMagicalArrow() {
   }, []);
 
   const scrollDown = () => {
-    const containers = document.querySelectorAll('.custom-scrollbar');
-    containers.forEach(container => {
-      if (container.scrollHeight > container.clientHeight) {
-        container.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' });
-      }
-    });
+    const container = document.querySelector('.custom-scrollbar') as HTMLElement | null;
+    if (!container) return;
+
+    const sections = Array.from(container.querySelectorAll<HTMLElement>('.story-section'));
+    const currentScroll = container.scrollTop;
+    const nextSection = sections.find(section => section.offsetTop > currentScroll + 20);
+
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   };
 
   return (

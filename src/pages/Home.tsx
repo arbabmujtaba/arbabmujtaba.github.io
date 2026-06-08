@@ -17,7 +17,7 @@ const StorySection = ({ children, containerRef, index }: { children: React.React
   const { scrollYProgress } = useScroll({
     target: targetRef,
     container: containerRef,
-    offset: ["start end", "center center"]
+    offset: ["start end", "end end"]
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
@@ -34,7 +34,7 @@ const StorySection = ({ children, containerRef, index }: { children: React.React
     <motion.div 
       ref={targetRef} 
       style={{ y, opacity, scale }}
-      className="p-6 md:p-12 lg:p-16 relative z-20 bg-zinc-950/80 backdrop-blur-sm border-t border-zinc-800/30"
+      className="story-section p-6 md:p-12 lg:p-16 relative z-20 bg-zinc-950/80 backdrop-blur-sm border-t border-zinc-800/30"
     >
       {children}
     </motion.div>

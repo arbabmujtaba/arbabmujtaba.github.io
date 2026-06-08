@@ -4,6 +4,7 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
+import EditButton from '../components/EditButton';
 import { getPortfolioProjects } from '../lib/cms';
 import { PortfolioProject } from '../types';
 
@@ -87,8 +88,27 @@ export default function Portfolio() {
                 <div 
                   key={idx} 
                   onClick={() => setSelectedProject(project)}
-                  className="group flex flex-col lg:flex-row gap-8 lg:gap-16 cursor-pointer"
+                  className="group flex flex-col lg:flex-row gap-8 lg:gap-16 cursor-pointer relative"
                 >
+                  <EditButton 
+                    item={{
+                      type: 'portfolio',
+                      slug: project.slug,
+                      filePath: `/content/portfolio/${project.slug}.md`,
+                      title: project.title,
+                      data: {
+                        title: project.title,
+                        slug: project.slug,
+                        description: project.description,
+                        techStack: project.techStack,
+                        githubLink: project.githubLink,
+                        liveLink: project.liveLink,
+                        projectImage: project.projectImage,
+                        featured: project.featured,
+                      },
+                      body: project.body,
+                    }}
+                  />
                   <div className="lg:w-[45%] order-2 lg:order-1 flex flex-col justify-center">
                     <span className="font-sans text-[9px] text-orange-500 mb-4 tracking-[0.2em] font-light">0{idx + 1}</span>
                     <h3 className="font-serif text-3xl md:text-4xl text-zinc-100 mb-6 group-hover:text-amber-100 transition-colors">{project.title}</h3>
