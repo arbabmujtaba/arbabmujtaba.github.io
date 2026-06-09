@@ -40,11 +40,11 @@ export default function QuoteReveal({ quote, author, containerRef }: QuoteReveal
       style={shouldReduceMotion ? undefined : { opacity, y, scale }}
       className="relative z-20 flex min-h-screen items-center justify-center overflow-hidden px-6 py-28 md:px-12 lg:px-16"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.075),transparent_48%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.026),transparent_54%)]" />
       <motion.div
         aria-hidden="true"
         className="absolute left-1/2 top-1/2 h-px w-[70vw] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-orange-400/20 to-transparent"
-        animate={shouldReduceMotion ? undefined : { rotate: [-2, 2, -2], opacity: [0.25, 0.55, 0.25] }}
+        animate={shouldReduceMotion ? undefined : { rotate: [-2, 2, -2], opacity: [0.16, 0.34, 0.16] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
 

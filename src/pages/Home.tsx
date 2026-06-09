@@ -6,11 +6,9 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react';
-import AnimatedGradientBg from '../components/AnimatedGradientBg';
 import CinematicImageReveal from '../components/CinematicImageReveal';
 import EnhancedHeroName from '../components/EnhancedHeroName';
 import Footer from '../components/Footer';
-import MagicParticles from '../components/MagicParticles';
 import MagicalGateway from '../components/MagicalGateway';
 import QuoteReveal from '../components/QuoteReveal';
 import ScrollIndicator from '../components/ScrollIndicator';
@@ -159,7 +157,7 @@ function ArchiveSection({ children, containerRef, className = '' }: ArchiveSecti
         observerRef.current = node;
       }}
       style={shouldReduceMotion ? undefined : { y, opacity, scale }}
-      className={`relative z-20 border-t border-zinc-800/20 bg-[#0a0a09]/82 px-6 py-24 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
+      className={`relative z-20 border-t border-zinc-800/20 bg-[#0a0a09]/58 px-6 py-24 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
       data-seen={seen ? 'true' : 'false'}
     >
       {children}
@@ -240,9 +238,6 @@ export default function Home({ setView }: HomeProps) {
       transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
       className="relative flex h-full flex-grow flex-col overflow-hidden"
     >
-      <AnimatedGradientBg />
-      <MagicParticles />
-
       <div
         ref={containerRef}
         className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto scroll-smooth"

@@ -15,6 +15,7 @@ import Collection from './pages/Collection';
 import Admin from './pages/Admin';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import CursorAura from './components/CursorAura';
+import GlobalBackground from './components/GlobalBackground';
 
 export default function App() {
   const [view, setView] = useState(() => {
@@ -36,14 +37,8 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30">
-      {/* Noise Texture Overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="min-h-screen bg-[#0a0a09] text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30">
+      <GlobalBackground />
 
       <CursorAura />
 
@@ -93,11 +88,11 @@ export default function App() {
                 className="pointer-events-none fixed inset-0 z-[90]"
                 initial={{ opacity: 0.55 }}
                 animate={{ opacity: 0 }}
-                exit={{ opacity: 0.45 }}
+                exit={{ opacity: 0.34 }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   background:
-                    'radial-gradient(circle at center, rgba(249,115,22,0.12), transparent 42%), rgba(10,10,9,0.62)',
+                    'radial-gradient(circle at center, rgba(249,115,22,0.045), transparent 46%), rgba(10,10,9,0.58)',
                 }}
               />
             )}

@@ -145,7 +145,7 @@ export default function FloatingMagicalArrow() {
           >
             {/* Main Ambient Glow */}
             <motion.div
-              className="absolute w-32 h-32 md:w-40 md:h-40 bg-amber-500/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"
+              className="absolute w-32 h-32 md:w-40 md:h-40 bg-orange-500/10 rounded-full blur-3xl mix-blend-screen pointer-events-none"
               variants={{
                 rest: { scale: 0.8, opacity: 0.3 },
                 hover: { scale: 1.2, opacity: 0.6 },
@@ -158,7 +158,7 @@ export default function FloatingMagicalArrow() {
             />
             {/* Core Focused Glow */}
             <motion.div
-              className="absolute w-16 h-16 md:w-20 md:h-20 bg-amber-400/30 rounded-full blur-2xl mix-blend-screen pointer-events-none"
+              className="absolute w-16 h-16 md:w-20 md:h-20 bg-orange-400/16 rounded-full blur-2xl mix-blend-screen pointer-events-none"
               variants={{
                 rest: { scale: 0.8, opacity: 0.5 },
                 hover: { scale: 1.3, opacity: 0.9 },
@@ -171,7 +171,7 @@ export default function FloatingMagicalArrow() {
             />
             {/* Inner Core */}
             <motion.div
-              className="absolute w-8 h-8 md:w-12 md:h-12 bg-yellow-200/40 rounded-full blur-lg mix-blend-screen pointer-events-none"
+              className="absolute w-8 h-8 md:w-12 md:h-12 bg-orange-200/18 rounded-full blur-lg mix-blend-screen pointer-events-none"
               variants={{
                 rest: { opacity: 0.7 },
                 animate: { 
@@ -186,10 +186,10 @@ export default function FloatingMagicalArrow() {
             <motion.div
               animate={{ rotate: isAtBottom ? 180 : 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              className="relative z-10 text-amber-200 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)] group-hover:text-amber-100 group-hover:drop-shadow-[0_0_20px_rgba(251,191,36,1)] transition-all duration-300 flex items-center justify-center pointer-events-none"
+              className="relative z-10 text-orange-200 drop-shadow-[0_0_14px_rgba(251,146,60,0.42)] group-hover:text-orange-100 group-hover:drop-shadow-[0_0_18px_rgba(251,146,60,0.62)] transition-all duration-300 flex items-center justify-center pointer-events-none"
             >
-              <Sparkle className="absolute -top-2 -right-4 w-4 h-4 md:w-5 md:h-5 text-amber-300 animate-pulse opacity-70 drop-shadow-[0_0_8px_rgba(251,191,36,1)]" />
-              <Sparkle className="absolute -bottom-1 -left-3 w-3 h-3 text-amber-400 animate-bounce opacity-50 delay-700 drop-shadow-[0_0_5px_rgba(251,191,36,1)]" />
+              <Sparkle className="absolute -top-2 -right-4 w-4 h-4 md:w-5 md:h-5 text-orange-300 animate-pulse opacity-55 drop-shadow-[0_0_8px_rgba(251,146,60,0.62)]" />
+              <Sparkle className="absolute -bottom-1 -left-3 w-3 h-3 text-orange-400 animate-bounce opacity-40 delay-700 drop-shadow-[0_0_5px_rgba(251,146,60,0.48)]" />
               <ChevronDown className="w-12 h-12 md:w-16 md:h-16" strokeWidth={1} />
             </motion.div>
           </motion.button>

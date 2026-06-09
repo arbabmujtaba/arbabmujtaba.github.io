@@ -109,7 +109,7 @@ export default function Collection() {
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="mb-32 relative"
         >
-          <div className="border-b border-zinc-800/80 pb-4 mb-16 flex items-end justify-between sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
+          <div className="border-b border-zinc-800/80 pb-4 mb-16 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
             <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 01 — Journey</h2>
             <Clock className="w-4 h-4 text-orange-500/80" strokeWidth={1} />
           </div>
@@ -117,7 +117,7 @@ export default function Collection() {
           <div className="relative border-l border-zinc-800/50 pl-8 md:pl-12 space-y-16 py-4 max-w-4xl">
             {timelineMilestones.map((milestone, idx) => (
               <div key={idx} className="relative group">
-                <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-[#0a0a09] border-2 border-zinc-700 group-hover:border-orange-500 transition-colors"></div>
+                <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-[#0a0a09]/72 border-2 border-zinc-700 group-hover:border-orange-500 transition-colors"></div>
                 <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-8 mb-3">
                   <span className="font-mono text-sm md:text-base text-orange-500 shrink-0">{milestone.year}</span>
                   <h3 className="font-serif text-2xl md:text-3xl text-zinc-200">{milestone.title}</h3>
@@ -139,7 +139,7 @@ export default function Collection() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col relative"
           >
-            <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
+            <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 02 — Uses & Gear</h2>
               <Terminal className="w-4 h-4 text-orange-500" strokeWidth={1} />
             </div>
@@ -171,7 +171,7 @@ export default function Collection() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
             className="flex flex-col relative"
           >
-            <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
+            <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 03 — Inspirations</h2>
               <Compass className="w-4 h-4 text-orange-500" strokeWidth={1} />
             </div>
@@ -216,7 +216,7 @@ export default function Collection() {
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col relative max-w-4xl mb-32"
         >
-          <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
+          <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
             <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 04 — Music</h2>
             <Disc3 className="w-4 h-4 text-orange-500/80 animate-[spin_4s_linear_infinite]" strokeWidth={1} />
           </div>

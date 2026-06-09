@@ -92,7 +92,7 @@ export default function Tech() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col relative"
           >
-            <div className="flex items-center gap-4 border-b border-zinc-800/80 pb-6 mb-12 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
+            <div className="flex items-center gap-4 border-b border-zinc-800/80 pb-6 mb-12 sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
               <Terminal className="w-5 h-5 text-orange-500/80" strokeWidth={1.5} />
               <h2 className="font-serif text-3xl text-zinc-200">Build Logs</h2>
             </div>
@@ -177,7 +177,7 @@ export default function Tech() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col relative"
           >
-            <div className="flex items-center gap-4 border-b border-zinc-800/80 pb-6 mb-12 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 pt-10">
+            <div className="flex items-center gap-4 border-b border-zinc-800/80 pb-6 mb-12 sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
               <Microchip className="w-5 h-5 text-orange-500/80" strokeWidth={1.5} />
               <h2 className="font-serif text-3xl text-zinc-200">Experiments & Linux Notes</h2>
             </div>

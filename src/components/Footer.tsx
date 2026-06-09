@@ -3,7 +3,7 @@ import { ArrowRight, Github, Twitter, Linkedin, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-zinc-800/80 mt-32 relative z-10 bg-[#0a0a09]">
+    <footer className="w-full border-t border-zinc-800/70 mt-32 relative z-10 bg-[#0a0a09]/48 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto py-24 md:py-32">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
           
