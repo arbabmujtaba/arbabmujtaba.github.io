@@ -4,9 +4,23 @@ import fs from 'fs-extra';
 import multer from 'multer';
 import matter from 'gray-matter';
 import { createServer as createViteServer } from 'vite';
+import http from 'http';
 
 const app = express();
 const PORT = 3000;
+
+// Enable CORS for Decap CMS local backend development
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Expose-Headers', 'Content-Type, X-Content-Length, X-File-Name');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Enable robust JSON parsing for incoming editor requests
 app.use(express.json({ limit: '50mb' }));
@@ -332,6 +346,72 @@ app.delete('/api/content/:collection/:slug', async (req, res) => {
     res.json({ success: true, message: 'Deleted successfully' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// DECAP CMS GITHUB OAUTH AUTHENTICATION ENDPOINTS
+// ============================================================
+
+/**
+ * POST /api/auth
+ * Handles GitHub OAuth token exchange
+ * Used by Decap CMS for secure GitHub authentication in production
+ */
+app.post('/api/auth', async (req, res) => {
+  try {
+    const { code } = req.body;
+    
+    if (!code) {
+      return res.status(400).json({ error: 'Authorization code required' });
+    }
+
+    if (!process.env.VITE_GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
+      console.warn('GitHub OAuth credentials not configured. Set VITE_GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.');
+      return res.status(501).json({ error: 'OAuth not configured. Use Personal Access Token instead.' });
+    }
+
+    // Import axios dynamically to handle the HTTP request
+    const axios = await import('axios');
+    const response = await axios.default.post('https://github.com/login/oauth/access_token', {
+      client_id: process.env.VITE_GITHUB_CLIENT_ID,
+      client_secret: process.env.GITHUB_CLIENT_SECRET,
+      code,
+      redirect_uri: `${req.protocol}://${req.get('host')}/api/auth/callback`
+    }, {
+      headers: { Accept: 'application/json' }
+    });
+
+    const { access_token, error } = response.data;
+    
+    if (error) {
+      return res.status(401).json({ error: `GitHub OAuth error: ${error}` });
+    }
+
+    // Return token for Decap CMS to use
+    res.json({ token: access_token });
+  } catch (error: any) {
+    console.error('OAuth token exchange error:', error.message);
+    res.status(500).json({ error: 'Failed to exchange OAuth code for token' });
+  }
+});
+
+/**
+ * GET /api/auth/callback
+ * GitHub OAuth callback redirect handler
+ * Redirects back to admin panel with authorization code
+ */
+app.get('/api/auth/callback', (req, res) => {
+  const { code, error } = req.query;
+  
+  if (error) {
+    return res.redirect(`/admin?error=${error}`);
+  }
+  
+  if (code) {
+    res.redirect(`/admin?code=${code}`);
+  } else {
+    res.redirect('/admin?error=no_code');
   }
 });
 

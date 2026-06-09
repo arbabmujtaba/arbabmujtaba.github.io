@@ -2,6 +2,14 @@ backend:
   name: github
   repo: arbabandjones/portfolio
   branch: main
+  auth_endpoint: api/auth  # GitHub OAuth endpoint for production
+  squash_merges: true
+  commit_messages:
+    create: 'Create {{collection}} "{{slug}}"'
+    update: 'Update {{collection}} "{{slug}}"'
+    delete: 'Delete {{collection}} "{{slug}}"'
+    uploadMedia: 'Upload "{{path}}"'
+    deleteMedia: 'Delete "{{path}}"'
 
 # Enable local development proxy support
 local_backend: true
