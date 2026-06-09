@@ -14,6 +14,7 @@ import Photography from './pages/Photography';
 import Collection from './pages/Collection';
 import Admin from './pages/Admin';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
+import CursorAura from './components/CursorAura';
 
 export default function App() {
   const [view, setView] = useState(() => {
@@ -44,6 +45,8 @@ export default function App() {
         }}
       />
 
+      <CursorAura />
+
       {/* Outer Border Frame */}
       <div className="flex-grow m-3 md:m-6 lg:m-8 border border-zinc-800/50 relative z-10 flex flex-col overflow-hidden">
         
@@ -68,13 +71,37 @@ export default function App() {
 
         {/* Main Content Area Routing */}
         <AnimatePresence mode="wait">
-          {view === 'home' && <Home key="home" setView={setView} />}
-          {view === 'portfolio' && <Portfolio key="portfolio" />}
-          {view === 'journal' && <Journal key="journal" />}
-          {view === 'tech' && <Tech key="tech" />}
-          {view === 'photography' && <Photography key="photography" />}
-          {view === 'collection' && <Collection key="collection" />}
-          {view === 'admin' && <Admin key="admin" setView={setView} />}
+          <motion.div
+            key={view}
+            className="relative flex min-h-0 flex-1 flex-col"
+            initial={{ opacity: 0, y: 26, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -24, filter: 'blur(8px)' }}
+            transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {view === 'home' && <Home setView={setView} />}
+            {view === 'portfolio' && <Portfolio />}
+            {view === 'journal' && <Journal />}
+            {view === 'tech' && <Tech />}
+            {view === 'photography' && <Photography />}
+            {view === 'collection' && <Collection />}
+            {view === 'admin' && <Admin setView={setView} />}
+
+            {view !== 'admin' && (
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none fixed inset-0 z-[90]"
+                initial={{ opacity: 0.55 }}
+                animate={{ opacity: 0 }}
+                exit={{ opacity: 0.45 }}
+                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  background:
+                    'radial-gradient(circle at center, rgba(249,115,22,0.12), transparent 42%), rgba(10,10,9,0.62)',
+                }}
+              />
+            )}
+          </motion.div>
         </AnimatePresence>
 
         {view !== 'admin' && <FloatingMagicalArrow />}
@@ -88,4 +115,3 @@ export default function App() {
     </div>
   );
 }
-

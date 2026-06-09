@@ -1,226 +1,434 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'motion/react';
-import { ArrowUpRight } from 'lucide-react';
-import Hero from '../components/Hero';
-import ScrollIndicator from '../components/ScrollIndicator';
-import ExploreArrow from '../components/ExploreArrow';
-
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react';
+import AnimatedGradientBg from '../components/AnimatedGradientBg';
+import CinematicImageReveal from '../components/CinematicImageReveal';
+import EnhancedHeroName from '../components/EnhancedHeroName';
 import Footer from '../components/Footer';
+import MagicParticles from '../components/MagicParticles';
+import MagicalGateway from '../components/MagicalGateway';
+import QuoteReveal from '../components/QuoteReveal';
+import ScrollIndicator from '../components/ScrollIndicator';
 
 interface HomeProps {
   setView: (view: string) => void;
-  key?: string;
 }
 
-const StorySection = ({ children, containerRef, index }: { children: React.ReactNode, containerRef: React.RefObject<HTMLDivElement>, index: number }) => {
-  const targetRef = useRef<HTMLDivElement>(null);
+interface ArchiveSectionProps {
+  children: ReactNode;
+  containerRef: React.RefObject<HTMLDivElement>;
+  className?: string;
+}
+
+const GATEWAY_SECTIONS = [
+  {
+    id: 'portfolio',
+    label: '01 // Builder',
+    title: 'Portfolio',
+    description:
+      'Selected engineering work, shaped as case studies of systems, interfaces, and careful technical decisions.',
+    image:
+      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1800&q=80',
+  },
+  {
+    id: 'journal',
+    label: '02 // Thinker',
+    title: 'Journal',
+    description:
+      'Essays, observations, and fragments from the human side of learning, building, and becoming.',
+    image:
+      'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=80',
+  },
+  {
+    id: 'tech',
+    label: '03 // Engineer',
+    title: 'Tech',
+    description:
+      'A living lab of experiments, notes, architecture sketches, and problems worth opening twice.',
+    image:
+      'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1800&q=80',
+  },
+  {
+    id: 'photography',
+    label: '04 // Witness',
+    title: 'Photography',
+    description:
+      'Light, place, and memory gathered into a visual archive of streets, quiet details, and passing weather.',
+    image:
+      'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1800&q=80',
+  },
+  {
+    id: 'collection',
+    label: '05 // Curator',
+    title: 'Collection',
+    description:
+      'Books, music, objects, and references that leave a trace on taste, thought, and craft.',
+    image:
+      'https://images.unsplash.com/photo-1507842217343-583f20270319?auto=format&fit=crop&w=1800&q=80',
+  },
+];
+
+const QUOTES = [
+  {
+    text: 'Every project begins with curiosity.',
+    author: 'Archive Note 001',
+  },
+  {
+    text: 'Some stories are written. Others are captured.',
+    author: 'Archive Note 002',
+  },
+  {
+    text: 'Technology becomes meaningful when it touches real lives.',
+    author: 'Archive Note 003',
+  },
+];
+
+const PRINCIPLES = [
+  {
+    label: 'Memory',
+    title: 'Collected Slowly',
+    text: 'Projects, photographs, and notes are treated as evidence of a life in motion, not isolated entries on a page.',
+  },
+  {
+    label: 'Craft',
+    title: 'Built Carefully',
+    text: 'The technical work is grounded in systems thinking, pragmatic detail, and the quiet pleasure of making things hold together.',
+  },
+  {
+    label: 'Wonder',
+    title: 'Kept Alive',
+    text: 'The archive leaves room for mystery: enough movement to feel alive, enough restraint to stay personal and premium.',
+  },
+];
+
+function useSectionSeen() {
+  const ref = useRef<HTMLElement>(null);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || seen) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSeen(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25, rootMargin: '0px 0px -10% 0px' }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [seen]);
+
+  return { ref, seen };
+}
+
+function ArchiveSection({ children, containerRef, className = '' }: ArchiveSectionProps) {
+  const targetRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const { ref: observerRef, seen } = useSectionSeen();
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
     container: containerRef,
-    offset: ["start end", "center center"]
+    offset: ['start end', 'end start'],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
+    stiffness: 90,
+    damping: 28,
+    restDelta: 0.001,
   });
 
-  const y = useTransform(smoothProgress, [0, 1], [150, 0]);
-  const opacity = useTransform(smoothProgress, [0, 0.5, 1], [0, 0.1, 1]);
-  const scale = useTransform(smoothProgress, [0, 1], [0.95, 1]);
+  const y = useTransform(smoothProgress, [0, 0.5, 1], [70, 0, -25]);
+  const opacity = useTransform(smoothProgress, [0, 0.18, 0.82, 1], [0, 1, 1, 0.72]);
+  const scale = useTransform(smoothProgress, [0, 0.5, 1], [0.97, 1, 0.99]);
 
   return (
-    <motion.div 
-      ref={targetRef} 
-      style={{ y, opacity, scale }}
-      className="p-6 md:p-12 lg:p-16 relative z-20 bg-zinc-950/80 backdrop-blur-sm border-t border-zinc-800/30"
+    <motion.section
+      ref={(node) => {
+        targetRef.current = node;
+        observerRef.current = node;
+      }}
+      style={shouldReduceMotion ? undefined : { y, opacity, scale }}
+      className={`relative z-20 border-t border-zinc-800/20 bg-[#0a0a09]/82 px-6 py-24 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
+      data-seen={seen ? 'true' : 'false'}
     >
       {children}
-    </motion.div>
+    </motion.section>
   );
-};
+}
 
-const CinematicReveal = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
-  const targetRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress: entranceProgress } = useScroll({
-    target: targetRef,
-    container: containerRef,
-    offset: ["start end", "center center"]
-  });
-
-  const smoothEntrance = useSpring(entranceProgress, {
-    stiffness: 70, damping: 20, restDelta: 0.001
-  });
-
-  const scale = useTransform(smoothEntrance, [0, 1], [0.85, 1]);
-  const opacity = useTransform(smoothEntrance, [0, 1], [0, 1]);
-
-  const { scrollYProgress: parallaxProgress } = useScroll({
-    target: targetRef,
-    container: containerRef,
-    offset: ["start end", "end start"]
-  });
-
-  const smoothParallax = useSpring(parallaxProgress, {
-    stiffness: 70, damping: 20, restDelta: 0.001
-  });
-
-  const imgScale = useTransform(smoothParallax, [0, 1], [1, 1.15]);
-  const y = useTransform(smoothParallax, [0, 1], ["-10%", "10%"]);
-
+function SectionHeading({
+  eyebrow,
+  title,
+  body,
+}: {
+  eyebrow: string;
+  title: string;
+  body?: string;
+}) {
   return (
-    <div ref={targetRef} className="w-full relative z-20 py-12 md:py-24 px-6 md:px-12 lg:px-16 flex justify-center items-center pointer-events-none">
-      <motion.div 
-        style={{ scale, opacity }} 
-        className="w-full h-[60vh] md:h-[85vh] overflow-hidden bg-zinc-950 border border-zinc-800/50 shadow-2xl shadow-black relative pointer-events-auto"
+    <div className="max-w-3xl">
+      <motion.p
+        className="mb-5 font-mono text-[10px] uppercase tracking-[0.34em] text-orange-400/75"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
-        <motion.div style={{ y, scale: imgScale, height: '120%', top: '-10%', position: 'relative' }} className="w-full">
-          <img 
-            src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80" 
-            alt="Atmospheric landscape"
-            className="w-full h-full object-cover grayscale-[40%]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-transparent to-zinc-950/30 mix-blend-overlay pointer-events-none" />
-        </motion.div>
-      </motion.div>
+        {eyebrow}
+      </motion.p>
+      <motion.h2
+        className="font-serif text-4xl leading-[1.02] tracking-tighter text-zinc-100 md:text-6xl lg:text-7xl"
+        initial={{ clipPath: 'inset(0 0 100% 0)', y: 28 }}
+        whileInView={{ clipPath: 'inset(0 0 0% 0)', y: 0 }}
+        viewport={{ once: true, amount: 0.45 }}
+        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {title}
+      </motion.h2>
+      {body && (
+        <motion.p
+          className="mt-8 max-w-xl font-sans text-sm font-light leading-relaxed text-zinc-400 md:text-base"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.45 }}
+          transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {body}
+        </motion.p>
+      )}
     </div>
   );
-};
+}
 
 export default function Home({ setView }: HomeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollY } = useScroll({ 
-    container: containerRef 
-  });
+  const shouldReduceMotion = useReducedMotion();
+  const { scrollY } = useScroll({ container: containerRef });
 
   const smoothScrollY = useSpring(scrollY, {
-    stiffness: 100,
+    stiffness: 95,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
-  const heroOpacity = useTransform(smoothScrollY, [0, 300], [1, 0]);
-  const heroY = useTransform(smoothScrollY, [0, 400], [0, 150]);
-  const heroScale = useTransform(smoothScrollY, [0, 400], [1, 0.9]);
-  const indicatorOpacity = useTransform(smoothScrollY, [0, 100], [1, 0]);
+  const heroOpacity = useTransform(smoothScrollY, [0, 360], [1, 0]);
+  const heroY = useTransform(smoothScrollY, [0, 520], [0, 160]);
+  const heroScale = useTransform(smoothScrollY, [0, 520], [1, 0.92]);
+  const archiveMarkY = useTransform(smoothScrollY, [0, 700], [0, -120]);
+
+  const handleNavigate = (section: string) => {
+    setView(section);
+  };
 
   return (
     <motion.div
       key="home"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      className="flex-grow flex flex-col relative overflow-hidden"
+      initial={{ opacity: 0, y: 18, filter: 'blur(10px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: -22, filter: 'blur(10px)' }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex h-full flex-grow flex-col overflow-hidden"
     >
-      <div 
+      <AnimatedGradientBg />
+      <MagicParticles />
+
+      <div
         ref={containerRef}
-        className="flex-grow overflow-y-auto scroll-smooth custom-scrollbar relative z-10 w-full pt-0"
+        className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto scroll-smooth"
       >
-        
-        {/* Full-height Hero Section */}
-        <div className="min-h-[85vh] flex flex-col justify-end p-6 md:p-12 lg:p-16 pb-24 md:pb-32 relative">
-          <motion.div style={{ opacity: heroOpacity, y: heroY, scale: heroScale }} className="w-full origin-bottom-left">
-            <Hero />
+        <section className="relative flex min-h-[94vh] flex-col justify-end overflow-hidden px-6 pb-28 pt-32 md:px-12 md:pb-36 lg:px-16">
+          <motion.div
+            aria-hidden="true"
+            style={shouldReduceMotion ? undefined : { y: archiveMarkY }}
+            className="pointer-events-none absolute right-4 top-24 z-0 hidden font-serif text-[12vw] uppercase leading-none tracking-tighter text-zinc-900/35 lg:block"
+          >
+            Archive
           </motion.div>
-          <motion.div style={{ opacity: indicatorOpacity }} className="absolute bottom-0 left-0 w-full pointer-events-none">
-            <ScrollIndicator />
+
+          <motion.div
+            style={shouldReduceMotion ? undefined : { opacity: heroOpacity, y: heroY, scale: heroScale }}
+            className="relative z-20 w-full origin-bottom-left"
+          >
+            <EnhancedHeroName />
           </motion.div>
-        </div>
 
-        {/* Cinematic Reveal Component */}
-        <CinematicReveal containerRef={containerRef} />
+          <motion.div
+            aria-hidden="true"
+            className="absolute bottom-24 right-6 hidden max-w-[18rem] border-l border-orange-400/25 pl-6 md:right-12 md:block lg:right-16"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.1, delay: 1.45, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="font-sans text-[11px] font-light uppercase leading-relaxed tracking-[0.28em] text-zinc-500">
+              A magical digital archive of projects, memories, technology, photography, and personal stories.
+            </p>
+          </motion.div>
 
-        {/* Storytelling Section 1: Identity */}
-        <StorySection containerRef={containerRef} index={0}>
-          <div className="flex flex-col md:flex-row gap-12 md:gap-24 py-12 md:py-24">
-            <div className="md:w-1/3">
-               <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-6">Identity</h2>
-               <span className="block w-8 h-[1px] bg-orange-500/50"></span>
-            </div>
-            <div className="md:w-2/3 max-w-2xl">
-               <p className="font-serif text-2xl md:text-3xl lg:text-4xl text-zinc-200 leading-[1.4] mb-8">
-                 Computer Engineering Student at IET DAVV, Indore. Based in Jammu & Kashmir, India.
-               </p>
-               <p className="font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed">
-                 I build systems, collect stories, and capture moments. This space serves as a personal digital archive—a quiet room to index the different facets of my work and life.
-               </p>
+          <ScrollIndicator />
+        </section>
+
+        <CinematicImageReveal
+          containerRef={containerRef}
+          imageUrl="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=85"
+        />
+
+        <ArchiveSection containerRef={containerRef}>
+          <div className="grid gap-16 md:grid-cols-[0.8fr_1.4fr] md:gap-24">
+            <SectionHeading
+              eyebrow="Identity // Personal Index"
+              title="A quiet room for everything I am learning to build, see, and understand."
+            />
+            <div className="self-end">
+              <motion.p
+                className="font-serif text-2xl leading-[1.35] tracking-tight text-zinc-200 md:text-4xl"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.45 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              >
+                Computer Engineering student at IET DAVV, Indore. Based between code,
+                cameras, Jammu &amp; Kashmir, and the small mysteries that make ordinary days worth documenting.
+              </motion.p>
+              <motion.p
+                className="mt-8 max-w-2xl font-sans text-sm font-light leading-relaxed text-zinc-400 md:text-base"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.45 }}
+                transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+              >
+                This homepage is the threshold: part portfolio, part journal, part visual memory bank. Every
+                section opens like a chapter in an archive that is still being written.
+              </motion.p>
             </div>
           </div>
-        </StorySection>
+        </ArchiveSection>
 
-        {/* Section 2: Selected Work & Journal Teaser */}
-        <StorySection containerRef={containerRef} index={1}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 py-12 md:py-24">
-            
-            <div className="group cursor-pointer flex flex-col" onClick={() => setView('portfolio')}>
-               <div className="aspect-[4/3] bg-zinc-900 border border-zinc-800/50 mb-8 overflow-hidden relative">
-                 <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/20 to-transparent group-hover:scale-105 transition-transform duration-1000"></div>
-                 <div className="absolute bottom-6 left-6 font-mono text-[10px] text-orange-500/80 tracking-[0.3em] uppercase">01 // Builder</div>
-               </div>
-               <h3 className="font-serif text-3xl text-zinc-200 mb-4 group-hover:text-white transition-colors">Portfolio</h3>
-               <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed mb-6 max-w-sm">
-                 A curated selection of technical work. Emphasizing precision, performance, and digital craft.
-               </p>
-               <ExploreArrow label="Explore Work" direction="up-right" onClick={() => setView('portfolio')} />
-            </div>
+        <QuoteReveal
+          containerRef={containerRef}
+          quote={QUOTES[0].text}
+          author={QUOTES[0].author}
+        />
 
-            <div className="group cursor-pointer flex flex-col mt-0 md:mt-24" onClick={() => setView('journal')}>
-               <div className="aspect-[3/4] bg-zinc-900 border border-zinc-800/50 mb-8 overflow-hidden relative">
-                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-zinc-900/50 group-hover:opacity-80 transition-opacity duration-1000"></div>
-                 <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center font-serif italic text-4xl text-zinc-800 blur-[0.5px]">Human</span>
-               </div>
-               <h3 className="font-serif text-3xl text-zinc-200 mb-4 group-hover:text-white transition-colors">Journal</h3>
-               <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed mb-6 max-w-sm">
-                 Personal thoughts, notes, and observations. Documenting the learning process and human experience.
-               </p>
-               <ExploreArrow label="Read Entries" direction="up-right" onClick={() => setView('journal')} />
-            </div>
-
+        <ArchiveSection containerRef={containerRef} className="pb-28 md:pb-40">
+          <div className="mb-16 flex flex-col justify-between gap-8 md:mb-24 md:flex-row md:items-end">
+            <SectionHeading
+              eyebrow="Gateways // Chapter Navigation"
+              title="Choose a doorway into the archive."
+              body="The main sections are no longer static cards. They are destinations: technical rooms, visual corridors, essays, collections, and work waiting behind the dark."
+            />
+            <motion.div
+              className="hidden h-px flex-1 bg-gradient-to-r from-orange-400/30 via-zinc-700/25 to-transparent md:block"
+              initial={{ scaleX: 0, transformOrigin: 'left' }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 1.1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            />
           </div>
-        </StorySection>
 
-        {/* Section 3: Lab & Camera */}
-        <StorySection containerRef={containerRef} index={2}>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 py-12 md:py-24">
-            
-            <div className="md:col-span-5 flex flex-col justify-center">
-              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-4">Engineer</h2>
-              <h3 className="font-serif text-4xl text-zinc-200 mb-6 font-light">Tech Notes.</h3>
-              <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed mb-10">
-                A structured index of ongoing technical explorations, experiments, and unfinished side-projects. Documenting the engineering process and breaking things under the hood.
-              </p>
-              <ExploreArrow label="Enter Lab" direction="up-right" onClick={() => setView('tech')} />
-            </div>
-
-            <div className="md:col-span-7 group cursor-pointer relative mt-8 md:mt-0" onClick={() => setView('photography')}>
-              <div className="aspect-[16/9] bg-zinc-900 border border-zinc-800/50 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1600&q=80" 
-                  alt="Camera lens" 
-                  className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 group-hover:grayscale-[50%] transition-all duration-1000 scale-105 group-hover:scale-100"
-                />
-              </div>
-              <div className="absolute top-6 left-6 text-white/80">
-                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 drop-shadow-md">Artist</h2>
-                <h3 className="font-serif text-2xl mt-1 drop-shadow-md text-zinc-100">Photography</h3>
-              </div>
-            </div>
-
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-6 md:gap-6 lg:gap-8">
+            {GATEWAY_SECTIONS.map((section, index) => (
+              <MagicalGateway
+                key={section.id}
+                label={section.label}
+                title={section.title}
+                description={section.description}
+                image={section.image}
+                index={index}
+                featured={index === 0 || index === 3}
+                onClick={() => handleNavigate(section.id)}
+              />
+            ))}
           </div>
-        </StorySection>
+        </ArchiveSection>
 
-        {/* Section 4: Collection */}
-        <StorySection containerRef={containerRef} index={3}>
-          <div className="text-center group cursor-pointer flex flex-col items-center justify-center py-12 md:py-32" onClick={() => setView('collection')}>
-             <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500/80 mb-6 block">Curator</span>
-             <h3 className="font-serif text-4xl md:text-5xl lg:text-6xl text-zinc-300 mb-12 italic group-hover:text-white transition-colors">The Collection</h3>
-             <ExploreArrow label="View Archive" direction="right" onClick={() => setView('collection')} />
+        <QuoteReveal
+          containerRef={containerRef}
+          quote={QUOTES[1].text}
+          author={QUOTES[1].author}
+        />
+
+        <ArchiveSection containerRef={containerRef}>
+          <div className="grid gap-14 md:grid-cols-[0.9fr_1.5fr] md:gap-20">
+            <SectionHeading
+              eyebrow="Method // The Spellbook"
+              title="Motion with restraint. Detail with purpose."
+              body="The site should feel alive even when idle, but the movement stays slow, readable, and respectful of the editorial tone."
+            />
+
+            <div className="grid gap-6">
+              {PRINCIPLES.map((item, index) => (
+                <motion.article
+                  key={item.title}
+                  className="group relative overflow-hidden border border-zinc-800/45 bg-zinc-950/25 p-6 md:p-8"
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.75, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-400/35 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.28em] text-orange-400/65">
+                    {item.label}
+                  </p>
+                  <h3 className="font-serif text-2xl tracking-tight text-zinc-100 md:text-3xl">
+                    {item.title}
+                  </h3>
+                  <p className="mt-4 max-w-xl font-sans text-sm font-light leading-relaxed text-zinc-400">
+                    {item.text}
+                  </p>
+                </motion.article>
+              ))}
+            </div>
           </div>
-        </StorySection>
+        </ArchiveSection>
+
+        <QuoteReveal
+          containerRef={containerRef}
+          quote={QUOTES[2].text}
+          author={QUOTES[2].author}
+        />
+
+        <ArchiveSection containerRef={containerRef} className="text-center">
+          <motion.div
+            className="mx-auto flex min-h-[46vh] max-w-4xl flex-col items-center justify-center"
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="mb-6 font-mono text-[10px] uppercase tracking-[0.34em] text-orange-400/75">
+              Begin // The Archive Is Open
+            </p>
+            <h2 className="font-serif text-5xl leading-[0.98] tracking-tighter text-zinc-100 md:text-7xl lg:text-8xl">
+              Enter another chapter.
+            </h2>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              {GATEWAY_SECTIONS.slice(0, 3).map((section) => (
+                <motion.button
+                  key={section.id}
+                  type="button"
+                  onClick={() => handleNavigate(section.id)}
+                  className="group relative overflow-hidden border border-zinc-800/70 px-5 py-3 font-sans text-[10px] uppercase tracking-[0.24em] text-zinc-400 outline-none transition-colors duration-300 hover:border-orange-400/45 hover:text-zinc-100 focus-visible:border-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400/30"
+                  whileHover={{ y: -3 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-orange-400/70 transition-transform duration-500 group-hover:scale-x-100" />
+                  {section.title}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        </ArchiveSection>
 
         <Footer />
       </div>
