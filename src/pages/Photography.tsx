@@ -69,11 +69,11 @@ export default function Photography() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
+      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
         
         {/* Hero Section */}
-        <div className="mb-24 md:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[5rem] sm:text-[7rem] md:text-[12rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
+        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[2.5rem] sm:text-[4rem] md:text-[7rem] lg:text-[12rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
             PHOTOGRAPHY
           </div>
           <motion.p 
@@ -145,7 +145,7 @@ export default function Photography() {
         )}
 
         {/* Life, Connected, Travel Grids */}
-        <div className="space-y-32 mb-32">
+        <div className="space-y-16 md:space-y-24 lg:space-y-32 mb-16 md:mb-24 lg:mb-32">
            {defaultPhotoSections.map((section, idx) => (
              <motion.section 
                 key={idx}
@@ -164,7 +164,7 @@ export default function Photography() {
                 
                 <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8 lg:mt-0">
                   {section.photos.map((photo, pIdx) => (
-                    <div key={photo.id} className={`relative overflow-hidden border border-zinc-850 bg-zinc-900 group cursor-pointer ${pIdx === 2 ? 'sm:col-span-2 aspect-[21/9]' : 'aspect-[3/4]'}`}>
+                    <div key={photo.id} className={`relative overflow-hidden border border-zinc-850 bg-zinc-900 group cursor-pointer ${pIdx === 2 ? 'sm:col-span-2 aspect-[16/9] sm:aspect-[21/9]' : 'aspect-[3/4]'}`}>
                        <ParallaxImage 
                          src={photo.src} 
                          alt={photo.alt}

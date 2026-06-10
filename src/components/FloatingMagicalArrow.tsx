@@ -133,7 +133,7 @@ export default function FloatingMagicalArrow() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 30, scale: 0.8 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-6 md:bottom-12 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-auto"
+          className="fixed bottom-6 md:bottom-12 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-auto hidden md:block"
         >
           <motion.button
             onClick={scrollDown}

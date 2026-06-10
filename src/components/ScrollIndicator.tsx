@@ -1,7 +1,20 @@
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 
 export default function ScrollIndicator() {
-  return (
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return (
+      <div className="absolute bottom-6 md:bottom-12 left-6 md:left-12 flex items-center space-x-6 z-20">
+        <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-zinc-600 font-sans font-light origin-left transform -rotate-90 md:rotate-0 translate-y-8 md:translate-y-0">
+          Discover
+        </span>
+        <div className="w-[1px] h-16 md:h-24 bg-zinc-800/80 overflow-hidden relative">
+          <div className="w-full h-1/3 bg-zinc-400 absolute top-0 left-0" />
+        </div>
+      </div>
+    );
+  } return ( 
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}

@@ -39,7 +39,7 @@ export default function MagicalGateway({
       whileHover={shouldReduceMotion ? undefined : { y: -6 }}
       whileTap={{ scale: 0.985 }}
       onClick={onClick}
-      className={`group relative min-h-[21rem] overflow-hidden border border-zinc-800/55 bg-zinc-950/35 text-left outline-none backdrop-blur-sm transition-colors duration-500 hover:border-orange-400/50 focus-visible:border-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400/30 md:min-h-[26rem] ${
+      className={`group relative min-h-[14rem] sm:min-h-[18rem] overflow-hidden border border-zinc-800/55 bg-zinc-950/35 text-left outline-none backdrop-blur-sm transition-colors duration-500 hover:border-orange-400/50 focus-visible:border-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400/30 md:min-h-[26rem] ${
         featured ? 'md:col-span-4' : 'md:col-span-3'
       } ${index === 4 ? 'md:col-span-6 lg:col-span-2' : ''}`}
     >

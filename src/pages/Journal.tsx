@@ -61,11 +61,11 @@ export default function Journal() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-5xl mx-auto">
+      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-5xl mx-auto">
         
         {/* Hero Section */}
-        <div className="mb-24 md:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[6rem] sm:text-[8rem] md:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
+        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
             JOURNAL
           </div>
           <motion.p 
@@ -126,7 +126,7 @@ export default function Journal() {
                       <p>{featuredEntry.excerpt}</p>
                     </article>
                     
-                    <div className="flex items-center gap-6 mt-8 p-4 border border-zinc-800/50 bg-zinc-950/50 w-max rounded-sm">
+                    <div className="flex items-center gap-6 mt-8 p-4 border border-zinc-800/50 bg-zinc-950/50 w-full max-w-sm rounded-sm">
                        <Disc3 className="w-8 h-8 text-orange-500 animate-[spin_5s_linear_infinite]" strokeWidth={1} />
                        <div className="flex flex-col">
                           <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-1">On Rotation</span>
@@ -149,7 +149,7 @@ export default function Journal() {
         )}
 
         {/* Journal Sections */}
-        <div className="space-y-32 mb-32">
+        <div className="space-y-16 md:space-y-24 lg:space-y-32 mb-16 md:mb-24 lg:mb-32">
           {groupedCategories.map((section, idx) => (
             <motion.section 
               key={idx}

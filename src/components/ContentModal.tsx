@@ -61,7 +61,7 @@ export default function ContentModal({
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 180 }}
-        className="relative w-full max-w-4xl h-full bg-[#0d0d0c] border-l border-zinc-900 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar"
+        className="relative w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl h-full bg-[#0d0d0c] border-l border-zinc-900 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar"
       >
         {/* Header action panel */}
         <div className="sticky top-0 z-30 bg-[#0d0d0c]/90 backdrop-blur-md px-6 md:px-12 py-6 border-b border-zinc-900/50 flex justify-between items-center">

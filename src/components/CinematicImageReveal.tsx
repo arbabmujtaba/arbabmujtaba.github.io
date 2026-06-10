@@ -45,16 +45,17 @@ export default function CinematicImageReveal({
   return (
     <section
       ref={targetRef}
-      className="relative z-20 flex min-h-[72vh] items-center px-6 py-20 md:min-h-screen md:px-12 lg:px-16"
+      className="relative z-20 flex min-h-[40vh] sm:min-h-[72vh] items-center px-6 py-20 md:min-h-screen md:px-12 lg:px-16"
     >
       <motion.div
         style={shouldReduceMotion ? undefined : { scale: frameScale, opacity: frameOpacity }}
-        className="group relative mx-auto aspect-[16/10] w-full max-w-6xl overflow-hidden border border-zinc-800/55 bg-zinc-950 shadow-2xl shadow-black/55"
+        className="group relative mx-auto aspect-[4/3] sm:aspect-[16/10] w-full max-w-6xl overflow-hidden border border-zinc-800/55 bg-zinc-950 shadow-2xl shadow-black/55"
       >
         <motion.img
           src={imageUrl}
           alt="A cinematic mountain landscape revealing the visual archive"
-          className="h-[118%] w-full object-cover opacity-80 grayscale-[30%] transition-all duration-700 group-hover:grayscale-[12%]"
+          loading="lazy"
+          className="h-full w-full object-cover opacity-80 grayscale-[30%] transition-all duration-700 group-hover:grayscale-[12%]"
           style={shouldReduceMotion ? undefined : { y: imageY, scale: imageScale, filter }}
         />
 

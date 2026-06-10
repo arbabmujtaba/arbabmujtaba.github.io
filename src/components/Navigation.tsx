@@ -15,13 +15,14 @@ interface NavigationProps {
 
 export default function Navigation({ activeView, setView }: NavigationProps) {
   return (
-    <nav className="flex flex-col items-end space-y-4 font-sans text-xs uppercase tracking-[0.2em] relative z-20">
+    <nav className="flex flex-col md:flex-row md:items-end gap-2 md:gap-4 font-sans text-xs uppercase tracking-[0.2em] relative z-20">
       {navItems.map((item, index) => {
         const isActive = activeView === item.id;
         
         return (
-          <motion.div
+          <motion.button
             key={index}
+            type="button"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{
@@ -30,9 +31,9 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
               ease: [0.16, 1, 0.3, 1],
             }}
             onClick={() => setView(item.id)}
-            className="group flex flex-col md:flex-row md:items-center cursor-pointer overflow-hidden items-end"
+            className="group flex flex-row items-center cursor-pointer min-h-[44px] md:min-h-0 px-2 md:px-0 rounded md:rounded-none hover:bg-zinc-900/40 md:hover:bg-transparent transition-colors md:transition-none"
           >
-            <span className={`text-zinc-600 md:mr-6 font-light text-[9px] transform transition-transform duration-500 ease-out md:group-hover:-translate-x-3 mb-1 md:mb-0 ${isActive ? 'text-orange-500/80' : ''}`}>
+            <span className={`text-zinc-600 md:mr-4 font-light text-[9px] transform transition-transform duration-500 ease-out md:group-hover:-translate-x-3 ${isActive ? 'text-orange-500/80' : ''}`}>
               {item.num}
             </span>
             <span className={`transition-colors duration-500 ease-out tracking-[0.2em] relative ${isActive ? 'text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-300'}`}>
@@ -44,7 +45,7 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
                 />
               )}
             </span>
-          </motion.div>
+          </motion.button>
         );
       })}
     </nav>

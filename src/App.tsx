@@ -23,6 +23,14 @@ export default function App() {
     return 'home';
   });
 
+  // Scroll to top on view change
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.custom-scrollbar');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [view]);
+
   // Keep routing synchronized if path parameters differ
   useEffect(() => {
     const handleLocationChange = () => {
@@ -37,17 +45,17 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a09] text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30">
+    <div className="min-h-screen bg-[#0a0a09] text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30 overflow-x-hidden">
       <GlobalBackground />
 
       <CursorAura />
 
       {/* Outer Border Frame */}
-      <div className="flex-grow m-3 md:m-6 lg:m-8 border border-zinc-800/50 relative z-10 flex flex-col overflow-hidden">
+      <div className="flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800/50 relative z-10 flex flex-col overflow-hidden">
         
         {/* Header containing Name and Navigation */}
         {view !== 'admin' && (
-          <header className="flex w-full justify-between items-start pt-8 px-6 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-8">
+          <header className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-start pt-8 px-6 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-4 sm:gap-8">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: view === 'home' ? 0 : 1, y: 0 }}
@@ -69,9 +77,9 @@ export default function App() {
           <motion.div
             key={view}
             className="relative flex min-h-0 flex-1 flex-col"
-            initial={{ opacity: 0, y: 26, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -24, filter: 'blur(8px)' }}
+            initial={{ opacity: 0, y: 26 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -24 }}
             transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
             {view === 'home' && <Home setView={setView} />}

@@ -72,11 +72,11 @@ export default function Collection() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
+      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
         
         {/* Hero Section */}
-        <div className="mb-24 md:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[6rem] sm:text-[8rem] md:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
+        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
             COLLECTION
           </div>
           <motion.p 
