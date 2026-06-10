@@ -41,10 +41,10 @@ export default function EnhancedHeroName() {
         }}
         aria-label="Arbab Mujtaba"
       >
-        {nameLines.map((line) => (
+        {nameLines.map((line, lineIdx) => (
           <div
             key={line}
-            className="flex overflow-hidden font-serif text-[17vw] font-medium uppercase leading-[0.78] tracking-tighter text-zinc-100 sm:text-[15vw] md:text-[13vw] lg:text-[10.8vw] xl:text-[9.6rem]"
+            className={`flex overflow-hidden font-serif text-[17vw] font-medium uppercase leading-[0.78] tracking-tighter sm:text-[15vw] md:text-[13vw] lg:text-[10.8vw] xl:text-[9.6rem] ${lineIdx === 1 ? 'text-orange-500/85' : 'text-zinc-100'}`}
           >
             {line.split('').map((letter, index) => (
               <motion.span

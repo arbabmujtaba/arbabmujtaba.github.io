@@ -72,8 +72,8 @@ export default function Photography() {
       <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
         
         {/* Hero Section */}
-        <div className="mb-32 mt-12 md:mt-32 max-w-4xl relative">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[7rem] md:text-[12rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
+        <div className="mb-24 md:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative">
+          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[5rem] sm:text-[7rem] md:text-[12rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
             PHOTOGRAPHY
           </div>
           <motion.p 
@@ -86,7 +86,7 @@ export default function Photography() {
           </motion.p>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="font-serif font-medium text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
+            className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
           >
             Photography
           </motion.h1>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { X, Calendar, Tag, ArrowUpRight } from 'lucide-react';
 import Markdown from 'react-markdown';
@@ -30,6 +31,17 @@ export default function ContentModal({
   body,
   metadata
 }: ContentModalProps) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

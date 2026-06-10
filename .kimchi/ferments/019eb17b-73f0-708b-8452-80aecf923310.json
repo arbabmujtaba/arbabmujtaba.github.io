@@ -1,0 +1,290 @@
+{
+  "id": "019eb17b-73f0-708b-8452-80aecf923310",
+  "name": "Mobile responsive optimization",
+  "description": "Completely optimize the website for phones and tablets while preserving the existing desktop design exactly as it is. Do NOT redesign the desktop version. Only improve responsiveness and mobile usability.\n\nCurrent mobile issues: text overlapping, elements colliding, content overflowing containers, navigation issues, images exceeding screen width, excessively small text, improper spacing, layout breaking, animations causing clipping, components not adapting to smaller screens.\n\nTarget devices: Small Phones (320px-480px), Large Phones (481px-768px), Tablets (769px-1024px), Desktop (1025px+).\n\nRequirements:\n- Mobile-first improvements to Hero section (prevent name/title overlap, scale typography, maintain hierarchy)\n- Replace desktop navigation with premium mobile menu (animated hamburger, full-screen overlay)\n- Responsive typography with clamp() where appropriate\n- Review and fix all pages: Home, Portfolio, Journal, Tech, Photography, Collection\n- Fix grid, flex, card, image layouts and section spacing\n- No horizontal scrolling\n- Images scale correctly with max-width: 100%, object-fit, responsive sizing\n- Framer Motion animations remain smooth on mobile, no clipping, reduce intensity on low-end devices\n- Touch optimization: buttons min 44px height, thumb-friendly navigation\n- Performance: lazy load images/sections, optimize Motion usage, prevent animation jank\n- Audit CSS for fixed widths, absolute positioning bugs, overflow issues, improper breakpoints\n- Use Tailwind responsive breakpoints correctly (sm:, md:, lg:, xl:, 2xl:)\n- Test for iPhone SE, iPhone 13/15 Pro, Samsung Galaxy, Google Pixel, iPads, Android phones\n\nThe mobile version should feel intentionally designed rather than a scaled-down desktop website. Desktop appearance must remain completely unchanged.",
+  "status": "paused",
+  "worktree": {
+    "path": "/Users/arbabmujtaba/AI-Portfolio",
+    "branch": "main",
+    "commit": "6558c8b59725fde9eb4f7ae20372d5fd2c5bb828"
+  },
+  "scoping": {
+    "goal": {
+      "answer": "Completely optimize the website for phones and tablets while preserving the existing desktop design exactly as it is. Replace desktop navigation with a premium animated hamburger menu (full-screen overlay) for all viewports below 1025px. Fix text overlap, element collisions, content overflow, image sizing, layout breaks, and animation clipping across all 6 public pages and the Admin dashboard. Implement lazy loading for images and heavy sections. Ensure all touch targets are ≥44px and Lighthouse mobile scores are ≥85.",
+      "confirmedAt": "2026-06-10T13:27:01.774Z"
+    },
+    "criteria": {
+      "answer": "No horizontal scrolling on any page at 320px–1024px viewport widths (verified via browser dev tools responsive preview on Home, Portfolio, Journal, Tech, Photography, Collection, Admin).\nDesktop navigation preserved exactly at ≥1025px; hamburger menu active at <1025px with animated full-screen overlay using existing dark/orange design language.\nHero section (EnhancedHeroName + titles) scales without text overlap at 320px–1024px; typography uses clamp() or responsive Tailwind classes.\nAll interactive touch targets (buttons, links, nav items, form inputs) are ≥44px height/width on mobile/tablet viewports.\nAll 6 public content pages (Home, Portfolio, Journal, Tech, Photography, Collection) render correctly without broken grid/flex layouts, overlapping elements, or content overflow on mobile/tablet.\nImages use max-width:100%, object-fit, and responsive sizing; no image overflow or gallery breakage on any breakpoint.\nFramer Motion animations don't clip or cause horizontal overflow on mobile; reduced-motion respected; animation intensity reduced for low-end devices if needed.\nLazy loading implemented for images and heavy section components (e.g., portfolio projects, photo galleries).\nAdmin page is usable on mobile/tablet: tables scroll horizontally, forms stack vertically, buttons are thumb-friendly.\nLighthouse Mobile score ≥85 for Performance and Accessibility (verified via Chrome DevTools Lighthouse audit on mobile preset).",
+      "confirmedAt": "2026-06-10T13:27:01.774Z"
+    },
+    "constraints": {
+      "answer": "Desktop appearance must remain completely unchanged at ≥1025px., Do not introduce new dependencies unless absolutely necessary (no new UI libraries)., Use Tailwind CSS responsive breakpoints (sm:, md:, lg:, xl:) correctly — do not break existing desktop classes., All touch targets must be ≥44px on mobile., No horizontal scrolling at any breakpoint below 1025px.",
+      "confirmedAt": "2026-06-10T13:27:01.774Z"
+    },
+    "phases": {
+      "answer": "P1: Global Foundation, P2: Home Page, P3: Content Pages, P4: Admin + Performance + Regression",
+      "confirmedAt": "2026-06-10T13:27:01.774Z"
+    },
+    "assumptions": {
+      "answer": "Desktop design (≥1025px) must remain pixel-perfect — all existing md:/lg:/xl: breakpoints are preserved.; Hamburger menu will be a full-screen dark overlay matching the existing #0a0a09 theme with orange accents, animated with Framer Motion.; Tablet navigation also uses the hamburger (sub-desktop <1025px per user confirmation).; Lazy loading for images will use native loading='lazy' and intersection-observer-based section lazy loading where feasible.; All pages share a common hero/watermark/layout pattern; fixes can be applied consistently across Portfolio, Journal, Tech, Photography, and Collection.; Admin page is lower priority than public pages but must still be usable on mobile/tablet.",
+      "confirmedAt": "2026-06-10T13:27:01.774Z"
+    }
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "index": 1,
+      "name": "P1: Global Foundation",
+      "goal": "Global responsive infrastructure: mobile nav, App frame, base CSS",
+      "description": "Build the responsive hamburger navigation with animated full-screen overlay, fix App.tsx frame margins for mobile, and add global responsive CSS utilities (touch targets, custom scrollbar mobile behavior).",
+      "budget": "150k tokens",
+      "parallel": false,
+      "status": "active",
+      "steps": [
+        {
+          "id": "step-1",
+          "index": 1,
+          "description": "Replace Navigation.tsx with hamburger icon on mobile/tablet (<1025px), full-screen overlay menu with staggered Framer Motion animations, preserve desktop nav exactly at ≥1025px.",
+          "status": "pending",
+          "verification": {
+            "command": "grep -c 'hamburger\\|mobile-menu\\|lg:hidden\\|lg:flex' src/components/Navigation.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-2",
+          "index": 2,
+          "description": "Fix App.tsx outer frame margins: adjust m-3 to be reasonable on 320px screens, ensure header flex doesn't break on small widths, preserve desktop exactly.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'm-3\\|m-4\\|sm:m-5\\|md:m-6' src/App.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-3",
+          "index": 3,
+          "description": "Audit index.css for fixed-width issues, add mobile-friendly custom scrollbar, ensure markdown-body text sizes scale down on mobile.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'custom-scrollbar\\|markdown-body' src/index.css",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        }
+      ],
+      "startedAt": "2026-06-10T13:27:17.796Z"
+    },
+    {
+      "id": "phase-2",
+      "index": 2,
+      "name": "P2: Home Page",
+      "goal": "Home page fully responsive: hero, gateways, scroll sections",
+      "description": "Fix Home.tsx hero section, MagicalGateway cards, CinematicImageReveal, QuoteReveal, ArchiveSection, and Footer for mobile. Ensure text scales without overlap, grids collapse gracefully, and images remain contained.",
+      "budget": "200k tokens",
+      "parallel": false,
+      "status": "planned",
+      "steps": [
+        {
+          "id": "step-1",
+          "index": 1,
+          "description": "Fix EnhancedHeroName.tsx: ensure text-[17vw] doesn't cause overflow on 320px, adjust letter spacing/leading if needed, verify subtitle positioning.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'text-\\[17vw\\]\\|sm:text-\\[15vw\\]\\|md:text-\\[13vw\\]' src/components/EnhancedHeroName.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-2",
+          "index": 2,
+          "description": "Fix Home.tsx ArchiveSection and MagicalGateway grid: ensure single-column layout on mobile, typography scales, no card overflow, image aspect ratios maintained.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'grid-cols-1\\|sm:grid-cols-2\\|md:grid-cols-3\\|md:grid-cols-6' src/pages/Home.tsx src/components/MagicalGateway.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-3",
+          "index": 3,
+          "description": "Fix CinematicImageReveal, QuoteReveal, ScrollIndicator, Footer for mobile widths and safe areas.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'aspect-\\[16/9\\]\\|max-w-sm\\|py-24' src/components/CinematicImageReveal.tsx src/components/QuoteReveal.tsx src/components/Footer.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "index": 3,
+      "name": "P3: Content Pages",
+      "goal": "All 5 public content pages responsive",
+      "description": "Apply responsive fixes to all 5 content pages (Portfolio, Journal, Tech, Photography, Collection). Each page shares a hero-watermark + content layout pattern. Fix page titles, grids, cards, image galleries, and ContentModal drawer.",
+      "budget": "250k tokens",
+      "parallel": false,
+      "status": "planned",
+      "steps": [
+        {
+          "id": "step-1",
+          "index": 1,
+          "description": "Fix Portfolio.tsx: hero watermark scaling, project grid (flex→single column on mobile), ParallaxImage sizing, tech skills grid, ContentModal adjustments.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'text-\\[8rem\\]\\|md:text-\\[14rem\\]\\|lg:flex-row\\|grid-cols-4' src/pages/Portfolio.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-2",
+          "index": 2,
+          "description": "Fix Journal.tsx: hero watermark, featured entry layout, category grid, entry cards, ContentModal.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'text-\\[8rem\\]\\|md:text-\\[14rem\\]\\|max-w-5xl' src/pages/Journal.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-3",
+          "index": 3,
+          "description": "Fix Tech.tsx: hero watermark, experiment cards, tech news grid, log accordion layout, implementation snapshot.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'text-\\[8rem\\]\\|md:text-\\[14rem\\]\\|grid-cols-2\\|lg:grid-cols-2' src/pages/Tech.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-4",
+          "index": 4,
+          "description": "Fix Photography.tsx: hero watermark, photo grid, gallery layout, gear list, ContentModal gallery grid.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'text-\\[7rem\\]\\|md:text-\\[12rem\\]\\|grid-cols-3\\|aspect-' src/pages/Photography.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-5",
+          "index": 5,
+          "description": "Fix Collection.tsx: hero watermark, timeline layout, uses grid, inspirations grid, music grid, ContentModal.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'text-\\[8rem\\]\\|md:text-\\[14rem\\]\\|grid-cols-2\\|sm:grid-cols-2' src/pages/Collection.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "index": 4,
+      "name": "P4: Admin + Performance + Regression",
+      "goal": "Admin responsive, lazy loading, animation audit, final regression",
+      "description": "Make Admin page usable on mobile: table horizontal scroll, form stacking, preview pane hidden on small screens, touch-friendly buttons. Add lazy loading to images and heavy sections. Audit Framer Motion for mobile clipping. Final regression test to confirm desktop unchanged.",
+      "budget": "200k tokens",
+      "parallel": false,
+      "status": "planned",
+      "steps": [
+        {
+          "id": "step-1",
+          "index": 1,
+          "description": "Fix Admin.tsx: convert table to responsive layout (horizontal scroll or card list), stack editor form vertically, hide preview pane on <1024px, ensure all buttons ≥44px.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'overflow-x-auto\\|lg:w-1/2\\|grid-cols-1\\|grid-cols-2' src/pages/Admin.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-2",
+          "index": 2,
+          "description": "Add lazy loading: native loading='lazy' on all <img> tags, add IntersectionObserver-based section lazy loading for heavy page sections if needed.",
+          "status": "pending",
+          "verification": {
+            "command": "grep -r \"loading='lazy'\" src/ | wc -l",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-3",
+          "index": 3,
+          "description": "Audit Framer Motion animations for mobile: reduce blur effects on small screens, ensure AnimatePresence doesn't cause horizontal overflow, verify reduced-motion handling.",
+          "status": "pending",
+          "verification": {
+            "command": "grep 'useReducedMotion\\|blur(' src/components/*.tsx src/pages/*.tsx | wc -l",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        },
+        {
+          "id": "step-4",
+          "index": 4,
+          "description": "Final regression: verify desktop (≥1025px) looks exactly the same by checking key desktop-only classes remain intact.",
+          "status": "pending",
+          "verification": {
+            "command": "grep -c 'lg:block\\|xl:block\\|lg:flex\\|xl:flex' src/App.tsx src/components/Navigation.tsx src/pages/*.tsx",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false
+        }
+      ]
+    }
+  ],
+  "decisions": [],
+  "memories": [],
+  "createdAt": "2026-06-10T12:21:58.384Z",
+  "updatedAt": "2026-06-10T13:31:03.570Z",
+  "goal": "Completely optimize the website for phones and tablets while preserving the existing desktop design exactly as it is. Replace desktop navigation with a premium animated hamburger menu (full-screen overlay) for all viewports below 1025px. Fix text overlap, element collisions, content overflow, image sizing, layout breaks, and animation clipping across all 6 public pages and the Admin dashboard. Implement lazy loading for images and heavy sections. Ensure all touch targets are ≥44px and Lighthouse mobile scores are ≥85.",
+  "successCriteria": [
+    "No horizontal scrolling on any page at 320px–1024px viewport widths (verified via browser dev tools responsive preview on Home, Portfolio, Journal, Tech, Photography, Collection, Admin).",
+    "Desktop navigation preserved exactly at ≥1025px; hamburger menu active at <1025px with animated full-screen overlay using existing dark/orange design language.",
+    "Hero section (EnhancedHeroName + titles) scales without text overlap at 320px–1024px; typography uses clamp() or responsive Tailwind classes.",
+    "All interactive touch targets (buttons, links, nav items, form inputs) are ≥44px height/width on mobile/tablet viewports.",
+    "All 6 public content pages (Home, Portfolio, Journal, Tech, Photography, Collection) render correctly without broken grid/flex layouts, overlapping elements, or content overflow on mobile/tablet.",
+    "Images use max-width:100%, object-fit, and responsive sizing; no image overflow or gallery breakage on any breakpoint.",
+    "Framer Motion animations don't clip or cause horizontal overflow on mobile; reduced-motion respected; animation intensity reduced for low-end devices if needed.",
+    "Lazy loading implemented for images and heavy section components (e.g., portfolio projects, photo galleries).",
+    "Admin page is usable on mobile/tablet: tables scroll horizontally, forms stack vertically, buttons are thumb-friendly.",
+    "Lighthouse Mobile score ≥85 for Performance and Accessibility (verified via Chrome DevTools Lighthouse audit on mobile preset)."
+  ],
+  "constraints": [
+    "Desktop appearance must remain completely unchanged at ≥1025px.",
+    "Do not introduce new dependencies unless absolutely necessary (no new UI libraries).",
+    "Use Tailwind CSS responsive breakpoints (sm:, md:, lg:, xl:) correctly — do not break existing desktop classes.",
+    "All touch targets must be ≥44px on mobile.",
+    "No horizontal scrolling at any breakpoint below 1025px."
+  ],
+  "lastActiveAt": "2026-06-10T13:27:17.796Z",
+  "activePhaseId": "phase-1"
+}
