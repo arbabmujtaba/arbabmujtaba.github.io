@@ -1,0 +1,462 @@
+{
+  "items": [
+    {
+      "id": "journal/coffee-code-tokyo",
+      "collection": "journal",
+      "slug": "coffee-code-tokyo",
+      "title": "Coffee, Code, and Tokyo",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2024-09-28T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2024-09-28T00:00:00.000Z",
+      "updatedAt": "2024-09-28T00:00:00.000Z",
+      "publishedAt": "2024-09-28T00:00:00.000Z",
+      "filePath": "content/journal/coffee-code-tokyo.md"
+    },
+    {
+      "id": "journal/designing-for-durability",
+      "collection": "journal",
+      "slug": "designing-for-durability",
+      "title": "Designing for Durability",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2024-08-14T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2024-08-14T00:00:00.000Z",
+      "updatedAt": "2024-08-14T00:00:00.000Z",
+      "publishedAt": "2024-08-14T00:00:00.000Z",
+      "filePath": "content/journal/designing-for-durability.md"
+    },
+    {
+      "id": "journal/growing-up",
+      "collection": "journal",
+      "slug": "growing-up",
+      "title": "Growing Up, Figuring Out",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2024-12-01T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2024-12-01T00:00:00.000Z",
+      "updatedAt": "2024-12-01T00:00:00.000Z",
+      "publishedAt": "2024-12-01T00:00:00.000Z",
+      "filePath": "content/journal/growing-up.md"
+    },
+    {
+      "id": "journal/launching-architecture",
+      "collection": "journal",
+      "slug": "launching-architecture",
+      "title": "Launching the New Architecture",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2024-12-01T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2024-12-01T00:00:00.000Z",
+      "updatedAt": "2024-12-01T00:00:00.000Z",
+      "publishedAt": "2024-12-01T00:00:00.000Z",
+      "filePath": "content/journal/launching-architecture.md"
+    },
+    {
+      "id": "journal/the-art-of-slowing-down",
+      "collection": "journal",
+      "slug": "the-art-of-slowing-down",
+      "title": "The Art of Slowing Down",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2024-10-12T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2024-10-12T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z",
+      "publishedAt": "2024-10-12T00:00:00.000Z",
+      "filePath": "content/journal/the-art-of-slowing-down.md"
+    },
+    {
+      "id": "tech/event-loop-optimizations",
+      "collection": "tech",
+      "slug": "event-loop-optimizations",
+      "title": "Event Loop Optimizations",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-02-14T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-02-14T00:00:00.000Z",
+      "updatedAt": "2026-02-14T00:00:00.000Z",
+      "publishedAt": "2026-02-14T00:00:00.000Z",
+      "filePath": "content/tech/event-loop-optimizations.md"
+    },
+    {
+      "id": "tech/java-swing-persistence-layer",
+      "collection": "tech",
+      "slug": "java-swing-persistence-layer",
+      "title": "Java Swing Persistence Layer",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2025-11-20T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2025-11-20T00:00:00.000Z",
+      "updatedAt": "2025-11-20T00:00:00.000Z",
+      "publishedAt": "2025-11-20T00:00:00.000Z",
+      "filePath": "content/tech/java-swing-persistence-layer.md"
+    },
+    {
+      "id": "tech/real-time-dsp-surround-engine",
+      "collection": "tech",
+      "slug": "real-time-dsp-surround-engine",
+      "title": "Real-time DSP Surround Engine",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-03-05T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-03-05T00:00:00.000Z",
+      "updatedAt": "2026-03-05T00:00:00.000Z",
+      "publishedAt": "2026-03-05T00:00:00.000Z",
+      "filePath": "content/tech/real-time-dsp-surround-engine.md"
+    },
+    {
+      "id": "tech/simulating-network-topologies",
+      "collection": "tech",
+      "slug": "simulating-network-topologies",
+      "title": "Simulating Network Topologies",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-05-10T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-05-10T00:00:00.000Z",
+      "updatedAt": "2026-05-10T00:00:00.000Z",
+      "publishedAt": "2026-05-10T00:00:00.000Z",
+      "filePath": "content/tech/simulating-network-topologies.md"
+    },
+    {
+      "id": "photography/chasing-first-light",
+      "collection": "photography",
+      "slug": "chasing-first-light",
+      "title": "Chasing the First Light",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2023-12-15T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2023-12-15T00:00:00.000Z",
+      "updatedAt": "2023-12-15T00:00:00.000Z",
+      "publishedAt": "2023-12-15T00:00:00.000Z",
+      "filePath": "content/photography/chasing-first-light.md"
+    },
+    {
+      "id": "photography/quiet-intersections",
+      "collection": "photography",
+      "slug": "quiet-intersections",
+      "title": "Quiet Intersections",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2024-10-04T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2024-10-04T00:00:00.000Z",
+      "updatedAt": "2024-10-04T00:00:00.000Z",
+      "publishedAt": "2024-10-04T00:00:00.000Z",
+      "filePath": "content/photography/quiet-intersections.md"
+    },
+    {
+      "id": "collection/less-but-better",
+      "collection": "collection",
+      "slug": "less-but-better",
+      "title": "Less, but better",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/collection/less-but-better.md"
+    },
+    {
+      "id": "collection/selected-ambient-works",
+      "collection": "collection",
+      "slug": "selected-ambient-works",
+      "title": "Selected Ambient Works 85-92",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/collection/selected-ambient-works.md"
+    },
+    {
+      "id": "collection/the-pragmatic-programmer",
+      "collection": "collection",
+      "slug": "the-pragmatic-programmer",
+      "title": "The Pragmatic Programmer",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/collection/the-pragmatic-programmer.md"
+    },
+    {
+      "id": "portfolio/created-a-beauty",
+      "collection": "portfolio",
+      "slug": "created-a-beauty",
+      "title": "Created A Beauty",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-09T00:00:00.000Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-09T00:00:00.000Z",
+      "updatedAt": "2026-06-09T00:00:00.000Z",
+      "publishedAt": "2026-06-09T00:00:00.000Z",
+      "filePath": "content/portfolio/created-a-beauty.md"
+    },
+    {
+      "id": "portfolio/davv-login",
+      "collection": "portfolio",
+      "slug": "davv-login-portal",
+      "title": "DAVV Login Portal",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/davv-login.md"
+    },
+    {
+      "id": "portfolio/dsp-surround",
+      "collection": "portfolio",
+      "slug": "dsp-surround",
+      "title": "DSP Surround",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/dsp-surround.md"
+    },
+    {
+      "id": "portfolio/geoproject",
+      "collection": "portfolio",
+      "slug": "geoproject",
+      "title": "GeoProject",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/geoproject.md"
+    },
+    {
+      "id": "portfolio/kashmiri-ai",
+      "collection": "portfolio",
+      "slug": "kashmiri-ai-assistant",
+      "title": "Kashmiri AI Assistant",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/kashmiri-ai.md"
+    },
+    {
+      "id": "portfolio/moodmix",
+      "collection": "portfolio",
+      "slug": "moodmix",
+      "title": "MoodMix",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/moodmix.md"
+    },
+    {
+      "id": "portfolio/network-simulator",
+      "collection": "portfolio",
+      "slug": "network-simulator",
+      "title": "Network Simulator",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/network-simulator.md"
+    },
+    {
+      "id": "portfolio/specwars",
+      "collection": "portfolio",
+      "slug": "specwars",
+      "title": "SpecWars",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/specwars.md"
+    },
+    {
+      "id": "portfolio/spotify-backend",
+      "collection": "portfolio",
+      "slug": "spotify-backend",
+      "title": "Spotify Backend",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/spotify-backend.md"
+    },
+    {
+      "id": "portfolio/student-attendance",
+      "collection": "portfolio",
+      "slug": "student-attendance-system",
+      "title": "Student Attendance Management System",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/student-attendance.md"
+    }
+  ],
+  "lastUpdated": "2026-06-11T04:05:30.037Z",
+  "version": 1
+}
