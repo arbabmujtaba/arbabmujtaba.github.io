@@ -1,8 +1,10 @@
 backend:
   name: github
-  repo: arbabandjones/portfolio
+  repo: arbabmujtaba/arbabmujtaba.github.io
   branch: main
-  auth_endpoint: api/auth  # GitHub OAuth endpoint for production
+  # GitHub Pages is static and cannot serve /api/auth.
+  # If you stay on GitHub Pages, set base_url/auth_endpoint to an external Decap OAuth proxy.
+  # If you move to Netlify, use Git Gateway instead of this GitHub OAuth endpoint.
   squash_merges: true
   commit_messages:
     create: 'Create {{collection}} "{{slug}}"'
