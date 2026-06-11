@@ -1,4 +1,3 @@
-import matter from 'gray-matter';
 import { 
   JournalEntry, 
   TechEntry, 
@@ -7,85 +6,72 @@ import {
   PortfolioProject 
 } from '../types';
 
-// Helper to reliably parse frontmatter on the client side
 function parseMarkdown(raw: string) {
-  try {
-    const parsed = matter(raw);
-    return {
-      data: parsed.data || {},
-      content: parsed.content || ''
-    };
-  } catch (err) {
-    // Elegant regex-based YAML parser for raw strings if gray-matter hits browser restrictions
-    const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-    if (!match) {
-      return { data: {}, content: raw };
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!match) {
+    return { data: {}, content: raw };
+  }
+
+  const data: Record<string, any> = {};
+  const yamlString = match[1];
+  const content = match[2];
+
+  const lines = yamlString.split('\n');
+  let currentKey: string | null = null;
+  let currentList: any[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    if (trimmed.startsWith('-') && currentKey) {
+      let val = trimmed.slice(1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+
+      const subColon = val.indexOf(':');
+      if (subColon > -1) {
+        const subKey = val.slice(0, subColon).trim();
+        let subVal = val.slice(subColon + 1).trim();
+        if ((subVal.startsWith('"') && subVal.endsWith('"')) || (subVal.startsWith("'") && subVal.endsWith("'"))) {
+          subVal = subVal.slice(1, -1);
+        }
+        currentList.push({ [subKey]: subVal });
+      } else {
+        currentList.push(val);
+      }
+      data[currentKey] = currentList;
+      continue;
     }
-    
-    const data: Record<string, any> = {};
-    const yamlString = match[1];
-    const content = match[2];
-    
-    const lines = yamlString.split('\n');
-    let currentKey: string | null = null;
-    let currentList: any[] = [];
-    
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      
-      // Check if it's a block list item like "- C++" or "- image: /uploads/img.png"
-      if (trimmed.startsWith('-') && currentKey) {
-        let val = trimmed.slice(1).trim();
-        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-          val = val.slice(1, -1);
-        }
-        
-        // Check if list item has sub-keys (objects, e.g. - image: /uploads/pic.jpg or - tech: Java)
-        const subColon = val.indexOf(':');
-        if (subColon > -1) {
-          const subKey = val.slice(0, subColon).trim();
-          let subVal = val.slice(subColon + 1).trim();
-          if ((subVal.startsWith('"') && subVal.endsWith('"')) || (subVal.startsWith("'") && subVal.endsWith("'"))) {
-            subVal = subVal.slice(1, -1);
-          }
-          currentList.push({ [subKey]: subVal });
-        } else {
-          currentList.push(val);
-        }
-        data[currentKey] = currentList;
+
+    const colonIdx = line.indexOf(':');
+    if (colonIdx > -1) {
+      currentKey = line.slice(0, colonIdx).trim();
+      let val = line.slice(colonIdx + 1).trim();
+      currentList = [];
+
+      if (val.startsWith('-')) {
         continue;
       }
-      
-      const colonIdx = line.indexOf(':');
-      if (colonIdx > -1) {
-        currentKey = line.slice(0, colonIdx).trim();
-        let val = line.slice(colonIdx + 1).trim();
-        currentList = [];
-        
-        if (val.startsWith('-')) {
-          // Block list starting on next line
-          continue;
-        }
-        
-        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-          val = val.slice(1, -1);
-        }
-        
-        if (val.startsWith('[') && val.endsWith(']')) {
-          data[currentKey] = val.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
-        } else if (val === 'true') {
-          data[currentKey] = true;
-        } else if (val === 'false') {
-          data[currentKey] = false;
-        } else if (val !== '') {
-          data[currentKey] = val;
-        }
+
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+
+      if (val.startsWith('[') && val.endsWith(']')) {
+        data[currentKey] = val.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+      } else if (val === 'true') {
+        data[currentKey] = true;
+      } else if (val === 'false') {
+        data[currentKey] = false;
+      } else if (val !== '') {
+        data[currentKey] = val;
       }
     }
-    
-    return { data, content };
   }
+
+  return { data, content };
 }
 
 // Dynamically import all *.md content files at build time
