@@ -11,13 +11,36 @@
           "version": 1,
           "state": "published",
           "timestamp": "2024-09-28T00:00:00.000Z"
+        },
+        {
+          "version": 2,
+          "state": "archived",
+          "timestamp": "2026-06-11T04:22:22.234Z"
+        },
+        {
+          "version": 3,
+          "state": "draft",
+          "timestamp": "2026-06-11T04:22:22.236Z"
+        },
+        {
+          "version": 4,
+          "state": "review",
+          "timestamp": "2026-06-11T04:22:22.236Z"
+        },
+        {
+          "version": 5,
+          "state": "published",
+          "timestamp": "2026-06-11T04:22:22.237Z",
+          "commitHash": "248c73e45be5123f5cdb1636a91370822193c540"
         }
       ],
       "unsavedChanges": false,
       "createdAt": "2024-09-28T00:00:00.000Z",
-      "updatedAt": "2024-09-28T00:00:00.000Z",
-      "publishedAt": "2024-09-28T00:00:00.000Z",
-      "filePath": "content/journal/coffee-code-tokyo.md"
+      "updatedAt": "2026-06-11T04:22:22.237Z",
+      "publishedAt": "2026-06-11T04:22:22.237Z",
+      "filePath": "content/journal/coffee-code-tokyo.md",
+      "archivedAt": "2026-06-11T04:22:22.234Z",
+      "lastReviewedAt": "2026-06-11T04:22:22.236Z"
     },
     {
       "id": "journal/designing-for-durability",
@@ -457,6 +480,6 @@
       "filePath": "content/portfolio/student-attendance.md"
     }
   ],
-  "lastUpdated": "2026-06-11T04:05:30.037Z",
+  "lastUpdated": "2026-06-11T06:42:50.272Z",
   "version": 1
 }

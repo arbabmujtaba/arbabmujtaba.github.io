@@ -5,6 +5,12 @@ import multer from 'multer';
 import matter from 'gray-matter';
 import { createServer as createViteServer } from 'vite';
 import http from 'http';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import { transitionState, getItem, saveItem, createItem, deleteItem, initialize, getStateStats, ContentState } from './src/lib/contentState';
+import { PreviewDocument } from './src/components/PreviewDocument';
+import { PublishingService } from './src/services/PublishingService';
+import { DeploymentService } from './src/services/DeploymentService';
 
 const app = express();
 const PORT = 3000;
@@ -107,6 +113,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 /**
  * GET /api/content
  * Crawls and compiles summaries of all existing items from all collections
+ * Merges publishing state from the content state registry
  */
 app.get('/api/content', async (req, res) => {
   try {
@@ -124,17 +131,24 @@ app.get('/api/content', async (req, res) => {
         const filePath = path.join(colDir, file);
         const raw = await fs.readFile(filePath, 'utf-8');
         const { data, content } = matter(raw);
+        const slug = data.slug || file.replace('.md', '');
+
+        // Merge publishing state from registry
+        const registryItem = await getItem(col, slug);
 
         allItems.push({
           collection: col,
-          slug: data.slug || file.replace('.md', ''),
+          slug,
           title: data.title || data.projectImage ? data.title || 'Untitled Project' : data.title || 'Untitled',
           date: data.date || '',
           category: data.category || '',
           featured: !!data.featured,
           coverImage: data.coverImage || data.projectImage || '',
           excerpt: data.excerpt || data.description || '',
-          filePath: `content/${col}/${file}`
+          filePath: `content/${col}/${file}`,
+          state: registryItem?.state || 'draft',
+          unsavedChanges: registryItem?.unsavedChanges || false,
+          publishedAt: registryItem?.publishedAt
         });
       }
     }
@@ -215,6 +229,251 @@ app.get('/api/content/:collection/:slug', async (req, res) => {
   }
 });
 
+// ----------------------------------------------------
+// CONTENT STATE LIFECYCLE ENDPOINTS
+// ----------------------------------------------------
+
+/**
+ * GET /api/content/:collection/:slug/state
+ * Returns the publishing state and metadata for a content item
+ */
+app.get('/api/content/:collection/:slug/state', async (req, res) => {
+  try {
+    const { collection, slug } = req.params;
+    const item = await getItem(collection, slug);
+
+    if (!item) {
+      return res.status(404).json({ error: `Item not found: ${collection}/${slug}` });
+    }
+
+    res.json({
+      state: item.state,
+      unsavedChanges: item.unsavedChanges,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      publishedAt: item.publishedAt,
+      lastReviewedAt: item.lastReviewedAt,
+      archivedAt: item.archivedAt,
+      versions: item.versions
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PATCH /api/content/:collection/:slug/state
+ * Transitions content through the publishing lifecycle.
+ * Valid transitions: draft→review, review→published, review→draft,
+ *                    published→archived, archived→draft
+ */
+app.patch('/api/content/:collection/:slug/state', async (req, res) => {
+  try {
+    const { collection, slug } = req.params;
+    const { state, notes } = req.body;
+
+    if (!state || !['draft', 'review', 'published', 'archived'].includes(state)) {
+      return res.status(400).json({ error: 'Invalid state. Must be draft, review, published, or archived.' });
+    }
+
+    const result = await transitionState(collection, slug, state as ContentState, { notes });
+
+    res.json({
+      success: true,
+      item: result
+    });
+  } catch (error: any) {
+    if (error.name === 'ContentNotFoundError') {
+      return res.status(404).json({ error: error.message });
+    }
+    if (error.name === 'InvalidTransitionError') {
+      return res.status(422).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/registry/state-stats
+ * Aggregate statistics across all content states
+ */
+app.get('/api/registry/state-stats', async (_req, res) => {
+  try {
+    const stats = await getStateStats();
+    res.json(stats);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// PREVIEW SYSTEM
+// ============================================================
+
+/**
+ * GET /preview/:collection/:slug
+ * Renders a production-like preview of content using SSR.
+ * Inlines the site's Tailwind index.css via Vite dev server.
+ */
+app.get('/preview/:collection/:slug', async (req, res) => {
+  try {
+    const { collection, slug } = req.params;
+    const filePath = path.join(CONTENT_DIR, collection, `${slug}.md`);
+
+    if (!(await fs.pathExists(filePath))) {
+      return res.status(404).send('<html><body style="background:#0a0a09;color:#999;font-family:sans-serif;padding:2rem;"><h1>404</h1><p>Content not found.</p></body></html>');
+    }
+
+    const raw = await fs.readFile(filePath, 'utf-8');
+    const { data, content } = matter(raw);
+
+    const html = renderToString(
+      React.createElement(PreviewDocument, {
+        frontmatter: data,
+        body: content,
+        collection
+      })
+    );
+
+    const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview — ${data.title || 'Untitled'}</title>
+  <link rel="stylesheet" href="/src/index.css">
+</head>
+<body>
+  ${html}
+</body>
+</html>`;
+
+    res.set('Content-Type', 'text/html');
+    res.send(fullHtml);
+  } catch (error: any) {
+    res.status(500).send(`<html><body style="background:#0a0a09;color:#999;font-family:sans-serif;padding:2rem;"><h1>Preview Error</h1><pre>${error.message}</pre></body></html>`);
+  }
+});
+
+// ============================================================
+// PUBLISHING PIPELINE
+// ============================================================
+
+const publishingService = new PublishingService();
+const deploymentService = new DeploymentService(publishingService);
+
+/**
+ * POST /api/publish
+ * Triggers the full 11-step publishing pipeline.
+ * Returns a job ID immediately; pipeline runs asynchronously.
+ */
+app.post('/api/publish', async (req, res) => {
+  try {
+    const { collection, slug, title, body, frontmatter, images } = req.body;
+
+    if (!collection || !slug || !title) {
+      return res.status(400).json({ error: 'collection, slug, and title are required' });
+    }
+
+    const job = await publishingService.publish({
+      collection,
+      slug,
+      title,
+      body: body || '',
+      frontmatter: frontmatter || {},
+      images,
+    });
+
+    res.json({
+      success: true,
+      jobId: job.id,
+      status: job.status,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/publish/:jobId
+ * Retrieves the current state of a publishing job.
+ */
+app.get('/api/publish/:jobId', (req, res) => {
+  const job = publishingService.getJob(req.params.jobId);
+  if (!job) {
+    return res.status(404).json({ error: 'Job not found' });
+  }
+  res.json(job);
+});
+
+/**
+ * GET /api/publish/:jobId/progress
+ * Server-Sent Events stream for real-time publishing progress.
+ */
+app.get('/api/publish/:jobId/progress', (req, res) => {
+  const { jobId } = req.params;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const sendUpdate = (job: any) => {
+    res.write(`data: ${JSON.stringify(job)}\n\n`);
+  };
+
+  // Subscribe to job updates
+  const unsubscribe = publishingService.subscribe(jobId, sendUpdate);
+
+  // Send initial state
+  const job = publishingService.getJob(jobId);
+  if (job) {
+    sendUpdate(job);
+  } else {
+    res.write(`data: ${JSON.stringify({ error: 'Job not found' })}\n\n`);
+    res.end();
+    return;
+  }
+
+  // Keep connection alive with heartbeat
+  const heartbeat = setInterval(() => {
+    res.write(':heartbeat\n\n');
+  }, 15000);
+
+  // Clean up on client disconnect
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    unsubscribe();
+    res.end();
+  });
+});
+
+/**
+ * GET /api/deploy/status
+ * Returns current deployment status for the Deployment Center.
+ */
+app.get('/api/deploy/status', async (_req, res) => {
+  try {
+    const status = await deploymentService.getStatus();
+    res.json(status);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/deploy/commits
+ * Returns recent git commit history.
+ */
+app.get('/api/deploy/commits', async (_req, res) => {
+  try {
+    const commits = await deploymentService.getCommitHistory(30);
+    res.json(commits);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 /**
  * POST /api/content
  * Creates a brand new markdown document with secure frontmatter serialization
@@ -257,6 +516,9 @@ app.post('/api/content', async (req, res) => {
     // Matter-stringify contents
     const markdownStr = matter.stringify(body, data);
     await fs.writeFile(filePath, markdownStr, 'utf-8');
+
+    // Register in content state as draft
+    await createItem(collection, finalSlug, data.title || finalSlug, `content/${collection}/${finalSlug}.md`);
 
     res.json({ success: true, slug: finalSlug, filePath });
   } catch (error: any) {
@@ -304,6 +566,16 @@ app.put('/api/content', async (req, res) => {
     const markdownStr = matter.stringify(body, data);
     await fs.writeFile(targetPath, markdownStr, 'utf-8');
 
+    // Update registry entry on slug change or metadata update
+    const existingItem = await getItem(collection, slug);
+    if (existingItem) {
+      existingItem.slug = finalSlug;
+      existingItem.title = data.title || existingItem.title;
+      existingItem.filePath = `content/${collection}/${finalSlug}.md`;
+      existingItem.updatedAt = new Date().toISOString();
+      await saveItem(existingItem);
+    }
+
     res.json({ success: true, slug: finalSlug, filePath: targetPath });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -328,6 +600,7 @@ app.delete('/api/content', async (req, res) => {
     }
 
     await fs.remove(filePath);
+    await deleteItem(collection, slug);
     res.json({ success: true, message: `Successfully deleted content ${slug}` });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -343,6 +616,7 @@ app.delete('/api/content/:collection/:slug', async (req, res) => {
       return res.status(404).json({ error: `File not found` });
     }
     await fs.remove(filePath);
+    await deleteItem(collection, slug);
     res.json({ success: true, message: 'Deleted successfully' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -417,6 +691,14 @@ app.get('/api/auth/callback', (req, res) => {
 
 // Configure Vite integration wrapper inside Express serving context
 async function startServer() {
+  // Initialize content state registry on startup
+  try {
+    await initialize({ autoMigrate: true });
+    console.log('[ContentState] Registry initialized');
+  } catch (err: any) {
+    console.warn('[ContentState] Registry init warning:', err.message);
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

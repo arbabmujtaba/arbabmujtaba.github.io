@@ -13,6 +13,8 @@ import * as path from 'path';
 import matter from 'gray-matter';
 import { execSync } from 'child_process';
 
+const DEBUG = process.env.DEBUG === 'true';
+
 // ============================================================
 // TYPE DEFINITIONS
 // ============================================================
@@ -588,7 +590,7 @@ export async function migrate(force: boolean = false): Promise<{
   
   // If registry doesn't exist or force migration, scan and rebuild
   if (!registryExists || force) {
-    console.log('[contentState] Scanning content directory...');
+    if (DEBUG) console.log('[contentState] Scanning content directory...');
     const scannedItems = await scanContentDir();
     
     const newRegistry: ContentRegistry = {
@@ -599,7 +601,7 @@ export async function migrate(force: boolean = false): Promise<{
     
     await saveRegistry(newRegistry);
     
-    console.log(`[contentState] Migration complete. ${scannedItems.length} items registered.`);
+    if (DEBUG) console.log(`[contentState] Migration complete. ${scannedItems.length} items registered.`);
     
     return {
       totalItems: scannedItems.length,
@@ -665,7 +667,7 @@ export async function migrate(force: boolean = false): Promise<{
   
   const updatedCollections = [...new Set(scannedItems.map(item => item.collection))];
   
-  console.log(`[contentState] Migration complete. ${newCount} new, ${updatedCount} updated, ${deletedItems.length} removed.`);
+  if (DEBUG) console.log(`[contentState] Migration complete. ${newCount} new, ${updatedCount} updated, ${deletedItems.length} removed.`);
   
   return {
     totalItems: registry.items.length,
@@ -798,10 +800,10 @@ export async function initialize(options: {
   const registryExists = await fs.pathExists(registryPath);
   
   if (!registryExists && autoMigrate) {
-    console.log('[contentState] No registry found. Running initial migration...');
+    if (DEBUG) console.log('[contentState] No registry found. Running initial migration...');
     await migrate(false);
   } else if (forceMigrate && registryExists) {
-    console.log('[contentState] Force migration requested. Re-scanning content directory...');
+    if (DEBUG) console.log('[contentState] Force migration requested. Re-scanning content directory...');
     await migrate(true);
   }
   

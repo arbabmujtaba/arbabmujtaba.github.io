@@ -4,9 +4,15 @@ import {
   Plus, Search, Edit3, Trash2, ChevronLeft, Save, Sparkles, 
   UploadCloud, Check, FileText, Calendar, Tag, Layers, 
   Settings, Eye, Terminal, Globe, Github, Info, AlertTriangle, 
-  Filter, Award, Loader2, ArrowUpRight
+  Filter, Award, Loader2, ArrowUpRight, Archive, RotateCcw, Rocket, Activity
 } from 'lucide-react';
 import Markdown from 'react-markdown';
+import PreviewFrame from '../components/PreviewFrame';
+import DeploymentCenter from '../components/DeploymentCenter';
+import PublishingModal from '../components/PublishingModal';
+import { ToastContainer, type ToastItem } from '../components/Toast';
+import StatusBadge from '../components/StatusBadge';
+import ActivityFeed from '../components/ActivityFeed';
 
 // Define localized types for form handling
 interface CMSItem {
@@ -19,15 +25,19 @@ interface CMSItem {
   coverImage?: string;
   excerpt?: string;
   filePath?: string;
+  state?: 'draft' | 'review' | 'published' | 'archived';
+  unsavedChanges?: boolean;
+  publishedAt?: string;
 }
 
 export default function Admin({ setView }: { setView: (v: string) => void }) {
   // Navigation & State management
-  const [viewState, setViewState] = useState<'list' | 'editor'>('list');
+  const [viewState, setViewState] = useState<'list' | 'editor' | 'deployment'>('list');
   const [allContent, setAllContent] = useState<CMSItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCollection, setFilterCollection] = useState('all');
+  const [filterState, setFilterState] = useState<string>('all');
   
   // Editor state
   const [activeCollection, setActiveCollection] = useState<string>('journal');
@@ -57,6 +67,20 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [draftAlert, setDraftAlert] = useState(false);
   const [lastDraftTime, setLastDraftTime] = useState<string | null>(null);
+
+  // Publishing modal state
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [publishJobId, setPublishJobId] = useState<string | null>(null);
+
+  // Toast notifications
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const addToast = (type: ToastItem['type'], message: string) => {
+    const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setToasts(prev => [...prev, { id, type, message }]);
+  };
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
 
   // Drag and drop areas
   const [isDragging, setIsDragging] = useState(false);
@@ -110,9 +134,10 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                             item.category.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesCollection = filterCollection === 'all' || item.collection === filterCollection;
-      return matchesSearch && matchesCollection;
+      const matchesState = filterState === 'all' || item.state === filterState;
+      return matchesSearch && matchesCollection && matchesState;
     });
-  }, [allContent, searchQuery, filterCollection]);
+  }, [allContent, searchQuery, filterCollection, filterState]);
 
   // Handle active field alterations
   const handleCollectionChange = (newVal: string) => {
@@ -359,6 +384,104 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     }
   };
 
+  // Transition content state
+  const handleStateTransition = async (item: CMSItem, newState: string) => {
+    try {
+      const res = await fetch(`/api/content/${item.collection}/${item.slug}/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: newState })
+      });
+
+      if (res.ok) {
+        await loadContent();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'State transition failed');
+      }
+    } catch (e) {
+      alert('Local API server is disconnected.');
+    }
+  };
+
+  // Full publish: save + trigger publishing pipeline
+  const handleFullPublish = async () => {
+    setSaveStatus('saving');
+    setErrorMessage('');
+
+    try {
+      const serialData: Record<string, any> = {
+        title: formTitle,
+        category: formCategory,
+        date: formDate || new Date().toISOString().split('T')[0],
+        excerpt: formExcerpt || ''
+      };
+
+      if (activeCollection === 'portfolio') {
+        serialData.projectImage = formCoverImage;
+        serialData.techStack = techStack;
+        serialData.githubLink = githubLink;
+        serialData.liveLink = liveLink;
+        serialData.featured = featuredProject;
+        serialData.description = formExcerpt;
+      } else if (activeCollection === 'photography') {
+        serialData.coverImage = formCoverImage;
+        serialData.galleryImages = galleryImages;
+        serialData.description = formExcerpt;
+      } else {
+        serialData.coverImage = formCoverImage;
+      }
+
+      // Step 1: Save content
+      const payload = {
+        collection: activeCollection,
+        slug: isEditing ? originalSlug : formSlug,
+        newSlug: formSlug,
+        data: serialData,
+        body: formBody
+      };
+
+      const method = isEditing ? 'PUT' : 'POST';
+      const saveRes = await fetch('/api/content', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const saveData = await saveRes.json();
+      if (!saveRes.ok || !saveData.success) {
+        throw new Error(saveData.error || 'Failed to save content');
+      }
+
+      // Step 2: Trigger publishing pipeline
+      const publishRes = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: activeCollection,
+          slug: formSlug,
+          title: formTitle,
+          body: formBody,
+          frontmatter: serialData,
+        })
+      });
+
+      const publishData = await publishRes.json();
+      if (!publishRes.ok || !publishData.success) {
+        throw new Error(publishData.error || 'Publishing failed');
+      }
+
+      setPublishJobId(publishData.jobId);
+      setPublishModalOpen(true);
+      setSaveStatus('success');
+      clearLocalDraft();
+      await loadContent();
+    } catch (err: any) {
+      setSaveStatus('error');
+      setErrorMessage(err.message || 'Publish failed');
+    }
+  };
+
   // Drag-and-drop file ingestion logic
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -467,6 +590,24 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
               Save Draft
             </button>
           )}
+          {viewState === 'list' && (
+            <button
+              onClick={() => setViewState('deployment')}
+              className="px-4 py-2 border border-zinc-800 bg-zinc-900/60 font-sans text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+            >
+              <Rocket className="w-3.5 h-3.5" />
+              Deployment Center
+            </button>
+          )}
+          {viewState === 'deployment' && (
+            <button
+              onClick={() => setViewState('list')}
+              className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to Dashboard
+            </button>
+          )}
           <button
             onClick={() => {
               if (viewState === 'editor') {
@@ -474,6 +615,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   setViewState('list');
                   resetFormFields();
                 }
+              } else if (viewState === 'deployment') {
+                setViewState('list');
               } else {
                 setView('home');
               }
@@ -481,7 +624,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
             className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
-            {viewState === 'editor' ? 'Back' : 'Back to Website'}
+            {viewState === 'editor' ? 'Back' : viewState === 'deployment' ? 'Back to Dashboard' : 'Back to Website'}
           </button>
         </div>
       </div>
@@ -501,7 +644,32 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
           /* ========================================================== */
           <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-12 lg:p-16 max-w-7xl mx-auto w-full">
             
-            {/* Summary Counters widget */}
+            {/* Editorial State Stats */}
+            <div className="mb-12">
+              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-4">Editorial Overview</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'Drafts', state: 'draft', color: 'text-amber-400', bg: 'bg-amber-500/5 border-amber-500/10' },
+                  { label: 'In Review', state: 'review', color: 'text-blue-400', bg: 'bg-blue-500/5 border-blue-500/10' },
+                  { label: 'Published', state: 'published', color: 'text-green-400', bg: 'bg-green-500/5 border-green-500/10' },
+                  { label: 'Archived', state: 'archived', color: 'text-zinc-400', bg: 'bg-zinc-500/5 border-zinc-500/10' },
+                ].map(({ label, state, color, bg }) => {
+                  const count = allContent.filter(v => v.state === state). length;
+                  return (
+                    <button
+                      key={state}
+                      onClick={() => setFilterState(state)}
+                      className={`border ${bg} p-5 rounded-sm text-left transition-all hover:border-opacity-50 cursor-pointer`}
+                    >
+                      <span className="block font-mono text-[9px] uppercase tracking-widest text-zinc-500 mb-2">{label}</span>
+                      <span className={`font-serif text-3xl font-medium ${color}`}>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Collection Counters widget */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
               {['journal', 'tech', 'photography', 'collection', 'portfolio'].map(col => {
                 const count = allContent.filter(v => v.collection === col).length;
@@ -512,6 +680,93 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Quick Views */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              {/* Recent Drafts */}
+              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm p-5">
+                <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
+                  <FileText className="w-3.5 h-3.5" />
+                  Recent Drafts
+                </h3>
+                <div className="space-y-3">
+                  {allContent.filter(i => i.state === 'draft').slice(0, 5).map(item => (
+                    <div
+                      key={item.slug}
+                      onClick={() => handleEditClick(item)}
+                      className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-colors border border-transparent hover:border-zinc-800/50"
+                    >
+                      <div className="w-8 h-8 bg-amber-500/10 rounded flex items-center justify-center shrink-0">
+                        <FileText className="w-3.5 h-3.5 text-amber-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
+                        <p className="font-mono text-[9px] text-zinc-600">{item.collection}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {allContent.filter(i => i.state === 'draft').length === 0 && (
+                    <p className="font-sans text-xs text-zinc-600 italic">No drafts</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Pending Publications (In Review) */}
+              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm p-5">
+                <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
+                  <Activity className="w-3.5 h-3.5" />
+                  Pending Publications
+                </h3>
+                <div className="space-y-3">
+                  {allContent.filter(i => i.state === 'review').slice(0, 5).map(item => (
+                    <div
+                      key={item.slug}
+                      onClick={() => handleEditClick(item)}
+                      className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-colors border border-transparent hover:border-zinc-800/50"
+                    >
+                      <div className="w-8 h-8 bg-blue-500/10 rounded flex items-center justify-center shrink-0">
+                        <Activity className="w-3.5 h-3.5 text-blue-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
+                        <p className="font-mono text-[9px] text-zinc-600">{item.collection}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {allContent.filter(i => i.state === 'review').length === 0 && (
+                    <p className="font-sans text-xs text-zinc-600 italic">Nothing pending review</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Recently Published */}
+              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm p-5">
+                <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5" />
+                  Recently Published
+                </h3>
+                <div className="space-y-3">
+                  {allContent.filter(i => i.state === 'published').slice(0, 5).map(item => (
+                    <div
+                      key={item.slug}
+                      onClick={() => handleEditClick(item)}
+                      className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-colors border border-transparent hover:border-zinc-800/50"
+                    >
+                      <div className="w-8 h-8 bg-green-500/10 rounded flex items-center justify-center shrink-0">
+                        <Check className="w-3.5 h-3.5 text-green-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
+                        <p className="font-mono text-[9px] text-zinc-600">{item.date || item.collection}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {allContent.filter(i => i.state === 'published').length === 0 && (
+                    <p className="font-sans text-xs text-zinc-600 italic">No published content</p>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Catalog Toolbar filters */}
@@ -545,6 +800,19 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     </button>
                   ))}
                 </div>
+
+                {/* State filter */}
+                <div className="flex gap-1.5 p-1 bg-zinc-950/60 border border-zinc-900 rounded-sm">
+                  {['all', 'draft', 'review', 'published', 'archived'].map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setFilterState(s)}
+                      className={`px-3 py-1 font-sans text-[10px] uppercase tracking-wider rounded-sm transition-all cursor-pointer ${filterState === s ? 'bg-orange-500/10 text-orange-400' : 'text-zinc-500 hover:text-zinc-200'}`}
+                    >
+                      {s === 'all' ? 'State: All' : s}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <button
@@ -568,10 +836,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                 <table className="w-full text-left border-collapse font-sans">
                   <thead>
                     <tr className="bg-zinc-950 border-b border-zinc-900 font-mono text-[9px] uppercase tracking-widest text-zinc-500">
-                      <th className="py-4 px-6">Collection Type</th>
+                      <th className="py-4 px-6">Collection</th>
                       <th className="py-4 px-6">Title / Cover</th>
                       <th className="py-4 px-6">Category</th>
-                      <th className="py-4 px-6">Publication Date</th>
+                      <th className="py-4 px-6">State</th>
+                      <th className="py-4 px-6">Date</th>
                       <th className="py-4 px-6 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -614,21 +883,81 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                           <span className="font-sans text-xs text-zinc-400">{item.category}</span>
                         </td>
                         <td className="py-4 px-6">
+                          {item.state && (
+                            <span className={`font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border ${
+                              item.state === 'published'
+                                ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                                : item.state === 'draft'
+                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                : item.state === 'review'
+                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                            }`}>
+                              {item.state}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
                           <span className="font-sans text-xs text-zinc-500">{item.date || 'Static Asset'}</span>
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-2.5">
+                            {item.state === 'draft' && (
+                              <button
+                                onClick={() => handleStateTransition(item, 'review')}
+                                title="Send to Review"
+                                className="p-2 border border-blue-900/40 bg-blue-950/20 text-blue-400 hover:text-white hover:bg-blue-600 transition-all rounded-sm cursor-pointer"
+                              >
+                                <ArrowUpRight className="w-4 h-4" />
+                              </button>
+                            )}
+                            {item.state === 'review' && (
+                              <>
+                                <button
+                                  onClick={() => handleStateTransition(item, 'published')}
+                                  title="Publish"
+                                  className="p-2 border border-green-900/40 bg-green-950/20 text-green-400 hover:text-white hover:bg-green-600 transition-all rounded-sm cursor-pointer"
+                                >
+                                  <Check className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleStateTransition(item, 'draft')}
+                                  title="Reject to Draft"
+                                  className="p-2 border border-amber-900/40 bg-amber-950/20 text-amber-400 hover:text-white hover:bg-amber-600 transition-all rounded-sm cursor-pointer"
+                                >
+                                  <ChevronLeft className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                            {item.state === 'published' && (
+                              <button
+                                onClick={() => handleStateTransition(item, 'archived')}
+                                title="Archive"
+                                className="p-2 border border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all rounded-sm cursor-pointer"
+                              >
+                                <Archive className="w-4 h-4" />
+                              </button>
+                            )}
+                            {item.state === 'archived' && (
+                              <button
+                                onClick={() => handleStateTransition(item, 'draft')}
+                                title="Restore to Draft"
+                                className="p-2 border border-amber-900/40 bg-amber-950/20 text-amber-400 hover:text-white hover:bg-amber-600 transition-all rounded-sm cursor-pointer"
+                              >
+                                <RotateCcw className="w-4 h-4" />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleEditClick(item)}
                               title="Edit Item"
-                              className="p-2 border border-zinc-900 bg-zinc-950/40 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all roundedCursor cursor-pointer outline-none"
+                              className="p-2 border border-zinc-900 bg-zinc-950/40 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all rounded-sm cursor-pointer outline-none"
                             >
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(item)}
                               title="Delete Item"
-                              className="p-2 border border-zinc-900/30 bg-zinc-950/20 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all roundedCursor cursor-pointer outline-none"
+                              className="p-2 border border-zinc-900/30 bg-zinc-950/20 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all rounded-sm cursor-pointer outline-none"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -1010,19 +1339,28 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   <button
                     type="submit"
                     disabled={saveStatus === 'saving'}
-                    className="flex-grow px-6 py-3 bg-orange-600 hover:bg-orange-500 text-black font-sans text-xs uppercase tracking-[0.16em] font-medium transition-colors rounded-sm flex items-center justify-center gap-3 cursor-pointer shadow-lg shadow-orange-950/10"
+                    className="px-6 py-3 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 hover:text-white font-sans text-xs uppercase tracking-[0.16em] font-medium transition-colors rounded-sm flex items-center justify-center gap-3 cursor-pointer"
                   >
                     {saveStatus === 'saving' ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Writing Changes to local files...
+                        Saving...
                       </>
                     ) : (
                       <>
-                        <Check className="w-4 h-4" />
-                        Publish Content
+                        <Save className="w-4 h-4" />
+                        Save Content
                       </>
                     )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleFullPublish}
+                    disabled={saveStatus === 'saving'}
+                    className="flex-grow px-6 py-3 bg-orange-600 hover:bg-orange-500 text-black font-sans text-xs uppercase tracking-[0.16em] font-medium transition-colors rounded-sm flex items-center justify-center gap-3 cursor-pointer shadow-lg shadow-orange-950/10"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Publish
                   </button>
                   <button
                     type="button"
@@ -1041,116 +1379,44 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
               </form>
             </div>
 
-            {/* RIGHT SIDE LIVE PREVIEW WRAPPER */}
-            <div className="hidden lg:block lg:w-1/2 h-full overflow-y-auto bg-[#0d0d0c] custom-scrollbar p-12">
-              <div className="border-b border-zinc-900 pb-4 mb-8 flex items-end justify-between">
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500">Exhibit Live-Preview Canvas</span>
-                <Eye className="w-4 h-4 text-orange-500" strokeWidth={1} />
-              </div>
-
-              {/* Cover Banner Mockup visual */}
-              {formCoverImage && (
-                <div className="relative aspect-[16/9] w-full overflow-hidden border border-zinc-905 bg-zinc-950 mb-10">
-                  <img src={formCoverImage} alt="Cover Preview" className="w-full h-full object-cover grayscale-[15%]" referrerPolicy="no-referrer" />
-                </div>
-              )}
-
-              {/* Core Details metadata */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded">
-                    {formCategory || 'Category'}
-                  </span>
-                  {formDate && (
-                    <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-                      <Calendar className="w-3 h-3 text-zinc-600" />
-                      {formDate}
-                    </span>
-                  )}
-                </div>
-
-                <h1 className="font-serif text-3xl md:text-5xl text-zinc-100 tracking-tight leading-[1.1] font-medium">
-                  {formTitle || 'Enter Title'}
-                </h1>
-                
-                {formExcerpt && (
-                  <p className="font-sans text-base text-zinc-400 font-light leading-relaxed border-l border-zinc-800 pl-6 italic">
-                    {formExcerpt}
-                  </p>
-                )}
-              </div>
-
-              {/* Resource blocks if available */}
-              {(githubLink || liveLink || techStack.length > 0) && (
-                <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm grid grid-cols-1 md:grid-cols-2 gap-8 my-10">
-                  {techStack.length > 0 && (
-                    <div>
-                      <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
-                        <Tag className="w-3 h-3 text-zinc-600" />
-                        Technologies
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {techStack.map((tech, idx) => (
-                          <span key={idx} className="font-mono text-xs text-zinc-350 bg-zinc-900 border border-zinc-850 px-2.5 py-1 rounded">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {(githubLink || liveLink) && (
-                    <div>
-                      <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
-                        Project Resources
-                      </h4>
-                      <div className="flex flex-col gap-2">
-                        {githubLink && (
-                          <a href={githubLink} target="_blank" rel="noreferrer" className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group">
-                            GitHub Repository
-                            <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </a>
-                        )}
-                        {liveLink && (
-                          <a href={liveLink} target="_blank" rel="noreferrer" className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group">
-                            Launch Direct Showcase
-                            <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Live Rendered Markdown body text content, matching site styles */}
-              <div className="markdown-body pt-8 border-t border-zinc-900 mt-10">
-                {formBody ? (
-                  <Markdown>{formBody}</Markdown>
-                ) : (
-                  <p className="text-zinc-600 font-sans italic text-sm">Write markdown on the left pane and see rich typographical preview render instantly in this canvas...</p>
-                )}
-              </div>
-
-              {/* Photography Gallery Previews section if relevant */}
-              {activeCollection === 'photography' && galleryImages.length > 0 && (
-                <div className="space-y-8 pt-8 border-t border-zinc-900 mt-10">
-                  <h3 className="font-serif text-2xl text-zinc-250 font-medium">Gallery Frames</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {galleryImages.map((img, idx) => (
-                      <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
-                        <img src={img} alt={`Gallery slide ${idx+1}`} className="w-full h-full object-cover grayscale-[10%]" referrerPolicy="no-referrer" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
+            {/* PREVIEW FRAME */}
+            <div className="hidden lg:block lg:w-1/2 h-full overflow-hidden bg-[#0d0d0c]">
+              <PreviewFrame
+                collection={activeCollection}
+                slug={isEditing && formSlug ? formSlug : 'new-draft'}
+                liveContent={{
+                  body: formBody,
+                  frontmatter: {
+                    title: formTitle,
+                    category: formCategory,
+                    date: formDate,
+                    coverImage: formCoverImage,
+                    excerpt: formExcerpt,
+                    techStack,
+                    githubLink,
+                    liveLink,
+                  }
+                }}
+              />
             </div>
 
           </div>
         )}
+        {viewState === 'deployment' && <DeploymentCenter />}
       </div>
+
+      {/* Publishing Modal */}
+      <PublishingModal
+        isOpen={publishModalOpen}
+        onClose={() => {
+          setPublishModalOpen(false);
+          setPublishJobId(null);
+        }}
+        jobId={publishJobId}
+      />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </motion.div>
   );
 }
