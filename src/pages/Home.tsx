@@ -242,7 +242,7 @@ export default function Home({ setView }: HomeProps) {
         ref={containerRef}
         className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto scroll-smooth"
       >
-        <section className="relative flex min-h-[94vh] flex-col justify-end overflow-hidden px-4 pb-16 pt-24 md:px-12 md:pb-36 lg:px-16">
+        <section className="relative flex min-h-[94vh] flex-col justify-start md:justify-end overflow-hidden px-4 pb-16 pt-6 md:pt-24 md:px-12 md:pb-36 lg:px-16">
           <motion.div
             aria-hidden="true"
             style={shouldReduceMotion ? undefined : { y: archiveMarkY }}

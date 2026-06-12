@@ -1,7 +1,10 @@
 import { motion, useReducedMotion } from 'motion/react';
 
 const nameLines = ['ARBAB', 'MUJTABA'];
-const titles = ['Engineer.', 'Photographer.', 'Explorer.'];
+const identity = [
+  'Software engineer & photographer,',
+  'drawn to where systems and stories meet.',
+];
 const editorialEase = [0.16, 1, 0.3, 1] as const;
 
 export default function EnhancedHeroName() {
@@ -27,7 +30,7 @@ export default function EnhancedHeroName() {
   return (
     <div className="relative z-20 max-w-[96rem] pointer-events-none">
       <motion.div
-        className="mb-4 md:mb-10 max-w-[95vw]"
+        className="mb-3 md:mb-10 max-w-[95vw]"
         initial="hidden"
         animate="visible"
         variants={{
@@ -59,10 +62,10 @@ export default function EnhancedHeroName() {
         ))}
       </motion.div>
 
-      <div className="grid max-w-3xl gap-3 md:ml-2 md:grid-cols-3 md:gap-6">
-        {titles.map((title, index) => (
+      <div className="flex max-w-3xl flex-col gap-1 md:ml-2 md:gap-2">
+        {identity.map((line, index) => (
           <motion.div
-            key={title}
+            key={line}
             initial={{
               opacity: 0,
               y: shouldReduceMotion ? 0 : 24,
@@ -71,25 +74,25 @@ export default function EnhancedHeroName() {
             animate={{ opacity: 1, y: 0, clipPath: 'inset(0 0% 0 0)' }}
             transition={{
               duration: 0.9,
-              delay: 1.05 + index * 0.32,
+              delay: 1.05 + index * 0.2,
               ease: [0.16, 1, 0.3, 1],
             }}
             className={`font-serif text-xl leading-none tracking-tight md:text-2xl lg:text-3xl ${
               index === 1 ? 'italic text-orange-400/85' : 'text-zinc-200'
             }`}
           >
-            {title}
+            {line}
           </motion.div>
         ))}
       </div>
 
       <motion.div
-        className="mt-8 max-w-sm font-sans text-[10px] font-light uppercase leading-relaxed tracking-[0.28em] text-zinc-500 md:ml-2"
+        className="mt-5 max-w-sm font-sans text-[10px] font-light uppercase leading-relaxed tracking-[0.28em] text-zinc-500 md:ml-2 md:mt-8"
         initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 2.05, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 1, delay: 1.85, ease: [0.16, 1, 0.3, 1] }}
       >
-        Building systems, collecting stories, capturing moments.
+        Building systems, documenting light, chasing quiet mysteries.
       </motion.div>
     </div>
   );
