@@ -290,25 +290,6 @@
       "filePath": "content/collection/the-pragmatic-programmer.md"
     },
     {
-      "id": "portfolio/created-a-beauty",
-      "collection": "portfolio",
-      "slug": "created-a-beauty",
-      "title": "Created A Beauty",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-06-09T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-06-09T00:00:00.000Z",
-      "updatedAt": "2026-06-09T00:00:00.000Z",
-      "publishedAt": "2026-06-09T00:00:00.000Z",
-      "filePath": "content/portfolio/created-a-beauty.md"
-    },
-    {
       "id": "portfolio/davv-login",
       "collection": "portfolio",
       "slug": "davv-login-portal",
@@ -480,6 +461,6 @@
       "filePath": "content/portfolio/student-attendance.md"
     }
   ],
-  "lastUpdated": "2026-06-11T06:42:50.272Z",
+  "lastUpdated": "2026-06-12T04:52:30.774Z",
   "version": 1
 }
