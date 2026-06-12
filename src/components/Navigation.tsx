@@ -61,26 +61,52 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a09]/85 backdrop-blur-xl border-t border-zinc-800/60 px-2 pt-3 pb-4 flex justify-around items-center md:hidden" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
-        {navItems.map((item, index) => {
-          const isActive = activeView === item.id;
-          return (
-            <button
-              key={`mobile-${index}`}
-              type="button"
-              onClick={() => handleNavigate(item.id)}
-              className={`relative flex flex-col items-center gap-1 min-w-[64px] min-h-[44px] p-2 rounded-lg transition-colors duration-300 touch-manipulation ${isActive ? 'text-orange-400' : 'text-zinc-500'}`}
-            >
-              {isActive && (
-                <div className="absolute top-1 w-1 h-1 rounded-full bg-orange-500" />
-              )}
-              <span className="font-mono text-[9px] opacity-60 mt-2">{item.num}</span>
-              <span className="font-sans text-[10px] uppercase tracking-wider">
-                {item.label.substring(0, 4)}
-              </span>
-            </button>
-          );
-        })}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a09]/85 backdrop-blur-xl border-t border-zinc-800/60 md:hidden"
+        style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="flex w-full px-1 min-[360px]:px-2 min-[390px]:px-3 min-[414px]:px-4 pt-2.5 pb-3">
+          {navItems.map((item, index) => {
+            const isActive = activeView === item.id;
+            return (
+              <button
+                key={`mobile-${index}`}
+                type="button"
+                onClick={() => handleNavigate(item.id)}
+                className={`relative flex flex-col items-center justify-center flex-1 min-h-[44px] py-1.5 rounded-lg transition-colors duration-300 touch-manipulation active:scale-[0.97] active:duration-100 ${
+                  isActive ? 'text-orange-400' : 'text-zinc-500'
+                }`}
+              >
+                {/* Active indicator */}
+                <div
+                  className={`w-1 h-1 rounded-full mb-1 transition-all duration-300 ${
+                    isActive
+                      ? 'bg-orange-500 opacity-100 scale-100'
+                      : 'bg-transparent opacity-0 scale-75'
+                  }`}
+                />
+
+                {/* Number */}
+                <span
+                  className={`font-mono font-light leading-none text-[6.5px] min-[360px]:text-[7px] min-[390px]:text-[8px] min-[414px]:text-[9px] tracking-[0.06em] min-[360px]:tracking-[0.08em] ${
+                    isActive ? 'text-orange-500/80' : 'text-zinc-600'
+                  }`}
+                >
+                  {item.num}
+                </span>
+
+                {/* Label */}
+                <span
+                  className={`font-sans uppercase leading-none whitespace-nowrap mt-1 text-[7px] min-[360px]:text-[8px] min-[390px]:text-[9px] min-[414px]:text-[10px] tracking-[0.03em] min-[360px]:tracking-[0.05em] min-[390px]:tracking-[0.06em] min-[414px]:tracking-[0.06em] ${
+                    isActive ? 'text-zinc-100' : ''
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </nav>
     </>
   );
