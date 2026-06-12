@@ -27,7 +27,7 @@ export default function EnhancedHeroName() {
   return (
     <div className="relative z-20 max-w-[96rem] pointer-events-none">
       <motion.div
-        className="mb-8 md:mb-10"
+        className="mb-4 md:mb-10 max-w-[95vw]"
         initial="hidden"
         animate="visible"
         variants={{
@@ -44,7 +44,7 @@ export default function EnhancedHeroName() {
         {nameLines.map((line, lineIdx) => (
           <div
             key={line}
-            className={`flex overflow-hidden font-serif text-[17vw] font-medium uppercase leading-[0.78] tracking-tighter sm:text-[15vw] md:text-[13vw] lg:text-[10.8vw] xl:text-[9.6rem] ${lineIdx === 1 ? 'text-orange-500/85' : 'text-zinc-100'}`}
+            className={`flex overflow-hidden font-serif text-[14vw] font-medium uppercase leading-[0.78] tracking-tighter sm:text-[15vw] md:text-[13vw] lg:text-[10.8vw] xl:text-[9.6rem] ${lineIdx === 1 ? 'text-orange-500/85' : 'text-zinc-100'}`}
           >
             {line.split('').map((letter, index) => (
               <motion.span

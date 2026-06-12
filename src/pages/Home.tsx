@@ -157,7 +157,7 @@ function ArchiveSection({ children, containerRef, className = '' }: ArchiveSecti
         observerRef.current = node;
       }}
       style={shouldReduceMotion ? undefined : { y, opacity, scale }}
-      className={`relative z-20 border-t border-zinc-800/20 bg-[#0a0a09]/58 px-6 py-24 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
+      className={`relative z-20 border-t border-zinc-800/20 bg-[#0a0a09]/58 px-4 py-16 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
       data-seen={seen ? 'true' : 'false'}
     >
       {children}
@@ -242,7 +242,7 @@ export default function Home({ setView }: HomeProps) {
         ref={containerRef}
         className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto scroll-smooth"
       >
-        <section className="relative flex min-h-[94vh] flex-col justify-end overflow-hidden px-6 pb-28 pt-32 md:px-12 md:pb-36 lg:px-16">
+        <section className="relative flex min-h-[94vh] flex-col justify-end overflow-hidden px-4 pb-16 pt-24 md:px-12 md:pb-36 lg:px-16">
           <motion.div
             aria-hidden="true"
             style={shouldReduceMotion ? undefined : { y: archiveMarkY }}
@@ -279,7 +279,7 @@ export default function Home({ setView }: HomeProps) {
         />
 
         <ArchiveSection containerRef={containerRef}>
-          <div className="grid gap-16 md:grid-cols-[0.8fr_1.4fr] md:gap-24">
+          <div className="grid gap-10 md:grid-cols-[0.8fr_1.4fr] md:gap-24">
             <SectionHeading
               eyebrow="Identity // Personal Index"
               title="A quiet room for everything I am learning to build, see, and understand."
@@ -315,8 +315,8 @@ export default function Home({ setView }: HomeProps) {
           author={QUOTES[0].author}
         />
 
-        <ArchiveSection containerRef={containerRef} className="pb-28 md:pb-40">
-          <div className="mb-16 flex flex-col justify-between gap-8 md:mb-24 md:flex-row md:items-end">
+        <ArchiveSection containerRef={containerRef} className="pb-16 md:pb-40">
+          <div className="mb-10 flex flex-col justify-between gap-6 md:mb-24 md:flex-row md:items-end">
             <SectionHeading
               eyebrow="Gateways // Chapter Navigation"
               title="Choose a doorway into the archive."
@@ -354,7 +354,7 @@ export default function Home({ setView }: HomeProps) {
         />
 
         <ArchiveSection containerRef={containerRef}>
-          <div className="grid gap-14 md:grid-cols-[0.9fr_1.5fr] md:gap-20">
+          <div className="grid gap-10 md:grid-cols-[0.9fr_1.5fr] md:gap-20">
             <SectionHeading
               eyebrow="Method // The Spellbook"
               title="Motion with restraint. Detail with purpose."
