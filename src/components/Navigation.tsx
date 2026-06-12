@@ -15,10 +15,6 @@ interface NavigationProps {
 
 export default function Navigation({ activeView, setView }: NavigationProps) {
   const handleNavigate = (id: string) => {
-    const container = document.querySelector('.custom-scrollbar');
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'instant' });
-    }
     setView(id);
   };
 

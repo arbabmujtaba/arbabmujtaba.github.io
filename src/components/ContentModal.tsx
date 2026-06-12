@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { X, Calendar, Tag, ArrowUpRight } from 'lucide-react';
 import Markdown from 'react-markdown';
@@ -31,9 +31,14 @@ export default function ContentModal({
   body,
   metadata
 }: ContentModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => {
+        modalRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+      });
     } else {
       document.body.style.overflow = '';
     }
@@ -57,6 +62,7 @@ export default function ContentModal({
 
       {/* Main Drawer container */}
       <motion.div
+        ref={modalRef}
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}

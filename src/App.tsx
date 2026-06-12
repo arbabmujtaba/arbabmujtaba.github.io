@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
@@ -16,32 +16,66 @@ import Admin from './pages/Admin';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import CursorAura from './components/CursorAura';
 import GlobalBackground from './components/GlobalBackground';
+import { resetAllScrolls } from './lib/scroll';
+
+const PATH_TO_VIEW: Record<string, string> = {
+  '/': 'home',
+  '/portfolio': 'portfolio',
+  '/journal': 'journal',
+  '/tech': 'tech',
+  '/photography': 'photography',
+  '/collection': 'collection',
+  '/admin': 'admin',
+};
+
+const VIEW_TO_PATH: Record<string, string> = {
+  home: '/',
+  portfolio: '/portfolio',
+  journal: '/journal',
+  tech: '/tech',
+  photography: '/photography',
+  collection: '/collection',
+  admin: '/admin',
+};
+
+function getViewFromPath(path: string): string {
+  const normalized = path.replace(/\/+$/, '') || '/';
+  return PATH_TO_VIEW[normalized] || 'home';
+}
 
 export default function App() {
-  const [view, setView] = useState(() => {
-    if (window.location.pathname === '/admin') return 'admin';
-    return 'home';
-  });
+  const [view, setViewState] = useState(() => getViewFromPath(window.location.pathname));
+
+  const setView = useCallback((newView: string) => {
+    const path = VIEW_TO_PATH[newView] || '/';
+    if (window.location.pathname !== path) {
+      window.history.pushState({ view: newView }, '', path);
+    }
+    setViewState(newView);
+  }, []);
+
+  // Disable browser scroll restoration
+  useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+  }, []);
 
   // Scroll to top on view change
   useEffect(() => {
-    const scrollContainer = document.querySelector('.custom-scrollbar');
-    if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    resetAllScrolls();
+    const timer = setTimeout(() => resetAllScrolls(), 800);
+    return () => clearTimeout(timer);
   }, [view]);
 
-  // Keep routing synchronized if path parameters differ
+  // Keep routing synchronized on back/forward
   useEffect(() => {
-    const handleLocationChange = () => {
-      if (window.location.pathname === '/admin') {
-        setView('admin');
-      } else {
-        setView('home');
-      }
+    const handlePopState = () => {
+      const targetView = getViewFromPath(window.location.pathname);
+      setViewState(targetView);
     };
-    window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   return (
