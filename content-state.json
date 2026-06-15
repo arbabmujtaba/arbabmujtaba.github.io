@@ -119,44 +119,6 @@
       "filePath": "content/journal/the-art-of-slowing-down.md"
     },
     {
-      "id": "tech/event-loop-optimizations",
-      "collection": "tech",
-      "slug": "event-loop-optimizations",
-      "title": "Event Loop Optimizations",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-02-14T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-02-14T00:00:00.000Z",
-      "updatedAt": "2026-02-14T00:00:00.000Z",
-      "publishedAt": "2026-02-14T00:00:00.000Z",
-      "filePath": "content/tech/event-loop-optimizations.md"
-    },
-    {
-      "id": "tech/java-swing-persistence-layer",
-      "collection": "tech",
-      "slug": "java-swing-persistence-layer",
-      "title": "Java Swing Persistence Layer",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2025-11-20T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2025-11-20T00:00:00.000Z",
-      "updatedAt": "2025-11-20T00:00:00.000Z",
-      "publishedAt": "2025-11-20T00:00:00.000Z",
-      "filePath": "content/tech/java-swing-persistence-layer.md"
-    },
-    {
       "id": "tech/real-time-dsp-surround-engine",
       "collection": "tech",
       "slug": "real-time-dsp-surround-engine",
@@ -176,25 +138,6 @@
       "filePath": "content/tech/real-time-dsp-surround-engine.md"
     },
     {
-      "id": "tech/simulating-network-topologies",
-      "collection": "tech",
-      "slug": "simulating-network-topologies",
-      "title": "Simulating Network Topologies",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-05-10T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-05-10T00:00:00.000Z",
-      "updatedAt": "2026-05-10T00:00:00.000Z",
-      "publishedAt": "2026-05-10T00:00:00.000Z",
-      "filePath": "content/tech/simulating-network-topologies.md"
-    },
-    {
       "id": "photography/chasing-first-light",
       "collection": "photography",
       "slug": "chasing-first-light",
@@ -212,25 +155,6 @@
       "updatedAt": "2023-12-15T00:00:00.000Z",
       "publishedAt": "2023-12-15T00:00:00.000Z",
       "filePath": "content/photography/chasing-first-light.md"
-    },
-    {
-      "id": "photography/quiet-intersections",
-      "collection": "photography",
-      "slug": "quiet-intersections",
-      "title": "Quiet Intersections",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2024-10-04T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2024-10-04T00:00:00.000Z",
-      "updatedAt": "2024-10-04T00:00:00.000Z",
-      "publishedAt": "2024-10-04T00:00:00.000Z",
-      "filePath": "content/photography/quiet-intersections.md"
     },
     {
       "id": "collection/less-but-better",
@@ -271,25 +195,6 @@
       "filePath": "content/collection/selected-ambient-works.md"
     },
     {
-      "id": "collection/the-pragmatic-programmer",
-      "collection": "collection",
-      "slug": "the-pragmatic-programmer",
-      "title": "The Pragmatic Programmer",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-06-11T04:05:30.026Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-06-11T04:05:30.026Z",
-      "updatedAt": "2026-06-11T04:05:30.026Z",
-      "publishedAt": "2026-06-11T04:05:30.026Z",
-      "filePath": "content/collection/the-pragmatic-programmer.md"
-    },
-    {
       "id": "portfolio/davv-login",
       "collection": "portfolio",
       "slug": "davv-login-portal",
@@ -307,25 +212,6 @@
       "updatedAt": "2026-06-11T04:05:30.026Z",
       "publishedAt": "2026-06-11T04:05:30.026Z",
       "filePath": "content/portfolio/davv-login.md"
-    },
-    {
-      "id": "portfolio/dsp-surround",
-      "collection": "portfolio",
-      "slug": "dsp-surround",
-      "title": "DSP Surround",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-06-11T04:05:30.026Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-06-11T04:05:30.026Z",
-      "updatedAt": "2026-06-11T04:05:30.026Z",
-      "publishedAt": "2026-06-11T04:05:30.026Z",
-      "filePath": "content/portfolio/dsp-surround.md"
     },
     {
       "id": "portfolio/geoproject",
@@ -461,6 +347,6 @@
       "filePath": "content/portfolio/student-attendance.md"
     }
   ],
-  "lastUpdated": "2026-06-12T04:52:30.774Z",
+  "lastUpdated": "2026-06-15T06:08:06.098Z",
   "version": 1
 }
