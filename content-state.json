@@ -289,8 +289,39 @@
       "filePath": "content/photography/life-gets-beautiful.md",
       "lastReviewedAt": "2026-06-17T06:40:45.388Z",
       "publishedAt": "2026-06-17T06:40:48.480Z"
+    },
+    {
+      "id": "photography/help",
+      "collection": "photography",
+      "slug": "help",
+      "title": "HELP",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-17T07:37:37.703Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-17T07:37:42.187Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-17T07:37:45.197Z",
+          "commitHash": "12a24851d4a57dce3e75d799f89d98c63bd0a2b2"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-17T07:37:37.704Z",
+      "updatedAt": "2026-06-17T07:37:45.197Z",
+      "filePath": "content/photography/help.md",
+      "lastReviewedAt": "2026-06-17T07:37:42.187Z",
+      "publishedAt": "2026-06-17T07:37:45.197Z"
     }
   ],
-  "lastUpdated": "2026-06-17T06:40:48.505Z",
+  "lastUpdated": "2026-06-17T07:37:45.226Z",
   "version": 1
 }
