@@ -63,6 +63,21 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [liveLink, setLiveLink] = useState('');
   const [featuredProject, setFeaturedProject] = useState(false);
 
+  // Config collection fields (gear, timeline, favorites, home, gallery)
+  const [formOrder, setFormOrder] = useState(0);
+  const [formVisible, setFormVisible] = useState(true);
+  const [formYear, setFormYear] = useState('');
+  const [formIcon, setFormIcon] = useState('');
+  const [formLink, setFormLink] = useState('');
+  const [formGroup, setFormGroup] = useState('');
+  const [formLabel, setFormLabel] = useState('');
+  const [formNavTarget, setFormNavTarget] = useState('');
+  const [formAuthor, setFormAuthor] = useState('');
+  const [formText, setFormText] = useState('');
+  const [formFeatured, setFormFeatured] = useState(false);
+  const [formSpecs, setFormSpecs] = useState<string[]>([]);
+  const [specInput, setSpecInput] = useState('');
+
   // Status indicators
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [isUploading, setIsUploading] = useState(false);
@@ -95,7 +110,12 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     { value: 'tech', label: 'Tech Logs' },
     { value: 'photography', label: 'Photography' },
     { value: 'collection', label: 'Museum Collection' },
-    { value: 'portfolio', label: 'Portfolio Project' }
+    { value: 'portfolio', label: 'Portfolio Project' },
+    { value: 'gear', label: 'Gear' },
+    { value: 'timeline', label: 'Timeline' },
+    { value: 'favorites', label: 'Favorites' },
+    { value: 'home', label: 'Home Config' },
+    { value: 'gallery', label: 'Gallery' }
   ];
 
   const categoryOptionsMap: Record<string, string[]> = {
@@ -103,7 +123,12 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     tech: ['Linux', 'Networking', 'Programming', 'Build Logs', 'Experiments', 'Tech News', 'Things I Like'],
     photography: ['Favorites', 'Life', 'Connected', 'Travel', 'Behind The Shot', 'Gear'],
     collection: ['Uses', 'Music', 'Books', 'Gear', 'Timeline', 'Inspirations', 'Favorites'],
-    portfolio: ['Web Development', 'Systems', 'Embedded & DSP', 'Audio Engineering', 'Design', 'Other']
+    portfolio: ['Web Development', 'Systems', 'Embedded & DSP', 'Audio Engineering', 'Design', 'Other'],
+    gear: ['Cameras', 'Lenses', 'Tools', 'Software', 'Audio', 'Other'],
+    timeline: ['Milestone'],
+    favorites: ['Favorite Technologies', 'Favorite Software', 'Favorite Linux Tools', 'Favorite Gear', 'Favorite Setups', 'Things I Like'],
+    home: ['gateway', 'quote', 'principle', 'profile', 'section'],
+    gallery: ['Life', 'Travel', 'Connected', 'Favorites', 'Behind The Shot']
   };
 
   // Run dynamic fetch to load recent items from API
@@ -186,6 +211,18 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       githubLink,
       liveLink,
       featuredProject,
+      order: formOrder,
+      visible: formVisible,
+      year: formYear,
+      icon: formIcon,
+      link: formLink,
+      group: formGroup,
+      label: formLabel,
+      navTarget: formNavTarget,
+      author: formAuthor,
+      text: formText,
+      featured: formFeatured,
+      specs: formSpecs,
       savedAt: new Date().toISOString()
     };
     localStorage.setItem(getDraftKey(activeCollection), JSON.stringify(draftPayload));
@@ -211,6 +248,18 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         setGithubLink(parsed.githubLink || '');
         setLiveLink(parsed.liveLink || '');
         setFeaturedProject(!!parsed.featuredProject);
+        setFormOrder(typeof parsed.order === 'number' ? parsed.order : 0);
+        setFormVisible(parsed.visible !== false);
+        setFormYear(parsed.year || '');
+        setFormIcon(parsed.icon || '');
+        setFormLink(parsed.link || '');
+        setFormGroup(parsed.group || '');
+        setFormLabel(parsed.label || '');
+        setFormNavTarget(parsed.navTarget || '');
+        setFormAuthor(parsed.author || '');
+        setFormText(parsed.text || '');
+        setFormFeatured(!!parsed.featured);
+        setFormSpecs(parsed.specs || []);
         setDraftAlert(false);
       } catch (e) {
         console.error('Error loading draft data', e);
@@ -249,6 +298,41 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.coverImage = formCoverImage;
         serialData.galleryImages = galleryImages;
         serialData.description = formExcerpt;
+      } else if (activeCollection === 'gear') {
+        serialData.image = formCoverImage;
+        serialData.description = formExcerpt;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+        serialData.specs = formSpecs;
+      } else if (activeCollection === 'timeline') {
+        serialData.year = formYear;
+        serialData.description = formExcerpt;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+      } else if (activeCollection === 'favorites') {
+        serialData.description = formExcerpt;
+        serialData.icon = formIcon;
+        serialData.link = formLink;
+        serialData.group = formGroup;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+      } else if (activeCollection === 'home') {
+        serialData.configType = formCategory;
+        serialData.label = formLabel;
+        serialData.description = formExcerpt;
+        serialData.image = formCoverImage;
+        serialData.author = formAuthor;
+        serialData.text = formText;
+        serialData.navTarget = formNavTarget;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+      } else if (activeCollection === 'gallery') {
+        serialData.image = formCoverImage;
+        serialData.category = formCategory;
+        serialData.description = formExcerpt;
+        serialData.featured = formFeatured;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
       } else {
         serialData.coverImage = formCoverImage;
       }
@@ -307,6 +391,19 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setGithubLink('');
     setLiveLink('');
     setFeaturedProject(false);
+    setFormOrder(0);
+    setFormVisible(true);
+    setFormYear('');
+    setFormIcon('');
+    setFormLink('');
+    setFormGroup('');
+    setFormLabel('');
+    setFormNavTarget('');
+    setFormAuthor('');
+    setFormText('');
+    setFormFeatured(false);
+    setFormSpecs([]);
+    setSpecInput('');
     setIsEditing(false);
     setOriginalSlug('');
     setErrorMessage('');
@@ -331,7 +428,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         
         setFormTitle(doc.data.title || '');
         setFormSlug(doc.slug || '');
-        setFormCategory(doc.data.category || doc.data.category || '');
+        setFormCategory(doc.data.category || doc.data.configType || '');
         setFormDate(doc.data.date || '');
         setFormCoverImage(doc.data.coverImage || doc.data.projectImage || '');
         setFormExcerpt(doc.data.excerpt || doc.data.description || '');
@@ -352,6 +449,35 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
             ? doc.data.galleryImages.map((g: any) => typeof g === 'string' ? g : Object.values(g)[0])
             : [];
           setGalleryImages(gallery);
+        }
+
+        // Load config collection fields
+        if (['gear', 'timeline', 'favorites', 'home', 'gallery'].includes(doc.collection)) {
+          setFormOrder(typeof doc.data.order === 'number' ? doc.data.order : 0);
+          setFormVisible(doc.data.visible !== false);
+        }
+        if (doc.collection === 'gear') {
+          const specs = Array.isArray(doc.data.specs)
+            ? doc.data.specs.map((s: any) => typeof s === 'string' ? s : Object.values(s)[0])
+            : [];
+          setFormSpecs(specs);
+        }
+        if (doc.collection === 'timeline') {
+          setFormYear(doc.data.year || '');
+        }
+        if (doc.collection === 'favorites') {
+          setFormIcon(doc.data.icon || '');
+          setFormLink(doc.data.link || '');
+          setFormGroup(doc.data.group || '');
+        }
+        if (doc.collection === 'home') {
+          setFormLabel(doc.data.label || '');
+          setFormNavTarget(doc.data.navTarget || '');
+          setFormAuthor(doc.data.author || '');
+          setFormText(doc.data.text || '');
+        }
+        if (doc.collection === 'gallery') {
+          setFormFeatured(!!doc.data.featured);
         }
 
         setViewState('editor');
@@ -430,6 +556,41 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.coverImage = formCoverImage;
         serialData.galleryImages = galleryImages;
         serialData.description = formExcerpt;
+      } else if (activeCollection === 'gear') {
+        serialData.image = formCoverImage;
+        serialData.description = formExcerpt;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+        serialData.specs = formSpecs;
+      } else if (activeCollection === 'timeline') {
+        serialData.year = formYear;
+        serialData.description = formExcerpt;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+      } else if (activeCollection === 'favorites') {
+        serialData.description = formExcerpt;
+        serialData.icon = formIcon;
+        serialData.link = formLink;
+        serialData.group = formGroup;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+      } else if (activeCollection === 'home') {
+        serialData.configType = formCategory;
+        serialData.label = formLabel;
+        serialData.description = formExcerpt;
+        serialData.image = formCoverImage;
+        serialData.author = formAuthor;
+        serialData.text = formText;
+        serialData.navTarget = formNavTarget;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
+      } else if (activeCollection === 'gallery') {
+        serialData.image = formCoverImage;
+        serialData.category = formCategory;
+        serialData.description = formExcerpt;
+        serialData.featured = formFeatured;
+        serialData.order = formOrder;
+        serialData.visible = formVisible;
       } else {
         serialData.coverImage = formCoverImage;
       }
@@ -564,6 +725,19 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
 
   const handleRemoveTechBadge = (val: string) => {
     setTechStack(prev => prev.filter(t => t !== val));
+  };
+
+  // Handling Gear Specification tags
+  const handleAddSpecBadge = () => {
+    const trimmed = specInput.trim();
+    if (trimmed && !formSpecs.includes(trimmed)) {
+      setFormSpecs(prev => [...prev, trimmed]);
+      setSpecInput('');
+    }
+  };
+
+  const handleRemoveSpecBadge = (val: string) => {
+    setFormSpecs(prev => prev.filter(s => s !== val));
   };
 
   return (
@@ -1187,6 +1361,182 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                           </div>
                         )}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Config collection metadata fields */}
+                  {['gear', 'timeline', 'favorites', 'home', 'gallery'].includes(activeCollection) && (
+                    <div className="space-y-6 p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 flex items-center gap-2">
+                        <Settings className="w-3.5 h-3.5" />
+                        Config Metadata Fields
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Display Order</label>
+                          <input
+                            type="number"
+                            value={formOrder}
+                            onChange={(e) => setFormOrder(parseInt(e.target.value) || 0)}
+                            className="w-full bg-zinc-950 border border-zinc-900 font-mono text-xs text-zinc-300 py-2.5 px-4 rounded-sm focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-6">
+                          <input
+                            type="checkbox"
+                            id="visible-item"
+                            checked={formVisible}
+                            onChange={(e) => setFormVisible(e.target.checked)}
+                            className="bg-zinc-950 border border-zinc-900 text-orange-500 focus:outline-none h-4 w-4 rounded cursor-pointer"
+                          />
+                          <label htmlFor="visible-item" className="font-sans text-xs text-zinc-400 select-none cursor-pointer">
+                            Visible on website
+                          </label>
+                        </div>
+                      </div>
+
+                      {activeCollection === 'timeline' && (
+                        <div>
+                          <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Year</label>
+                          <input
+                            type="text"
+                            value={formYear}
+                            onChange={(e) => setFormYear(e.target.value)}
+                            placeholder="e.g. 2024"
+                            className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                      )}
+
+                      {activeCollection === 'favorites' && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Icon Name</label>
+                            <input
+                              type="text"
+                              value={formIcon}
+                              onChange={(e) => setFormIcon(e.target.value)}
+                              placeholder="e.g. Code2"
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Link URL</label>
+                            <input
+                              type="url"
+                              value={formLink}
+                              onChange={(e) => setFormLink(e.target.value)}
+                              placeholder="https://..."
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Group (Sub-category)</label>
+                            <input
+                              type="text"
+                              value={formGroup}
+                              onChange={(e) => setFormGroup(e.target.value)}
+                              placeholder="e.g. Ecosystems"
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {activeCollection === 'home' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Label</label>
+                            <input
+                              type="text"
+                              value={formLabel}
+                              onChange={(e) => setFormLabel(e.target.value)}
+                              placeholder="e.g. 01 // Builder"
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Navigation Target</label>
+                            <input
+                              type="text"
+                              value={formNavTarget}
+                              onChange={(e) => setFormNavTarget(e.target.value)}
+                              placeholder="e.g. portfolio"
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Author</label>
+                            <input
+                              type="text"
+                              value={formAuthor}
+                              onChange={(e) => setFormAuthor(e.target.value)}
+                              placeholder="e.g. Archive Note 001"
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Text / Short Content</label>
+                            <input
+                              type="text"
+                              value={formText}
+                              onChange={(e) => setFormText(e.target.value)}
+                              placeholder="Short text content"
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {activeCollection === 'gallery' && (
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            id="featured-gallery"
+                            checked={formFeatured}
+                            onChange={(e) => setFormFeatured(e.target.checked)}
+                            className="bg-zinc-950 border border-zinc-900 text-orange-500 focus:outline-none h-4 w-4 rounded cursor-pointer"
+                          />
+                          <label htmlFor="featured-gallery" className="font-sans text-xs text-zinc-400 select-none cursor-pointer">
+                            Featured Gallery Item
+                          </label>
+                        </div>
+                      )}
+
+                      {activeCollection === 'gear' && (
+                        <div>
+                          <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Specifications</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={specInput}
+                              onChange={(e) => setSpecInput(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSpecBadge())}
+                              placeholder="Enter spec (e.g. 24.2MP Sensor)"
+                              className="flex-grow bg-zinc-955 border border-zinc-900 font-sans text-xs text-zinc-350 py-2 px-3 focus:outline-none focus:border-orange-500/30"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleAddSpecBadge}
+                              className="px-3 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs hover:bg-zinc-800 rounded cursor-pointer"
+                            >
+                              Add
+                            </button>
+                          </div>
+                          {formSpecs.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-3">
+                              {formSpecs.map(spec => (
+                                <span key={spec} className="font-mono text-[10px] text-zinc-300 bg-zinc-900 border border-zinc-850 px-2 py-0.5 rounded flex items-center gap-1.5">
+                                  {spec}
+                                  <button type="button" onClick={() => handleRemoveSpecBadge(spec)} className="text-zinc-500 hover:text-red-400 font-sans font-semibold">×</button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 

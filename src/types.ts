@@ -49,3 +49,75 @@ export interface PortfolioProject {
   featured: boolean;
   body: string;
 }
+
+// ============================================================
+// CMS-MANAGED CONFIGURATION TYPES (replaces hardcoded data)
+// ============================================================
+
+export interface GearItem {
+  title: string;
+  slug: string;
+  category: "Cameras" | "Lenses" | "Tools" | "Software" | "Audio" | "Other";
+  description: string;
+  image?: string;
+  specs?: string[] | { spec: string }[];
+  order: number;
+  visible: boolean;
+  body: string;
+}
+
+export interface TimelineMilestone {
+  title: string;
+  slug: string;
+  year: string;
+  description: string;
+  order: number;
+  visible: boolean;
+  body: string;
+}
+
+export interface FavoriteItem {
+  title: string;
+  slug: string;
+  category:
+    | "Favorite Technologies"
+    | "Favorite Software"
+    | "Favorite Linux Tools"
+    | "Favorite Gear"
+    | "Favorite Setups"
+    | "Things I Like";
+  description: string;
+  icon?: string;
+  link?: string;
+  group?: string;
+  order: number;
+  visible: boolean;
+  body: string;
+}
+
+export interface PhotoGalleryItem {
+  title: string;
+  slug: string;
+  category: "Life" | "Travel" | "Connected" | "Favorites" | "Behind The Shot";
+  description?: string;
+  image: string;
+  featured: boolean;
+  order: number;
+  visible: boolean;
+  body: string;
+}
+
+export interface HomeConfigEntry {
+  title: string;
+  slug: string;
+  configType: "gateway" | "quote" | "principle" | "profile" | "section";
+  label?: string;
+  description?: string;
+  image?: string;
+  author?: string;
+  text?: string;
+  navTarget?: string;
+  body?: string;
+  order: number;
+  visible: boolean;
+}

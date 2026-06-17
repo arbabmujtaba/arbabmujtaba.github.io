@@ -3,7 +3,12 @@ import {
   TechEntry, 
   PhotographyEntry, 
   CollectionEntry, 
-  PortfolioProject 
+  PortfolioProject,
+  GearItem,
+  TimelineMilestone,
+  FavoriteItem,
+  HomeConfigEntry,
+  PhotoGalleryItem
 } from '../types';
 
 function parseMarkdown(raw: string) {
@@ -80,6 +85,11 @@ const techGlob = (import.meta as any).glob('/content/tech/**/*.md', { query: '?r
 const photographyGlob = (import.meta as any).glob('/content/photography/**/*.md', { query: '?raw', eager: true });
 const collectionGlob = (import.meta as any).glob('/content/collection/**/*.md', { query: '?raw', eager: true });
 const portfolioGlob = (import.meta as any).glob('/content/portfolio/**/*.md', { query: '?raw', eager: true });
+const gearGlob = (import.meta as any).glob('/content/gear/**/*.md', { query: '?raw', eager: true });
+const timelineGlob = (import.meta as any).glob('/content/timeline/**/*.md', { query: '?raw', eager: true });
+const favoritesGlob = (import.meta as any).glob('/content/favorites/**/*.md', { query: '?raw', eager: true });
+const homeGlob = (import.meta as any).glob('/content/home/**/*.md', { query: '?raw', eager: true });
+const galleryGlob = (import.meta as any).glob('/content/gallery/**/*.md', { query: '?raw', eager: true });
 
 // Normalize listing maps to typed arrays
 export function getJournalEntries(): JournalEntry[] {
@@ -187,4 +197,108 @@ export function getPortfolioProjects(): PortfolioProject[] {
       body: content || ""
     };
   });
+}
+
+export function getGearItems(): GearItem[] {
+  return Object.entries(gearGlob).map(([filePath, module]: [string, any]) => {
+    const rawContent = module.default;
+    const { data, content } = parseMarkdown(rawContent);
+    
+    let specs: string[] = [];
+    if (Array.isArray(data.specs)) {
+      specs = data.specs.map((item: any) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          return item.spec || Object.values(item)[0] as string;
+        }
+        return "";
+      }).filter(Boolean);
+    }
+
+    return {
+      title: data.title || "Untitled Gear",
+      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
+      category: data.category || "Other",
+      description: data.description || "",
+      image: data.image || "",
+      specs,
+      order: typeof data.order === 'number' ? data.order : 0,
+      visible: data.visible !== false,
+      body: content || ""
+    };
+  }).sort((a, b) => a.order - b.order);
+}
+
+export function getTimelineMilestones(): TimelineMilestone[] {
+  return Object.entries(timelineGlob).map(([filePath, module]: [string, any]) => {
+    const rawContent = module.default;
+    const { data, content } = parseMarkdown(rawContent);
+    return {
+      title: data.title || "Untitled",
+      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
+      year: data.year || "",
+      description: data.description || "",
+      order: typeof data.order === 'number' ? data.order : 0,
+      visible: data.visible !== false,
+      body: content || ""
+    };
+  }).sort((a, b) => a.order - b.order);
+}
+
+export function getFavoriteItems(): FavoriteItem[] {
+  return Object.entries(favoritesGlob).map(([filePath, module]: [string, any]) => {
+    const rawContent = module.default;
+    const { data, content } = parseMarkdown(rawContent);
+    return {
+      title: data.title || "Untitled",
+      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
+      category: data.category || "Things I Like",
+      description: data.description || "",
+      icon: data.icon || "",
+      link: data.link || "",
+      group: data.group || "",
+      order: typeof data.order === 'number' ? data.order : 0,
+      visible: data.visible !== false,
+      body: content || ""
+    };
+  }).sort((a, b) => a.order - b.order);
+}
+
+export function getHomeConfig(): HomeConfigEntry[] {
+  return Object.entries(homeGlob).map(([filePath, module]: [string, any]) => {
+    const rawContent = module.default;
+    const { data, content } = parseMarkdown(rawContent);
+    return {
+      title: data.title || "Untitled",
+      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
+      configType: data.configType || "section",
+      label: data.label || "",
+      description: data.description || "",
+      image: data.image || "",
+      author: data.author || "",
+      text: data.text || "",
+      navTarget: data.navTarget || "",
+      body: content || "",
+      order: typeof data.order === 'number' ? data.order : 0,
+      visible: data.visible !== false
+    };
+  }).sort((a, b) => a.order - b.order);
+}
+
+export function getGalleryItems(): PhotoGalleryItem[] {
+  return Object.entries(galleryGlob).map(([filePath, module]: [string, any]) => {
+    const rawContent = module.default;
+    const { data, content } = parseMarkdown(rawContent);
+    return {
+      title: data.title || "Untitled",
+      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
+      category: data.category || "Life",
+      description: data.description || "",
+      image: data.image || "",
+      featured: !!data.featured,
+      order: typeof data.order === 'number' ? data.order : 0,
+      visible: data.visible !== false,
+      body: content || ""
+    };
+  }).sort((a, b) => a.order - b.order);
 }

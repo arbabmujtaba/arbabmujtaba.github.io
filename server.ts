@@ -39,7 +39,7 @@ const UPLOADS_DIR = path.join(PUBLIC_DIR, 'uploads');
 // Ensure system directories exist
 fs.ensureDirSync(CONTENT_DIR);
 fs.ensureDirSync(UPLOADS_DIR);
-['journal', 'tech', 'photography', 'collection', 'portfolio'].forEach(col => {
+['journal', 'tech', 'photography', 'collection', 'portfolio', 'gear', 'timeline', 'favorites', 'home', 'gallery'].forEach(col => {
   fs.ensureDirSync(path.join(CONTENT_DIR, col));
   fs.ensureDirSync(path.join(UPLOADS_DIR, col));
 });
@@ -121,7 +121,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
  */
 app.get('/api/content', async (req, res) => {
   try {
-    const collections = ['journal', 'tech', 'photography', 'collection', 'portfolio'];
+    const collections = ['journal', 'tech', 'photography', 'collection', 'portfolio', 'gear', 'timeline', 'favorites', 'home', 'gallery'];
     const allItems: any[] = [];
 
     for (const col of collections) {

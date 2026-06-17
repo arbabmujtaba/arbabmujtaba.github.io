@@ -12,6 +12,8 @@ import Footer from '../components/Footer';
 import MagicalGateway from '../components/MagicalGateway';
 import QuoteReveal from '../components/QuoteReveal';
 import ScrollIndicator from '../components/ScrollIndicator';
+import { getHomeConfig } from '../lib/cms';
+import { HomeConfigEntry } from '../types';
 
 interface HomeProps {
   setView: (view: string) => void;
@@ -22,87 +24,6 @@ interface ArchiveSectionProps {
   containerRef: React.RefObject<HTMLDivElement>;
   className?: string;
 }
-
-const GATEWAY_SECTIONS = [
-  {
-    id: 'portfolio',
-    label: '01 // Builder',
-    title: 'Portfolio',
-    description:
-      'Selected engineering work, shaped as case studies of systems, interfaces, and careful technical decisions.',
-    image:
-      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1800&q=80',
-  },
-  {
-    id: 'journal',
-    label: '02 // Thinker',
-    title: 'Journal',
-    description:
-      'Essays, observations, and fragments from the human side of learning, building, and becoming.',
-    image:
-      'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=80',
-  },
-  {
-    id: 'tech',
-    label: '03 // Engineer',
-    title: 'Tech',
-    description:
-      'A living lab of experiments, notes, architecture sketches, and problems worth opening twice.',
-    image:
-      'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1800&q=80',
-  },
-  {
-    id: 'photography',
-    label: '04 // Witness',
-    title: 'Photography',
-    description:
-      'Light, place, and memory gathered into a visual archive of streets, quiet details, and passing weather.',
-    image:
-      'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1800&q=80',
-  },
-  {
-    id: 'collection',
-    label: '05 // Curator',
-    title: 'Collection',
-    description:
-      'Books, music, objects, and references that leave a trace on taste, thought, and craft.',
-    image:
-      'https://images.unsplash.com/photo-1507842217343-583f20270319?auto=format&fit=crop&w=1800&q=80',
-  },
-];
-
-const QUOTES = [
-  {
-    text: 'Every project begins with curiosity.',
-    author: 'Archive Note 001',
-  },
-  {
-    text: 'Some stories are written. Others are captured.',
-    author: 'Archive Note 002',
-  },
-  {
-    text: 'Technology becomes meaningful when it touches real lives.',
-    author: 'Archive Note 003',
-  },
-];
-
-const PRINCIPLES = [
-  {
-    label: 'Memory',
-    title: 'Collected Slowly',
-    text: 'Projects, photographs, and notes are treated as evidence of a life in motion, not isolated entries on a page.',
-  },
-  {
-    label: 'Craft',
-    title: 'Built Carefully',
-    text: 'The technical work is grounded in systems thinking, pragmatic detail, and the quiet pleasure of making things hold together.',
-  },
-  {
-    label: 'Wonder',
-    title: 'Kept Alive',
-    text: 'The archive leaves room for mystery: enough movement to feel alive, enough restraint to stay personal and premium.',
-  },
-];
 
 function useSectionSeen() {
   const ref = useRef<HTMLElement>(null);
@@ -229,6 +150,13 @@ export default function Home({ setView }: HomeProps) {
     setView(section);
   };
 
+  // Load all home page config from CMS
+  const homeConfig = getHomeConfig().filter(h => h.visible).sort((a, b) => a.order - b.order);
+  const gatewaySections = homeConfig.filter(h => h.configType === 'gateway');
+  const quotes = homeConfig.filter(h => h.configType === 'quote');
+  const principles = homeConfig.filter(h => h.configType === 'principle');
+  const profile = homeConfig.find(h => h.configType === 'profile');
+
   return (
     <motion.div
       key="home"
@@ -266,7 +194,7 @@ export default function Home({ setView }: HomeProps) {
             transition={{ duration: 1.1, delay: 1.45, ease: [0.16, 1, 0.3, 1] }}
           >
             <p className="font-sans text-[11px] font-light uppercase leading-relaxed tracking-[0.28em] text-zinc-500">
-              A magical digital archive of projects, memories, technology, photography, and personal stories.
+              {profile?.description || 'A magical digital archive of projects, memories, technology, photography, and personal stories.'}
             </p>
           </motion.div>
 
@@ -283,8 +211,8 @@ export default function Home({ setView }: HomeProps) {
         <ArchiveSection containerRef={containerRef}>
           <div className="grid gap-10 md:grid-cols-[0.8fr_1.4fr] md:gap-24">
             <SectionHeading
-              eyebrow="Identity // Personal Index"
-              title="A quiet room for everything I am learning to build, see, and understand."
+              eyebrow={profile?.label || "Identity // Personal Index"}
+              title={profile?.title || "A quiet room for everything I am learning to build, see, and understand."}
             />
             <div className="self-end">
               <motion.p
@@ -294,8 +222,7 @@ export default function Home({ setView }: HomeProps) {
                 viewport={{ once: true, amount: 0.45 }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               >
-                Computer Engineering student at IET DAVV, Indore. Based between code,
-                cameras, Jammu &amp; Kashmir, and the small mysteries that make ordinary days worth documenting.
+                {profile?.description || "Computer Engineering student at IET DAVV, Indore. Based between code, cameras, Jammu & Kashmir, and the small mysteries that make ordinary days worth documenting."}
               </motion.p>
               <motion.p
                 className="mt-8 max-w-2xl font-sans text-sm font-light leading-relaxed text-zinc-400 md:text-base"
@@ -304,96 +231,105 @@ export default function Home({ setView }: HomeProps) {
                 viewport={{ once: true, amount: 0.45 }}
                 transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
               >
-                This homepage is the threshold: part portfolio, part journal, part visual memory bank. Every
-                section opens like a chapter in an archive that is still being written.
+                {profile?.body || "This homepage is the threshold: part portfolio, part journal, part visual memory bank. Every section opens like a chapter in an archive that is still being written."}
               </motion.p>
             </div>
           </div>
         </ArchiveSection>
 
-        <QuoteReveal
-          containerRef={containerRef}
-          quote={QUOTES[0].text}
-          author={QUOTES[0].author}
-        />
+        {quotes.length > 0 && (
+          <QuoteReveal
+            containerRef={containerRef}
+            quote={quotes[0]?.title || 'Every project begins with curiosity.'}
+            author={quotes[0]?.author || 'Archive Note 001'}
+          />
+        )}
 
-        <ArchiveSection containerRef={containerRef} className="pb-16 md:pb-40">
-          <div className="mb-10 flex flex-col justify-between gap-6 md:mb-24 md:flex-row md:items-end">
-            <SectionHeading
-              eyebrow="Gateways // Chapter Navigation"
-              title="Choose a doorway into the archive."
-              body="The main sections are no longer static cards. They are destinations: technical rooms, visual corridors, essays, collections, and work waiting behind the dark."
-            />
-            <motion.div
-              className="hidden h-px flex-1 bg-gradient-to-r from-orange-400/30 via-zinc-700/25 to-transparent md:block"
-              initial={{ scaleX: 0, transformOrigin: 'left' }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 1.1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-6 md:gap-6 lg:gap-8">
-            {GATEWAY_SECTIONS.map((section, index) => (
-              <MagicalGateway
-                key={section.id}
-                label={section.label}
-                title={section.title}
-                description={section.description}
-                image={section.image}
-                index={index}
-                featured={index === 0 || index === 3}
-                onClick={() => handleNavigate(section.id)}
+        {gatewaySections.length > 0 && (
+          <ArchiveSection containerRef={containerRef} className="pb-16 md:pb-40">
+            <div className="mb-10 flex flex-col justify-between gap-6 md:mb-24 md:flex-row md:items-end">
+              <SectionHeading
+                eyebrow="Gateways // Chapter Navigation"
+                title="Choose a doorway into the archive."
+                body="The main sections are no longer static cards. They are destinations: technical rooms, visual corridors, essays, collections, and work waiting behind the dark."
               />
-            ))}
-          </div>
-        </ArchiveSection>
+              <motion.div
+                className="hidden h-px flex-1 bg-gradient-to-r from-orange-400/30 via-zinc-700/25 to-transparent md:block"
+                initial={{ scaleX: 0, transformOrigin: 'left' }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 1.1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </div>
 
-        <QuoteReveal
-          containerRef={containerRef}
-          quote={QUOTES[1].text}
-          author={QUOTES[1].author}
-        />
-
-        <ArchiveSection containerRef={containerRef}>
-          <div className="grid gap-10 md:grid-cols-[0.9fr_1.5fr] md:gap-20">
-            <SectionHeading
-              eyebrow="Method // The Spellbook"
-              title="Motion with restraint. Detail with purpose."
-              body="The site should feel alive even when idle, but the movement stays slow, readable, and respectful of the editorial tone."
-            />
-
-            <div className="grid gap-6">
-              {PRINCIPLES.map((item, index) => (
-                <motion.article
-                  key={item.title}
-                  className="group relative overflow-hidden border border-zinc-800/45 bg-zinc-950/25 p-6 md:p-8"
-                  initial={{ opacity: 0, y: 32 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
-                  transition={{ duration: 0.75, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-400/35 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                  <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.28em] text-orange-400/65">
-                    {item.label}
-                  </p>
-                  <h3 className="font-serif text-2xl tracking-tight text-zinc-100 md:text-3xl">
-                    {item.title}
-                  </h3>
-                  <p className="mt-4 max-w-xl font-sans text-sm font-light leading-relaxed text-zinc-400">
-                    {item.text}
-                  </p>
-                </motion.article>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-6 md:gap-6 lg:gap-8">
+              {gatewaySections.map((section, index) => (
+                <MagicalGateway
+                  key={section.slug}
+                  label={section.label || ''}
+                  title={section.title}
+                  description={section.description || ''}
+                  image={section.image || ''}
+                  index={index}
+                  featured={index === 0 || index === 3}
+                  onClick={() => handleNavigate(section.navTarget || section.slug.replace('gateway-', ''))}
+                />
               ))}
             </div>
-          </div>
-        </ArchiveSection>
+          </ArchiveSection>
+        )}
 
-        <QuoteReveal
-          containerRef={containerRef}
-          quote={QUOTES[2].text}
-          author={QUOTES[2].author}
-        />
+        {quotes.length > 1 && (
+          <QuoteReveal
+            containerRef={containerRef}
+            quote={quotes[1]?.title || 'Some stories are written. Others are captured.'}
+            author={quotes[1]?.author || 'Archive Note 002'}
+          />
+        )}
+
+        {principles.length > 0 && (
+          <ArchiveSection containerRef={containerRef}>
+            <div className="grid gap-10 md:grid-cols-[0.9fr_1.5fr] md:gap-20">
+              <SectionHeading
+                eyebrow="Method // The Spellbook"
+                title="Motion with restraint. Detail with purpose."
+                body="The site should feel alive even when idle, but the movement stays slow, readable, and respectful of the editorial tone."
+              />
+
+              <div className="grid gap-6">
+                {principles.map((item, index) => (
+                  <motion.article
+                    key={item.slug}
+                    className="group relative overflow-hidden border border-zinc-800/45 bg-zinc-950/25 p-6 md:p-8"
+                    initial={{ opacity: 0, y: 32 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.35 }}
+                    transition={{ duration: 0.75, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-400/35 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.28em] text-orange-400/65">
+                      {item.label}
+                    </p>
+                    <h3 className="font-serif text-2xl tracking-tight text-zinc-100 md:text-3xl">
+                      {item.title}
+                    </h3>
+                    <p className="mt-4 max-w-xl font-sans text-sm font-light leading-relaxed text-zinc-400">
+                      {item.description}
+                    </p>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
+          </ArchiveSection>
+        )}
+
+        {quotes.length > 2 && (
+          <QuoteReveal
+            containerRef={containerRef}
+            quote={quotes[2]?.title || 'Technology becomes meaningful when it touches real lives.'}
+            author={quotes[2]?.author || 'Archive Note 003'}
+          />
+        )}
 
         <ArchiveSection containerRef={containerRef} className="text-center">
           <motion.div
@@ -410,11 +346,11 @@ export default function Home({ setView }: HomeProps) {
               Enter another chapter.
             </h2>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              {GATEWAY_SECTIONS.slice(0, 3).map((section) => (
+              {gatewaySections.slice(0, 3).map((section) => (
                 <motion.button
-                  key={section.id}
+                  key={section.slug}
                   type="button"
-                  onClick={() => handleNavigate(section.id)}
+                  onClick={() => handleNavigate(section.navTarget || section.slug.replace('gateway-', ''))}
                   className="group relative overflow-hidden border border-zinc-800/70 px-5 py-3 font-sans text-[10px] uppercase tracking-[0.24em] text-zinc-400 outline-none transition-colors duration-300 hover:border-orange-400/45 hover:text-zinc-100 focus-visible:border-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400/30"
                   whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.98 }}
