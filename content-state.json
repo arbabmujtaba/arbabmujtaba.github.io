@@ -191,6 +191,25 @@
       "filePath": "content/portfolio/moodmix.md"
     },
     {
+      "id": "portfolio/network-simulator",
+      "collection": "portfolio",
+      "slug": "network-simulator",
+      "title": "Network Simulator",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-06-11T04:05:30.026Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-11T04:05:30.026Z",
+      "updatedAt": "2026-06-11T04:05:30.026Z",
+      "publishedAt": "2026-06-11T04:05:30.026Z",
+      "filePath": "content/portfolio/network-simulator.md"
+    },
+    {
       "id": "portfolio/specwars",
       "collection": "portfolio",
       "slug": "specwars",
