@@ -303,7 +303,12 @@ export class PublishingService {
       // --- Step 2: Save Images ---
       this.updateStep(job, 'save_images', 'running', 'Processing images...');
       const imagePaths = await this.saveImages(payload);
-      this.updateStep(job, 'save_images', imagePaths.length > 0 ? 'success' : 'skipped', imagePaths.length > 0 ? `${imagePaths.length} image(s) saved` : 'No new images', { paths: imagePaths });
+
+      // --- Step 2b: Collect existing local image refs ---
+      const referencedImagePaths = await this.collectLocalImagePaths(payload);
+      const allImagePaths = [...new Set([...imagePaths, ...referencedImagePaths])];
+
+      this.updateStep(job, 'save_images', allImagePaths.length > 0 ? 'success' : 'skipped', allImagePaths.length > 0 ? `${allImagePaths.length} image(s) saved` : 'No new images', { paths: allImagePaths });
 
       // --- Step 3: Validate Markdown ---
       this.updateStep(job, 'validate_markdown', 'running', 'Validating markdown...');
@@ -336,7 +341,7 @@ export class PublishingService {
 
       // --- Step 7: Stage Files ---
       this.updateStep(job, 'stage_files', 'running', 'Staging changes...');
-      const allPaths = [...savedPaths, ...imagePaths];
+      const allPaths = [...savedPaths, ...allImagePaths];
       if (allPaths.length > 0) {
         await this.gitService.stageFiles(allPaths);
       }
@@ -439,6 +444,51 @@ export class PublishingService {
     }
 
     return savedPaths;
+  }
+
+  /**
+   * Scan frontmatter and markdown body for local /uploads/... image paths
+   * and return absolute filesystem paths for any that exist.
+   */
+  private async collectLocalImagePaths(payload: PublishPayload): Promise<string[]> {
+    const cwd = process.cwd();
+    const imageUrls: Set<string> = new Set();
+
+    // -- Frontmatter fields --
+    const scanValue = (val: unknown) => {
+      if (typeof val !== 'string') return;
+      const trimmed = val.trim();
+      if (trimmed.startsWith('/uploads/')) {
+        imageUrls.add(trimmed);
+      }
+    };
+
+    const fm = payload.frontmatter || {};
+    scanValue(fm.coverImage);
+    scanValue(fm.projectImage);
+    if (Array.isArray(fm.galleryImages)) {
+      for (const img of fm.galleryImages) {
+        scanValue(img);
+      }
+    }
+
+    // -- Markdown body: ![alt](/uploads/...) --
+    const bodyImageRegex = /!\[.*?\]\((\/uploads\/[^)]+)\)/g;
+    let match: RegExpExecArray | null;
+    while ((match = bodyImageRegex.exec(payload.body || '')) !== null) {
+      imageUrls.add(match[1]);
+    }
+
+    // Resolve to absolute paths and filter existing files
+    const result: string[] = [];
+    for (const url of imageUrls) {
+      const absPath = path.join(cwd, 'public', url);
+      const exists = await fs.pathExists(absPath);
+      if (exists) {
+        result.push(absPath);
+      }
+    }
+    return result;
   }
 }
 

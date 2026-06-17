@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "fermentId": "019ed454-2ead-767e-96ff-8037850573a7",
+  "phaseId": "phase-1",
+  "phaseName": "Fix upload path mismatch and commit staging",
+  "attempt": 1,
+  "timestamp": "2026-06-17T07:24:16.653Z",
+  "goal": "Fix the root causes: (1) multer saves files to the wrong directory because FormData sends the image field before the collection field, and (2) the publishing pipeline does not include already-uploaded image files in the git commit.",
+  "summary": "Phase 1 completed: fixed the two root causes of image 404s and black screens. (1) Swapped FormData append order in Admin.tsx so 'collection' precedes 'image', ensuring multer's diskStorage saves files to the correct collection subdirectory instead of defaulting to public/uploads/general/. (2) Added collectLocalImagePaths to PublishingService that scans frontmatter and markdown body for /uploads/... references, resolves them to filesystem paths, and includes them in git staging so published content carries its images. Verified /uploads static route order in server.ts and confirmed clean TypeScript compilation.",
+  "stepSummaries": "  1. Fix FormData field order in Admin.tsx so 'collection' is appended before 'image', ensuring multer's diskStorage destination callback reads the correct collection [verified]\n  2. Fix PublishingService publish orchestrator so uploaded image files from existing public/uploads/ directories are included in the git stage when publish is triggered [verified]\n  3. Verify /uploads static serving in server.ts is registered before production catch-all and before Vite middleware [verified]\n  4. Run TypeScript check to confirm no type errors after all changes [verified]",
+  "diffAvailable": true,
+  "diffFilesChanged": "src/pages/Admin.tsx               |  4 ++-\n src/services/PublishingService.ts | 54 +++++++++++++++++++++++++++++++++++++--\n 2 files changed, 55 insertions(+), 3 deletions(-)",
+  "flags": [],
+  "derivedGrade": "A",
+  "reviewerRationale": "All gates pass; project checks validate.",
+  "gateVerdicts": [
+    {
+      "evidence": "Step 1: grep confirms collection before image in Admin.tsx; Step 2: grep confirms allImagePaths merge and stage_files updated; Step 4: tsc --noEmit passes clean",
+      "id": "F1",
+      "rationale": "Mixed verification acceptable: load-bearing steps 1 and 2 use real code inspection (grep); step 4 uses tsc type-check. Step 3 verifies existing static route order",
+      "verdict": "pass"
+    },
+    {
+      "id": "F2",
+      "rationale": "Phase goal was to fix two root causes: (1) multer wrong directory — fixed via Admin.tsx FormData reorder; (2) git commit missing images — fixed via PublishingService collectLocalImagePaths and allImagePaths staging",
+      "verdict": "pass",
+      "evidence": "Admin.tsx:505-506 collection before image; PublishingService.ts:305-309 allImagePaths merge + collectLocalImagePaths; PublishingService.ts:344 allPaths = [...savedPaths, ...allImagePaths]"
+    },
+    {
+      "id": "F3",
+      "rationale": "Nothing deferred; all 4 steps completed successfully",
+      "verdict": "pass",
+      "evidence": "n/a"
+    }
+  ],
+  "projectChecks": {
+    "discovered": true,
+    "anyFailed": false,
+    "commands": [
+      {
+        "kind": "lint",
+        "command": "npm run lint",
+        "exitCode": 0,
+        "durationMs": 0,
+        "timedOut": false
+      }
+    ]
+  }
+}

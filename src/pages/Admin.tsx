@@ -500,8 +500,10 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setErrorMessage('');
     
     const formData = new FormData();
-    formData.append('image', file);
+    // MUST append collection BEFORE image so multer's diskStorage
+    // destination callback can read req.body.collection when saving.
     formData.append('collection', activeCollection);
+    formData.append('image', file);
 
     try {
       const res = await fetch('/api/upload', {

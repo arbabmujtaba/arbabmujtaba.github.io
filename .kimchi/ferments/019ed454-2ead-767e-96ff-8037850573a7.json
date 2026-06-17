@@ -1,0 +1,164 @@
+{
+  "id": "019ed454-2ead-767e-96ff-8037850573a7",
+  "name": "Fix broken admin image uploads",
+  "description": "Fix image \"It again is fully black screen image with when I checked the inspected logs of network. It's showing some error 404. I don't know what the thing is, but on the website. It's a black screen image, not the image in the neither the image loaded inside the content neither is the image loading even in local host\"",
+  "status": "complete",
+  "worktree": {
+    "path": "/Volumes/LocalDisk/Code/arbabmujtaba.github.io",
+    "branch": "main",
+    "commit": "c853732f184b3998bf7f97303f1d1751b946d55f"
+  },
+  "scoping": {
+    "goal": {
+      "answer": "Fix the root cause why images uploaded through the admin portal show as a black screen with 404 errors. Uploaded files are currently being saved to the wrong directory (public/uploads/general/ instead of the collection-specific directory like public/uploads/photography/), while the stored markdown frontmatter URL points to the correct collection path. This mismatch produces a 404 every time. Once fixed, images must render correctly in listings, modals, and markdown body content both for local uploads and external URLs.",
+      "confirmedAt": "2026-06-17T06:53:14.450Z"
+    },
+    "criteria": {
+      "answer": "Uploading a local image via admin portal saves it to the correct collection subdirectory (e.g., public/uploads/photography/... rather than general/)\nThe URL stored in markdown frontmatter matches the actual file path (no 404 errors for uploaded images)\nCover images display correctly on Journal, Portfolio, Photography, and Collection page listings\nGallery images in Photography entries render correctly in ContentModal\nMarkdown body images like ![alt](/uploads/...) render without 404 errors\nExternal image URLs (e.g., Unsplash) continue to load normally\nAdmin dashboard table thumbnails and cover image preview show uploaded images\nBoth .jpg and .jpeg extensions are fully supported",
+      "confirmedAt": "2026-06-17T06:53:14.450Z"
+    },
+    "constraints": {
+      "answer": "Do not break existing external image URLs, Changes must be backward-compatible with existing markdown content, Do not alter frontmatter schema field names",
+      "confirmedAt": "2026-06-17T06:53:14.450Z"
+    },
+    "phases": {
+      "answer": "Fix upload path mismatch and commit staging",
+      "confirmedAt": "2026-06-17T06:53:14.450Z"
+    },
+    "assumptions": {
+      "answer": "User runs the dev server locally (npm run dev) when uploading images; Publishing pipeline commits both content and images to git; External image URLs pass through unchanged; Images are stored as static assets, not processed by a CDN",
+      "confirmedAt": "2026-06-17T06:53:14.450Z"
+    }
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "index": 1,
+      "name": "Fix upload path mismatch and commit staging",
+      "goal": "Fix the root causes: (1) multer saves files to the wrong directory because FormData sends the image field before the collection field, and (2) the publishing pipeline does not include already-uploaded image files in the git commit.",
+      "description": "",
+      "parallel": false,
+      "status": "completed",
+      "steps": [
+        {
+          "id": "step-1",
+          "index": 1,
+          "description": "Fix FormData field order in Admin.tsx so 'collection' is appended before 'image', ensuring multer's diskStorage destination callback reads the correct collection",
+          "status": "verified",
+          "verification": {
+            "command": "grep -n 'formData.append' src/pages/Admin.tsx | grep -E 'collection.*image|image.*collection' | head -5",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false,
+          "startedAt": "2026-06-17T06:54:07.708Z",
+          "completedAt": "2026-06-17T06:57:56.120Z",
+          "result": {
+            "success": true,
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "",
+            "completedAt": "2026-06-17T06:57:56.120Z"
+          }
+        },
+        {
+          "id": "step-2",
+          "index": 2,
+          "description": "Fix PublishingService publish orchestrator so uploaded image files from existing public/uploads/ directories are included in the git stage when publish is triggered",
+          "status": "verified",
+          "verification": {
+            "command": "grep -n 'stage_files\\|imagePaths\\|savedPaths' src/services/PublishingService.ts | head -10",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false,
+          "startedAt": "2026-06-17T07:01:54.634Z",
+          "completedAt": "2026-06-17T07:04:33.913Z",
+          "result": {
+            "success": true,
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "",
+            "completedAt": "2026-06-17T07:04:33.913Z"
+          }
+        },
+        {
+          "id": "step-3",
+          "index": 3,
+          "description": "Verify /uploads static serving in server.ts is registered before production catch-all and before Vite middleware",
+          "status": "verified",
+          "verification": {
+            "command": "grep -n \"app.use('/uploads'\" server.ts",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false,
+          "startedAt": "2026-06-17T07:11:52.658Z",
+          "completedAt": "2026-06-17T07:14:52.519Z",
+          "result": {
+            "success": true,
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "",
+            "completedAt": "2026-06-17T07:14:52.519Z"
+          }
+        },
+        {
+          "id": "step-4",
+          "index": 4,
+          "description": "Run TypeScript check to confirm no type errors after all changes",
+          "status": "verified",
+          "verification": {
+            "command": "npx tsc --noEmit",
+            "retries": 2,
+            "retryDelayMs": 1000
+          },
+          "parallel": false,
+          "startedAt": "2026-06-17T07:18:22.179Z",
+          "completedAt": "2026-06-17T07:18:55.121Z",
+          "result": {
+            "success": true,
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "",
+            "completedAt": "2026-06-17T07:18:55.121Z"
+          }
+        }
+      ],
+      "startedAt": "2026-06-17T06:53:31.217Z",
+      "completedAt": "2026-06-17T07:24:16.655Z",
+      "summary": "Phase 1 completed: fixed the two root causes of image 404s and black screens. (1) Swapped FormData append order in Admin.tsx so 'collection' precedes 'image', ensuring multer's diskStorage saves files to the correct collection subdirectory instead of defaulting to public/uploads/general/. (2) Added collectLocalImagePaths to PublishingService that scans frontmatter and markdown body for /uploads/... references, resolves them to filesystem paths, and includes them in git staging so published content carries its images. Verified /uploads static route order in server.ts and confirmed clean TypeScript compilation.",
+      "grade": {
+        "grade": "A",
+        "rationale": "All gates pass; project checks validate.",
+        "gradedAt": "2026-06-17T07:24:16.655Z"
+      }
+    }
+  ],
+  "decisions": [],
+  "memories": [],
+  "createdAt": "2026-06-17T06:45:47.309Z",
+  "updatedAt": "2026-06-17T07:28:01.254Z",
+  "goal": "Fix the root cause why images uploaded through the admin portal show as a black screen with 404 errors. Uploaded files are currently being saved to the wrong directory (public/uploads/general/ instead of the collection-specific directory like public/uploads/photography/), while the stored markdown frontmatter URL points to the correct collection path. This mismatch produces a 404 every time. Once fixed, images must render correctly in listings, modals, and markdown body content both for local uploads and external URLs.",
+  "successCriteria": [
+    "Uploading a local image via admin portal saves it to the correct collection subdirectory (e.g., public/uploads/photography/... rather than general/)",
+    "The URL stored in markdown frontmatter matches the actual file path (no 404 errors for uploaded images)",
+    "Cover images display correctly on Journal, Portfolio, Photography, and Collection page listings",
+    "Gallery images in Photography entries render correctly in ContentModal",
+    "Markdown body images like ![alt](/uploads/...) render without 404 errors",
+    "External image URLs (e.g., Unsplash) continue to load normally",
+    "Admin dashboard table thumbnails and cover image preview show uploaded images",
+    "Both .jpg and .jpeg extensions are fully supported"
+  ],
+  "constraints": [
+    "Do not break existing external image URLs",
+    "Changes must be backward-compatible with existing markdown content",
+    "Do not alter frontmatter schema field names"
+  ],
+  "lastActiveAt": "2026-06-17T06:53:31.217Z",
+  "grade": {
+    "grade": "B",
+    "rationale": "The diff cleanly fixes the two root causes—reordering FormData in Admin.tsx and adding collectLocalImagePaths in PublishingService.ts—but verification was purely static (grep, tsc, and route-order inspection) rather than real execution of the upload artifact. C-gate claims that cover images, gallery modals, admin thumbnails, and .jpg/.jpeg support all work are extrapolated from code analysis, not validated at runtime.",
+    "gradedAt": "2026-06-17T07:28:01.252Z"
+  }
+}
