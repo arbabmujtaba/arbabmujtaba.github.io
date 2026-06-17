@@ -4,7 +4,9 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
+import SafeImage from '../components/SafeImage';
 import { getPortfolioProjects } from '../lib/cms';
+import { normalizeImagePath } from '../lib/image';
 import { PortfolioProject } from '../types';
 
 const technicalSkills = [
@@ -103,12 +105,16 @@ export default function Portfolio() {
                   </div>
                   <div className="lg:w-[55%] order-1 lg:order-2">
                     <div className="aspect-[4/3] bg-zinc-900 border border-zinc-800/50 relative overflow-hidden flex items-center justify-center group-hover:border-orange-500/30 transition-colors duration-700">
-                      <ParallaxImage 
-                        src={project.projectImage}
-                        alt={project.title}
-                        className="w-full h-full opacity-60 mix-blend-luminosity"
-                        imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
-                      />
+                      {normalizeImagePath(project.projectImage) ? (
+                        <ParallaxImage 
+                          src={project.projectImage}
+                          alt={project.title}
+                          className="w-full h-full opacity-60 mix-blend-luminosity"
+                          imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                        />
+                      ) : (
+                        <SafeImage src={project.projectImage} alt={project.title} className="w-full h-full opacity-40" />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-tr from-zinc-950/80 to-transparent pointer-events-none"></div>
                     </div>
                   </div>

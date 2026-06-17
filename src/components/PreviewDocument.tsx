@@ -8,6 +8,8 @@
 
 import React from 'react';
 import Markdown from 'react-markdown';
+import SafeImage from './SafeImage';
+import { normalizeImagePath } from '../lib/image';
 
 interface PreviewDocumentProps {
   frontmatter: Record<string, any>;
@@ -30,10 +32,10 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
     <div className="min-h-screen bg-[#0d0d0c] text-zinc-100">
       <div className="p-6 md:p-12 lg:p-16 space-y-12 max-w-4xl mx-auto">
         {/* Cover image banner */}
-        {coverImage && (
+        {normalizeImagePath(coverImage) && (
           <div className="relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950">
             <img
-              src={coverImage}
+              src={normalizeImagePath(coverImage)!}
               alt={title}
               className="w-full h-full object-cover grayscale-[15%]"
               referrerPolicy="no-referrer"
@@ -108,24 +110,40 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
 
         {/* Markdown content */}
         <div className="markdown-body pt-4 border-t border-zinc-900">
-          <Markdown>{body}</Markdown>
+          <Markdown
+            components={{
+              img: ({ src, alt, ...rest }) => (
+                <SafeImage
+                  src={src}
+                  alt={alt || ''}
+                  className="max-w-full rounded-sm border border-zinc-900 my-4"
+                  {...rest}
+                />
+              ),
+            }}
+          >
+            {body}
+          </Markdown>
         </div>
 
         {/* Gallery */}
-        {galleryImages.length > 0 && (
+        {galleryImages.filter(normalizeImagePath).length > 0 && (
           <div className="space-y-8 pt-8 border-t border-zinc-900">
             <h3 className="font-serif text-2xl text-zinc-200">Gallery</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              {galleryImages.map((img: string, idx: number) => (
-                <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
-                  <img
-                    src={img}
-                    alt={`Gallery slide ${idx + 1}`}
-                    className="w-full h-full object-cover grayscale-[10%]"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))}
+              {galleryImages.map((img: string, idx: number) => {
+                const normalized = normalizeImagePath(img);
+                return normalized ? (
+                  <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
+                    <img
+                      src={normalized}
+                      alt={`Gallery slide ${idx + 1}`}
+                      className="w-full h-full object-cover grayscale-[10%]"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                ) : null;
+              })}
             </div>
           </div>
         )}

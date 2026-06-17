@@ -44,6 +44,10 @@ fs.ensureDirSync(UPLOADS_DIR);
   fs.ensureDirSync(path.join(UPLOADS_DIR, col));
 });
 
+// Serve uploaded images explicitly — needed in production where only dist/ is served
+// In dev, Vite also serves public/ but this ensures consistency
+app.use('/uploads', express.static(UPLOADS_DIR));
+
 // Configure Multer storage to place images in collection-specific uploads directories
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

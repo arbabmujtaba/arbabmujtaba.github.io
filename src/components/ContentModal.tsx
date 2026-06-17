@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { X, Calendar, Tag, ArrowUpRight } from 'lucide-react';
 import Markdown from 'react-markdown';
+import SafeImage from './SafeImage';
+import { normalizeImagePath } from '../lib/image';
 
 interface ContentModalProps {
   isOpen: boolean;
@@ -95,9 +97,9 @@ export default function ContentModal({
         {/* Content canvas */}
         <div className="p-6 md:p-12 lg:p-16 space-y-12">
           {/* Cover image banner */}
-          {coverImage && (
+          {normalizeImagePath(coverImage) && (
             <div className="relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950">
-              <img 
+              <SafeImage 
                 src={coverImage} 
                 alt={title} 
                 className="w-full h-full object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-700"
@@ -174,7 +176,20 @@ export default function ContentModal({
 
           {/* Markdown Content Parser */}
           <div className="markdown-body pt-4 border-t border-zinc-900">
-            <Markdown>{body}</Markdown>
+            <Markdown
+              components={{
+                img: ({ src, alt, ...rest }) => (
+                  <SafeImage
+                    src={src}
+                    alt={alt || ''}
+                    className="max-w-full rounded-sm border border-zinc-900 my-4"
+                    {...rest}
+                  />
+                ),
+              }}
+            >
+              {body}
+            </Markdown>
           </div>
 
           {/* Photography Gallery Images if available */}
@@ -182,16 +197,19 @@ export default function ContentModal({
             <div className="space-y-8 pt-8 border-t border-zinc-900">
               <h3 className="font-serif text-2xl text-zinc-200">Gallery</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {metadata.galleryImages.map((img, idx) => (
-                  <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
-                    <img 
-                      src={img} 
-                      alt={`Gallery slide ${idx + 1}`} 
-                      className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700 hover:scale-105"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                ))}
+                {metadata.galleryImages
+                  .map((img, idx) => ({ img, idx, normalized: normalizeImagePath(img) }))
+                  .filter(({ normalized }) => normalized)
+                  .map(({ img, idx, normalized }) => (
+                    <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
+                      <SafeImage 
+                        src={normalized!} 
+                        alt={`Gallery slide ${idx + 1}`} 
+                        className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700 hover:scale-105"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  ))}
               </div>
             </div>
           )}

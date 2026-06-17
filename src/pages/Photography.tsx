@@ -5,7 +5,9 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
+import SafeImage from '../components/SafeImage';
 import { getPhotographyEntries } from '../lib/cms';
+import { normalizeImagePath } from '../lib/image';
 import { PhotographyEntry } from '../types';
 
 const defaultPhotoSections = [
@@ -121,12 +123,16 @@ export default function Photography() {
                      onClick={() => setSelectedPhoto(photo)}
                      className="cursor-pointer group/photo"
                    >
-                      <ParallaxImage 
-                        src={photo.coverImage}
-                        alt={photo.title}
-                        className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover/photo:border-orange-500/35 transition-colors"
-                        imageClassName="grayscale-[20%] group-hover/photo:grayscale-0 transition-all duration-1000 scale-105 group-hover/photo:scale-100"
-                      />
+                      {normalizeImagePath(photo.coverImage) ? (
+                        <ParallaxImage 
+                          src={photo.coverImage}
+                          alt={photo.title}
+                          className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover/photo:border-orange-500/35 transition-colors"
+                          imageClassName="grayscale-[20%] group-hover/photo:grayscale-0 transition-all duration-1000 scale-105 group-hover/photo:scale-100"
+                        />
+                      ) : (
+                        <div className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8" />
+                      )}
                       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                         <div className="max-w-md">
                           <h3 className="font-serif text-2xl text-zinc-200 mb-2 group-hover/photo:text-orange-200 transition-colors">{photo.title}</h3>
@@ -203,12 +209,16 @@ export default function Photography() {
                   className="group cursor-pointer block"
                 >
                   <div className="relative overflow-hidden mb-6 border border-zinc-850">
-                    <ParallaxImage 
-                      src={photo.coverImage}
-                      alt={photo.title}
-                      className="w-full aspect-[16/10] bg-zinc-900"
-                      imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"
-                    />
+                    {normalizeImagePath(photo.coverImage) ? (
+                      <ParallaxImage 
+                        src={photo.coverImage}
+                        alt={photo.title}
+                        className="w-full aspect-[16/10] bg-zinc-900"
+                        imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full aspect-[16/10] bg-zinc-900" />
+                    )}
                     <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
                   </div>
                   <div className="flex flex-col gap-4">

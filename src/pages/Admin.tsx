@@ -7,6 +7,8 @@ import {
   Filter, Award, Loader2, ArrowUpRight, Archive, RotateCcw, Rocket, Activity
 } from 'lucide-react';
 import Markdown from 'react-markdown';
+import SafeImage from '../components/SafeImage';
+import { normalizeImagePath } from '../lib/image';
 import PreviewFrame from '../components/PreviewFrame';
 import DeploymentCenter from '../components/DeploymentCenter';
 import PublishingModal from '../components/PublishingModal';
@@ -857,12 +859,17 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-4">
-                            {item.coverImage ? (
-                              <img 
+                            {normalizeImagePath(item.coverImage) ? (
+                              <SafeImage 
                                 src={item.coverImage} 
                                 alt={item.title} 
                                 className="w-9 h-12 object-cover border border-zinc-800 bg-zinc-900 rounded-sm"
                                 referrerPolicy="no-referrer"
+                                fallback={
+                                  <div className="w-9 h-12 bg-zinc-900 rounded-sm border border-zinc-800 flex items-center justify-center">
+                                    <FileText className="w-4 h-4 text-zinc-600" />
+                                  </div>
+                                }
                               />
                             ) : (
                               <div className="w-9 h-12 bg-zinc-900 rounded-sm border border-zinc-800 flex items-center justify-center">
@@ -1230,10 +1237,10 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                       )}
                     </div>
 
-                    {formCoverImage && (
+                    {normalizeImagePath(formCoverImage) && (
                       <div className="mt-4 flex items-center justify-between p-3 border border-zinc-900 bg-zinc-950/50 rounded-sm">
                         <div className="flex items-center gap-3">
-                          <img src={formCoverImage} alt="Cover Preview" className="w-12 h-12 object-cover border border-zinc-800 bg-zinc-950" referrerPolicy="no-referrer" />
+                          <SafeImage src={formCoverImage} alt="Cover Preview" className="w-12 h-12 object-cover border border-zinc-800 bg-zinc-950" referrerPolicy="no-referrer" />
                           <span className="font-mono text-[10px] text-zinc-400 text-ellipsis overflow-hidden max-w-sm">{formCoverImage}</span>
                         </div>
                         <button type="button" onClick={() => setFormCoverImage('')} className="font-sans text-xs text-zinc-500 hover:text-red-400 cursor-pointer">Remove image</button>
@@ -1284,7 +1291,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {galleryImages.map((src, pIdx) => (
                               <div key={pIdx} className="relative aspect-square border border-zinc-850 bg-zinc-950 group/gal">
-                                <img src={src} alt="Gallery slide" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                <SafeImage src={src} alt="Gallery slide" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/gal:opacity-100 transition-opacity flex items-center justify-center">
                                   <button
                                     type="button"

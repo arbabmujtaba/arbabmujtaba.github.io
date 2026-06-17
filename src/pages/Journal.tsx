@@ -4,7 +4,9 @@ import ExploreArrow from '../components/ExploreArrow';
 import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
+import SafeImage from '../components/SafeImage';
 import { getJournalEntries } from '../lib/cms';
+import { normalizeImagePath } from '../lib/image';
 import { JournalEntry } from '../types';
 import { Disc3 } from 'lucide-react';
 
@@ -103,11 +105,15 @@ export default function Journal() {
             <div className="border border-zinc-800/80 bg-zinc-900/40 p-8 md:p-12 lg:p-16 relative overflow-hidden group">
                {/* Background Image / Texture overlay */}
                <div className="absolute inset-0 opacity-10 mix-blend-overlay group-hover:opacity-20 transition-opacity duration-1000">
-                 <ParallaxImage 
-                   src={featuredEntry.coverImage || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80"}
-                   alt={featuredEntry.title}
-                   className="w-full h-full object-cover"
-                 />
+                 {normalizeImagePath(featuredEntry.coverImage) ? (
+                   <ParallaxImage 
+                     src={featuredEntry.coverImage!}
+                     alt={featuredEntry.title}
+                     className="w-full h-full object-cover"
+                   />
+                 ) : (
+                   <div className="w-full h-full bg-zinc-900" />
+                 )}
                </div>
                
                <div className="relative z-10 flex flex-col md:flex-row gap-12 lg:gap-24">

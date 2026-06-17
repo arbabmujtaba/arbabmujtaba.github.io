@@ -258,8 +258,39 @@
       "filePath": "content/photography/bleeding-sky.md",
       "lastReviewedAt": "2026-06-17T05:27:39.149Z",
       "publishedAt": "2026-06-17T05:27:43.458Z"
+    },
+    {
+      "id": "photography/life-gets-beautiful",
+      "collection": "photography",
+      "slug": "life-gets-beautiful",
+      "title": "Life Gets Beautiful",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-17T06:40:39.399Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-17T06:40:45.388Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-17T06:40:48.480Z",
+          "commitHash": "7ef4ba4a4b264782734dd1f739f70d727b5bbf70"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-17T06:40:39.399Z",
+      "updatedAt": "2026-06-17T06:40:48.480Z",
+      "filePath": "content/photography/life-gets-beautiful.md",
+      "lastReviewedAt": "2026-06-17T06:40:45.388Z",
+      "publishedAt": "2026-06-17T06:40:48.480Z"
     }
   ],
-  "lastUpdated": "2026-06-17T05:27:43.494Z",
+  "lastUpdated": "2026-06-17T06:40:48.505Z",
   "version": 1
 }

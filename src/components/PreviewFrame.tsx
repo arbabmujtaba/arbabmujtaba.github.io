@@ -9,6 +9,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Monitor, Tablet, Smartphone, Loader2, RefreshCw, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { normalizeImagePath } from '../lib/image';
 
 type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 
@@ -41,7 +42,8 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
     const title = frontmatter.title || 'Untitled';
     const date = frontmatter.date || '';
     const category = frontmatter.category || '';
-    const coverImage = frontmatter.coverImage || frontmatter.projectImage || '';
+    const rawCover = frontmatter.coverImage || frontmatter.projectImage || '';
+    const coverImage = normalizeImagePath(rawCover);
 
     // Simple markdown-to-HTML conversion for live preview (basic)
     const htmlBody = body
@@ -60,7 +62,7 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
 
     const coverHtml = coverImage
       ? `<div class="relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950 mb-10">
-           <img src="${coverImage}" alt="${title}" class="w-full h-full object-cover grayscale-[15%]" referrerPolicy="no-referrer" />
+           <img src="${coverImage}" alt="${title}" class="w-full h-full object-cover grayscale-[15%]" referrerPolicy="no-referrer" onerror="this.style.display='none'" />
          </div>`
       : '';
 
