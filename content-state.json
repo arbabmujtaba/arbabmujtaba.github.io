@@ -20,44 +20,6 @@
       "filePath": "content/journal/growing-up.md"
     },
     {
-      "id": "journal/launching-architecture",
-      "collection": "journal",
-      "slug": "launching-architecture",
-      "title": "Launching the New Architecture",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2024-12-01T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2024-12-01T00:00:00.000Z",
-      "updatedAt": "2024-12-01T00:00:00.000Z",
-      "publishedAt": "2024-12-01T00:00:00.000Z",
-      "filePath": "content/journal/launching-architecture.md"
-    },
-    {
-      "id": "journal/the-art-of-slowing-down",
-      "collection": "journal",
-      "slug": "the-art-of-slowing-down",
-      "title": "The Art of Slowing Down",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2024-10-12T00:00:00.000Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2024-10-12T00:00:00.000Z",
-      "updatedAt": "2024-10-12T00:00:00.000Z",
-      "publishedAt": "2024-10-12T00:00:00.000Z",
-      "filePath": "content/journal/the-art-of-slowing-down.md"
-    },
-    {
       "id": "photography/chasing-first-light",
       "collection": "photography",
       "slug": "chasing-first-light",
@@ -267,6 +229,6 @@
       "filePath": "content/portfolio/student-attendance.md"
     }
   ],
-  "lastUpdated": "2026-06-17T04:53:21.099Z",
+  "lastUpdated": "2026-06-17T05:17:30.198Z",
   "version": 1
 }
