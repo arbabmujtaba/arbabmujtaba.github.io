@@ -227,8 +227,39 @@
       "updatedAt": "2026-06-11T04:05:30.026Z",
       "publishedAt": "2026-06-11T04:05:30.026Z",
       "filePath": "content/portfolio/student-attendance.md"
+    },
+    {
+      "id": "photography/bleeding-sky",
+      "collection": "photography",
+      "slug": "bleeding-sky",
+      "title": "Bleeding Sky",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-17T05:27:34.295Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-17T05:27:39.149Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-17T05:27:43.458Z",
+          "commitHash": "db47120a9faa3507a740a00414f8e689b6af83e1"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-17T05:27:34.295Z",
+      "updatedAt": "2026-06-17T05:27:43.458Z",
+      "filePath": "content/photography/bleeding-sky.md",
+      "lastReviewedAt": "2026-06-17T05:27:39.149Z",
+      "publishedAt": "2026-06-17T05:27:43.458Z"
     }
   ],
-  "lastUpdated": "2026-06-17T05:22:30.694Z",
+  "lastUpdated": "2026-06-17T05:27:43.494Z",
   "version": 1
 }
