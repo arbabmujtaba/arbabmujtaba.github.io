@@ -21,15 +21,6 @@ const defaultPhotoSections = [
     ]
   },
   {
-    title: "Connected",
-    description: "Stories, faces, and the invisible threads between people.",
-    photos: [
-      { id: 4, src: "https://images.unsplash.com/photo-1525286102598-6415bf3721fb?auto=format&fit=crop&w=800&q=80", alt: "Street market" },
-      { id: 5, src: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=80", alt: "People interacting" },
-      { id: 6, src: "https://images.unsplash.com/photo-1529156069898-49953eb1f5bc?auto=format&fit=crop&w=800&q=80", alt: "Friends walking" },
-    ]
-  },
-  {
     title: "Travel",
     description: "Journeys outward to journey inward. Places that left a mark.",
     photos: [
