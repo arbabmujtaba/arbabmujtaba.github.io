@@ -89,18 +89,18 @@ export default function App() {
         
         {/* Header containing Name and Navigation */}
         {view !== 'admin' && (
-          <header className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center pt-5 px-4 md:px-12 lg:px-16 md:pt-12 relative z-20 gap-0 sm:gap-8">
+          <header className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center pt-5 px-4 md:px-12 lg:px-16 md:pt-8 relative z-20 gap-0 sm:gap-8">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: view === 'home' ? 0 : 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-              className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-1 md:mt-8 ${view === 'home' ? 'pointer-events-none' : ''}`}
+              className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-1 md:mt-5 ${view === 'home' ? 'pointer-events-none' : ''}`}
               onClick={() => setView('home')}
             >
               Arbab <span className="italic text-orange-500/80">Mujtaba.</span>
             </motion.div>
             
-            <div className="pt-0 md:pt-8 z-50">
+            <div className="pt-0 md:pt-5 z-50">
               <Navigation activeView={view} setView={setView} />
             </div>
           </header>

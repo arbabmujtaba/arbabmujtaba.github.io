@@ -7,6 +7,7 @@ import {
   useTransform,
 } from 'motion/react';
 import CinematicImageReveal from '../components/CinematicImageReveal';
+import EditorialPortrait, { PortraitOrbitals } from '../components/EditorialPortrait';
 import EnhancedHeroName from '../components/EnhancedHeroName';
 import Footer from '../components/Footer';
 import MagicalGateway from '../components/MagicalGateway';
@@ -171,10 +172,13 @@ export default function Home({ setView }: HomeProps) {
         className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto scroll-smooth"
       >
         <section className="relative flex flex-col justify-start md:min-h-[94vh] md:justify-end overflow-hidden px-4 pb-8 pt-6 md:pt-24 md:px-12 md:pb-36 lg:px-16">
+          {/* MIDDLE LAYER — editorial portrait, sits behind the ARCHIVE type */}
+          <EditorialPortrait />
+
           <motion.div
             aria-hidden="true"
             style={shouldReduceMotion ? undefined : { y: archiveMarkY }}
-            className="pointer-events-none absolute right-4 top-24 z-0 hidden font-serif text-[12vw] uppercase leading-none tracking-tighter text-zinc-900/35 lg:block"
+            className="pointer-events-none absolute right-4 top-4 z-[4] hidden font-serif text-[12vw] uppercase leading-none tracking-tighter text-zinc-900/35 lg:block"
           >
             Archive
           </motion.div>
@@ -186,9 +190,12 @@ export default function Home({ setView }: HomeProps) {
             <EnhancedHeroName />
           </motion.div>
 
+          {/* TOP LAYER — orbital lines, particles & atmospheric lighting */}
+          <PortraitOrbitals />
+
           <motion.div
             aria-hidden="true"
-            className="absolute bottom-24 right-6 hidden max-w-[18rem] border-l border-orange-400/25 pl-6 md:right-12 md:block lg:right-16"
+            className="absolute bottom-24 right-6 z-20 hidden max-w-[18rem] border-l border-orange-400/25 pl-6 md:right-12 md:block lg:right-16"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1.1, delay: 1.45, ease: [0.16, 1, 0.3, 1] }}
