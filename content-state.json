@@ -320,8 +320,39 @@
       "filePath": "content/photography/help.md",
       "lastReviewedAt": "2026-06-17T07:37:42.187Z",
       "publishedAt": "2026-06-17T07:37:45.197Z"
+    },
+    {
+      "id": "collection/test",
+      "collection": "collection",
+      "slug": "test",
+      "title": "TEST",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-18T15:52:09.073Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-18T15:52:13.774Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-18T15:52:16.793Z",
+          "commitHash": "3d320f3b2683420b171f34783ec4108fa16ebe6c"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-18T15:52:09.073Z",
+      "updatedAt": "2026-06-18T15:52:16.793Z",
+      "filePath": "content/collection/test.md",
+      "lastReviewedAt": "2026-06-18T15:52:13.774Z",
+      "publishedAt": "2026-06-18T15:52:16.793Z"
     }
   ],
-  "lastUpdated": "2026-06-17T07:37:45.226Z",
+  "lastUpdated": "2026-06-18T15:52:16.829Z",
   "version": 1
 }

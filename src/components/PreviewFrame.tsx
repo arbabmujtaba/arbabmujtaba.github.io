@@ -6,7 +6,7 @@
  * production-like rendering with actual site CSS.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Monitor, Tablet, Smartphone, Loader2, RefreshCw, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { normalizeImagePath } from '../lib/image';
@@ -35,7 +35,38 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
   const [key, setKey] = useState(0);
   const [srcdoc, setSrcdoc] = useState<string>('');
 
+  // Available space inside the scroll canvas (content box, excluding padding).
+  // Used to scale the device viewport so the *full* logical layout (e.g. a
+  // 1200px desktop) fits the pane instead of being clamped to half the screen
+  // — which previously left the dark hero/cover dominating the visible area.
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [avail, setAvail] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    const measure = () => {
+      const style = window.getComputedStyle(el);
+      const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+      setAvail({
+        width: Math.max(0, el.clientWidth - padX),
+        height: Math.max(0, el.clientHeight - padY),
+      });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const config = VIEWPORT_CONFIGS[mode];
+
+  // Scale the device frame down to fit the available width (never up past 1:1).
+  const scale = avail.width > 0 ? Math.min(1, avail.width / config.width) : 1;
+  // The unscaled frame height is chosen so that, once scaled, it exactly fills
+  // the available canvas height. Falls back to a sane default before measuring.
+  const frameHeight = avail.height > 0 ? Math.max(400, avail.height / scale) : 400;
 
   // Build live srcdoc when liveContent changes
   const buildLiveSrcdoc = useCallback((body: string, frontmatter: Record<string, any>) => {
@@ -159,7 +190,10 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
       </div>
 
       {/* Viewport Canvas */}
-      <div className="flex-1 overflow-auto bg-zinc-950/30 flex justify-center p-4 custom-scrollbar">
+      <div
+        ref={canvasRef}
+        className="flex-1 overflow-auto bg-zinc-950/30 flex justify-center items-start p-4 custom-scrollbar"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={`${mode}-${key}`}
@@ -167,37 +201,52 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative bg-[#0a0a09] border border-zinc-900 shadow-2xl shadow-black/50 overflow-hidden"
-            style={{ width: config.width, maxWidth: '100%', height: '100%', minHeight: 400 }}
+            className="relative shrink-0"
+            // Outer wrapper reserves the *scaled* footprint so the flex layout
+            // (and centering) accounts for the transform applied below.
+            style={{ width: config.width * scale, height: frameHeight * scale }}
           >
-            {loading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a09] z-10">
-                <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Loading preview…</span>
+            <div
+              className="absolute top-0 left-0 bg-[#0a0a09] border border-zinc-900 shadow-2xl shadow-black/50 overflow-hidden"
+              // Render the device frame at its true logical size, then scale it
+              // down to fit the available pane. transform-origin top-left keeps it
+              // aligned with the reserved footprint above.
+              style={{
+                width: config.width,
+                height: frameHeight,
+                transform: `scale(${scale})`,
+                transformOrigin: 'top left',
+              }}
+            >
+              {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a09] z-10">
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Loading preview…</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {liveContent ? (
-              <iframe
-                key={`srcdoc-${key}`}
-                title="Live Preview"
-                srcDoc={srcdoc}
-                className="w-full h-full border-0"
-                sandbox="allow-scripts"
-                onLoad={() => setLoading(false)}
-              />
-            ) : (
-              <iframe
-                key={`route-${key}`}
-                title="Production Preview"
-                src={`/preview/${collection}/${slug}`}
-                className="w-full h-full border-0"
-                sandbox="allow-same-origin allow-scripts"
-                onLoad={() => setLoading(false)}
-              />
-            )}
+              {liveContent ? (
+                <iframe
+                  key={`srcdoc-${key}`}
+                  title="Live Preview"
+                  srcDoc={srcdoc}
+                  className="w-full h-full border-0"
+                  sandbox="allow-scripts"
+                  onLoad={() => setLoading(false)}
+                />
+              ) : (
+                <iframe
+                  key={`route-${key}`}
+                  title="Production Preview"
+                  src={`/preview/${collection}/${slug}`}
+                  className="w-full h-full border-0"
+                  sandbox="allow-same-origin allow-scripts"
+                  onLoad={() => setLoading(false)}
+                />
+              )}
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
