@@ -11,7 +11,7 @@ import {
   PhotoGalleryItem
 } from '../types';
 
-function parseMarkdown(raw: string) {
+export function parseMarkdown(raw: string) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     return { data: {}, content: raw };
@@ -24,12 +24,44 @@ function parseMarkdown(raw: string) {
   const lines = yamlString.split('\n');
   let currentKey: string | null = null;
   let currentList: any[] = [];
+  let blockScalar: 'fold' | 'literal' | null = null;
+  let blockLines: string[] = [];
 
-  for (const line of lines) {
+  function flushBlock() {
+    if (blockScalar && currentKey) {
+      if (blockScalar === 'fold') {
+        data[currentKey] = blockLines.join(' ').trim();
+      } else {
+        data[currentKey] = blockLines.join('\n').trimEnd();
+      }
+    }
+    blockScalar = null;
+    blockLines = [];
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
+
+    // If we are inside a block scalar, collect indented lines
+    if (blockScalar !== null) {
+      if (line.match(/^[ \t]/) && trimmed !== '') {
+        blockLines.push(trimmed);
+        continue;
+      } else if (trimmed === '') {
+        // Empty lines in block scalars become paragraph breaks
+        blockLines.push('');
+        continue;
+      } else {
+        // Non-indented line means end of block scalar
+        flushBlock();
+        // Fall through to process this line normally
+      }
+    }
+
     if (!trimmed) continue;
 
-    if (trimmed.startsWith('-') && currentKey) {
+    if (trimmed.startsWith('-') && currentKey && blockScalar === null) {
       let val = trimmed.slice(1).trim();
       if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
         val = val.slice(1, -1);
@@ -56,6 +88,18 @@ function parseMarkdown(raw: string) {
       let val = line.slice(colonIdx + 1).trim();
       currentList = [];
 
+      // Check for block scalar indicators
+      if (val === '>' || val === '>-' || val === '>+') {
+        blockScalar = 'fold';
+        blockLines = [];
+        continue;
+      }
+      if (val === '|' || val === '|-' || val === '|+') {
+        blockScalar = 'literal';
+        blockLines = [];
+        continue;
+      }
+
       if (val.startsWith('-')) {
         continue;
       }
@@ -75,6 +119,9 @@ function parseMarkdown(raw: string) {
       }
     }
   }
+
+  // Flush any remaining block scalar
+  flushBlock();
 
   return { data, content };
 }
