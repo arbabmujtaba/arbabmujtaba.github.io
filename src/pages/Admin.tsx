@@ -1,8 +1,7 @@
 /**
  * Admin
  *
- * Thin wrapper that renders the new modular AdminLayout.
- * The legacy admin component is preserved in AdminLegacy.tsx for reference.
+ * Thin wrapper that renders the modular AdminLayout.
  */
 
 import AdminLayout from './admin/AdminLayout';

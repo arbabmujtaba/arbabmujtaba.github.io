@@ -227,8 +227,1448 @@
       "updatedAt": "2026-06-11T04:05:30.026Z",
       "publishedAt": "2026-06-11T04:05:30.026Z",
       "filePath": "content/portfolio/student-attendance.md"
+    },
+    {
+      "id": "tech/custom-linux-kernel-modules",
+      "collection": "tech",
+      "slug": "custom-linux-kernel-modules",
+      "title": "Custom Linux Kernel Modules",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/tech/custom-linux-kernel-modules.md"
+    },
+    {
+      "id": "tech/kashmiri-ai-assistant",
+      "collection": "tech",
+      "slug": "kashmiri-ai-assistant",
+      "title": "Kashmiri AI Assistant",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/tech/kashmiri-ai-assistant.md"
+    },
+    {
+      "id": "tech/moodmix-audio-space",
+      "collection": "tech",
+      "slug": "moodmix-audio-space",
+      "title": "MoodMix Audio Space",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/tech/moodmix-audio-space.md"
+    },
+    {
+      "id": "tech/react-state-reconciliation",
+      "collection": "tech",
+      "slug": "react-state-reconciliation",
+      "title": "React State Reconciliation",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/tech/react-state-reconciliation.md"
+    },
+    {
+      "id": "gear/black-pro-mist",
+      "collection": "gear",
+      "slug": "black-pro-mist",
+      "title": "Black Pro-Mist 1/4",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/black-pro-mist.md"
+    },
+    {
+      "id": "gear/capture-one-pro",
+      "collection": "gear",
+      "slug": "capture-one-pro",
+      "title": "Capture One Pro",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/capture-one-pro.md"
+    },
+    {
+      "id": "gear/fujinon-56mm",
+      "collection": "gear",
+      "slug": "fujinon-56mm",
+      "title": "Fujinon 56mm F1.2",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/fujinon-56mm.md"
+    },
+    {
+      "id": "gear/kodak-portra-400",
+      "collection": "gear",
+      "slug": "kodak-portra-400",
+      "title": "Kodak Portra 400",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/kodak-portra-400.md"
+    },
+    {
+      "id": "gear/nikon-f3",
+      "collection": "gear",
+      "slug": "nikon-f3",
+      "title": "Nikon F3 // 35mm Analog",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/nikon-f3.md"
+    },
+    {
+      "id": "gear/sigma-24-70mm",
+      "collection": "gear",
+      "slug": "sigma-24-70mm",
+      "title": "Sigma 24-70mm F2.8 Art",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/sigma-24-70mm.md"
+    },
+    {
+      "id": "gear/sony-35mm",
+      "collection": "gear",
+      "slug": "sony-35mm",
+      "title": "Sony 35mm F1.4 GM",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/sony-35mm.md"
+    },
+    {
+      "id": "gear/sony-a7iii",
+      "collection": "gear",
+      "slug": "sony-a7iii",
+      "title": "Sony A7III // Primary System",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gear/sony-a7iii.md"
+    },
+    {
+      "id": "timeline/2019-the-beginning",
+      "collection": "timeline",
+      "slug": "2019-the-beginning",
+      "title": "The Beginning",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/timeline/2019-the-beginning.md"
+    },
+    {
+      "id": "timeline/2021-first-significant-build",
+      "collection": "timeline",
+      "slug": "2021-first-significant-build",
+      "title": "First Significant Build",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/timeline/2021-first-significant-build.md"
+    },
+    {
+      "id": "timeline/2022-network-systems",
+      "collection": "timeline",
+      "slug": "2022-network-systems",
+      "title": "Network Systems",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/timeline/2022-network-systems.md"
+    },
+    {
+      "id": "timeline/2023-dsp-spatial-audio",
+      "collection": "timeline",
+      "slug": "2023-dsp-spatial-audio",
+      "title": "DSP & Spatial Audio",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/timeline/2023-dsp-spatial-audio.md"
+    },
+    {
+      "id": "timeline/2024-scale-architecture",
+      "collection": "timeline",
+      "slug": "2024-scale-architecture",
+      "title": "Scale & Architecture",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/timeline/2024-scale-architecture.md"
+    },
+    {
+      "id": "favorites/ai-til",
+      "collection": "favorites",
+      "slug": "ai-til",
+      "title": "AI",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/ai-til.md"
+    },
+    {
+      "id": "favorites/audio-engineering-til",
+      "collection": "favorites",
+      "slug": "audio-engineering-til",
+      "title": "Audio Engineering",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/audio-engineering-til.md"
+    },
+    {
+      "id": "favorites/blank-keycaps",
+      "collection": "favorites",
+      "slug": "blank-keycaps",
+      "title": "Blank Keycaps",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/blank-keycaps.md"
+    },
+    {
+      "id": "favorites/cpp-til",
+      "collection": "favorites",
+      "slug": "cpp-til",
+      "title": "C++",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/cpp-til.md"
+    },
+    {
+      "id": "favorites/cpp",
+      "collection": "favorites",
+      "slug": "cpp",
+      "title": "C++",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/cpp.md"
+    },
+    {
+      "id": "favorites/dsp-til",
+      "collection": "favorites",
+      "slug": "dsp-til",
+      "title": "DSP",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/dsp-til.md"
+    },
+    {
+      "id": "favorites/express-til",
+      "collection": "favorites",
+      "slug": "express-til",
+      "title": "Express",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/express-til.md"
+    },
+    {
+      "id": "favorites/figma",
+      "collection": "favorites",
+      "slug": "figma",
+      "title": "Figma",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/figma.md"
+    },
+    {
+      "id": "favorites/focusrite-scarlett",
+      "collection": "favorites",
+      "slug": "focusrite-scarlett",
+      "title": "Focusrite Scarlett",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/focusrite-scarlett.md"
+    },
+    {
+      "id": "favorites/ghostty",
+      "collection": "favorites",
+      "slug": "ghostty",
+      "title": "Ghostty",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/ghostty.md"
+    },
+    {
+      "id": "favorites/grep",
+      "collection": "favorites",
+      "slug": "grep",
+      "title": "grep",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/grep.md"
+    },
+    {
+      "id": "favorites/hhkb-professional",
+      "collection": "favorites",
+      "slug": "hhkb-professional",
+      "title": "HHKB Professional",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/hhkb-professional.md"
+    },
+    {
+      "id": "favorites/htop",
+      "collection": "favorites",
+      "slug": "htop",
+      "title": "htop",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/htop.md"
+    },
+    {
+      "id": "favorites/java",
+      "collection": "favorites",
+      "slug": "java-til",
+      "title": "Java",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/java.md"
+    },
+    {
+      "id": "favorites/linux-til",
+      "collection": "favorites",
+      "slug": "linux-til",
+      "title": "Linux",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/linux-til.md"
+    },
+    {
+      "id": "favorites/lorawan-til",
+      "collection": "favorites",
+      "slug": "lorawan-til",
+      "title": "LoRaWAN",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/lorawan-til.md"
+    },
+    {
+      "id": "favorites/macbook-pro",
+      "collection": "favorites",
+      "slug": "macbook-pro",
+      "title": "MacBook Pro",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/macbook-pro.md"
+    },
+    {
+      "id": "favorites/mongodb-til",
+      "collection": "favorites",
+      "slug": "mongodb-til",
+      "title": "MongoDB",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/mongodb-til.md"
+    },
+    {
+      "id": "favorites/mysql-til",
+      "collection": "favorites",
+      "slug": "mysql-til",
+      "title": "MySQL",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/mysql-til.md"
+    },
+    {
+      "id": "favorites/neovim-tmux",
+      "collection": "favorites",
+      "slug": "neovim-tmux",
+      "title": "Neovim & Tmux",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/neovim-tmux.md"
+    },
+    {
+      "id": "favorites/networking-til",
+      "collection": "favorites",
+      "slug": "networking-til",
+      "title": "Networking",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/networking-til.md"
+    },
+    {
+      "id": "favorites/nodejs-express",
+      "collection": "favorites",
+      "slug": "nodejs-express",
+      "title": "Node.js & Express",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/nodejs-express.md"
+    },
+    {
+      "id": "favorites/nodejs-til",
+      "collection": "favorites",
+      "slug": "nodejs-til",
+      "title": "Node.js",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/nodejs-til.md"
+    },
+    {
+      "id": "favorites/notebook-pen",
+      "collection": "favorites",
+      "slug": "notebook-pen",
+      "title": "Notebook & Pen",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/notebook-pen.md"
+    },
+    {
+      "id": "favorites/python-til",
+      "collection": "favorites",
+      "slug": "python-til",
+      "title": "Python",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/python-til.md"
+    },
+    {
+      "id": "favorites/python",
+      "collection": "favorites",
+      "slug": "python",
+      "title": "Python",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/python.md"
+    },
+    {
+      "id": "favorites/raycast",
+      "collection": "favorites",
+      "slug": "raycast",
+      "title": "Raycast",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/raycast.md"
+    },
+    {
+      "id": "favorites/react-til",
+      "collection": "favorites",
+      "slug": "react-til",
+      "title": "React",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/react-til.md"
+    },
+    {
+      "id": "favorites/react",
+      "collection": "favorites",
+      "slug": "react",
+      "title": "React",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/react.md"
+    },
+    {
+      "id": "favorites/rsync",
+      "collection": "favorites",
+      "slug": "rsync",
+      "title": "rsync",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/rsync.md"
+    },
+    {
+      "id": "favorites/sed-awk",
+      "collection": "favorites",
+      "slug": "sed-awk",
+      "title": "sed & awk",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/sed-awk.md"
+    },
+    {
+      "id": "favorites/single-ultrawide",
+      "collection": "favorites",
+      "slug": "single-ultrawide",
+      "title": "Single Ultrawide Monitor",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/single-ultrawide.md"
+    },
+    {
+      "id": "favorites/sony-fuji-cameras",
+      "collection": "favorites",
+      "slug": "sony-fuji-cameras",
+      "title": "Sony A7III & Fuji X-T4",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/sony-fuji-cameras.md"
+    },
+    {
+      "id": "favorites/swing-til",
+      "collection": "favorites",
+      "slug": "swing-til",
+      "title": "Swing",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/swing-til.md"
+    },
+    {
+      "id": "favorites/systemd",
+      "collection": "favorites",
+      "slug": "systemd",
+      "title": "systemd",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/systemd.md"
+    },
+    {
+      "id": "favorites/typescript",
+      "collection": "favorites",
+      "slug": "typescript",
+      "title": "TypeScript",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/typescript.md"
+    },
+    {
+      "id": "favorites/warm-desk-lamp",
+      "collection": "favorites",
+      "slug": "warm-desk-lamp",
+      "title": "Warm Desk Lamp",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/favorites/warm-desk-lamp.md"
+    },
+    {
+      "id": "home/gateway-collection",
+      "collection": "home",
+      "slug": "gateway-collection",
+      "title": "Collection",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/gateway-collection.md"
+    },
+    {
+      "id": "home/gateway-journal",
+      "collection": "home",
+      "slug": "gateway-journal",
+      "title": "Journal",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/gateway-journal.md"
+    },
+    {
+      "id": "home/gateway-photography",
+      "collection": "home",
+      "slug": "gateway-photography",
+      "title": "Photography",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/gateway-photography.md"
+    },
+    {
+      "id": "home/gateway-portfolio",
+      "collection": "home",
+      "slug": "gateway-portfolio",
+      "title": "Portfolio",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/gateway-portfolio.md"
+    },
+    {
+      "id": "home/gateway-tech",
+      "collection": "home",
+      "slug": "gateway-tech",
+      "title": "Tech",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/gateway-tech.md"
+    },
+    {
+      "id": "home/principle-craft",
+      "collection": "home",
+      "slug": "principle-craft",
+      "title": "Built Carefully",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/principle-craft.md"
+    },
+    {
+      "id": "home/principle-memory",
+      "collection": "home",
+      "slug": "principle-memory",
+      "title": "Collected Slowly",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/principle-memory.md"
+    },
+    {
+      "id": "home/principle-wonder",
+      "collection": "home",
+      "slug": "principle-wonder",
+      "title": "Kept Alive",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/principle-wonder.md"
+    },
+    {
+      "id": "home/profile-bio",
+      "collection": "home",
+      "slug": "profile-bio",
+      "title": "Profile Bio",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/profile-bio.md"
+    },
+    {
+      "id": "home/quote-curiosity",
+      "collection": "home",
+      "slug": "quote-curiosity",
+      "title": "Every project begins with curiosity.",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/quote-curiosity.md"
+    },
+    {
+      "id": "home/quote-stories",
+      "collection": "home",
+      "slug": "quote-stories",
+      "title": "Some stories are written. Others are captured.",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/quote-stories.md"
+    },
+    {
+      "id": "home/quote-technology",
+      "collection": "home",
+      "slug": "quote-technology",
+      "title": "Technology becomes meaningful when it touches real lives.",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/home/quote-technology.md"
+    },
+    {
+      "id": "gallery/coffee-on-table",
+      "collection": "gallery",
+      "slug": "coffee-on-table",
+      "title": "Coffee on table",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gallery/coffee-on-table.md"
+    },
+    {
+      "id": "gallery/dolomites",
+      "collection": "gallery",
+      "slug": "dolomites",
+      "title": "Dolomites mountains",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gallery/dolomites.md"
+    },
+    {
+      "id": "gallery/kashmir-valley",
+      "collection": "gallery",
+      "slug": "kashmir-valley",
+      "title": "Kashmir valley",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gallery/kashmir-valley.md"
+    },
+    {
+      "id": "gallery/mountain-paths",
+      "collection": "gallery",
+      "slug": "mountain-paths",
+      "title": "Mountain paths",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gallery/mountain-paths.md"
+    },
+    {
+      "id": "gallery/rainy-window",
+      "collection": "gallery",
+      "slug": "rainy-window",
+      "title": "Rainy window",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gallery/rainy-window.md"
+    },
+    {
+      "id": "gallery/workspace",
+      "collection": "gallery",
+      "slug": "workspace",
+      "title": "Workspace",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/gallery/workspace.md"
+    },
+    {
+      "id": "pages/collection-hero",
+      "collection": "pages",
+      "slug": "collection-hero",
+      "title": "Collection",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/collection-hero.md"
+    },
+    {
+      "id": "pages/home-hero",
+      "collection": "pages",
+      "slug": "home-hero",
+      "title": "Home Hero",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/home-hero.md"
+    },
+    {
+      "id": "pages/journal-hero",
+      "collection": "pages",
+      "slug": "journal-hero",
+      "title": "Journal",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/journal-hero.md"
+    },
+    {
+      "id": "pages/photography-hero",
+      "collection": "pages",
+      "slug": "photography-hero",
+      "title": "Photography",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/photography-hero.md"
+    },
+    {
+      "id": "pages/portfolio-hero",
+      "collection": "pages",
+      "slug": "portfolio-hero",
+      "title": "Portfolio",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/portfolio-hero.md"
+    },
+    {
+      "id": "pages/portfolio-skills",
+      "collection": "pages",
+      "slug": "portfolio-skills",
+      "title": "Portfolio Skills",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/portfolio-skills.md"
+    },
+    {
+      "id": "pages/tech-hero",
+      "collection": "pages",
+      "slug": "tech-hero",
+      "title": "Tech",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.005Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.005Z",
+      "updatedAt": "2026-06-19T06:11:03.005Z",
+      "filePath": "content/pages/tech-hero.md"
+    },
+    {
+      "id": "gear/fuji-x-t4",
+      "collection": "gear",
+      "slug": "fuji-x-t4",
+      "title": "Untitled",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-19T06:11:03.069Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-19T06:11:03.069Z",
+      "updatedAt": "2026-06-19T06:11:03.069Z",
+      "filePath": "content/gear/fuji-x-t4.md"
     }
   ],
-  "lastUpdated": "2026-06-19T06:08:07.455Z",
+  "lastUpdated": "2026-06-19T06:11:30.127Z",
   "version": 1
 }
