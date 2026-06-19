@@ -1,9 +1,10 @@
 /**
  * Content State Transition Tests
  *
- * Run with: npx tsx tests/contentState.test.ts
+ * Converted to Vitest format from manual test runner.
  */
 
+import { describe, it, expect } from 'vitest';
 import {
   isValidTransition,
   assertValidTransition,
@@ -19,212 +20,169 @@ import {
   type ContentState,
 } from '../src/lib/contentState';
 
-let passed = 0;
-let failed = 0;
+describe('ContentState Transition Tests', () => {
+  describe('isValidTransition', () => {
+    it('draft -> review is valid', () => {
+      expect(isValidTransition('draft', 'review')).toBe(true);
+    });
 
-function test(name: string, fn: () => void | Promise<void>) {
-  return async () => {
-    try {
-      await fn();
-      passed++;
-      console.log(`  ✓ ${name}`);
-    } catch (e: any) {
-      failed++;
-      console.log(`  ✗ ${name}: ${e.message}`);
-    }
-  };
-}
+    it('review -> published is valid', () => {
+      expect(isValidTransition('review', 'published')).toBe(true);
+    });
 
-function assertEqual(actual: any, expected: any, msg?: string) {
-  if (actual !== expected) {
-    throw new Error(`${msg || 'Assertion failed'}: expected ${expected}, got ${actual}`);
-  }
-}
+    it('review -> draft is valid', () => {
+      expect(isValidTransition('review', 'draft')).toBe(true);
+    });
 
-function assertTrue(value: boolean, msg?: string) {
-  if (!value) throw new Error(msg || 'Expected true');
-}
+    it('published -> archived is valid', () => {
+      expect(isValidTransition('published', 'archived')).toBe(true);
+    });
 
-function assertThrows(fn: () => void, expectedName: string, msg?: string) {
-  try {
-    fn();
-    throw new Error(`${msg || 'Expected throw'} but function did not throw`);
-  } catch (e: any) {
-    if (e.name !== expectedName) {
-      throw new Error(`${msg || 'Wrong error type'}: expected ${expectedName}, got ${e.name}: ${e.message}`);
-    }
-  }
-}
+    it('archived -> draft is valid', () => {
+      expect(isValidTransition('archived', 'draft')).toBe(true);
+    });
 
-async function runTests() {
-  console.log('\n=== ContentState Transition Tests ===\n');
+    it('draft -> published is invalid', () => {
+      expect(isValidTransition('draft', 'published')).toBe(false);
+    });
 
-  // --- isValidTransition ---
+    it('published -> review is invalid', () => {
+      expect(isValidTransition('published', 'review')).toBe(false);
+    });
 
-  await test('draft → review is valid', () => {
-    assertTrue(isValidTransition('draft', 'review'));
-  })();
+    it('archived -> published is invalid', () => {
+      expect(isValidTransition('archived', 'published')).toBe(false);
+    });
 
-  await test('review → published is valid', () => {
-    assertTrue(isValidTransition('review', 'published'));
-  })();
+    it('draft -> archived is invalid', () => {
+      expect(isValidTransition('draft', 'archived')).toBe(false);
+    });
 
-  await test('review → draft is valid', () => {
-    assertTrue(isValidTransition('review', 'draft'));
-  })();
+    it('published -> draft is invalid', () => {
+      expect(isValidTransition('published', 'draft')).toBe(false);
+    });
 
-  await test('published → archived is valid', () => {
-    assertTrue(isValidTransition('published', 'archived'));
-  })();
+    it('same-state transitions: draft->draft allowed for initialization', () => {
+      expect(isValidTransition('draft', 'draft')).toBe(true);
+    });
 
-  await test('archived → draft is valid', () => {
-    assertTrue(isValidTransition('archived', 'draft'));
-  })();
+    it('same-state transitions for non-draft states are invalid', () => {
+      expect(isValidTransition('published', 'published')).toBe(false);
+      expect(isValidTransition('review', 'review')).toBe(false);
+      expect(isValidTransition('archived', 'archived')).toBe(false);
+    });
+  });
 
-  await test('draft → published is invalid', () => {
-    assertTrue(!isValidTransition('draft', 'published'));
-  })();
+  describe('assertValidTransition', () => {
+    it('throws InvalidTransitionError for draft->published', () => {
+      expect(() => assertValidTransition('draft', 'published', 'test', 'slug')).toThrow();
+      try {
+        assertValidTransition('draft', 'published', 'test', 'slug');
+      } catch (e: any) {
+        expect(e.name).toBe('InvalidTransitionError');
+      }
+    });
 
-  await test('published → review is invalid', () => {
-    assertTrue(!isValidTransition('published', 'review'));
-  })();
+    it('does not throw for valid transitions', () => {
+      expect(() => assertValidTransition('draft', 'review', 'test', 'slug')).not.toThrow();
+      expect(() => assertValidTransition('review', 'published', 'test', 'slug')).not.toThrow();
+    });
+  });
 
-  await test('archived → published is invalid', () => {
-    assertTrue(!isValidTransition('archived', 'published'));
-  })();
+  describe('Registry CRUD', () => {
+    it('createItem initializes with draft state', async () => {
+      const item = await createItem('test-collection', 'test-slug-a', 'Test Title', 'content/test-collection/test-slug-a.md');
+      expect(item.state).toBe('draft');
+      expect(item.title).toBe('Test Title');
+      expect(item.versions.length).toBe(1);
+      expect(item.versions[0].state).toBe('draft');
+      await deleteItem('test-collection', 'test-slug-a');
+    });
 
-  await test('draft → archived is invalid', () => {
-    assertTrue(!isValidTransition('draft', 'archived'));
-  })();
+    it('transitionState advances item through lifecycle', async () => {
+      // Create fresh item
+      const item = await createItem('test-collection', 'test-slug-b', 'Lifecycle Test', 'content/test-collection/test-slug-b.md');
+      expect(item.state).toBe('draft');
 
-  await test('published → draft is invalid', () => {
-    assertTrue(!isValidTransition('published', 'draft'));
-  })();
+      // draft -> review
+      const reviewItem = await transitionState('test-collection', 'test-slug-b', 'review', { notes: 'Ready for review' });
+      expect(reviewItem.state).toBe('review');
+      expect(reviewItem.versions.length).toBe(2);
+      expect(reviewItem.versions[1].state).toBe('review');
+      expect(reviewItem.lastReviewedAt?.slice(0, 10)).toBe(new Date().toISOString().slice(0, 10));
 
-  await test('same-state transitions: draft→draft allowed for initialization', () => {
-    assertTrue(isValidTransition('draft', 'draft'));
-  })();
+      // review -> published
+      const publishedItem = await transitionState('test-collection', 'test-slug-b', 'published');
+      expect(publishedItem.state).toBe('published');
+      expect(publishedItem.versions.length).toBe(3);
+      expect(publishedItem.versions[2].state).toBe('published');
+      expect(publishedItem.publishedAt).toBeDefined();
 
-  await test('same-state transitions for non-draft states are invalid', () => {
-    assertTrue(!isValidTransition('published', 'published'));
-    assertTrue(!isValidTransition('review', 'review'));
-    assertTrue(!isValidTransition('archived', 'archived'));
-  })();
+      // published -> archived
+      const archivedItem = await transitionState('test-collection', 'test-slug-b', 'archived');
+      expect(archivedItem.state).toBe('archived');
+      expect(archivedItem.versions.length).toBe(4);
+      expect(archivedItem.versions[3].state).toBe('archived');
 
-  // --- assertValidTransition ---
+      // archived -> draft
+      const restoredItem = await transitionState('test-collection', 'test-slug-b', 'draft');
+      expect(restoredItem.state).toBe('draft');
+      expect(restoredItem.versions.length).toBe(5);
 
-  await test('assertValidTransition throws InvalidTransitionError for draft→published', () => {
-    assertThrows(() => assertValidTransition('draft', 'published', 'test', 'slug'), 'InvalidTransitionError');
-  })();
+      await deleteItem('test-collection', 'test-slug-b');
+    });
 
-  await test('assertValidTransition does not throw for valid transitions', () => {
-    assertValidTransition('draft', 'review', 'test', 'slug');
-    assertValidTransition('review', 'published', 'test', 'slug');
-  })();
+    it('transitionState rejects invalid transitions', async () => {
+      const item = await createItem('test-collection', 'test-slug-c', 'Invalid Test', 'content/test-collection/test-slug-c.md');
 
-  // --- Registry CRUD ---
+      // Cannot skip to published
+      try {
+        await transitionState('test-collection', 'test-slug-c', 'published');
+        expect.fail('Expected InvalidTransitionError');
+      } catch (e: any) {
+        expect(e.name).toBe('InvalidTransitionError');
+      }
 
-  await test('createItem initializes with draft state', async () => {
-    const item = await createItem('test-collection', 'test-slug-a', 'Test Title', 'content/test-collection/test-slug-a.md');
-    assertEqual(item.state, 'draft');
-    assertEqual(item.title, 'Test Title');
-    assertTrue(item.versions.length === 1);
-    assertEqual(item.versions[0].state, 'draft');
-    await deleteItem('test-collection', 'test-slug-a');
-  })();
+      // Cannot go published directly from draft
+      expect(item.state).toBe('draft');
 
-  await test('transitionState advances item through lifecycle', async () => {
-    // Create fresh item
-    const item = await createItem('test-collection', 'test-slug-b', 'Lifecycle Test', 'content/test-collection/test-slug-b.md');
-    assertEqual(item.state, 'draft');
+      await deleteItem('test-collection', 'test-slug-c');
+    });
 
-    // draft → review
-    const reviewItem = await transitionState('test-collection', 'test-slug-b', 'review', { notes: 'Ready for review' });
-    assertEqual(reviewItem.state, 'review');
-    assertEqual(reviewItem.versions.length, 2);
-    assertEqual(reviewItem.versions[1].state, 'review');
-    assertEqual(reviewItem.lastReviewedAt?.slice(0, 10), new Date().toISOString().slice(0, 10));
+    it('transitionState throws ContentNotFoundError for missing item', async () => {
+      try {
+        await transitionState('nonexistent', 'nonexistent', 'published');
+        expect.fail('Expected ContentNotFoundError');
+      } catch (e: any) {
+        expect(e.name).toBe('ContentNotFoundError');
+      }
+    });
 
-    // review → published
-    const publishedItem = await transitionState('test-collection', 'test-slug-b', 'published');
-    assertEqual(publishedItem.state, 'published');
-    assertEqual(publishedItem.versions.length, 3);
-    assertEqual(publishedItem.versions[2].state, 'published');
-    assertTrue(publishedItem.publishedAt !== undefined);
+    it('saveItem updates existing item', async () => {
+      const item = await createItem('test-collection', 'test-slug-d', 'Save Test', 'content/test-collection/test-slug-d.md');
+      item.title = 'Updated Title';
+      await saveItem(item);
 
-    // published → archived
-    const archivedItem = await transitionState('test-collection', 'test-slug-b', 'archived');
-    assertEqual(archivedItem.state, 'archived');
-    assertEqual(archivedItem.versions.length, 4);
-    assertEqual(archivedItem.versions[3].state, 'archived');
+      const fetched = await getItem('test-collection', 'test-slug-d');
+      expect(fetched?.title).toBe('Updated Title');
 
-    // archived → draft
-    const restoredItem = await transitionState('test-collection', 'test-slug-b', 'draft');
-    assertEqual(restoredItem.state, 'draft');
-    assertEqual(restoredItem.versions.length, 5);
+      await deleteItem('test-collection', 'test-slug-d');
+    });
 
-    await deleteItem('test-collection', 'test-slug-b');
-  })();
+    it('getStateStats returns accurate counts', async () => {
+      const before = await getStateStats();
 
-  await test('transitionState rejects invalid transitions', async () => {
-    const item = await createItem('test-collection', 'test-slug-c', 'Invalid Test', 'content/test-collection/test-slug-c.md');
+      const newItem = await createItem('test-collection', 'test-stats', 'Stats Test', 'content/test-collection/test-stats.md');
 
-    // Cannot skip to published
-    try {
-      await transitionState('test-collection', 'test-slug-c', 'published');
-      throw new Error('Expected InvalidTransitionError');
-    } catch (e: any) {
-      assertEqual(e.name, 'InvalidTransitionError');
-    }
+      const after = await getStateStats();
+      expect(after.draft).toBe((before.draft || 0) + 1);
 
-    // Cannot go published directly from draft
-    assertEqual(item.state, 'draft');
+      await transitionState('test-collection', 'test-stats', 'review');
+      const afterReview = await getStateStats();
+      expect(afterReview.draft).toBe(before.draft || 0);
+      expect(afterReview.review).toBe((before.review || 0) + 1);
 
-    await deleteItem('test-collection', 'test-slug-c');
-  })();
-
-  await test('transitionState throws ContentNotFoundError for missing item', async () => {
-    try {
-      await transitionState('nonexistent', 'nonexistent', 'published');
-      throw new Error('Expected ContentNotFoundError');
-    } catch (e: any) {
-      assertEqual(e.name, 'ContentNotFoundError');
-    }
-  })();
-
-  await test('saveItem updates existing item', async () => {
-    const item = await createItem('test-collection', 'test-slug-d', 'Save Test', 'content/test-collection/test-slug-d.md');
-    item.title = 'Updated Title';
-    await saveItem(item);
-
-    const fetched = await getItem('test-collection', 'test-slug-d');
-    assertEqual(fetched?.title, 'Updated Title');
-
-    await deleteItem('test-collection', 'test-slug-d');
-  })();
-
-  await test('getStateStats returns accurate counts', async () => {
-    const before = await getStateStats();
-
-    const newItem = await createItem('test-collection', 'test-stats', 'Stats Test', 'content/test-collection/test-stats.md');
-
-    const after = await getStateStats();
-    assertEqual(after.draft, (before.draft || 0) + 1);
-
-    await transitionState('test-collection', 'test-stats', 'review');
-    const afterReview = await getStateStats();
-    assertEqual(afterReview.draft, before.draft || 0);
-    assertEqual(afterReview.review, (before.review || 0) + 1);
-
-    await deleteItem('test-collection', 'test-stats');
-  })();
-
-  // --- Summary ---
-  console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
-  if (failed > 0) process.exit(1);
-}
-
-runTests().catch(e => {
-  console.error(e);
-  process.exit(1);
+      await deleteItem('test-collection', 'test-stats');
+    });
+  });
 });
