@@ -226,6 +226,7 @@ export default function Journal() {
             coverImage={selectedEntry.coverImage}
             excerpt={selectedEntry.excerpt}
             body={selectedEntry.body}
+            customization={selectedEntry.customization}
           />
         )}
       </AnimatePresence>

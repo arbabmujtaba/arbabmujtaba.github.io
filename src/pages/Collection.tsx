@@ -253,6 +253,7 @@ export default function Collection() {
             category={selectedEntry.category}
             excerpt={selectedEntry.description}
             body={selectedEntry.body}
+            customization={selectedEntry.customization}
           />
         )}
       </AnimatePresence>

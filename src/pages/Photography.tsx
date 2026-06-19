@@ -284,6 +284,7 @@ export default function Photography() {
                 ? selectedPhoto.galleryImages.map(img => typeof img === 'string' ? img : Object.values(img)[0] as string)
                 : []
             }}
+            customization={selectedPhoto.customization}
           />
         )}
       </AnimatePresence>

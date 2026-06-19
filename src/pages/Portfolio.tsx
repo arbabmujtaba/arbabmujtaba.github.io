@@ -166,6 +166,7 @@ export default function Portfolio() {
                 ? selectedProject.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
                 : []
             }}
+            customization={selectedProject.customization}
           />
         )}
       </AnimatePresence>

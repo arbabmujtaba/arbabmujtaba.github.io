@@ -17,6 +17,8 @@ import { ToastContainer, type ToastItem } from '../components/Toast';
 import StatusBadge from '../components/StatusBadge';
 import ActivityFeed from '../components/ActivityFeed';
 import LiveEditor from '../components/LiveEditor';
+import PostCustomizationPanel from '../components/PostCustomization';
+import type { PostCustomization } from '../types';
 
 // Define localized types for form handling
 interface CMSItem {
@@ -79,6 +81,9 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [formFeatured, setFormFeatured] = useState(false);
   const [formSpecs, setFormSpecs] = useState<string[]>([]);
   const [specInput, setSpecInput] = useState('');
+
+  // Post customization state
+  const [formCustomization, setFormCustomization] = useState<PostCustomization>({});
 
   // Status indicators
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
@@ -225,6 +230,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       text: formText,
       featured: formFeatured,
       specs: formSpecs,
+      customization: formCustomization,
       savedAt: new Date().toISOString()
     };
     localStorage.setItem(getDraftKey(activeCollection), JSON.stringify(draftPayload));
@@ -262,6 +268,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         setFormText(parsed.text || '');
         setFormFeatured(!!parsed.featured);
         setFormSpecs(parsed.specs || []);
+        setFormCustomization(parsed.customization || {});
         setDraftAlert(false);
       } catch (e) {
         console.error('Error loading draft data', e);
@@ -339,6 +346,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.coverImage = formCoverImage;
       }
 
+      // Add post customization if any fields are set
+      if (formCustomization && Object.keys(formCustomization).length > 0) {
+        serialData.customization = formCustomization;
+      }
+
       const payload = {
         collection: activeCollection,
         slug: isEditing ? originalSlug : formSlug,
@@ -406,6 +418,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setFormFeatured(false);
     setFormSpecs([]);
     setSpecInput('');
+    setFormCustomization({});
     setIsEditing(false);
     setOriginalSlug('');
     setErrorMessage('');
@@ -481,6 +494,9 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         if (doc.collection === 'gallery') {
           setFormFeatured(!!doc.data.featured);
         }
+
+        // Load post customization
+        setFormCustomization(doc.data.customization || {});
 
         setViewState('editor');
       }
@@ -595,6 +611,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.visible = formVisible;
       } else {
         serialData.coverImage = formCoverImage;
+      }
+
+      // Add post customization if any fields are set
+      if (formCustomization && Object.keys(formCustomization).length > 0) {
+        serialData.customization = formCustomization;
       }
 
       // Step 1: Save content
@@ -1750,6 +1771,9 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     />
                   </div>
 
+                  {/* Post Customization Panel */}
+                  <PostCustomizationPanel value={formCustomization} onChange={setFormCustomization} />
+
                 </div>
 
                 {/* Confirmations toolbar */}
@@ -1813,6 +1837,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     techStack,
                     githubLink,
                     liveLink,
+                    customization: formCustomization,
                   }
                 }}
               />

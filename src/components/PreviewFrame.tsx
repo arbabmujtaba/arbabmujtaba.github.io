@@ -10,6 +10,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Monitor, Tablet, Smartphone, Loader2, RefreshCw, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { normalizeImagePath } from '../lib/image';
+import { generatePreviewCSS } from '../lib/customization';
 
 type ViewportMode = 'desktop' | 'tablet' | 'mobile';
 
@@ -75,6 +76,8 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
     const category = frontmatter.category || '';
     const rawCover = frontmatter.coverImage || frontmatter.projectImage || '';
     const coverImage = normalizeImagePath(rawCover);
+    const customization = frontmatter.customization || null;
+    const customizationCSS = generatePreviewCSS(customization);
 
     // Simple markdown-to-HTML conversion for live preview (basic)
     const htmlBody = body
@@ -92,10 +95,15 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
       .replace(/^(.+)$/gim, '<p class="text-zinc-350 leading-relaxed mb-4">$1</p>');
 
     const coverHtml = coverImage
-      ? `<div class="relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950 mb-10">
+      ? `<div class="cover-image relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950 mb-10">
            <img src="${coverImage}" alt="${title}" class="w-full h-full object-cover grayscale-[15%]" referrerPolicy="no-referrer" onerror="this.style.display='none'" />
          </div>`
       : '';
+
+    // Grain and vignette overlays
+    const grainHtml = customization?.effects?.grain ? '<div class="grain-overlay"></div>' : '';
+    const vignetteHtml = customization?.effects?.vignette ? '<div class="vignette-overlay"></div>' : '';
+    const gradientHtml = customization?.style?.gradient?.enabled ? '<div class="gradient-overlay"></div>' : '';
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -104,19 +112,25 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Preview — ${title}</title>
   <link rel="stylesheet" href="/src/index.css">
+  ${customizationCSS}
 </head>
 <body class="bg-[#0d0d0c] text-zinc-100">
-  <div class="min-h-screen bg-[#0d0d0c] text-zinc-100 p-6 md:p-12 lg:p-16 space-y-12 max-w-4xl mx-auto">
-    ${coverHtml}
-    <div class="flex items-center gap-4">
-      ${category ? `<span class="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded">${category}</span>` : ''}
-      ${date ? `<span class="font-sans text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">${date}</span>` : ''}
-    </div>
-    <div class="space-y-6">
-      <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl text-zinc-100 tracking-tight leading-[1.1]">${title}</h1>
-    </div>
-    <div class="markdown-body pt-4 border-t border-zinc-900">
-      ${htmlBody}
+  ${grainHtml}
+  ${vignetteHtml}
+  <div class="preview-card min-h-screen bg-[#0d0d0c] text-zinc-100 relative">
+    ${gradientHtml}
+    <div class="preview-content p-6 md:p-12 lg:p-16 space-y-12 max-w-4xl mx-auto relative z-10">
+      ${coverHtml}
+      <div class="flex items-center gap-4">
+        ${category ? `<span class="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded">${category}</span>` : ''}
+        ${date ? `<span class="font-sans text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">${date}</span>` : ''}
+      </div>
+      <div class="space-y-6">
+        <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl text-zinc-100 tracking-tight leading-[1.1]">${title}</h1>
+      </div>
+      <div class="markdown-body pt-4 border-t border-zinc-900">
+        ${htmlBody}
+      </div>
     </div>
   </div>
   <script>window.addEventListener('DOMContentLoaded', () => parent.postMessage({type:'preview-loaded'}, '*'));</script>
