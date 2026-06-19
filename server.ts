@@ -630,14 +630,25 @@ app.delete('/api/content/:collection/:slug', async (req, res) => {
 });
 
 // ============================================================
-// SECTION RESOLVER ENDPOINTS
+// SECTION RESOLVER ENDPOINTS (dev-only)
 // ============================================================
+
+/**
+ * Middleware guard: admin/section API routes are only available in development.
+ * In production, the site is statically deployed and these endpoints should not exist.
+ */
+function devOnly(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  next();
+}
 
 /**
  * GET /api/sections
  * Returns the full sections registry for client consumption.
  */
-app.get('/api/sections', (_req, res) => {
+app.get('/api/sections', devOnly, (_req, res) => {
   res.json(SECTIONS);
 });
 
@@ -645,7 +656,7 @@ app.get('/api/sections', (_req, res) => {
  * GET /api/sections/:id/items
  * Resolves items for a given section (singleton or collection with filter).
  */
-app.get('/api/sections/:id/items', async (req, res) => {
+app.get('/api/sections/:id/items', devOnly, async (req, res) => {
   try {
     const { id } = req.params;
     const section = getSectionById(id);
@@ -666,7 +677,7 @@ app.get('/api/sections/:id/items', async (req, res) => {
  * Scans titles, frontmatter values, and body text across all content.
  * Returns matches with section id, collection, slug, title, and a context snippet.
  */
-app.get('/api/search', async (req, res) => {
+app.get('/api/search', devOnly, async (req, res) => {
   try {
     const q = req.query.q as string;
 

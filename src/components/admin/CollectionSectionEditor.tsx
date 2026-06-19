@@ -362,33 +362,36 @@ export default function CollectionSectionEditor({ section, initialExpandSlug, on
       });
     });
 
-    // Save both items
+    // Save both items sequentially to avoid race conditions
     try {
-      await Promise.all([
-        fetch('/api/content', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            collection: section.collection,
-            slug: itemA.slug,
-            data: itemA.data,
-            body: itemA.body,
-          }),
+      const resA = await fetch('/api/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: section.collection,
+          slug: itemA.slug,
+          data: itemA.data,
+          body: itemA.body,
         }),
-        fetch('/api/content', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            collection: section.collection,
-            slug: itemB.slug,
-            data: itemB.data,
-            body: itemB.body,
-          }),
+      });
+
+      if (!resA.ok) throw new Error(`Reorder failed for ${itemA.slug}: ${resA.status}`);
+
+      const resB = await fetch('/api/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: section.collection,
+          slug: itemB.slug,
+          data: itemB.data,
+          body: itemB.body,
         }),
-      ]);
+      });
+
+      if (!resB.ok) throw new Error(`Reorder failed for ${itemB.slug}: ${resB.status}`);
     } catch (err: any) {
       setError(err.message || 'Reorder failed');
-      // Refresh to get server state
+      // Refresh to get consistent server state
       await fetchItems();
     }
   };

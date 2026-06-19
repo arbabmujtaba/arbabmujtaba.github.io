@@ -125,8 +125,9 @@ export async function getSectionItems(id: string): Promise<ContentItem[]> {
  * Search across all content files for a query string.
  * Scans titles, frontmatter values, and body text.
  * Returns matches with section id, slug, title, and a context snippet.
+ * Results are capped at `limit` (default 50) to prevent unbounded responses.
  */
-export async function searchContent(query: string): Promise<SearchResult[]> {
+export async function searchContent(query: string, limit = 50): Promise<SearchResult[]> {
   if (!query || query.trim().length === 0) {
     return [];
   }
@@ -138,12 +139,15 @@ export async function searchContent(query: string): Promise<SearchResult[]> {
   const collections = [...new Set(SECTIONS.map((s) => s.collection))];
 
   for (const collection of collections) {
+    if (results.length >= limit) break;
+
     const colDir = path.join(CONTENT_DIR, collection);
     if (!(await fs.pathExists(colDir))) continue;
 
     const files = await fs.readdir(colDir);
 
     for (const file of files) {
+      if (results.length >= limit) break;
       if (!file.endsWith('.md')) continue;
 
       const filePath = path.join(colDir, file);
@@ -271,6 +275,7 @@ function findSectionForItem(
 
 /**
  * Search frontmatter key-value pairs (excluding title, which is checked separately).
+ * Skips non-primitive values (objects/arrays) that would produce garbage via String().
  */
 function searchFrontmatter(
   data: Record<string, unknown>,
@@ -279,6 +284,11 @@ function searchFrontmatter(
   for (const [key, value] of Object.entries(data)) {
     if (key === 'title') continue;
     if (value == null) continue;
+
+    // Only search primitive values (string, number, boolean)
+    // Objects and arrays would produce "[object Object]" via String()
+    const valueType = typeof value;
+    if (valueType === 'object') continue;
 
     const strValue = String(value);
     if (strValue.toLowerCase().includes(lowerQuery)) {
