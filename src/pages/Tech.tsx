@@ -298,6 +298,7 @@ export default function Tech() {
             date={new Date(selectedEntry.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
             excerpt={selectedEntry.excerpt}
             body={selectedEntry.body}
+            customization={selectedEntry.customization}
           />
         )}
       </AnimatePresence>

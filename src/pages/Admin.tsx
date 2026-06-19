@@ -1837,6 +1837,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     techStack,
                     githubLink,
                     liveLink,
+                    customization: formCustomization,
                   }
                 }}
               />
