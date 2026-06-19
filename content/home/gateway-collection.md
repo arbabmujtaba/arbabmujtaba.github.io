@@ -1,11 +1,21 @@
 ---
 title: Collection
-slug: gateway-collection
-navTarget: collection
+category: gateway
+date: '2026-06-19'
+excerpt: >-
+  Books, music, objects, and references that leave a trace on taste, thought,
+  and craft.
 configType: gateway
-label: "05 // Curator"
-description: "Books, music, objects, and references that leave a trace on taste, thought, and craft."
-image: "https://images.unsplash.com/photo-1507842217343-583f20270319?auto=format&fit=crop&w=1800&q=80"
+label: 05 // Curator
+description: >-
+  Books, music, objects, and references that leave a trace on taste, thought,
+  and craft.
+image: /uploads/home/1781841191101-361910064.jpeg
+author: ''
+text: ''
+navTarget: collection
 order: 5
 visible: true
+slug: gateway-collection
 ---
+
