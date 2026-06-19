@@ -12,72 +12,134 @@ import {
   PostCustomization
 } from '../types';
 
+function parseYamlValue(val: string): any {
+  if (val === 'true') return true;
+  if (val === 'false') return false;
+  if (val === 'null' || val === '~') return null;
+  // Numeric values
+  if (/^-?\d+(\.\d+)?$/.test(val)) return parseFloat(val);
+  // Inline arrays [a, b, c]
+  if (val.startsWith('[') && val.endsWith(']')) {
+    return val.slice(1, -1).split(',').map(s => {
+      const t = s.trim().replace(/^['"]|['"]$/g, '');
+      return parseYamlValue(t);
+    });
+  }
+  // Strip surrounding quotes
+  if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+    return val.slice(1, -1);
+  }
+  return val;
+}
+
 function parseMarkdown(raw: string) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     return { data: {}, content: raw };
   }
 
-  const data: Record<string, any> = {};
   const yamlString = match[1];
   const content = match[2];
+  const data = parseYamlBlock(yamlString);
 
+  return { data, content };
+}
+
+/**
+ * Parse a YAML block supporting nested objects (indentation-based),
+ * arrays with dash syntax, and scalar values.
+ */
+function parseYamlBlock(yamlString: string): Record<string, any> {
+  const data: Record<string, any> = {};
   const lines = yamlString.split('\n');
-  let currentKey: string | null = null;
-  let currentList: any[] = [];
+
+  // Stack tracks the current object at each indentation level
+  // Each entry: { indent: number, obj: Record<string, any>, key: string | null, list: any[] | null }
+  interface StackFrame {
+    indent: number;
+    obj: Record<string, any>;
+    key: string | null;
+    list: any[] | null;
+  }
+
+  const stack: StackFrame[] = [{ indent: -1, obj: data, key: null, list: null }];
+
+  function currentFrame(): StackFrame {
+    return stack[stack.length - 1];
+  }
 
   for (const line of lines) {
+    // Skip empty lines
+    if (line.trim() === '') continue;
+
+    // Determine indentation level (number of leading spaces)
+    const indentMatch = line.match(/^(\s*)/);
+    const indent = indentMatch ? indentMatch[1].length : 0;
     const trimmed = line.trim();
-    if (!trimmed) continue;
 
-    if (trimmed.startsWith('-') && currentKey) {
-      let val = trimmed.slice(1).trim();
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
-      }
+    // Pop stack frames that are at the same or deeper indentation (when we go back to a shallower level)
+    while (stack.length > 1 && indent <= currentFrame().indent) {
+      stack.pop();
+    }
 
-      const subColon = val.indexOf(':');
-      if (subColon > -1) {
-        const subKey = val.slice(0, subColon).trim();
-        let subVal = val.slice(subColon + 1).trim();
-        if ((subVal.startsWith('"') && subVal.endsWith('"')) || (subVal.startsWith("'") && subVal.endsWith("'"))) {
-          subVal = subVal.slice(1, -1);
+    // Handle list items (lines starting with -)
+    if (trimmed.startsWith('- ') || trimmed === '-') {
+      const listVal = trimmed.length > 2 ? trimmed.slice(2).trim() : '';
+      const frame = currentFrame();
+
+      // If the current frame key has a list, append to it
+      if (frame.list !== null) {
+        if (listVal.includes(':')) {
+          // Inline object in list: "- key: value"
+          const colonIdx = listVal.indexOf(':');
+          const subKey = listVal.slice(0, colonIdx).trim();
+          let subVal = listVal.slice(colonIdx + 1).trim();
+          subVal = subVal.replace(/^['"]|['"]$/g, '');
+          frame.list.push({ [subKey]: parseYamlValue(subVal) });
+        } else {
+          frame.list.push(parseYamlValue(listVal));
         }
-        currentList.push({ [subKey]: subVal });
-      } else {
-        currentList.push(val);
+      } else if (frame.key) {
+        // Start a new list on the frame's key
+        const list: any[] = [];
+        if (listVal.includes(':')) {
+          const colonIdx = listVal.indexOf(':');
+          const subKey = listVal.slice(0, colonIdx).trim();
+          let subVal = listVal.slice(colonIdx + 1).trim();
+          subVal = subVal.replace(/^['"]|['"]$/g, '');
+          list.push({ [subKey]: parseYamlValue(subVal) });
+        } else if (listVal) {
+          list.push(parseYamlValue(listVal));
+        }
+        frame.obj[frame.key] = list;
+        frame.list = list;
       }
-      data[currentKey] = currentList;
       continue;
     }
 
-    const colonIdx = line.indexOf(':');
+    // Handle key:value lines
+    const colonIdx = trimmed.indexOf(':');
     if (colonIdx > -1) {
-      currentKey = line.slice(0, colonIdx).trim();
-      let val = line.slice(colonIdx + 1).trim();
-      currentList = [];
+      const key = trimmed.slice(0, colonIdx).trim();
+      const rawVal = trimmed.slice(colonIdx + 1).trim();
+      const frame = currentFrame();
 
-      if (val.startsWith('-')) {
-        continue;
-      }
-
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
-      }
-
-      if (val.startsWith('[') && val.endsWith(']')) {
-        data[currentKey] = val.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
-      } else if (val === 'true') {
-        data[currentKey] = true;
-      } else if (val === 'false') {
-        data[currentKey] = false;
-      } else if (val !== '') {
-        data[currentKey] = val;
+      if (rawVal === '' || rawVal === undefined) {
+        // This key introduces a nested object (value on subsequent indented lines)
+        const nestedObj: Record<string, any> = {};
+        frame.obj[key] = nestedObj;
+        stack.push({ indent, obj: nestedObj, key, list: null });
+      } else {
+        // Scalar or inline array value
+        frame.obj[key] = parseYamlValue(rawVal);
+        // Update frame key in case next lines are list items for this key
+        frame.key = key;
+        frame.list = null;
       }
     }
   }
 
-  return { data, content };
+  return data;
 }
 
 // Dynamically import all *.md content files at build time

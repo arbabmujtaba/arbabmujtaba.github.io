@@ -20,6 +20,8 @@ import {
   detectMusicProvider,
   extractSpotifyTrackId,
   extractYouTubeId,
+  isValidEmbedUrl,
+  isValidAudioUrl,
 } from '../lib/customization';
 
 interface ContentModalProps {
@@ -49,7 +51,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
   // Spotify embed
   if (detectedProvider === 'spotify') {
     const trackId = extractSpotifyTrackId(songUrl);
-    if (trackId) {
+    if (trackId && isValidEmbedUrl(songUrl)) {
       return (
         <div className="border border-zinc-800/60 bg-zinc-950/60 rounded-lg overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800/40">
@@ -72,7 +74,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
   // YouTube embed
   if (detectedProvider === 'youtube') {
     const videoId = extractYouTubeId(songUrl);
-    if (videoId) {
+    if (videoId && isValidEmbedUrl(songUrl)) {
       return (
         <div className="border border-zinc-800/60 bg-zinc-950/60 rounded-lg overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800/40">
@@ -94,7 +96,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
   }
 
   // SoundCloud embed
-  if (detectedProvider === 'soundcloud') {
+  if (detectedProvider === 'soundcloud' && isValidEmbedUrl(songUrl)) {
     return (
       <div className="border border-zinc-800/60 bg-zinc-950/60 rounded-lg overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800/40">
@@ -114,7 +116,9 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
     );
   }
 
-  // Custom / HTML5 audio player
+  // Custom / HTML5 audio player - validate URL before rendering
+  const audioUrlValid = isValidAudioUrl(songUrl);
+
   return (
     <div className="border border-zinc-800/60 bg-zinc-950/60 rounded-lg p-4">
       <div className="flex items-center gap-4">
@@ -131,19 +135,25 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
           {songTitle && <p className="font-sans text-sm text-zinc-200 truncate">{songTitle}</p>}
           {songArtist && <p className="font-sans text-xs text-zinc-500 truncate">{songArtist}</p>}
         </div>
-        <a
-          href={songUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="p-1.5 text-zinc-500 hover:text-orange-500 transition-colors shrink-0"
-          title="Open link"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+        {audioUrlValid && (
+          <a
+            href={songUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="p-1.5 text-zinc-500 hover:text-orange-500 transition-colors shrink-0"
+            title="Open link"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
       </div>
-      <audio controls className="w-full mt-3 h-8 opacity-80" preload="none">
-        <source src={songUrl} />
-      </audio>
+      {audioUrlValid ? (
+        <audio controls className="w-full mt-3 h-8 opacity-80" preload="none">
+          <source src={songUrl} />
+        </audio>
+      ) : (
+        <p className="font-mono text-[10px] text-zinc-600 mt-3">Audio source unavailable (invalid URL)</p>
+      )}
     </div>
   );
 }

@@ -53,20 +53,23 @@ export function getAnimationVariants(customization?: PostCustomization) {
 
   switch (preset) {
     case 'slide-up':
+      // Slides in from below with y-axis movement
       return {
-        initial: { x: '100%', opacity: 0 },
-        animate: { x: 0, opacity: 1 },
-        exit: { x: '100%', opacity: 0 },
-        transition: { type: 'spring' as const, damping: 25, stiffness: 180, duration },
+        initial: { y: '100%', opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: '100%', opacity: 0 },
+        transition: { type: 'spring' as const, damping: 28, stiffness: 200, duration },
       };
     case 'fade-in':
+      // Pure opacity transition with no spatial movement
       return {
-        initial: { x: '100%', opacity: 0 },
-        animate: { x: 0, opacity: 1 },
-        exit: { x: '100%', opacity: 0 },
-        transition: { type: 'spring' as const, damping: 30, stiffness: 200, duration },
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+        transition: { duration, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
       };
     case 'cinematic':
+      // Scale + opacity with dramatic slow reveal
       return {
         initial: { x: '100%', opacity: 0, scale: 0.95 },
         animate: { x: 0, opacity: 1, scale: 1 },
@@ -74,18 +77,20 @@ export function getAnimationVariants(customization?: PostCustomization) {
         transition: { type: 'spring' as const, damping: 20, stiffness: 100, duration: duration * 1.5 },
       };
     case 'parallax':
+      // Y-axis with slower, heavier spring for depth/weight effect
       return {
-        initial: { x: '100%', opacity: 0 },
-        animate: { x: 0, opacity: 1 },
-        exit: { x: '100%', opacity: 0 },
-        transition: { type: 'spring' as const, damping: 22, stiffness: 120, duration },
+        initial: { y: '60%', opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: '60%', opacity: 0 },
+        transition: { type: 'spring' as const, damping: 15, stiffness: 60, mass: 1.5, duration: duration * 1.3 },
       };
     case 'typewriter':
+      // Quick container reveal with staggered children cascade
       return {
-        initial: { x: '100%', opacity: 0 },
-        animate: { x: 0, opacity: 1 },
-        exit: { x: '100%', opacity: 0 },
-        transition: { type: 'spring' as const, damping: 28, stiffness: 160, duration, staggerChildren: 0.05 },
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+        transition: { duration: duration * 0.4, staggerChildren: 0.06, delayChildren: 0.1 },
       };
     case 'none':
       return {
@@ -129,16 +134,18 @@ export function getContentAnimationVariants(customization?: PostCustomization) {
         transition: { duration: duration * 1.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
       };
     case 'parallax':
+      // Heavier content reveal with depth-like slower motion
       return {
-        initial: { opacity: 0, y: 40 },
+        initial: { opacity: 0, y: 60 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: duration * 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+        transition: { duration: duration * 1.5, delay: 0.25, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] },
       };
     case 'typewriter':
+      // Stagger children with opacity cascade for text reveal feel
       return {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
-        transition: { duration: 0.3, delay: 0.1, staggerChildren: 0.03 },
+        transition: { duration: 0.2, delay: 0.05, staggerChildren: 0.04, delayChildren: 0.15 },
       };
     default:
       return {
@@ -197,7 +204,49 @@ export function getSpacingStyle(customization?: PostCustomization): React.CSSPro
 }
 
 export function getAccentColor(customization?: PostCustomization): string | undefined {
-  return customization?.style?.accentColor || undefined;
+  const color = customization?.style?.accentColor;
+  if (!color) return undefined;
+  return isValidCSSColor(color) ? color : undefined;
+}
+
+/**
+ * Validates that a string is a safe CSS color value (hex, named, rgb/hsl function).
+ * Rejects values containing characters that could break inline style attributes.
+ */
+export function isValidCSSColor(value: string): boolean {
+  if (!value || typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  // Reject empty, overly long, or values with dangerous characters
+  if (trimmed.length === 0 || trimmed.length > 50) return false;
+  if (/[;{}'"\\<>]/.test(trimmed)) return false;
+  // Allow hex colors: #rgb, #rrggbb, #rrggbbaa
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) return true;
+  // Allow CSS named colors (common subset)
+  const namedColors = new Set([
+    'aliceblue','antiquewhite','aqua','aquamarine','azure','beige','bisque','black','blanchedalmond',
+    'blue','blueviolet','brown','burlywood','cadetblue','chartreuse','chocolate','coral','cornflowerblue',
+    'cornsilk','crimson','cyan','darkblue','darkcyan','darkgoldenrod','darkgray','darkgreen','darkgrey',
+    'darkkhaki','darkmagenta','darkolivegreen','darkorange','darkorchid','darkred','darksalmon',
+    'darkseagreen','darkslateblue','darkslategray','darkslategrey','darkturquoise','darkviolet',
+    'deeppink','deepskyblue','dimgray','dimgrey','dodgerblue','firebrick','floralwhite','forestgreen',
+    'fuchsia','gainsboro','ghostwhite','gold','goldenrod','gray','green','greenyellow','grey',
+    'honeydew','hotpink','indianred','indigo','ivory','khaki','lavender','lavenderblush','lawngreen',
+    'lemonchiffon','lightblue','lightcoral','lightcyan','lightgoldenrodyellow','lightgray','lightgreen',
+    'lightgrey','lightpink','lightsalmon','lightseagreen','lightskyblue','lightslategray',
+    'lightslategrey','lightsteelblue','lightyellow','lime','limegreen','linen','magenta','maroon',
+    'mediumaquamarine','mediumblue','mediumorchid','mediumpurple','mediumseagreen','mediumslateblue',
+    'mediumspringgreen','mediumturquoise','mediumvioletred','midnightblue','mintcream','mistyrose',
+    'moccasin','navajowhite','navy','oldlace','olive','olivedrab','orange','orangered','orchid',
+    'palegoldenrod','palegreen','paleturquoise','palevioletred','papayawhip','peachpuff','peru','pink',
+    'plum','powderblue','purple','rebeccapurple','red','rosybrown','royalblue','saddlebrown','salmon',
+    'sandybrown','seagreen','seashell','sienna','silver','skyblue','slateblue','slategray','slategrey',
+    'snow','springgreen','steelblue','tan','teal','thistle','tomato','turquoise','violet','wheat',
+    'white','whitesmoke','yellow','yellowgreen','transparent','currentcolor','inherit'
+  ]);
+  if (namedColors.has(trimmed.toLowerCase())) return true;
+  // Allow rgb(), rgba(), hsl(), hsla() functional notation
+  if (/^(rgb|rgba|hsl|hsla)\(\s*[\d.,\s%]+\)$/.test(trimmed)) return true;
+  return false;
 }
 
 export function getGradientStyle(customization?: PostCustomization): React.CSSProperties | null {
@@ -225,6 +274,59 @@ export function getBlurIntensity(customization?: PostCustomization): number {
 export function getColorFilterValue(customization?: PostCustomization): string {
   const filter = customization?.effects?.colorFilter || 'none';
   return COLOR_FILTER_MAP[filter] || 'none';
+}
+
+/**
+ * Allowed embed domains for music player iframes and audio sources.
+ */
+const ALLOWED_EMBED_DOMAINS = [
+  'open.spotify.com',
+  'spotify.com',
+  'youtube.com',
+  'www.youtube.com',
+  'youtu.be',
+  'soundcloud.com',
+  'w.soundcloud.com',
+];
+
+/**
+ * Validates that a URL is safe to embed in an iframe or audio element.
+ * Must be https:// and from an allowed domain, or a relative path / data URL for audio.
+ */
+export function isValidEmbedUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  // Must start with https://
+  if (!trimmed.startsWith('https://')) return false;
+  try {
+    const parsed = new URL(trimmed);
+    // Check protocol
+    if (parsed.protocol !== 'https:') return false;
+    // Check domain against allowlist
+    const hostname = parsed.hostname.toLowerCase();
+    return ALLOWED_EMBED_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Validates that a URL is safe for use in an HTML5 audio element.
+ * Allows https:// URLs (any domain since they are not iframed) and relative paths.
+ */
+export function isValidAudioUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  // Allow relative URLs (uploaded files)
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) return true;
+  // Must be https
+  if (!trimmed.startsWith('https://')) return false;
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -262,7 +364,7 @@ export function generatePreviewCSS(customization?: PostCustomization): string {
   const rules: string[] = [];
 
   // Accent color
-  if (customization.style?.accentColor) {
+  if (customization.style?.accentColor && isValidCSSColor(customization.style.accentColor)) {
     rules.push(`h1, h2, h3, a { color: ${customization.style.accentColor} !important; }`);
   }
 
