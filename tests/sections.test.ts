@@ -32,6 +32,7 @@ const EXISTING_COLLECTIONS = [
   'favorites',
   'home',
   'gallery',
+  'pages',
 ];
 
 describe('Section Registry', () => {

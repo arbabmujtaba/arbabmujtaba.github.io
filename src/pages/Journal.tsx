@@ -5,17 +5,27 @@ import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
 import SafeImage from '../components/SafeImage';
-import { getJournalEntries } from '../lib/cms';
+import { getJournalEntries, getPageContent } from '../lib/cms';
 import { normalizeImagePath } from '../lib/image';
 import { JournalEntry } from '../types';
 import { Disc3 } from 'lucide-react';
 
-const categoryDescriptions: Record<string, string> = {
+const defaultCategoryDescriptions: Record<string, string> = {
   "Life": "Personal experiences, daily observations, and reflections on the passage of time.",
   "People": "Stories about meaningful people, conversations, and the impact of relationships.",
   "Travel": "Trips, places, memories, and observations from wandering.",
   "Thoughts": "Ideas, reflections, and lessons learned through building and breaking things.",
   "Milestones": "Important moments, achievements, and turning points in the journey."
+};
+
+const journalHero = getPageContent('journal-hero');
+
+const categoryDescriptions: Record<string, string> = {
+  "Life": journalHero?.categoryLife || defaultCategoryDescriptions["Life"],
+  "People": journalHero?.categoryPeople || defaultCategoryDescriptions["People"],
+  "Travel": journalHero?.categoryTravel || defaultCategoryDescriptions["Travel"],
+  "Thoughts": journalHero?.categoryThoughts || defaultCategoryDescriptions["Thoughts"],
+  "Milestones": journalHero?.categoryMilestones || defaultCategoryDescriptions["Milestones"],
 };
 
 const categoryTitles = ["Life", "People", "Travel", "Thoughts", "Milestones"];
@@ -68,7 +78,7 @@ export default function Journal() {
         {/* Hero Section */}
         <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
           <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            JOURNAL
+            {journalHero?.headline || 'JOURNAL'}
           </div>
           <motion.p 
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -82,13 +92,13 @@ export default function Journal() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
           >
-            Journal
+            {journalHero?.title || 'Journal'}
           </motion.h1>
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
           >
-            A personal archive of thoughts, late-night reflections, and milestones. Writing as a tool for figuring things out and finding stability in the noise of creating something real.
+            {journalHero?.subtitle || 'A personal archive of thoughts, late-night reflections, and milestones. Writing as a tool for figuring things out and finding stability in the noise of creating something real.'}
           </motion.div>
         </div>
 

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, Microchip, Activity, Database, Code2, Server, Network, Headphones, ArrowRight, ChevronDown } from 'lucide-react';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
-import { getTechEntries, getFavoriteItems } from '../lib/cms';
+import { getTechEntries, getFavoriteItems, getPageContent } from '../lib/cms';
 import { TechEntry, FavoriteItem } from '../types';
 
 const groupIconMap: Record<string, React.ReactNode> = {
@@ -16,6 +16,9 @@ const groupIconMap: Record<string, React.ReactNode> = {
 export default function Tech() {
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<TechEntry | null>(null);
+
+  // Load page hero from CMS
+  const techHero = useMemo(() => getPageContent('tech-hero'), []);
 
   // Load from CMS
   const logs = useMemo(() => getTechEntries(), []);
@@ -77,7 +80,7 @@ export default function Tech() {
         {/* Header Section */}
         <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
           <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            TECH
+            {techHero?.headline || 'TECH'}
           </div>
           <motion.p
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -91,13 +94,13 @@ export default function Tech() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
           >
-            Tech
+            {techHero?.title || 'Tech'}
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
           >
-            A digital laboratory, engineering notebook, and technical archive. Documenting experiments, systems, and implementation stories.
+            {techHero?.subtitle || 'A digital laboratory, engineering notebook, and technical archive. Documenting experiments, systems, and implementation stories.'}
           </motion.div>
         </div>
 

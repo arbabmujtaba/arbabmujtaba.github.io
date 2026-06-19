@@ -102,7 +102,7 @@ export class ContentNotFoundError extends Error {
 
 const REGISTRY_FILENAME = 'content-state.json';
 const CONTENT_DIR = path.join(process.cwd(), 'content');
-const SUPPORTED_COLLECTIONS = ['journal', 'tech', 'photography', 'collection', 'portfolio', 'gear', 'timeline', 'favorites', 'home', 'gallery'];
+const SUPPORTED_COLLECTIONS = ['journal', 'tech', 'photography', 'collection', 'portfolio', 'gear', 'timeline', 'favorites', 'home', 'gallery', 'pages'];
 
 /**
  * Valid state transitions map

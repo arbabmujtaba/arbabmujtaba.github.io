@@ -13,7 +13,7 @@ import Footer from '../components/Footer';
 import MagicalGateway from '../components/MagicalGateway';
 import QuoteReveal from '../components/QuoteReveal';
 import ScrollIndicator from '../components/ScrollIndicator';
-import { getHomeConfig } from '../lib/cms';
+import { getHomeConfig, getPageContent } from '../lib/cms';
 import { HomeConfigEntry } from '../types';
 
 interface HomeProps {
@@ -157,6 +157,8 @@ export default function Home({ setView }: HomeProps) {
   const quotes = homeConfig.filter(h => h.configType === 'quote');
   const principles = homeConfig.filter(h => h.configType === 'principle');
   const profile = homeConfig.find(h => h.configType === 'profile');
+  const homeHeroContent = getPageContent('home-hero');
+  const cinematicImageUrl = homeHeroContent?.cinematicImage || 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=85';
 
   return (
     <motion.div
@@ -212,7 +214,7 @@ export default function Home({ setView }: HomeProps) {
 
         <CinematicImageReveal
           containerRef={containerRef}
-          imageUrl="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=85"
+          imageUrl={cinematicImageUrl}
         />
 
         <ArchiveSection containerRef={containerRef}>

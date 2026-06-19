@@ -4,7 +4,7 @@ import { Clock, Terminal, Compass, Disc3, Layers } from 'lucide-react';
 import ExploreArrow from '../components/ExploreArrow';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
-import { getCollectionEntries, getTimelineMilestones, getFavoriteItems } from '../lib/cms';
+import { getCollectionEntries, getTimelineMilestones, getFavoriteItems, getPageContent } from '../lib/cms';
 import { CollectionEntry, FavoriteItem } from '../types';
 
 export default function Collection() {
@@ -14,6 +14,7 @@ export default function Collection() {
   const entries = useMemo(() => getCollectionEntries(), []);
   const timelineMilestones = useMemo(() => getTimelineMilestones().filter(t => t.visible).sort((a, b) => a.order - b.order), []);
   const favoriteItems = useMemo(() => getFavoriteItems().filter(f => f.visible).sort((a, b) => a.order - b.order), []);
+  const collectionHero = useMemo(() => getPageContent('collection-hero'), []);
 
   // Filter books and inspirations
   const inspirations = useMemo(() => {
@@ -57,7 +58,7 @@ export default function Collection() {
         {/* Hero Section */}
         <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
           <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            COLLECTION
+            {collectionHero?.headline || 'COLLECTION'}
           </div>
           <motion.p
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -71,13 +72,13 @@ export default function Collection() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
           >
-            Collection
+            {collectionHero?.title || 'Collection'}
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
           >
-            A personal museum archive. Documenting the timelines, tools, literature, and soundscapes that shape my engineering journey and creative output.
+            {collectionHero?.subtitle || 'A personal museum archive. Documenting the timelines, tools, literature, and soundscapes that shape my engineering journey and creative output.'}
           </motion.div>
         </div>
 
@@ -189,7 +190,7 @@ export default function Collection() {
               <div>
                 <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-3">Curator&apos;s Note</span>
                 <p className="font-sans text-sm text-zinc-300 font-light leading-relaxed italic">
-                  &ldquo;We are generally the product of what we consume. Building a curated environment of high-quality inputs is essential for producing meaningful outputs.&rdquo;
+                  &ldquo;{collectionHero?.curatorsNote || 'We are generally the product of what we consume. Building a curated environment of high-quality inputs is essential for producing meaningful outputs.'}&rdquo;
                 </p>
               </div>
             </div>

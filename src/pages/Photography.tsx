@@ -6,7 +6,7 @@ import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
 import SafeImage from '../components/SafeImage';
-import { getPhotographyEntries, getGearItems, getGalleryItems } from '../lib/cms';
+import { getPhotographyEntries, getGearItems, getGalleryItems, getPageContent } from '../lib/cms';
 import { normalizeImagePath } from '../lib/image';
 import { PhotographyEntry, GearItem, PhotoGalleryItem } from '../types';
 
@@ -17,6 +17,7 @@ export default function Photography() {
   const allPhotos = useMemo(() => getPhotographyEntries(), []);
   const gearItems = useMemo(() => getGearItems().filter(g => g.visible).sort((a, b) => a.order - b.order), []);
   const galleryItems = useMemo(() => getGalleryItems().filter(g => g.visible).sort((a, b) => a.order - b.order), []);
+  const photoHero = useMemo(() => getPageContent('photography-hero'), []);
 
   // Group gear by category
   const gearByCategory = useMemo(() => {
@@ -66,7 +67,7 @@ export default function Photography() {
         {/* Hero Section */}
         <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
           <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[2.5rem] sm:text-[4rem] md:text-[7rem] lg:text-[12rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            PHOTOGRAPHY
+            {photoHero?.headline || 'PHOTOGRAPHY'}
           </div>
           <motion.p
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -80,13 +81,13 @@ export default function Photography() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
           >
-            Photography
+            {photoHero?.title || 'Photography'}
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
             className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
           >
-            A collection of moments gathered over the years. This is less of a portfolio and more of a personal visual diary, focusing on memories, people, and the stories carried within light.
+            {photoHero?.subtitle || 'A collection of moments gathered over the years. This is less of a portfolio and more of a personal visual diary, focusing on memories, people, and the stories carried within light.'}
           </motion.div>
         </div>
 

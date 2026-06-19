@@ -1,10 +1,15 @@
 import { motion, useReducedMotion } from 'motion/react';
+import { getPageContent } from '../lib/cms';
 
-const nameLines = ['ARBAB', 'MUJTABA'];
+const homeHero = getPageContent('home-hero');
+const nameLines = homeHero?.nameLines
+  ? (Array.isArray(homeHero.nameLines) ? homeHero.nameLines : [homeHero.nameLines])
+  : ['ARBAB', 'MUJTABA'];
 const identity = [
-  'Software engineer & photographer,',
-  'drawn to where systems and stories meet.',
+  homeHero?.identityLine1 || 'Software engineer & photographer,',
+  homeHero?.identityLine2 || 'drawn to where systems and stories meet.',
 ];
+const tagline = homeHero?.tagline || 'Building systems, documenting light, chasing quiet mysteries.';
 const editorialEase = [0.16, 1, 0.3, 1] as const;
 
 export default function EnhancedHeroName() {
@@ -92,7 +97,7 @@ export default function EnhancedHeroName() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 1.85, ease: [0.16, 1, 0.3, 1] }}
       >
-        Building systems, documenting light, chasing quiet mysteries.
+        {tagline}
       </motion.div>
     </div>
   );

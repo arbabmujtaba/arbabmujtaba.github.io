@@ -137,6 +137,7 @@ const timelineGlob = (import.meta as any).glob('/content/timeline/**/*.md', { qu
 const favoritesGlob = (import.meta as any).glob('/content/favorites/**/*.md', { query: '?raw', eager: true });
 const homeGlob = (import.meta as any).glob('/content/home/**/*.md', { query: '?raw', eager: true });
 const galleryGlob = (import.meta as any).glob('/content/gallery/**/*.md', { query: '?raw', eager: true });
+const pagesGlob = (import.meta as any).glob('/content/pages/**/*.md', { query: '?raw', eager: true });
 
 // Normalize listing maps to typed arrays
 export function getJournalEntries(): JournalEntry[] {
@@ -348,4 +349,70 @@ export function getGalleryItems(): PhotoGalleryItem[] {
       body: content || ""
     };
   }).sort((a, b) => a.order - b.order);
+}
+
+// ============================================================
+// PAGE CONTENT (pages collection)
+// ============================================================
+
+export interface PageContent {
+  title: string;
+  slug: string;
+  headline: string;
+  subtitle: string;
+  image: string;
+  body: string;
+  [key: string]: any;
+}
+
+export interface SkillCategory {
+  category: string;
+  items: string[];
+}
+
+/**
+ * Returns parsed page content for a given slug from the pages collection.
+ * Returns null if the slug is not found.
+ */
+export function getPageContent(slug: string): PageContent | null {
+  for (const [filePath, module] of Object.entries(pagesGlob)) {
+    const rawContent = (module as any).default;
+    const { data, content } = parseMarkdown(rawContent);
+    const fileSlug = data.slug || filePath.split('/').pop()?.replace('.md', '') || '';
+    if (fileSlug === slug) {
+      return {
+        title: data.title || '',
+        slug: fileSlug,
+        headline: data.headline || data.title || '',
+        subtitle: data.subtitle || '',
+        image: data.image || data.cinematicImage || '',
+        body: content || '',
+        ...data,
+      };
+    }
+  }
+  return null;
+}
+
+/**
+ * Returns the technical skills array from the portfolio-skills page content.
+ * Parses the skillsJson field (JSON string stored in frontmatter).
+ * Returns null if unavailable or unparseable.
+ */
+export function getPageSkills(): SkillCategory[] | null {
+  const page = getPageContent('portfolio-skills');
+  if (!page) return null;
+
+  const raw = page.skillsJson;
+  if (!raw || typeof raw !== 'string') return null;
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed as SkillCategory[];
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
