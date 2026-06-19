@@ -35,7 +35,7 @@ export function getLiveEditBridgeScript(): string {
         outline-offset: 2px !important;
         box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15) !important;
       }
-      * { cursor: pointer !important; }
+      body *:not(input):not(textarea):not(select):not(button) { cursor: crosshair !important; }
     \`;
     document.head.appendChild(styleEl);
   }

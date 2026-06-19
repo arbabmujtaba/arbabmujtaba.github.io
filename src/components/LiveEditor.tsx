@@ -70,6 +70,9 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
+  // Server connectivity state
+  const [serverAvailable, setServerAvailable] = useState(true);
+
   // Refs
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -82,6 +85,23 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
     coverImage: item.coverImage,
     category: item.category,
   }));
+
+  // Health check: verify the dev server API is available on mount
+  useEffect(() => {
+    const checkServer = async () => {
+      try {
+        const res = await fetch('/api/content');
+        if (!res.ok) {
+          setServerAvailable(false);
+        } else {
+          setServerAvailable(true);
+        }
+      } catch {
+        setServerAvailable(false);
+      }
+    };
+    checkServer();
+  }, []);
 
   // Inject bridge script into iframe
   const injectBridge = useCallback(() => {
@@ -122,6 +142,8 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
   // Listen for messages from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      // Validate origin to prevent cross-origin message injection
+      if (event.origin !== window.location.origin) return;
       if (!event.data || typeof event.data !== 'object') return;
 
       switch (event.data.type) {
@@ -197,10 +219,21 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
   // Save changes
   const handleSave = async () => {
     if (!mappedElement) return;
+
+    // Prevent saving when field type is unknown - no meaningful update can be made
+    if (mappedElement.field === 'unknown') {
+      onToast('error', 'Cannot save: field type is unknown. Try clicking directly on a heading, paragraph, or image.');
+      return;
+    }
+
     setIsSaving(true);
 
     try {
-      // First fetch the full content to update
+      // NOTE: This save flow has a known read-modify-write race condition.
+      // If two fields of the same content item are edited in quick succession,
+      // the second save may overwrite the first because it fetched stale data
+      // before the first PUT landed. A field-level PATCH endpoint or optimistic
+      // locking would resolve this, but is acceptable for single-user editing.
       const res = await fetch(`/api/content/${mappedElement.collection}/${mappedElement.slug}`);
       if (!res.ok) throw new Error('Failed to fetch content');
       const doc = await res.json();
@@ -282,7 +315,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
   const config = VIEWPORT_CONFIGS[viewportMode];
 
   return (
-    <div className="flex-grow flex flex-col h-full overflow-hidden">
+    <div className="flex-grow flex flex-col h-full overflow-hidden relative">
       {/* Top Toolbar */}
       <div className="border-b border-zinc-900 bg-zinc-950/80 px-4 py-2.5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -359,6 +392,14 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
 
       {/* Main Content Area */}
       <div className="flex-grow flex overflow-hidden">
+        {/* Server unavailable banner */}
+        {!serverAvailable && (
+          <div className="absolute top-[49px] left-0 right-0 z-20 bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center gap-2">
+            <span className="font-sans text-xs text-amber-400">
+              Live editing requires the local development server. Start it with <code className="font-mono bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-300">npm run dev</code>.
+            </span>
+          </div>
+        )}
         {/* Left: Iframe Panel */}
         <div className="flex-grow flex items-start justify-center overflow-auto bg-zinc-950/30 p-4 custom-scrollbar">
           <motion.div
@@ -518,6 +559,13 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
                             {mappedElement.field}
                           </span>
                         </div>
+                        {mappedElement.field === 'unknown' && (
+                          <div className="bg-amber-500/5 border border-amber-500/20 rounded-sm p-2">
+                            <p className="font-sans text-[11px] text-amber-400 leading-relaxed">
+                              This field type could not be determined. Saving is disabled. Try clicking directly on a title, paragraph, or image.
+                            </p>
+                          </div>
+                        )}
                         {mappedElement.field === 'coverImage' ? (
                           <input
                             type="text"
@@ -549,7 +597,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
                       <div className="space-y-2 pt-2">
                         <button
                           onClick={handleSave}
-                          disabled={isSaving}
+                          disabled={isSaving || !serverAvailable || mappedElement.field === 'unknown'}
                           className="w-full px-3 py-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 hover:bg-orange-500/20 hover:border-orange-500/50 transition-all rounded-sm font-sans text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSaving ? (
@@ -570,7 +618,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
                           </button>
                           <button
                             onClick={handlePublish}
-                            disabled={isPublishing}
+                            disabled={isPublishing || !serverAvailable}
                             className="flex-1 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all rounded-sm font-sans text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {isPublishing ? (
