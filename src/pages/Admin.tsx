@@ -4,7 +4,8 @@ import {
   Plus, Search, Edit3, Trash2, ChevronLeft, Save, Sparkles, 
   UploadCloud, Check, FileText, Calendar, Tag, Layers, 
   Settings, Eye, Terminal, Globe, Github, Info, AlertTriangle, 
-  Filter, Award, Loader2, ArrowUpRight, Archive, RotateCcw, Rocket, Activity
+  Filter, Award, Loader2, ArrowUpRight, Archive, RotateCcw, Rocket, Activity,
+  MousePointerClick
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from '../components/SafeImage';
@@ -15,6 +16,7 @@ import PublishingModal from '../components/PublishingModal';
 import { ToastContainer, type ToastItem } from '../components/Toast';
 import StatusBadge from '../components/StatusBadge';
 import ActivityFeed from '../components/ActivityFeed';
+import LiveEditor from '../components/LiveEditor';
 
 // Define localized types for form handling
 interface CMSItem {
@@ -34,7 +36,7 @@ interface CMSItem {
 
 export default function Admin({ setView }: { setView: (v: string) => void }) {
   // Navigation & State management
-  const [viewState, setViewState] = useState<'list' | 'editor' | 'deployment'>('list');
+  const [viewState, setViewState] = useState<'list' | 'editor' | 'deployment' | 'live-editor'>('list');
   const [allContent, setAllContent] = useState<CMSItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -749,38 +751,59 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       className="flex-grow flex flex-col relative overflow-hidden bg-[#0d0d0c] h-full"
     >
       {/* Editorial Studio Header */}
-      <div className="z-20 border-b border-zinc-900 bg-zinc-950/80 px-6 md:px-12 py-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+      <div className="z-20 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-sm px-6 md:px-12 py-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 relative">
         <div className="flex items-center gap-4">
-          <Terminal className="w-5 h-5 text-orange-500" />
+          <div className="relative">
+            <Terminal className="w-5 h-5 text-orange-500" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+          </div>
           <div>
-            <span className="block font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 font-medium">Publishing Engine</span>
+            <span className="block font-mono text-[9px] uppercase tracking-[0.3em] text-orange-500/80 font-medium">Publishing Engine</span>
             <h1 className="font-serif text-2xl text-zinc-200 font-medium tracking-tight">Editorial Hub</h1>
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {viewState === 'editor' && (
             <button 
               onClick={saveLocalDraft}
-              className="px-4 py-2 border border-zinc-800 bg-zinc-900/60 font-sans text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 border border-zinc-800 bg-zinc-900/60 font-sans text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 hover:scale-[1.02] transition-all rounded-sm flex items-center gap-2 cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
               Save Draft
             </button>
           )}
           {viewState === 'list' && (
-            <button
-              onClick={() => setViewState('deployment')}
-              className="px-4 py-2 border border-zinc-800 bg-zinc-900/60 font-sans text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
-            >
-              <Rocket className="w-3.5 h-3.5" />
-              Deployment Center
-            </button>
+            <>
+              <button
+                onClick={() => setViewState('live-editor')}
+                className="px-4 py-2 border border-orange-500/30 bg-orange-500/5 font-sans text-xs text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 hover:border-orange-500/50 hover:scale-[1.02] transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+              >
+                <MousePointerClick className="w-3.5 h-3.5" />
+                Live Editor
+              </button>
+              <button
+                onClick={() => setViewState('deployment')}
+                className="px-4 py-2 border border-zinc-800 bg-zinc-900/60 font-sans text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 hover:scale-[1.02] transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+              >
+                <Rocket className="w-3.5 h-3.5" />
+                Deployment Center
+              </button>
+            </>
           )}
           {viewState === 'deployment' && (
             <button
               onClick={() => setViewState('list')}
-              className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 hover:scale-[1.02] transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to Dashboard
+            </button>
+          )}
+          {viewState === 'live-editor' && (
+            <button
+              onClick={() => setViewState('list')}
+              className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 hover:scale-[1.02] transition-all rounded-sm flex items-center gap-2 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
               Back to Dashboard
@@ -793,18 +816,21 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   setViewState('list');
                   resetFormFields();
                 }
-              } else if (viewState === 'deployment') {
+              } else if (viewState === 'deployment' || viewState === 'live-editor') {
                 setViewState('list');
               } else {
                 setView('home');
               }
             }}
-            className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all rounded-sm flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 border border-zinc-900 bg-zinc-950/40 text-xs font-sans text-zinc-400 hover:text-white hover:bg-zinc-900 hover:scale-[1.02] transition-all rounded-sm flex items-center gap-2 cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
-            {viewState === 'editor' ? 'Back' : viewState === 'deployment' ? 'Back to Dashboard' : 'Back to Website'}
+            {viewState === 'editor' ? 'Back' : viewState === 'deployment' || viewState === 'live-editor' ? 'Back to Dashboard' : 'Back to Website'}
           </button>
         </div>
+
+        {/* Gradient accent line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-orange-500/40 to-transparent" />
       </div>
 
       {/* Primary Workspace Scroll Area */}
@@ -824,24 +850,27 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
             
             {/* Editorial State Stats */}
             <div className="mb-12">
-              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-4">Editorial Overview</h2>
+              <h2 className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-500 mb-5">Editorial Overview</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: 'Drafts', state: 'draft', color: 'text-amber-400', bg: 'bg-amber-500/5 border-amber-500/10' },
-                  { label: 'In Review', state: 'review', color: 'text-blue-400', bg: 'bg-blue-500/5 border-blue-500/10' },
-                  { label: 'Published', state: 'published', color: 'text-green-400', bg: 'bg-green-500/5 border-green-500/10' },
-                  { label: 'Archived', state: 'archived', color: 'text-zinc-400', bg: 'bg-zinc-500/5 border-zinc-500/10' },
-                ].map(({ label, state, color, bg }) => {
-                  const count = allContent.filter(v => v.state === state). length;
+                  { label: 'Drafts', state: 'draft', color: 'text-amber-400', bg: 'bg-amber-500/5 border-amber-500/10', glow: 'hover:shadow-amber-500/5' },
+                  { label: 'In Review', state: 'review', color: 'text-blue-400', bg: 'bg-blue-500/5 border-blue-500/10', glow: 'hover:shadow-blue-500/5' },
+                  { label: 'Published', state: 'published', color: 'text-green-400', bg: 'bg-green-500/5 border-green-500/10', glow: 'hover:shadow-green-500/5' },
+                  { label: 'Archived', state: 'archived', color: 'text-zinc-400', bg: 'bg-zinc-500/5 border-zinc-500/10', glow: 'hover:shadow-zinc-500/5' },
+                ].map(({ label, state, color, bg, glow }, index) => {
+                  const count = allContent.filter(v => v.state === state).length;
                   return (
-                    <button
+                    <motion.button
                       key={state}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.08 }}
                       onClick={() => setFilterState(state)}
-                      className={`border ${bg} p-5 rounded-sm text-left transition-all hover:border-opacity-50 cursor-pointer`}
+                      className={`border ${bg} p-6 rounded-sm text-left transition-all hover:border-opacity-60 cursor-pointer hover:shadow-lg ${glow} hover:scale-[1.02] group`}
                     >
-                      <span className="block font-mono text-[9px] uppercase tracking-widest text-zinc-500 mb-2">{label}</span>
+                      <span className="block font-mono text-[9px] uppercase tracking-widest text-zinc-500 mb-3 group-hover:text-zinc-400 transition-colors">{label}</span>
                       <span className={`font-serif text-3xl font-medium ${color}`}>{count}</span>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -849,13 +878,25 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
 
             {/* Collection Counters widget */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
-              {['journal', 'tech', 'photography', 'collection', 'portfolio'].map(col => {
+              {[
+                { col: 'journal', accent: 'border-l-orange-500' },
+                { col: 'tech', accent: 'border-l-blue-500' },
+                { col: 'photography', accent: 'border-l-green-500' },
+                { col: 'collection', accent: 'border-l-purple-500' },
+                { col: 'portfolio', accent: 'border-l-pink-500' },
+              ].map(({ col, accent }, index) => {
                 const count = allContent.filter(v => v.collection === col).length;
                 return (
-                  <div key={col} className="border border-zinc-900 bg-zinc-950/50 p-5 rounded-sm">
+                  <motion.div
+                    key={col}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.32 + index * 0.06 }}
+                    className={`border border-zinc-900 border-l-2 ${accent} bg-zinc-950/50 p-5 rounded-sm hover:bg-zinc-900/30 hover:scale-[1.02] transition-all cursor-default`}
+                  >
                     <span className="block font-mono text-[9px] uppercase tracking-widest text-zinc-500 mb-2">{col}</span>
                     <span className="font-serif text-3xl font-medium text-zinc-100">{count}</span>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -863,86 +904,104 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
             {/* Quick Views */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               {/* Recent Drafts */}
-              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm p-5">
-                <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
-                  <FileText className="w-3.5 h-3.5" />
-                  Recent Drafts
-                </h3>
-                <div className="space-y-3">
-                  {allContent.filter(i => i.state === 'draft').slice(0, 5).map(item => (
-                    <div
-                      key={item.slug}
-                      onClick={() => handleEditClick(item)}
-                      className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-colors border border-transparent hover:border-zinc-800/50"
-                    >
-                      <div className="w-8 h-8 bg-amber-500/10 rounded flex items-center justify-center shrink-0">
-                        <FileText className="w-3.5 h-3.5 text-amber-400" />
+              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-amber-500/60 via-amber-500/20 to-transparent" />
+                <div className="p-5">
+                  <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-amber-400/60" />
+                    Recent Drafts
+                  </h3>
+                  <div className="space-y-2">
+                    {allContent.filter(i => i.state === 'draft').slice(0, 5).map(item => (
+                      <div
+                        key={item.slug}
+                        onClick={() => handleEditClick(item)}
+                        className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-amber-500/60 border border-transparent hover:border-zinc-800/50"
+                      >
+                        <div className="w-8 h-8 bg-amber-500/10 rounded flex items-center justify-center shrink-0">
+                          <FileText className="w-3.5 h-3.5 text-amber-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
+                          <p className="font-mono text-[9px] text-zinc-600">{item.collection}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
-                        <p className="font-mono text-[9px] text-zinc-600">{item.collection}</p>
+                    ))}
+                    {allContent.filter(i => i.state === 'draft').length === 0 && (
+                      <div className="flex flex-col items-center py-6 text-center">
+                        <FileText className="w-8 h-8 text-zinc-800 mb-2" strokeWidth={1} />
+                        <p className="font-sans text-xs text-zinc-600 italic">No drafts</p>
                       </div>
-                    </div>
-                  ))}
-                  {allContent.filter(i => i.state === 'draft').length === 0 && (
-                    <p className="font-sans text-xs text-zinc-600 italic">No drafts</p>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Pending Publications (In Review) */}
-              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm p-5">
-                <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
-                  <Activity className="w-3.5 h-3.5" />
-                  Pending Publications
-                </h3>
-                <div className="space-y-3">
-                  {allContent.filter(i => i.state === 'review').slice(0, 5).map(item => (
-                    <div
-                      key={item.slug}
-                      onClick={() => handleEditClick(item)}
-                      className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-colors border border-transparent hover:border-zinc-800/50"
-                    >
-                      <div className="w-8 h-8 bg-blue-500/10 rounded flex items-center justify-center shrink-0">
-                        <Activity className="w-3.5 h-3.5 text-blue-400" />
+              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-blue-500/60 via-blue-500/20 to-transparent" />
+                <div className="p-5">
+                  <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
+                    <Activity className="w-3.5 h-3.5 text-blue-400/60" />
+                    Pending Publications
+                  </h3>
+                  <div className="space-y-2">
+                    {allContent.filter(i => i.state === 'review').slice(0, 5).map(item => (
+                      <div
+                        key={item.slug}
+                        onClick={() => handleEditClick(item)}
+                        className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-blue-500/60 border border-transparent hover:border-zinc-800/50"
+                      >
+                        <div className="w-8 h-8 bg-blue-500/10 rounded flex items-center justify-center shrink-0">
+                          <Activity className="w-3.5 h-3.5 text-blue-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
+                          <p className="font-mono text-[9px] text-zinc-600">{item.collection}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
-                        <p className="font-mono text-[9px] text-zinc-600">{item.collection}</p>
+                    ))}
+                    {allContent.filter(i => i.state === 'review').length === 0 && (
+                      <div className="flex flex-col items-center py-6 text-center">
+                        <Activity className="w-8 h-8 text-zinc-800 mb-2" strokeWidth={1} />
+                        <p className="font-sans text-xs text-zinc-600 italic">Nothing pending review</p>
                       </div>
-                    </div>
-                  ))}
-                  {allContent.filter(i => i.state === 'review').length === 0 && (
-                    <p className="font-sans text-xs text-zinc-600 italic">Nothing pending review</p>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Recently Published */}
-              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm p-5">
-                <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5" />
-                  Recently Published
-                </h3>
-                <div className="space-y-3">
-                  {allContent.filter(i => i.state === 'published').slice(0, 5).map(item => (
-                    <div
-                      key={item.slug}
-                      onClick={() => handleEditClick(item)}
-                      className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-colors border border-transparent hover:border-zinc-800/50"
-                    >
-                      <div className="w-8 h-8 bg-green-500/10 rounded flex items-center justify-center shrink-0">
-                        <Check className="w-3.5 h-3.5 text-green-400" />
+              <div className="border border-zinc-900 bg-zinc-950/30 rounded-sm overflow-hidden">
+                <div className="h-[2px] bg-gradient-to-r from-green-500/60 via-green-500/20 to-transparent" />
+                <div className="p-5">
+                  <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-green-400/60" />
+                    Recently Published
+                  </h3>
+                  <div className="space-y-2">
+                    {allContent.filter(i => i.state === 'published').slice(0, 5).map(item => (
+                      <div
+                        key={item.slug}
+                        onClick={() => handleEditClick(item)}
+                        className="flex items-center gap-3 p-2.5 rounded-sm bg-zinc-950/40 hover:bg-zinc-900/40 cursor-pointer transition-all border-l-2 border-l-transparent hover:border-l-green-500/60 border border-transparent hover:border-zinc-800/50"
+                      >
+                        <div className="w-8 h-8 bg-green-500/10 rounded flex items-center justify-center shrink-0">
+                          <Check className="w-3.5 h-3.5 text-green-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
+                          <p className="font-mono text-[9px] text-zinc-600">{item.date || item.collection}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-sans text-xs text-zinc-300 truncate">{item.title}</p>
-                        <p className="font-mono text-[9px] text-zinc-600">{item.date || item.collection}</p>
+                    ))}
+                    {allContent.filter(i => i.state === 'published').length === 0 && (
+                      <div className="flex flex-col items-center py-6 text-center">
+                        <Check className="w-8 h-8 text-zinc-800 mb-2" strokeWidth={1} />
+                        <p className="font-sans text-xs text-zinc-600 italic">No published content</p>
                       </div>
-                    </div>
-                  ))}
-                  {allContent.filter(i => i.state === 'published').length === 0 && (
-                    <p className="font-sans text-xs text-zinc-600 italic">No published content</p>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1013,7 +1072,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
               <div className="overflow-hidden border border-zinc-900 rounded-sm">
                 <table className="w-full text-left border-collapse font-sans">
                   <thead>
-                    <tr className="bg-zinc-950 border-b border-zinc-900 font-mono text-[9px] uppercase tracking-widest text-zinc-500">
+                    <tr className="bg-gradient-to-r from-zinc-950 to-zinc-950/80 border-b border-zinc-900 font-mono text-[9px] uppercase tracking-widest text-zinc-500">
                       <th className="py-4 px-6">Collection</th>
                       <th className="py-4 px-6">Title / Cover</th>
                       <th className="py-4 px-6">Category</th>
@@ -1026,7 +1085,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     {processedContent.map((item, idx) => (
                       <tr 
                         key={idx} 
-                        className="bg-zinc-950/20 hover:bg-zinc-900/10 transition-colors"
+                        className={`${idx % 2 === 0 ? 'bg-zinc-950/20' : 'bg-zinc-950/40'} hover:bg-zinc-900/20 transition-all border-l-2 border-l-transparent hover:border-l-orange-500/50`}
                       >
                         <td className="py-4 px-6">
                           <span className="font-mono text-[9px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-2 py-0.5 rounded uppercase tracking-wider">
@@ -1762,6 +1821,13 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
           </div>
         )}
         {viewState === 'deployment' && <DeploymentCenter />}
+        {viewState === 'live-editor' && (
+          <LiveEditor
+            content={allContent}
+            onNavigateToEditor={(item) => handleEditClick(item)}
+            onToast={addToast}
+          />
+        )}
       </div>
 
       {/* Publishing Modal */}
