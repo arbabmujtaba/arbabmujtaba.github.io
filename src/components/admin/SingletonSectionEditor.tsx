@@ -3,15 +3,19 @@
  *
  * Loads a singleton section's item via GET /api/content/:collection/:slug,
  * renders fields via FieldRenderer based on section.fields,
- * provides Save (PUT /api/content) and Revert (re-fetch) buttons.
- * Shows save status indicator (idle/saving/success/error).
+ * provides Save (PUT /api/content), Publish (POST /api/publish + PublishingModal),
+ * and Revert (re-fetch from API) buttons.
+ * Shows a live preview pane alongside the editor on desktop.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { Save, RotateCcw, Loader2, Check, AlertCircle } from 'lucide-react';
+import { Save, RotateCcw, Loader2, Check, AlertCircle, Rocket } from 'lucide-react';
 import type { SectionDef } from '../../lib/sections';
+import { resolvePreviewUrl, buildPublishPayload, startPublish, fetchContentForRevert } from '../../lib/preview';
 import FieldRenderer from './fields/FieldRenderer';
+import PreviewPane from './PreviewPane';
+import PublishingModal from '../PublishingModal';
 
 type SaveStatus = 'idle' | 'saving' | 'success' | 'error';
 
@@ -27,9 +31,14 @@ export default function SingletonSectionEditor({ section }: SingletonSectionEdit
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [lastSaved, setLastSaved] = useState(0);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [publishJobId, setPublishJobId] = useState<string | null>(null);
+  const [reverting, setReverting] = useState(false);
 
   const slug = section.slug!;
   const collection = section.collection;
+  const previewUrl = resolvePreviewUrl(section);
 
   const fetchContent = useCallback(async () => {
     setLoading(true);
@@ -95,6 +104,7 @@ export default function SingletonSectionEditor({ section }: SingletonSectionEdit
       setOriginalData({ ...formData });
       setOriginalBody(body);
       setSaveStatus('success');
+      setLastSaved(Date.now());
 
       // Reset status after 3 seconds
       setTimeout(() => setSaveStatus('idle'), 3000);
@@ -104,10 +114,34 @@ export default function SingletonSectionEditor({ section }: SingletonSectionEdit
     }
   };
 
-  const handleRevert = () => {
-    setFormData({ ...originalData });
-    setBody(originalBody);
-    setSaveStatus('idle');
+  const handleRevert = async () => {
+    setReverting(true);
+    try {
+      const result = await fetchContentForRevert(collection, slug);
+      setFormData({ ...result.data });
+      setOriginalData({ ...result.data });
+      setBody(result.body);
+      setOriginalBody(result.body);
+      setSaveStatus('idle');
+      setErrorMessage('');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Revert failed');
+      setSaveStatus('error');
+    } finally {
+      setReverting(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      const payload = buildPublishPayload(collection, slug, formData, body);
+      const jobId = await startPublish(payload);
+      setPublishJobId(jobId);
+      setPublishModalOpen(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Publish failed');
+      setSaveStatus('error');
+    }
   };
 
   if (loading) {
@@ -126,89 +160,118 @@ export default function SingletonSectionEditor({ section }: SingletonSectionEdit
   const bodyField = section.fields.find((f) => f.name === 'body');
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-        className="p-6 md:p-8 max-w-3xl"
-      >
-        {/* Header with Save/Revert */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase text-zinc-600">
-                {section.page}
-              </span>
-              <span className="text-zinc-700">/</span>
-              <span className="text-xs font-mono text-zinc-500">
-                {section.id}
-              </span>
-            </div>
-            <h1 className="font-serif text-2xl text-zinc-100">
-              {section.title}
-            </h1>
-            {section.description && (
-              <p className="text-sm text-zinc-500 mt-1">
-                {section.description}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {/* Status Indicator */}
-            <StatusIndicator status={saveStatus} message={errorMessage} />
+    <>
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Editor Panel (left on desktop, top on mobile) */}
+        <div className="flex-1 lg:w-[60%] lg:flex-none overflow-y-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="p-6 md:p-8 max-w-3xl"
+          >
+            {/* Header with Save/Revert/Publish */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-mono uppercase text-zinc-600">
+                    {section.page}
+                  </span>
+                  <span className="text-zinc-700">/</span>
+                  <span className="text-xs font-mono text-zinc-500">
+                    {section.id}
+                  </span>
+                </div>
+                <h1 className="font-serif text-2xl text-zinc-100">
+                  {section.title}
+                </h1>
+                {section.description && (
+                  <p className="text-sm text-zinc-500 mt-1">
+                    {section.description}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Status Indicator */}
+                <StatusIndicator status={saveStatus} message={errorMessage} />
 
-            <button
-              type="button"
-              onClick={handleRevert}
-              disabled={!hasChanges()}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-zinc-700 rounded-md text-zinc-300 hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <RotateCcw size={13} />
-              Revert
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={!hasChanges() || saveStatus === 'saving'}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-600 hover:bg-orange-500 text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {saveStatus === 'saving' ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <Save size={13} />
+                <button
+                  type="button"
+                  onClick={handleRevert}
+                  disabled={reverting}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-zinc-700 rounded-md text-zinc-300 hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {reverting ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <RotateCcw size={13} />
+                  )}
+                  Revert
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={!hasChanges() || saveStatus === 'saving'}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-600 hover:bg-orange-500 text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {saveStatus === 'saving' ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <Save size={13} />
+                  )}
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePublish}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-md transition-colors"
+                >
+                  <Rocket size={13} />
+                  Publish
+                </button>
+              </div>
+            </div>
+
+            {/* Fields */}
+            <div className="space-y-5">
+              {frontmatterFields.map((field) => (
+                <FieldRenderer
+                  key={field.name}
+                  field={field}
+                  value={formData[field.name]}
+                  onChange={(val) => handleFieldChange(field.name, val)}
+                  collection={collection}
+                />
+              ))}
+
+              {/* Body field rendered separately (full width, at bottom) */}
+              {bodyField && (
+                <div className="pt-4 border-t border-zinc-800">
+                  <FieldRenderer
+                    field={bodyField}
+                    value={body}
+                    onChange={handleBodyChange}
+                    collection={collection}
+                  />
+                </div>
               )}
-              Save
-            </button>
-          </div>
-        </div>
-
-        {/* Fields */}
-        <div className="space-y-5">
-          {frontmatterFields.map((field) => (
-            <FieldRenderer
-              key={field.name}
-              field={field}
-              value={formData[field.name]}
-              onChange={(val) => handleFieldChange(field.name, val)}
-              collection={collection}
-            />
-          ))}
-
-          {/* Body field rendered separately (full width, at bottom) */}
-          {bodyField && (
-            <div className="pt-4 border-t border-zinc-800">
-              <FieldRenderer
-                field={bodyField}
-                value={body}
-                onChange={handleBodyChange}
-                collection={collection}
-              />
             </div>
-          )}
+          </motion.div>
         </div>
-      </motion.div>
-    </div>
+
+        {/* Preview Pane (right on desktop, bottom on mobile) */}
+        <div className="h-64 lg:h-auto lg:flex-1 border-t lg:border-t-0">
+          <PreviewPane previewUrl={previewUrl} lastSaved={lastSaved} />
+        </div>
+      </div>
+
+      {/* Publishing Modal */}
+      <PublishingModal
+        isOpen={publishModalOpen}
+        onClose={() => setPublishModalOpen(false)}
+        jobId={publishJobId}
+      />
+    </>
   );
 }
 

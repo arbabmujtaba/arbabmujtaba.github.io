@@ -5,9 +5,12 @@
  * - Fetches items from GET /api/sections/:id/items
  * - Displays items as cards (title, status badge, thumbnail, order)
  * - Inline expand-to-edit via FieldRenderer
+ * - Preview pane shows when an item is expanded for editing
  * - Add New (auto-applies section filter values as defaults)
  * - Delete with confirmation dialog
  * - Reorder via up/down arrows (swaps order field values)
+ * - Publish button triggers the publishing pipeline
+ * - Revert re-fetches from server
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -23,10 +26,15 @@ import {
   Loader2,
   AlertCircle,
   Image as ImageIcon,
+  Rocket,
+  RotateCcw,
 } from 'lucide-react';
 import type { SectionDef } from '../../lib/sections';
+import { resolvePreviewUrl, buildPublishPayload, startPublish, fetchContentForRevert } from '../../lib/preview';
 import FieldRenderer from './fields/FieldRenderer';
 import StatusBadge from '../StatusBadge';
+import PreviewPane from './PreviewPane';
+import PublishingModal from '../PublishingModal';
 
 // ============================================================
 // Types
@@ -129,6 +137,10 @@ export default function CollectionSectionEditor({ section }: CollectionSectionEd
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [lastSaved, setLastSaved] = useState(0);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [publishJobId, setPublishJobId] = useState<string | null>(null);
+  const [reverting, setReverting] = useState(false);
 
   // Fetch items for this section
   const fetchItems = useCallback(async () => {
@@ -205,11 +217,47 @@ export default function CollectionSectionEditor({ section }: CollectionSectionEd
             : item
         )
       );
-      setExpandedSlug(null);
+      setLastSaved(Date.now());
     } catch (err: any) {
       setError(err.message || 'Save failed');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Revert expanded item from server
+  const handleRevert = async () => {
+    if (!expandedSlug) return;
+    setReverting(true);
+    try {
+      const result = await fetchContentForRevert(section.collection, expandedSlug);
+      setEditData({ ...result.data });
+      setEditBody(result.body);
+      // Also update the item in local state
+      setItems((prev) =>
+        prev.map((item) =>
+          item.slug === expandedSlug
+            ? { ...item, data: { ...result.data }, body: result.body }
+            : item
+        )
+      );
+    } catch (err: any) {
+      setError(err.message || 'Revert failed');
+    } finally {
+      setReverting(false);
+    }
+  };
+
+  // Publish expanded item
+  const handlePublish = async () => {
+    if (!expandedSlug) return;
+    try {
+      const payload = buildPublishPayload(section.collection, expandedSlug, editData, editBody);
+      const jobId = await startPublish(payload);
+      setPublishJobId(jobId);
+      setPublishModalOpen(true);
+    } catch (err: any) {
+      setError(err.message || 'Publish failed');
     }
   };
 
@@ -338,6 +386,11 @@ export default function CollectionSectionEditor({ section }: CollectionSectionEd
   const frontmatterFields = section.fields.filter((f) => f.name !== 'body');
   const bodyField = section.fields.find((f) => f.name === 'body');
 
+  // Resolve preview URL for expanded item
+  const expandedPreviewUrl = expandedSlug
+    ? resolvePreviewUrl(section, expandedSlug)
+    : null;
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
@@ -350,227 +403,260 @@ export default function CollectionSectionEditor({ section }: CollectionSectionEd
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="p-6 md:p-8 max-w-3xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase text-zinc-600">
-                {section.page}
-              </span>
-              <span className="text-zinc-700">/</span>
-              <span className="text-xs font-mono text-zinc-500">
-                {section.id}
-              </span>
-            </div>
-            <h1 className="font-serif text-2xl text-zinc-100">
-              {section.title}
-            </h1>
-            {section.description && (
-              <p className="text-sm text-zinc-500 mt-1">
-                {section.description}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={handleAddNew}
-            disabled={creating}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-600 hover:bg-orange-500 text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {creating ? (
-              <Loader2 size={13} className="animate-spin" />
-            ) : (
-              <Plus size={13} />
-            )}
-            Add New
-          </button>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="flex items-center gap-2 mb-4 p-3 border border-red-500/30 rounded-lg bg-red-500/5 text-red-400 text-sm">
-            <AlertCircle size={14} />
-            {error}
-          </div>
-        )}
-
-        {/* Items Count */}
-        <div className="text-xs text-zinc-600 mb-3">
-          {items.length} item{items.length !== 1 ? 's' : ''}
-        </div>
-
-        {/* Items List */}
-        <div className="space-y-2">
-          <AnimatePresence mode="popLayout">
-            {items.map((item, index) => (
-              <motion.div
-                key={item.slug}
-                layout
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="border border-zinc-800 rounded-lg overflow-hidden bg-zinc-900/30"
+    <>
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* List/Editor Panel */}
+        <div className="flex-1 lg:w-[60%] lg:flex-none overflow-y-auto">
+          <div className="p-6 md:p-8 max-w-3xl">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-mono uppercase text-zinc-600">
+                    {section.page}
+                  </span>
+                  <span className="text-zinc-700">/</span>
+                  <span className="text-xs font-mono text-zinc-500">
+                    {section.id}
+                  </span>
+                </div>
+                <h1 className="font-serif text-2xl text-zinc-100">
+                  {section.title}
+                </h1>
+                {section.description && (
+                  <p className="text-sm text-zinc-500 mt-1">
+                    {section.description}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleAddNew}
+                disabled={creating}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-600 hover:bg-orange-500 text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {/* Card Header */}
-                <div
-                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-zinc-800/30 transition-colors"
-                  onClick={() => handleExpand(item)}
-                >
-                  {/* Thumbnail */}
-                  {getThumbnail(item) ? (
-                    <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0 bg-zinc-800">
-                      <img
-                        src={getThumbnail(item)!}
-                        alt=""
-                        className="w-full h-full object-cover"
+                {creating ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
+                  <Plus size={13} />
+                )}
+                Add New
+              </button>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="flex items-center gap-2 mb-4 p-3 border border-red-500/30 rounded-lg bg-red-500/5 text-red-400 text-sm">
+                <AlertCircle size={14} />
+                {error}
+              </div>
+            )}
+
+            {/* Items Count */}
+            <div className="text-xs text-zinc-600 mb-3">
+              {items.length} item{items.length !== 1 ? 's' : ''}
+            </div>
+
+            {/* Items List */}
+            <div className="space-y-2">
+              <AnimatePresence mode="popLayout">
+                {items.map((item, index) => (
+                  <motion.div
+                    key={item.slug}
+                    layout
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="border border-zinc-800 rounded-lg overflow-hidden bg-zinc-900/30"
+                  >
+                    {/* Card Header */}
+                    <div
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-zinc-800/30 transition-colors"
+                      onClick={() => handleExpand(item)}
+                    >
+                      {/* Thumbnail */}
+                      {getThumbnail(item) ? (
+                        <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0 bg-zinc-800">
+                          <img
+                            src={getThumbnail(item)!}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 rounded flex-shrink-0 bg-zinc-800 flex items-center justify-center">
+                          <ImageIcon size={14} className="text-zinc-600" />
+                        </div>
+                      )}
+
+                      {/* Title + Meta */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-zinc-200 truncate">
+                            {item.data.title || item.slug}
+                          </span>
+                          <StatusBadge state={item.data.state} />
+                        </div>
+                        {item.data.category && (
+                          <span className="text-xs text-zinc-600">
+                            {item.data.category}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Order badge */}
+                      {typeof item.data.order === 'number' && (
+                        <span className="text-[10px] font-mono text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">
+                          #{item.data.order}
+                        </span>
+                      )}
+
+                      {/* Reorder buttons */}
+                      <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => handleReorder(index, 'up')}
+                          disabled={index === 0}
+                          className="p-0.5 text-zinc-500 hover:text-zinc-300 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                          title="Move up"
+                        >
+                          <ChevronUp size={12} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleReorder(index, 'down')}
+                          disabled={index === items.length - 1}
+                          className="p-0.5 text-zinc-500 hover:text-zinc-300 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                          title="Move down"
+                        >
+                          <ChevronDown size={12} />
+                        </button>
+                      </div>
+
+                      {/* Expand indicator */}
+                      <Edit3
+                        size={13}
+                        className={`text-zinc-600 transition-colors ${
+                          expandedSlug === item.slug ? 'text-orange-500' : ''
+                        }`}
                       />
                     </div>
-                  ) : (
-                    <div className="w-10 h-10 rounded flex-shrink-0 bg-zinc-800 flex items-center justify-center">
-                      <ImageIcon size={14} className="text-zinc-600" />
-                    </div>
-                  )}
 
-                  {/* Title + Meta */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-zinc-200 truncate">
-                        {item.data.title || item.slug}
-                      </span>
-                      <StatusBadge state={item.data.state} />
-                    </div>
-                    {item.data.category && (
-                      <span className="text-xs text-zinc-600">
-                        {item.data.category}
-                      </span>
-                    )}
-                  </div>
+                    {/* Expanded Edit Form */}
+                    <AnimatePresence>
+                      {expandedSlug === item.slug && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 pt-2 border-t border-zinc-800">
+                            <div className="space-y-4">
+                              {frontmatterFields.map((field) => (
+                                <FieldRenderer
+                                  key={field.name}
+                                  field={field}
+                                  value={editData[field.name]}
+                                  onChange={(val) => handleFieldChange(field.name, val)}
+                                  collection={section.collection}
+                                />
+                              ))}
 
-                  {/* Order badge */}
-                  {typeof item.data.order === 'number' && (
-                    <span className="text-[10px] font-mono text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">
-                      #{item.data.order}
-                    </span>
-                  )}
-
-                  {/* Reorder buttons */}
-                  <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      onClick={() => handleReorder(index, 'up')}
-                      disabled={index === 0}
-                      className="p-0.5 text-zinc-500 hover:text-zinc-300 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                      title="Move up"
-                    >
-                      <ChevronUp size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleReorder(index, 'down')}
-                      disabled={index === items.length - 1}
-                      className="p-0.5 text-zinc-500 hover:text-zinc-300 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                      title="Move down"
-                    >
-                      <ChevronDown size={12} />
-                    </button>
-                  </div>
-
-                  {/* Expand indicator */}
-                  <Edit3
-                    size={13}
-                    className={`text-zinc-600 transition-colors ${
-                      expandedSlug === item.slug ? 'text-orange-500' : ''
-                    }`}
-                  />
-                </div>
-
-                {/* Expanded Edit Form */}
-                <AnimatePresence>
-                  {expandedSlug === item.slug && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-4 pb-4 pt-2 border-t border-zinc-800">
-                        <div className="space-y-4">
-                          {frontmatterFields.map((field) => (
-                            <FieldRenderer
-                              key={field.name}
-                              field={field}
-                              value={editData[field.name]}
-                              onChange={(val) => handleFieldChange(field.name, val)}
-                              collection={section.collection}
-                            />
-                          ))}
-
-                          {bodyField && (
-                            <div className="pt-3 border-t border-zinc-800/50">
-                              <FieldRenderer
-                                field={bodyField}
-                                value={editBody}
-                                onChange={handleBodyChange}
-                                collection={section.collection}
-                              />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800/50">
-                          <button
-                            type="button"
-                            onClick={() => setDeleteTarget(item.slug)}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500/10 border border-red-500/20 rounded-md transition-colors"
-                          >
-                            <Trash2 size={12} />
-                            Delete
-                          </button>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setExpandedSlug(null)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-zinc-700 rounded-md text-zinc-300 hover:bg-zinc-800 transition-colors"
-                            >
-                              <X size={12} />
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleSave}
-                              disabled={saving}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-orange-600 hover:bg-orange-500 text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                              {saving ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <Save size={12} />
+                              {bodyField && (
+                                <div className="pt-3 border-t border-zinc-800/50">
+                                  <FieldRenderer
+                                    field={bodyField}
+                                    value={editBody}
+                                    onChange={handleBodyChange}
+                                    collection={section.collection}
+                                  />
+                                </div>
                               )}
-                              Save
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                            </div>
 
-          {/* Empty state */}
-          {items.length === 0 && !error && (
-            <div className="text-center py-12 text-zinc-600">
-              <p className="text-sm">No items in this section yet.</p>
-              <p className="text-xs mt-1">Click "Add New" to create the first one.</p>
+                            {/* Action buttons */}
+                            <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800/50">
+                              <button
+                                type="button"
+                                onClick={() => setDeleteTarget(item.slug)}
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500/10 border border-red-500/20 rounded-md transition-colors"
+                              >
+                                <Trash2 size={12} />
+                                Delete
+                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={handleRevert}
+                                  disabled={reverting}
+                                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-zinc-700 rounded-md text-zinc-300 hover:bg-zinc-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                  {reverting ? (
+                                    <Loader2 size={12} className="animate-spin" />
+                                  ) : (
+                                    <RotateCcw size={12} />
+                                  )}
+                                  Revert
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedSlug(null)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-zinc-700 rounded-md text-zinc-300 hover:bg-zinc-800 transition-colors"
+                                >
+                                  <X size={12} />
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleSave}
+                                  disabled={saving}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-orange-600 hover:bg-orange-500 text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                  {saving ? (
+                                    <Loader2 size={12} className="animate-spin" />
+                                  ) : (
+                                    <Save size={12} />
+                                  )}
+                                  Save
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handlePublish}
+                                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-md transition-colors"
+                                >
+                                  <Rocket size={12} />
+                                  Publish
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* Empty state */}
+              {items.length === 0 && !error && (
+                <div className="text-center py-12 text-zinc-600">
+                  <p className="text-sm">No items in this section yet.</p>
+                  <p className="text-xs mt-1">Click "Add New" to create the first one.</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Preview Pane (shows when an item is expanded) */}
+        {expandedSlug && expandedPreviewUrl && (
+          <div className="h-64 lg:h-auto lg:flex-1 border-t lg:border-t-0">
+            <PreviewPane previewUrl={expandedPreviewUrl} lastSaved={lastSaved} />
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -617,6 +703,13 @@ export default function CollectionSectionEditor({ section }: CollectionSectionEd
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+
+      {/* Publishing Modal */}
+      <PublishingModal
+        isOpen={publishModalOpen}
+        onClose={() => setPublishModalOpen(false)}
+        jobId={publishJobId}
+      />
+    </>
   );
 }
