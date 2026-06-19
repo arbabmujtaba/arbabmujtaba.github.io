@@ -16,6 +16,7 @@ import PublishingModal from '../components/PublishingModal';
 import { ToastContainer, type ToastItem } from '../components/Toast';
 import StatusBadge from '../components/StatusBadge';
 import ActivityFeed from '../components/ActivityFeed';
+import LiveEditor from '../components/LiveEditor';
 
 // Define localized types for form handling
 interface CMSItem {
@@ -1821,26 +1822,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         )}
         {viewState === 'deployment' && <DeploymentCenter />}
         {viewState === 'live-editor' && (
-          <div className="flex-grow flex items-center justify-center p-12">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="max-w-lg w-full text-center"
-            >
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                <MousePointerClick className="w-9 h-9 text-orange-500" />
-              </div>
-              <h2 className="font-serif text-2xl text-zinc-200 font-medium mb-3">Live Click Editor</h2>
-              <p className="font-sans text-sm text-zinc-500 font-light leading-relaxed mb-6">
-                Click-based live frontend editing. Select any element on your website preview and edit content directly. Changes are saved to your content files and deployed via GitHub Pages.
-              </p>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/60 border border-zinc-800 rounded-sm">
-                <Loader2 className="w-3.5 h-3.5 text-orange-500 animate-spin" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">Initializing Live Editor...</span>
-              </div>
-            </motion.div>
-          </div>
+          <LiveEditor
+            content={allContent}
+            onNavigateToEditor={(item) => handleEditClick(item)}
+            onToast={addToast}
+          />
         )}
       </div>
 
