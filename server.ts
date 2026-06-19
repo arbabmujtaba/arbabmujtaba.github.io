@@ -11,6 +11,8 @@ import { transitionState, getItem, saveItem, createItem, deleteItem, initialize,
 import { PreviewDocument } from './src/components/PreviewDocument';
 import { PublishingService } from './src/services/PublishingService';
 import { DeploymentService } from './src/services/DeploymentService';
+import { getSectionById, getSectionItems, searchContent } from './src/lib/sectionResolver';
+import { SECTIONS } from './src/lib/sections';
 
 const app = express();
 const PORT = 3000;
@@ -622,6 +624,58 @@ app.delete('/api/content/:collection/:slug', async (req, res) => {
     await fs.remove(filePath);
     await deleteItem(collection, slug);
     res.json({ success: true, message: 'Deleted successfully' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// SECTION RESOLVER ENDPOINTS
+// ============================================================
+
+/**
+ * GET /api/sections
+ * Returns the full sections registry for client consumption.
+ */
+app.get('/api/sections', (_req, res) => {
+  res.json(SECTIONS);
+});
+
+/**
+ * GET /api/sections/:id/items
+ * Resolves items for a given section (singleton or collection with filter).
+ */
+app.get('/api/sections/:id/items', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const section = getSectionById(id);
+
+    if (!section) {
+      return res.status(404).json({ error: `Section "${id}" not found` });
+    }
+
+    const items = await getSectionItems(id);
+    res.json(items);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/search?q=
+ * Scans titles, frontmatter values, and body text across all content.
+ * Returns matches with section id, collection, slug, title, and a context snippet.
+ */
+app.get('/api/search', async (req, res) => {
+  try {
+    const q = req.query.q as string;
+
+    if (!q || q.trim().length === 0) {
+      return res.status(400).json({ error: 'Query parameter "q" is required' });
+    }
+
+    const results = await searchContent(q);
+    res.json(results);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
