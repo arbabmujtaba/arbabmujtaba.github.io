@@ -250,7 +250,11 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
 
       const body = mappedElement.field === 'body' ? editValue : doc.body;
 
-      const saveRes = await fetch(`/api/content/${mappedElement.collection}/${mappedElement.slug}`, {
+      // The server exposes a single update route: PUT /api/content
+      // (it reads collection + slug from the body). There is no
+      // PUT /api/content/:collection/:slug route, so calling the
+      // path-based URL 404s and looks like a dead server.
+      const saveRes = await fetch('/api/content', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -261,14 +265,17 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
         }),
       });
 
-      if (!saveRes.ok) throw new Error('Failed to save');
+      if (!saveRes.ok) {
+        const errBody = await saveRes.json().catch(() => null);
+        throw new Error(errBody?.error || `Save failed (HTTP ${saveRes.status})`);
+      }
 
       onToast('success', `Updated ${mappedElement.field} for "${updatedData.title || mappedElement.slug}"`);
       // Refresh iframe to reflect changes
       setTimeout(() => handleRefresh(), 500);
     } catch (err) {
       console.error('Save error:', err);
-      onToast('error', 'Failed to save changes. Make sure the dev server is running.');
+      onToast('error', err instanceof Error ? err.message : 'Failed to save changes.');
     } finally {
       setIsSaving(false);
     }
@@ -276,15 +283,44 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
 
   // Publish
   const handlePublish = async () => {
+    if (!mappedElement) {
+      onToast('error', 'Select a content item before publishing.');
+      return;
+    }
+
     setIsPublishing(true);
     try {
-      const res = await fetch('/api/publish', { method: 'POST' });
-      if (!res.ok) throw new Error('Publish failed');
-      const data = await res.json();
-      onToast('success', data.message || 'Published successfully!');
+      // POST /api/publish requires a full payload (collection, slug, title,
+      // body, frontmatter) and validates the markdown + metadata. Fetch the
+      // currently-saved document so we publish complete, on-disk content.
+      const res = await fetch(`/api/content/${mappedElement.collection}/${mappedElement.slug}`);
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null);
+        throw new Error(errBody?.error || `Could not load content to publish (HTTP ${res.status})`);
+      }
+      const doc = await res.json();
+
+      const publishRes = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: mappedElement.collection,
+          slug: mappedElement.slug,
+          title: doc.data?.title || mappedElement.slug,
+          body: doc.body || '',
+          frontmatter: doc.data || {},
+        }),
+      });
+
+      if (!publishRes.ok) {
+        const errBody = await publishRes.json().catch(() => null);
+        throw new Error(errBody?.error || `Publish failed (HTTP ${publishRes.status})`);
+      }
+      const data = await publishRes.json();
+      onToast('success', data.message || 'Publishing started successfully!');
     } catch (err) {
       console.error('Publish error:', err);
-      onToast('error', 'Failed to publish. Check server connection.');
+      onToast('error', err instanceof Error ? err.message : 'Failed to publish.');
     } finally {
       setIsPublishing(false);
     }
