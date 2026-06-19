@@ -18,11 +18,10 @@ interface DeployStatusInfo {
 
 interface AdminTopBarProps {
   onExitAdmin: () => void;
-  onSearch: (query: string) => void;
+  onSearch: () => void;
 }
 
 export default function AdminTopBar({ onExitAdmin, onSearch }: AdminTopBarProps) {
-  const [searchValue, setSearchValue] = useState('');
   const [deployStatus, setDeployStatus] = useState<DeployStatusInfo | null>(null);
 
   useEffect(() => {
@@ -45,11 +44,6 @@ export default function AdminTopBar({ onExitAdmin, onSearch }: AdminTopBarProps)
     const interval = setInterval(fetchStatus, 10000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-    onSearch(e.target.value);
-  };
 
   const getStatusIcon = () => {
     if (!deployStatus) return <Activity size={14} className="text-zinc-600" />;
@@ -95,10 +89,11 @@ export default function AdminTopBar({ onExitAdmin, onSearch }: AdminTopBarProps)
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
         <input
           type="text"
-          placeholder="Search content..."
-          value={searchValue}
-          onChange={handleSearchChange}
-          className="w-full pl-9 pr-3 py-1.5 text-sm bg-zinc-900/50 border border-zinc-800 rounded text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 transition-colors"
+          placeholder="Search content... ⌘K"
+          readOnly
+          onClick={() => onSearch()}
+          onFocus={() => onSearch()}
+          className="w-full pl-9 pr-3 py-1.5 text-sm bg-zinc-900/50 border border-zinc-800 rounded text-zinc-200 placeholder-zinc-600 cursor-pointer focus:outline-none focus:border-orange-500/50 transition-colors"
         />
       </div>
 

@@ -4,6 +4,7 @@
  * Main shell component for the new admin interface.
  * Renders sidebar + top bar + main panel.
  * Fetches sections from /api/sections and manages active section state.
+ * Integrates global search command palette (Cmd+K).
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -13,6 +14,8 @@ import AdminTopBar from './AdminTopBar';
 import AdminDashboard from './AdminDashboard';
 import SectionPanel from './SectionPanel';
 import DeploymentCenter from '../../components/DeploymentCenter';
+import CommandPalette from '../../components/admin/CommandPalette';
+import { isCommandPaletteShortcut, type NavigationTarget } from '../../lib/commandPalette';
 import type { SectionDef } from '../../lib/sections';
 
 type AdminView = 'dashboard' | 'section' | 'deployment';
@@ -26,6 +29,8 @@ export default function AdminLayout({ setView }: AdminLayoutProps) {
   const [activeView, setActiveView] = useState<AdminView>('dashboard');
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [initialExpandSlug, setInitialExpandSlug] = useState<string | null>(null);
 
   // Fetch sections from API
   useEffect(() => {
@@ -50,6 +55,31 @@ export default function AdminLayout({ setView }: AdminLayoutProps) {
     return sections.find((s) => s.id === activeSectionId) || null;
   }, [sections, activeSectionId]);
 
+  // Sections metadata for command palette (simplified structure)
+  const sectionsMeta = useMemo(
+    () =>
+      sections.map((s) => ({
+        id: s.id,
+        title: s.title,
+        page: s.page,
+        kind: s.kind,
+      })),
+    [sections]
+  );
+
+  // Keyboard listener for Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isCommandPaletteShortcut(e)) {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleSelectSection = useCallback((id: string) => {
     setActiveSectionId(id);
     setActiveView('section');
@@ -69,17 +99,17 @@ export default function AdminLayout({ setView }: AdminLayoutProps) {
     setView('home');
   }, [setView]);
 
-  const handleGlobalSearch = useCallback(
-    (query: string) => {
-      if (!query.trim()) {
-        // If clearing search and in section view, stay there
-        return;
-      }
-      // For now, global search just filters sidebar
-      // Future: open command palette or search results panel
-    },
-    []
-  );
+  const handleGlobalSearch = useCallback(() => {
+    setPaletteOpen(true);
+  }, []);
+
+  // Handle navigation from command palette
+  const handlePaletteNavigate = useCallback((target: NavigationTarget) => {
+    setActiveSectionId(target.sectionId);
+    setActiveView('section');
+    // Set initial expand slug for collection items
+    setInitialExpandSlug(target.slug);
+  }, []);
 
   if (isLoading) {
     return (
@@ -99,6 +129,14 @@ export default function AdminLayout({ setView }: AdminLayoutProps) {
     <div className="h-screen w-full flex flex-col bg-[#0a0a09] overflow-hidden">
       {/* Top Bar */}
       <AdminTopBar onExitAdmin={handleExitAdmin} onSearch={handleGlobalSearch} />
+
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onNavigate={handlePaletteNavigate}
+        sectionsMeta={sectionsMeta}
+      />
 
       {/* Main Area: Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
@@ -139,7 +177,11 @@ export default function AdminLayout({ setView }: AdminLayoutProps) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <SectionPanel section={activeSection} />
+                <SectionPanel
+                  section={activeSection}
+                  initialExpandSlug={initialExpandSlug}
+                  onExpandSlugConsumed={() => setInitialExpandSlug(null)}
+                />
               </motion.div>
             )}
 

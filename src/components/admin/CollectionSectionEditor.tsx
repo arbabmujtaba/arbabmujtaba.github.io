@@ -49,6 +49,8 @@ interface CollectionItem {
 
 interface CollectionSectionEditorProps {
   section: SectionDef;
+  initialExpandSlug?: string | null;
+  onExpandSlugConsumed?: () => void;
 }
 
 // ============================================================
@@ -127,7 +129,7 @@ export function removeItem(items: CollectionItem[], slug: string): CollectionIte
 // Component
 // ============================================================
 
-export default function CollectionSectionEditor({ section }: CollectionSectionEditorProps) {
+export default function CollectionSectionEditor({ section, initialExpandSlug, onExpandSlugConsumed }: CollectionSectionEditorProps) {
   const [items, setItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -170,6 +172,20 @@ export default function CollectionSectionEditor({ section }: CollectionSectionEd
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  // Auto-expand item from command palette navigation
+  useEffect(() => {
+    if (initialExpandSlug && items.length > 0) {
+      const item = items.find((i) => i.slug === initialExpandSlug);
+      if (item) {
+        setExpandedSlug(item.slug);
+        setEditData({ ...item.data });
+        setEditBody(item.body || '');
+      }
+      // Consume the slug so it doesn't re-trigger
+      onExpandSlugConsumed?.();
+    }
+  }, [initialExpandSlug, items, onExpandSlugConsumed]);
 
   // Expand a card for inline editing
   const handleExpand = (item: CollectionItem) => {

@@ -12,12 +12,20 @@ import CollectionSectionEditor from '../../components/admin/CollectionSectionEdi
 
 interface SectionPanelProps {
   section: SectionDef;
+  initialExpandSlug?: string | null;
+  onExpandSlugConsumed?: () => void;
 }
 
-export default function SectionPanel({ section }: SectionPanelProps) {
+export default function SectionPanel({ section, initialExpandSlug, onExpandSlugConsumed }: SectionPanelProps) {
   if (section.kind === 'singleton') {
     return <SingletonSectionEditor section={section} />;
   }
 
-  return <CollectionSectionEditor section={section} />;
+  return (
+    <CollectionSectionEditor
+      section={section}
+      initialExpandSlug={initialExpandSlug}
+      onExpandSlugConsumed={onExpandSlugConsumed}
+    />
+  );
 }
