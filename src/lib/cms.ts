@@ -8,7 +8,8 @@ import {
   TimelineMilestone,
   FavoriteItem,
   HomeConfigEntry,
-  PhotoGalleryItem
+  PhotoGalleryItem,
+  PostCustomization
 } from '../types';
 
 function parseMarkdown(raw: string) {
@@ -103,7 +104,8 @@ export function getJournalEntries(): JournalEntry[] {
       category: data.category || "Life",
       coverImage: data.coverImage,
       excerpt: data.excerpt || "",
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
@@ -119,7 +121,8 @@ export function getTechEntries(): TechEntry[] {
       category: data.category || "Programming",
       coverImage: data.coverImage,
       excerpt: data.excerpt || "",
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
@@ -149,7 +152,8 @@ export function getPhotographyEntries(): PhotographyEntry[] {
       coverImage: data.coverImage || "",
       galleryImages: gallery,
       description: data.description || "",
-      story: content || ""
+      story: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
@@ -164,7 +168,8 @@ export function getCollectionEntries(): CollectionEntry[] {
       category: data.category || "Uses",
       coverImage: data.coverImage,
       description: data.description || "",
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   });
 }
@@ -194,7 +199,8 @@ export function getPortfolioProjects(): PortfolioProject[] {
       liveLink: data.liveLink,
       projectImage: data.projectImage || "",
       featured: !!data.featured,
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   });
 }
@@ -224,7 +230,8 @@ export function getGearItems(): GearItem[] {
       specs,
       order: typeof data.order === 'number' ? data.order : 0,
       visible: data.visible !== false,
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => a.order - b.order);
 }
@@ -240,7 +247,8 @@ export function getTimelineMilestones(): TimelineMilestone[] {
       description: data.description || "",
       order: typeof data.order === 'number' ? data.order : 0,
       visible: data.visible !== false,
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => a.order - b.order);
 }
@@ -259,7 +267,8 @@ export function getFavoriteItems(): FavoriteItem[] {
       group: data.group || "",
       order: typeof data.order === 'number' ? data.order : 0,
       visible: data.visible !== false,
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => a.order - b.order);
 }
@@ -280,7 +289,8 @@ export function getHomeConfig(): HomeConfigEntry[] {
       navTarget: data.navTarget || "",
       body: content || "",
       order: typeof data.order === 'number' ? data.order : 0,
-      visible: data.visible !== false
+      visible: data.visible !== false,
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => a.order - b.order);
 }
@@ -298,7 +308,8 @@ export function getGalleryItems(): PhotoGalleryItem[] {
       featured: !!data.featured,
       order: typeof data.order === 'number' ? data.order : 0,
       visible: data.visible !== false,
-      body: content || ""
+      body: content || "",
+      customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => a.order - b.order);
 }

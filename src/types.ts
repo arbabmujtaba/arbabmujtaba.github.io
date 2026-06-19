@@ -1,3 +1,49 @@
+// ============================================================
+// POST CUSTOMIZATION TYPES
+// ============================================================
+
+export interface PostCustomization {
+  music?: {
+    songTitle?: string;
+    songArtist?: string;
+    songUrl?: string;
+    albumArt?: string;
+    provider?: 'spotify' | 'soundcloud' | 'youtube' | 'custom';
+  };
+  animation?: {
+    preset?: 'fade-in' | 'slide-up' | 'parallax' | 'typewriter' | 'cinematic' | 'none';
+    speed?: 'slow' | 'normal' | 'fast';
+    hoverEffects?: boolean;
+  };
+  style?: {
+    borderRadius?: number;
+    shadow?: 'none' | 'subtle' | 'medium' | 'dramatic' | 'glow';
+    gradient?: {
+      enabled?: boolean;
+      from?: string;
+      to?: string;
+      angle?: number;
+    };
+    accentColor?: string;
+    opacity?: number;
+  };
+  layout?: {
+    contentWidth?: 'narrow' | 'default' | 'wide' | 'full';
+    textAlign?: 'left' | 'center' | 'right';
+    spacing?: 'compact' | 'default' | 'relaxed' | 'spacious';
+  };
+  effects?: {
+    grain?: boolean;
+    vignette?: boolean;
+    blur?: number;
+    colorFilter?: 'none' | 'warm' | 'cool' | 'vintage' | 'noir';
+  };
+}
+
+// ============================================================
+// CONTENT ENTRY TYPES
+// ============================================================
+
 export interface JournalEntry {
   title: string;
   slug: string;
@@ -6,6 +52,7 @@ export interface JournalEntry {
   coverImage?: string;
   excerpt: string;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface TechEntry {
@@ -16,6 +63,7 @@ export interface TechEntry {
   coverImage?: string;
   excerpt: string;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface PhotographyEntry {
@@ -27,6 +75,7 @@ export interface PhotographyEntry {
   galleryImages: string[] | { image: string }[];
   description: string;
   story: string;
+  customization?: PostCustomization;
 }
 
 export interface CollectionEntry {
@@ -36,6 +85,7 @@ export interface CollectionEntry {
   coverImage?: string;
   description: string;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface PortfolioProject {
@@ -48,6 +98,7 @@ export interface PortfolioProject {
   projectImage: string;
   featured: boolean;
   body: string;
+  customization?: PostCustomization;
 }
 
 // ============================================================
@@ -64,6 +115,7 @@ export interface GearItem {
   order: number;
   visible: boolean;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface TimelineMilestone {
@@ -74,6 +126,7 @@ export interface TimelineMilestone {
   order: number;
   visible: boolean;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface FavoriteItem {
@@ -93,6 +146,7 @@ export interface FavoriteItem {
   order: number;
   visible: boolean;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface PhotoGalleryItem {
@@ -105,6 +159,7 @@ export interface PhotoGalleryItem {
   order: number;
   visible: boolean;
   body: string;
+  customization?: PostCustomization;
 }
 
 export interface HomeConfigEntry {
@@ -120,4 +175,5 @@ export interface HomeConfigEntry {
   body?: string;
   order: number;
   visible: boolean;
+  customization?: PostCustomization;
 }
