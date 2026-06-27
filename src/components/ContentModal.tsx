@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink } from 'lucide-react';
+import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink, Camera } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from './SafeImage';
 import { normalizeImagePath } from '../lib/image';
@@ -38,6 +38,8 @@ interface ContentModalProps {
     liveLink?: string;
     techStack?: string[];
     galleryImages?: string[];
+    gear?: string[];
+    captureMode?: string;
   };
   customization?: PostCustomization;
 }
@@ -321,6 +323,28 @@ export default function ContentModal({
               </p>
             )}
           </div>
+
+          {/* Captured With — gear used for this photo */}
+          {metadata && ((metadata.gear && metadata.gear.length > 0) || metadata.captureMode) && (
+            <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
+              <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
+                <Camera className="w-3 h-3 text-zinc-600" />
+                Captured With
+              </h4>
+              {metadata.gear && metadata.gear.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {metadata.gear.map((g, idx) => (
+                    <span key={idx} className="font-mono text-xs text-zinc-300 bg-zinc-900 border border-zinc-800/40 px-2.5 py-1 rounded">
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {metadata.captureMode && (
+                <p className="font-sans text-xs text-zinc-500">{metadata.captureMode}</p>
+              )}
+            </div>
+          )}
 
           {/* Project Specific Links/Tags if available */}
           {metadata && (metadata.githubLink || metadata.liveLink || (metadata.techStack && metadata.techStack.length > 0)) && (

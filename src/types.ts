@@ -75,6 +75,10 @@ export interface PhotographyEntry {
   galleryImages: string[] | { image: string }[];
   description: string;
   story: string;
+  /** Camera / lens / tools used to capture this photo. Replaces the old hardcoded gear label. */
+  gear?: string[];
+  /** Optional capture mode / technique line (e.g. "Natural Light", "35mm f/1.8"). */
+  captureMode?: string;
   customization?: PostCustomization;
 }
 

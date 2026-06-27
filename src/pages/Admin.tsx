@@ -5,11 +5,12 @@ import {
   UploadCloud, Check, FileText, Calendar, Tag, Layers, 
   Settings, Eye, Terminal, Globe, Github, Info, AlertTriangle, 
   Filter, Award, Loader2, ArrowUpRight, Archive, RotateCcw, Rocket, Activity,
-  MousePointerClick
+  MousePointerClick, Camera, X
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from '../components/SafeImage';
 import { normalizeImagePath } from '../lib/image';
+import { getGearItems } from '../lib/cms';
 import PreviewFrame from '../components/PreviewFrame';
 import DeploymentCenter from '../components/DeploymentCenter';
 import PublishingModal from '../components/PublishingModal';
@@ -82,6 +83,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [formSpecs, setFormSpecs] = useState<string[]>([]);
   const [specInput, setSpecInput] = useState('');
 
+  // Photography gear-selection fields (replaces the old hardcoded camera label)
+  const [formGear, setFormGear] = useState<string[]>([]);
+  const [formCaptureMode, setFormCaptureMode] = useState('');
+  const [gearInput, setGearInput] = useState('');
+
   // Post customization state
   const [formCustomization, setFormCustomization] = useState<PostCustomization>({});
 
@@ -110,6 +116,23 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  // Available gear options for the photography gear selector (read from the gear CMS collection)
+  const availableGear = useMemo(() => getGearItems().filter(g => g.visible), []);
+
+  // Toggle a known gear item on/off in the selected list
+  const toggleGear = (title: string) => {
+    setFormGear(prev => prev.includes(title) ? prev.filter(g => g !== title) : [...prev, title]);
+  };
+
+  // Add a free-text gear entry (for gear not present in the gear collection)
+  const addCustomGear = (value: string) => {
+    const v = value.trim();
+    if (v && !formGear.includes(v)) {
+      setFormGear(prev => [...prev, v]);
+    }
+    setGearInput('');
+  };
 
   // Retrieve current system parameters depending on Collection Type Selected
   const collectionOptions = [
@@ -230,6 +253,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       text: formText,
       featured: formFeatured,
       specs: formSpecs,
+      gear: formGear,
+      captureMode: formCaptureMode,
       customization: formCustomization,
       savedAt: new Date().toISOString()
     };
@@ -268,6 +293,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         setFormText(parsed.text || '');
         setFormFeatured(!!parsed.featured);
         setFormSpecs(parsed.specs || []);
+        setFormGear(Array.isArray(parsed.gear) ? parsed.gear : []);
+        setFormCaptureMode(parsed.captureMode || '');
         setFormCustomization(parsed.customization || {});
         setDraftAlert(false);
       } catch (e) {
@@ -307,6 +334,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.coverImage = formCoverImage;
         serialData.galleryImages = galleryImages;
         serialData.description = formExcerpt;
+        serialData.gear = formGear;
+        serialData.captureMode = formCaptureMode;
       } else if (activeCollection === 'gear') {
         serialData.image = formCoverImage;
         serialData.description = formExcerpt;
@@ -418,6 +447,9 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setFormFeatured(false);
     setFormSpecs([]);
     setSpecInput('');
+    setFormGear([]);
+    setFormCaptureMode('');
+    setGearInput('');
     setFormCustomization({});
     setIsEditing(false);
     setOriginalSlug('');
@@ -464,6 +496,15 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
             ? doc.data.galleryImages.map((g: any) => typeof g === 'string' ? g : Object.values(g)[0])
             : [];
           setGalleryImages(gallery);
+
+          // Normalize stored gear (array of strings/objects, or delimited string)
+          const gearList: string[] = Array.isArray(doc.data.gear)
+            ? doc.data.gear.map((g: any) => typeof g === 'string' ? g : (g.item || g.title || g.value || Object.values(g)[0])).filter(Boolean)
+            : (typeof doc.data.gear === 'string' && doc.data.gear.trim()
+                ? doc.data.gear.split(/[/,]/).map((s: string) => s.trim()).filter(Boolean)
+                : []);
+          setFormGear(gearList);
+          setFormCaptureMode(doc.data.captureMode || '');
         }
 
         // Load config collection fields
@@ -574,6 +615,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.coverImage = formCoverImage;
         serialData.galleryImages = galleryImages;
         serialData.description = formExcerpt;
+        serialData.gear = formGear;
+        serialData.captureMode = formCaptureMode;
       } else if (activeCollection === 'gear') {
         serialData.image = formCoverImage;
         serialData.description = formExcerpt;
@@ -1742,6 +1785,98 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     </div>
                   )}
 
+                  {/* Photography gear selector — pick the gear actually used for this shot */}
+                  {activeCollection === 'photography' && (
+                    <div className="space-y-5 p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 flex items-center gap-2">
+                        <Camera className="w-4 h-4" />
+                        Gear Used / Capture Details
+                      </div>
+                      <p className="font-sans text-[11px] text-zinc-500 -mt-2 leading-relaxed">
+                        Select the gear you actually shot this photo with. This replaces the old fixed
+                        &ldquo;Sony A7III / Fuji X-T4 &middot; Dynamic Creative Capture&rdquo; label. Leave it empty to show no gear line at all.
+                      </p>
+
+                      {/* Toggle pills for gear from the gear collection */}
+                      {availableGear.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {availableGear.map((g) => {
+                            const active = formGear.includes(g.title);
+                            return (
+                              <button
+                                type="button"
+                                key={g.slug}
+                                onClick={() => toggleGear(g.title)}
+                                className={`px-3 py-1.5 rounded-full text-[11px] font-sans border transition-colors cursor-pointer ${active ? 'bg-orange-500/15 border-orange-500/60 text-orange-200' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'}`}
+                              >
+                                {g.title}
+                                {g.category && <span className="ml-2 text-[9px] uppercase tracking-wider opacity-60">{g.category}</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Free-text custom gear entry */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={gearInput}
+                          onChange={(e) => setGearInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addCustomGear(gearInput);
+                            }
+                          }}
+                          placeholder="Add custom gear (e.g. iPhone 15 Pro) and press Enter"
+                          className="flex-grow bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-4 rounded-sm focus:outline-none focus:border-orange-500/50"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => addCustomGear(gearInput)}
+                          className="px-4 py-2.5 border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs rounded-sm cursor-pointer transition-colors"
+                        >
+                          Add
+                        </button>
+                      </div>
+
+                      {/* Selected gear chips */}
+                      {formGear.length > 0 && (
+                        <div>
+                          <span className="block font-mono text-[9px] uppercase tracking-widest text-zinc-500 mb-2">Selected Gear ({formGear.length})</span>
+                          <div className="flex flex-wrap gap-2">
+                            {formGear.map((g, idx) => (
+                              <span key={idx} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-sans bg-zinc-900 border border-zinc-800 text-zinc-300">
+                                {g}
+                                <button
+                                  type="button"
+                                  onClick={() => setFormGear(prev => prev.filter((_, i) => i !== idx))}
+                                  className="text-zinc-500 hover:text-red-400 cursor-pointer"
+                                  aria-label={`Remove ${g}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Capture mode / technique line */}
+                      <div>
+                        <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Capture Mode / Technique (optional)</label>
+                        <input
+                          type="text"
+                          value={formCaptureMode}
+                          onChange={(e) => setFormCaptureMode(e.target.value)}
+                          placeholder="e.g. Natural Light, 35mm f/1.8, Long Exposure"
+                          className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-4 rounded-sm focus:outline-none focus:border-orange-500/50"
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Summary excerpts */}
                   <div>
                     <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Creative Summary / Excerpt</label>
@@ -1837,6 +1972,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     techStack,
                     githubLink,
                     liveLink,
+                    gear: formGear,
+                    captureMode: formCaptureMode,
                     customization: formCustomization,
                   }
                 }}

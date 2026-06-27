@@ -128,10 +128,12 @@ export default function Photography() {
                           <h3 className="font-serif text-2xl text-zinc-200 mb-2 group-hover/photo:text-orange-200 transition-colors">{photo.title}</h3>
                           <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{photo.description}</p>
                         </div>
-                        <div className="text-left md:text-right font-mono text-[9px] uppercase tracking-widest text-zinc-500 font-light space-y-1 mt-4 md:mt-0">
-                          <p>Sony A7III / Fuji X-T4</p>
-                          <p>Dynamic Creative Capture</p>
-                        </div>
+                        {(photo.gear?.length || photo.captureMode) ? (
+                          <div className="text-left md:text-right font-mono text-[9px] uppercase tracking-widest text-zinc-500 font-light space-y-1 mt-4 md:mt-0">
+                            {photo.gear && photo.gear.length > 0 && <p>{photo.gear.join(' / ')}</p>}
+                            {photo.captureMode && <p>{photo.captureMode}</p>}
+                          </div>
+                        ) : null}
                       </div>
                    </div>
                 ))}
@@ -282,7 +284,9 @@ export default function Photography() {
             metadata={{
               galleryImages: Array.isArray(selectedPhoto.galleryImages)
                 ? selectedPhoto.galleryImages.map(img => typeof img === 'string' ? img : Object.values(img)[0] as string)
-                : []
+                : [],
+              gear: selectedPhoto.gear,
+              captureMode: selectedPhoto.captureMode
             }}
             customization={selectedPhoto.customization}
           />

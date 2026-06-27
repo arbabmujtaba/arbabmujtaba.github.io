@@ -60,9 +60,14 @@ function parseYamlBlock(yamlString: string): Record<string, any> {
     obj: Record<string, any>;
     key: string | null;
     list: any[] | null;
+    // Present on a deferred child frame created for an empty-value key. Lets a
+    // deeper-indented block sequence replace the provisional nested object with
+    // a real array on the owning object.
+    ownerObj: Record<string, any> | null;
+    ownerKey: string | null;
   }
 
-  const stack: StackFrame[] = [{ indent: -1, obj: data, key: null, list: null }];
+  const stack: StackFrame[] = [{ indent: -1, obj: data, key: null, list: null, ownerObj: null, ownerKey: null }];
 
   function currentFrame(): StackFrame {
     return stack[stack.length - 1];
@@ -100,7 +105,7 @@ function parseYamlBlock(yamlString: string): Record<string, any> {
           frame.list.push(parseYamlValue(listVal));
         }
       } else if (frame.key) {
-        // Start a new list on the frame's key
+        // Start a new list on the frame's key (sequence at same indent as key)
         const list: any[] = [];
         if (listVal.includes(':')) {
           const colonIdx = listVal.indexOf(':');
@@ -112,6 +117,21 @@ function parseYamlBlock(yamlString: string): Record<string, any> {
           list.push(parseYamlValue(listVal));
         }
         frame.obj[frame.key] = list;
+        frame.list = list;
+      } else if (frame.ownerObj && frame.ownerKey) {
+        // Block sequence indented under an empty-value key: replace the
+        // provisional nested object on the owner with a real array.
+        const list: any[] = [];
+        if (listVal.includes(':')) {
+          const colonIdx = listVal.indexOf(':');
+          const subKey = listVal.slice(0, colonIdx).trim();
+          let subVal = listVal.slice(colonIdx + 1).trim();
+          subVal = subVal.replace(/^['"]|['"]$/g, '');
+          list.push({ [subKey]: parseYamlValue(subVal) });
+        } else if (listVal) {
+          list.push(parseYamlValue(listVal));
+        }
+        frame.ownerObj[frame.ownerKey] = list;
         frame.list = list;
       }
       continue;
@@ -125,10 +145,14 @@ function parseYamlBlock(yamlString: string): Record<string, any> {
       const frame = currentFrame();
 
       if (rawVal === '' || rawVal === undefined) {
-        // This key introduces a nested object (value on subsequent indented lines)
+        // Empty value: provisionally treat as a nested object, but it may turn
+        // out to be a block sequence. Deeper-indented '- ' items will replace
+        // this provisional object with an array via ownerObj/ownerKey.
         const nestedObj: Record<string, any> = {};
         frame.obj[key] = nestedObj;
-        stack.push({ indent, obj: nestedObj, key, list: null });
+        frame.key = key;
+        frame.list = null;
+        stack.push({ indent, obj: nestedObj, key: null, list: null, ownerObj: frame.obj, ownerKey: key });
       } else {
         // Scalar or inline array value
         frame.obj[key] = parseYamlValue(rawVal);
@@ -206,6 +230,22 @@ export function getPhotographyEntries(): PhotographyEntry[] {
       }).filter(Boolean);
     }
 
+    // Normalize gear to a clean array of strings.
+    // Supports: array of strings, array of objects ({ item / title / value }),
+    // or a single delimited string ("Sony A7III / 35mm").
+    let gear: string[] = [];
+    if (Array.isArray(data.gear)) {
+      gear = data.gear.map((item: any) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          return (item.item || item.title || item.value || Object.values(item)[0]) as string;
+        }
+        return "";
+      }).filter(Boolean);
+    } else if (typeof data.gear === 'string' && data.gear.trim()) {
+      gear = data.gear.split(/[/,]/).map((s: string) => s.trim()).filter(Boolean);
+    }
+
     return {
       title: data.title || "Untitled",
       slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
@@ -215,6 +255,8 @@ export function getPhotographyEntries(): PhotographyEntry[] {
       galleryImages: gallery,
       description: data.description || "",
       story: content || "",
+      gear,
+      captureMode: data.captureMode || "",
       customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
