@@ -227,8 +227,39 @@
       "updatedAt": "2026-06-11T04:05:30.026Z",
       "publishedAt": "2026-06-11T04:05:30.026Z",
       "filePath": "content/portfolio/student-attendance.md"
+    },
+    {
+      "id": "photography/her",
+      "collection": "photography",
+      "slug": "her",
+      "title": "Her",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-27T17:01:49.163Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-27T17:01:53.812Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-27T17:01:59.916Z",
+          "commitHash": "84550f17218e8bc31c1614b3a74110edaf464071"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-27T17:01:49.164Z",
+      "updatedAt": "2026-06-27T17:01:59.916Z",
+      "filePath": "content/photography/her.md",
+      "lastReviewedAt": "2026-06-27T17:01:53.812Z",
+      "publishedAt": "2026-06-27T17:01:59.916Z"
     }
   ],
-  "lastUpdated": "2026-06-19T03:54:07.857Z",
+  "lastUpdated": "2026-06-27T17:01:59.946Z",
   "version": 1
 }
