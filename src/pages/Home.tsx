@@ -245,7 +245,7 @@ export default function Home({ setView }: HomeProps) {
         </ArchiveSection>
 
         {quotes[0] && (
-          <Interlude containerRef={containerRef} index={0} entry={quotes[0]} />
+          <Interlude index={0} entry={quotes[0]} />
         )}
 
         {gatewaySections.length > 0 && (
@@ -283,7 +283,7 @@ export default function Home({ setView }: HomeProps) {
         )}
 
         {quotes[1] && (
-          <Interlude containerRef={containerRef} index={1} entry={quotes[1]} />
+          <Interlude index={1} entry={quotes[1]} />
         )}
 
         {principles.length > 0 && (
@@ -323,7 +323,7 @@ export default function Home({ setView }: HomeProps) {
         )}
 
         {quotes[2] && (
-          <Interlude containerRef={containerRef} index={2} entry={quotes[2]} />
+          <Interlude index={2} entry={quotes[2]} />
         )}
 
         <ArchiveSection containerRef={containerRef} className="text-center">

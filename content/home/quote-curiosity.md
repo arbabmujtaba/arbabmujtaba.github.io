@@ -1,11 +1,11 @@
 ---
-title: "Every project begins with curiosity."
+title: "Every project begins with a small, stubborn question."
 slug: quote-curiosity
 configType: quote
 variant: quote
 label: "Interlude"
-description: "A small question, followed long enough, quietly becomes a body of work."
-author: "Archive Note 001"
+description: "Followed long enough, that question quietly becomes a body of work."
+author: ""
 order: 1
 visible: true
 ---
