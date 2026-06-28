@@ -1,10 +1,10 @@
 ---
-title: sed & awk
+title: Wifite
 slug: sed-awk
-category: "Favorite Linux Tools"
-description: "Stream editors for text transformation and data extraction."
+category: Favorite Linux Tools
+description: Stream editors for text transformation and data extraction.
 icon: FileEdit
-link: ""
+link: ''
 order: 4
 visible: true
 ---

@@ -1,10 +1,10 @@
 ---
-title: Focusrite Scarlett
+title: Digitech DTR 425
 slug: focusrite-scarlett
-category: "Favorite Gear"
-description: "Audio interface for recording, monitoring, and digital audio production."
+category: Favorite Gear
+description: 'Audio interface for recording, monitoring, and digital audio production.'
 icon: Mic
-link: ""
+link: ''
 order: 4
 visible: true
 ---

@@ -1,10 +1,10 @@
 ---
-title: "Sony A7III & Fuji X-T4"
+title: Sony A7III
 slug: sony-fuji-cameras
-category: "Favorite Gear"
-description: "Dual camera system covering full-frame and APS-C needs for photography."
+category: Favorite Gear
+description: Dual camera system covering full-frame and APS-C needs for photography.
 icon: Camera
-link: ""
+link: ''
 order: 3
 visible: true
 ---
