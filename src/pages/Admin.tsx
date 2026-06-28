@@ -234,6 +234,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [formNavTarget, setFormNavTarget] = useState('');
   const [formAuthor, setFormAuthor] = useState('');
   const [formText, setFormText] = useState('');
+  const [formVariant, setFormVariant] = useState('quote');
   const [formFeatured, setFormFeatured] = useState(false);
   const [formSpecs, setFormSpecs] = useState<string[]>([]);
   const [specInput, setSpecInput] = useState('');
@@ -530,6 +531,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.image = formCoverImage;
         serialData.author = formAuthor;
         serialData.text = formText;
+        serialData.variant = formVariant;
         serialData.navTarget = formNavTarget;
         serialData.order = formOrder;
         serialData.visible = formVisible;
@@ -613,6 +615,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setFormNavTarget('');
     setFormAuthor('');
     setFormText('');
+    setFormVariant('quote');
     setFormFeatured(false);
     setFormSpecs([]);
     setSpecInput('');
@@ -701,6 +704,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
           setFormNavTarget(doc.data.navTarget || '');
           setFormAuthor(doc.data.author || '');
           setFormText(doc.data.text || '');
+          setFormVariant(doc.data.variant || 'quote');
         }
         if (doc.collection === 'gallery') {
           setFormFeatured(!!doc.data.featured);
@@ -812,6 +816,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.image = formCoverImage;
         serialData.author = formAuthor;
         serialData.text = formText;
+        serialData.variant = formVariant;
         serialData.navTarget = formNavTarget;
         serialData.order = formOrder;
         serialData.visible = formVisible;
@@ -1824,45 +1829,73 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                       )}
 
                       {activeCollection === 'home' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Label</label>
-                            <input
-                              type="text"
-                              value={formLabel}
-                              onChange={(e) => setFormLabel(e.target.value)}
-                              placeholder="e.g. 01 // Builder"
-                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
-                            />
+                        <div className="space-y-6">
+                          {formCategory === 'quote' && (
+                            <div>
+                              <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Interlude Template</label>
+                              <select
+                                value={formVariant}
+                                onChange={(e) => setFormVariant(e.target.value)}
+                                className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-200 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50 cursor-pointer"
+                              >
+                                <option value="quote">Quote — kinetic editorial quote</option>
+                                <option value="statement">Statement — oversized headline</option>
+                                <option value="marquee">Marquee — looping phrase</option>
+                                <option value="stat">Stat — animated milestone counters</option>
+                              </select>
+                              <p className="mt-2 font-sans text-[10px] text-zinc-500 font-light leading-snug">
+                                How this homepage interlude renders. <span className="text-zinc-400">Title</span> = the main text/phrase,
+                                {' '}<span className="text-zinc-400">Author</span> = the small note label,
+                                {' '}<span className="text-zinc-400">Excerpt</span> = an optional supporting line.
+                                {' '}For <span className="text-zinc-400">Stat</span>, add one metric per line in the Text field as
+                                {' '}<span className="font-mono text-zinc-400">value | label</span> (e.g. <span className="font-mono text-zinc-400">12+ | Projects shipped</span>).
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Label / Eyebrow</label>
+                              <input
+                                type="text"
+                                value={formLabel}
+                                onChange={(e) => setFormLabel(e.target.value)}
+                                placeholder={formCategory === 'quote' ? 'e.g. Interlude' : 'e.g. 01 // Builder'}
+                                className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                              />
+                            </div>
+                            <div>
+                              <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Navigation Target</label>
+                              <input
+                                type="text"
+                                value={formNavTarget}
+                                onChange={(e) => setFormNavTarget(e.target.value)}
+                                placeholder="e.g. portfolio (gateways only)"
+                                className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                              />
+                            </div>
+                            <div>
+                              <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">{formCategory === 'quote' ? 'Note Label' : 'Author'}</label>
+                              <input
+                                type="text"
+                                value={formAuthor}
+                                onChange={(e) => setFormAuthor(e.target.value)}
+                                placeholder="e.g. Archive Note 001"
+                                className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                              />
+                            </div>
                           </div>
+
                           <div>
-                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Navigation Target</label>
-                            <input
-                              type="text"
-                              value={formNavTarget}
-                              onChange={(e) => setFormNavTarget(e.target.value)}
-                              placeholder="e.g. portfolio"
-                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
-                            />
-                          </div>
-                          <div>
-                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Author</label>
-                            <input
-                              type="text"
-                              value={formAuthor}
-                              onChange={(e) => setFormAuthor(e.target.value)}
-                              placeholder="e.g. Archive Note 001"
-                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
-                            />
-                          </div>
-                          <div>
-                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Text / Short Content</label>
-                            <input
-                              type="text"
+                            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                              {formCategory === 'quote' && formVariant === 'stat' ? 'Stat Items (one "value | label" per line)' : 'Text / Short Content'}
+                            </label>
+                            <textarea
+                              rows={formCategory === 'quote' && formVariant === 'stat' ? 4 : 2}
                               value={formText}
                               onChange={(e) => setFormText(e.target.value)}
-                              placeholder="Short text content"
-                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                              placeholder={formCategory === 'quote' && formVariant === 'stat' ? '12+ | Projects shipped\n3 | Years building\n5 | Sections to explore' : 'Short text content'}
+                              className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50 resize-y leading-relaxed"
                             />
                           </div>
                         </div>

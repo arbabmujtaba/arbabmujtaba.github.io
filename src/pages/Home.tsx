@@ -11,7 +11,7 @@ import EditorialPortrait, { PortraitOrbitals } from '../components/EditorialPort
 import EnhancedHeroName from '../components/EnhancedHeroName';
 import Footer from '../components/Footer';
 import MagicalGateway from '../components/MagicalGateway';
-import QuoteReveal from '../components/QuoteReveal';
+import Interlude from '../components/Interlude';
 import ScrollIndicator from '../components/ScrollIndicator';
 import { getHomeConfig } from '../lib/cms';
 import { HomeConfigEntry } from '../types';
@@ -244,12 +244,8 @@ export default function Home({ setView }: HomeProps) {
           </div>
         </ArchiveSection>
 
-        {quotes.length > 0 && (
-          <QuoteReveal
-            containerRef={containerRef}
-            quote={quotes[0]?.title || 'Every project begins with curiosity.'}
-            author={quotes[0]?.author || 'Archive Note 001'}
-          />
+        {quotes[0] && (
+          <Interlude containerRef={containerRef} index={0} entry={quotes[0]} />
         )}
 
         {gatewaySections.length > 0 && (
@@ -286,12 +282,8 @@ export default function Home({ setView }: HomeProps) {
           </ArchiveSection>
         )}
 
-        {quotes.length > 1 && (
-          <QuoteReveal
-            containerRef={containerRef}
-            quote={quotes[1]?.title || 'Some stories are written. Others are captured.'}
-            author={quotes[1]?.author || 'Archive Note 002'}
-          />
+        {quotes[1] && (
+          <Interlude containerRef={containerRef} index={1} entry={quotes[1]} />
         )}
 
         {principles.length > 0 && (
@@ -330,12 +322,8 @@ export default function Home({ setView }: HomeProps) {
           </ArchiveSection>
         )}
 
-        {quotes.length > 2 && (
-          <QuoteReveal
-            containerRef={containerRef}
-            quote={quotes[2]?.title || 'Technology becomes meaningful when it touches real lives.'}
-            author={quotes[2]?.author || 'Archive Note 003'}
-          />
+        {quotes[2] && (
+          <Interlude containerRef={containerRef} index={2} entry={quotes[2]} />
         )}
 
         <ArchiveSection containerRef={containerRef} className="text-center">

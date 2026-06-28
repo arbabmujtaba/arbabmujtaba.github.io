@@ -174,6 +174,8 @@ export interface HomeConfigEntry {
   title: string;
   slug: string;
   configType: "gateway" | "quote" | "principle" | "profile" | "section";
+  /** For interlude blocks (configType "quote"): which visual template to render. */
+  variant?: "quote" | "statement" | "marquee" | "stat";
   label?: string;
   description?: string;
   image?: string;

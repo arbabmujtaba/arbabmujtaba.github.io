@@ -385,6 +385,7 @@ export function getHomeConfig(): HomeConfigEntry[] {
       title: data.title || "Untitled",
       slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
       configType: data.configType || "section",
+      variant: data.variant || "quote",
       label: data.label || "",
       description: data.description || "",
       image: data.image || "",
