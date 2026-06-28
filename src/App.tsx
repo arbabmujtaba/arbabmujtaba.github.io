@@ -97,7 +97,7 @@ export default function App() {
               className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-1 md:mt-5 ${view === 'home' ? 'pointer-events-none' : ''}`}
               onClick={() => setView('home')}
             >
-              Arbab <span className="italic text-orange-500/80">Mujtaba.</span>
+              Arbab <span className="italic text-orange-500/80">Mujtaba</span>
             </motion.div>
             
             <div className="pt-0 md:pt-5 z-50">
