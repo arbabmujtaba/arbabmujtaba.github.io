@@ -6,9 +6,19 @@ import ParallaxImage from '../components/ParallaxImage';
 import Footer from '../components/Footer';
 import ContentModal from '../components/ContentModal';
 import SafeImage from '../components/SafeImage';
-import { getPhotographyEntries, getGearItems, getGalleryItems } from '../lib/cms';
+import { getPhotographyEntries, getGearItems } from '../lib/cms';
 import { normalizeImagePath } from '../lib/image';
-import { PhotographyEntry, GearItem, PhotoGalleryItem } from '../types';
+import { PhotographyEntry, GearItem } from '../types';
+
+// Preferred ordering and copy for the photo-story categories. Anything not
+// listed here is still rendered (appended after these) so no category is dropped.
+const STORY_CATEGORY_ORDER = ['Behind The Shot', 'Travel', 'Life', 'Connected'];
+const STORY_CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  'Behind The Shot': 'Stories and context behind selected frames.',
+  'Travel': 'Frames gathered from journeys and the places in between.',
+  'Life': 'Everyday moments and the memories worth keeping.',
+  'Connected': 'People, relationships, and the moments shared with them.',
+};
 
 export default function Photography() {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotographyEntry | null>(null);
@@ -16,7 +26,6 @@ export default function Photography() {
   // Load from CMS
   const allPhotos = useMemo(() => getPhotographyEntries(), []);
   const gearItems = useMemo(() => getGearItems().filter(g => g.visible).sort((a, b) => a.order - b.order), []);
-  const galleryItems = useMemo(() => getGalleryItems().filter(g => g.visible).sort((a, b) => a.order - b.order), []);
 
   // Group gear by category
   const gearByCategory = useMemo(() => {
@@ -27,29 +36,30 @@ export default function Photography() {
     }, {} as Record<string, GearItem[]>);
   }, [gearItems]);
 
-  // Group gallery by category for grid sections
-  const gallerySections = useMemo(() => {
-    const grouped = galleryItems.reduce((acc, item) => {
-      if (!acc[item.category]) acc[item.category] = [];
-      acc[item.category].push(item);
-      return acc;
-    }, {} as Record<string, PhotoGalleryItem[]>);
-
-    return Object.entries(grouped).map(([category, photos]) => ({
-      title: category,
-      description: photos[0]?.body || photos[0]?.description || `A collection of ${category.toLowerCase()} photography.`,
-      photos
-    }));
-  }, [galleryItems]);
-
   // Filter dynamic favorites
   const favorites = useMemo(() => {
     return allPhotos.filter(p => p.category === 'Favorites');
   }, [allPhotos]);
 
-  // Behind the shot entries
-  const behindTheShot = useMemo(() => {
-    return allPhotos.filter(p => p.category === 'Behind The Shot' || p.category === 'Life' || p.category === 'Travel');
+  // Group photo "stories" (everything except the Favorites showcase) by their
+  // own category, so each category routes to its own correctly-labelled section
+  // (a "Travel" photo appears under "Travel", not lumped into "Behind The Shot").
+  const storySections = useMemo(() => {
+    const grouped = allPhotos
+      .filter(p => p.category !== 'Favorites')
+      .reduce((acc, photo) => {
+        const cat = photo.category || 'Behind The Shot';
+        (acc[cat] = acc[cat] || []).push(photo);
+        return acc;
+      }, {} as Record<string, PhotographyEntry[]>);
+
+    const known = STORY_CATEGORY_ORDER.filter(c => grouped[c]?.length);
+    const extras = Object.keys(grouped).filter(c => !STORY_CATEGORY_ORDER.includes(c));
+    return [...known, ...extras].map(category => ({
+      title: category,
+      description: STORY_CATEGORY_DESCRIPTIONS[category] || `Photo stories filed under ${category}.`,
+      photos: grouped[category],
+    }));
   }, [allPhotos]);
 
   return (
@@ -142,10 +152,10 @@ export default function Photography() {
           </motion.div>
         )}
 
-        {/* Dynamic Gallery Grids */}
-        {gallerySections.length > 0 && (
-          <div className="space-y-16 md:space-y-24 lg:space-y-32 mb-16 md:mb-24 lg:mb-32">
-            {gallerySections.map((section, idx) => (
+        {/* Dynamic Photo Stories — each category routes to its own section */}
+        {storySections.length > 0 && (
+          <div className="space-y-16 md:space-y-24 lg:space-y-32 mb-32">
+            {storySections.map((section) => (
               <motion.section
                 key={section.title}
                 initial={{ opacity: 0, y: 30 }}
@@ -161,73 +171,41 @@ export default function Photography() {
                   </div>
                 </div>
 
-                <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8 lg:mt-0">
-                  {section.photos.map((photo, pIdx) => (
-                    <div key={photo.slug} className={`relative overflow-hidden border border-zinc-850 bg-zinc-900 group cursor-pointer ${pIdx === 2 ? 'sm:col-span-2 aspect-[16/9] sm:aspect-[21/9]' : 'aspect-[3/4]'}`}>
-                       <ParallaxImage
-                         src={photo.image}
-                         alt={photo.title}
-                         className="w-full h-full"
-                         imageClassName="grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
-                       />
-                       <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
-                    </div>
+                <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:mt-0">
+                  {section.photos.map((photo, idx) => (
+                    <article
+                      key={photo.slug || idx}
+                      onClick={() => setSelectedPhoto(photo)}
+                      className="group cursor-pointer block"
+                    >
+                      <div className="relative overflow-hidden mb-6 border border-zinc-850">
+                        {normalizeImagePath(photo.coverImage) ? (
+                          <ParallaxImage
+                            src={photo.coverImage}
+                            alt={photo.title}
+                            className="w-full aspect-[16/10] bg-zinc-900"
+                            imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full aspect-[16/10] bg-zinc-900" />
+                        )}
+                        <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
+                      </div>
+                      <div className="flex flex-col gap-4">
+                        <div>
+                          <h3 className="font-serif text-2xl text-zinc-200 mb-3 group-hover:text-amber-100 transition-colors">{photo.title}</h3>
+                          <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed line-clamp-2">{photo.description}</p>
+                        </div>
+                        <div className="mt-2">
+                          <ExploreArrow label="Explore Story" direction="up-right" />
+                        </div>
+                      </div>
+                    </article>
                   ))}
                 </div>
               </motion.section>
             ))}
           </div>
-        )}
-
-        {/* Dynamic Behind The Shot */}
-        {behindTheShot.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-32 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-zinc-800/80 pt-12"
-          >
-            <div className="lg:col-span-3">
-              <div className="sticky top-24">
-                <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">Behind The Shot</h2>
-                <p className="font-sans text-sm text-zinc-400 font-light pr-4">Stories and context behind selected frames.</p>
-              </div>
-            </div>
-
-            <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:mt-0">
-              {behindTheShot.map((photo, idx) => (
-                <article
-                  key={idx}
-                  onClick={() => setSelectedPhoto(photo)}
-                  className="group cursor-pointer block"
-                >
-                  <div className="relative overflow-hidden mb-6 border border-zinc-850">
-                    {normalizeImagePath(photo.coverImage) ? (
-                      <ParallaxImage
-                        src={photo.coverImage}
-                        alt={photo.title}
-                        className="w-full aspect-[16/10] bg-zinc-900"
-                        imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full aspect-[16/10] bg-zinc-900" />
-                    )}
-                    <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <h3 className="font-serif text-2xl text-zinc-200 mb-3 group-hover:text-amber-100 transition-colors">{photo.title}</h3>
-                      <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed line-clamp-2">{photo.description}</p>
-                    </div>
-                    <div className="mt-2">
-                      <ExploreArrow label="Read Journal" direction="up-right" />
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </motion.div>
         )}
 
         {/* Dynamic Gear */}

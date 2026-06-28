@@ -19,6 +19,7 @@ import StatusBadge from '../components/StatusBadge';
 import ActivityFeed from '../components/ActivityFeed';
 import LiveEditor from '../components/LiveEditor';
 import PostCustomizationPanel from '../components/PostCustomization';
+import DestinationPreview from '../components/DestinationPreview';
 import type { PostCustomization } from '../types';
 
 // Define localized types for form handling
@@ -37,17 +38,171 @@ interface CMSItem {
   publishedAt?: string;
 }
 
+// ---------------------------------------------------------------------------
+// WEBSITE PUBLISHING STRUCTURE
+// ---------------------------------------------------------------------------
+// The Publishing Center is organized around the website's *visible* structure
+// (the five primary sections in the main navigation) instead of the raw backend
+// collections. Each visible section maps to one or more "areas" (destinations),
+// and each destination maps to a backend collection plus the categories that
+// actually render in that part of the site. This keeps the publishing flow
+// focused on where content appears, not on how it is stored internally.
+interface PublishDestination {
+  collection: string;      // backend collection the content is stored in
+  label: string;           // how this area is described on the website
+  blurb: string;           // short note about where the content appears
+  categories: string[];    // categories that are meaningful for this area
+  categoryLabel?: string;  // optional override for the category field label
+  fixedCategory?: string;  // when set, the category is implied (no picker shown)
+}
+
+interface WebsiteSection {
+  id: string;              // matches the main-nav view id
+  label: string;           // section name shown to the user
+  isConfig?: boolean;      // true for the Home page / site-configuration area
+  destinations: PublishDestination[];
+}
+
+const WEBSITE_STRUCTURE: WebsiteSection[] = [
+  {
+    id: 'portfolio',
+    label: 'Portfolio',
+    destinations: [
+      {
+        collection: 'portfolio',
+        label: 'Case Studies',
+        blurb: 'Project case studies on the Portfolio page',
+        categories: ['Web Development', 'Systems', 'Embedded & DSP', 'Audio Engineering', 'Design', 'Other'],
+      },
+    ],
+  },
+  {
+    id: 'journal',
+    label: 'Journal',
+    destinations: [
+      {
+        collection: 'journal',
+        label: 'Journal Entries',
+        blurb: 'Written entries grouped by theme',
+        categories: ['Life', 'People', 'Travel', 'Thoughts', 'Milestones'],
+      },
+    ],
+  },
+  {
+    id: 'tech',
+    label: 'Tech',
+    destinations: [
+      {
+        collection: 'tech',
+        label: 'Build Logs & Articles',
+        blurb: 'Build logs, experiments and tech notes',
+        categories: ['Build Logs', 'Experiments', 'Linux', 'Networking', 'Programming', 'Tech News'],
+      },
+      {
+        collection: 'favorites',
+        label: 'Things I Like',
+        blurb: 'The "Things I Like" grid on the Tech page',
+        categories: ['Things I Like'],
+        fixedCategory: 'Things I Like',
+      },
+    ],
+  },
+  {
+    id: 'photography',
+    label: 'Photography',
+    destinations: [
+      {
+        collection: 'photography',
+        label: 'Photo Stories',
+        blurb: 'Featured frames and "Behind The Shot" write-ups',
+        categories: ['Favorites', 'Behind The Shot', 'Life', 'Travel', 'Connected'],
+      },
+      {
+        collection: 'gear',
+        label: 'Gear / The Tools',
+        blurb: 'The camera and lens list ("The Tools")',
+        categories: ['Cameras', 'Lenses', 'Tools', 'Software', 'Audio', 'Other'],
+        categoryLabel: 'Gear Type',
+      },
+    ],
+  },
+  {
+    id: 'collection',
+    label: 'Collections',
+    destinations: [
+      {
+        collection: 'collection',
+        label: 'Museum Collection',
+        blurb: 'Inspirations, books and music exhibits',
+        categories: ['Inspirations', 'Books', 'Music'],
+      },
+      {
+        collection: 'timeline',
+        label: 'Timeline / Journey',
+        blurb: 'Milestones on the journey timeline',
+        categories: ['Milestone'],
+        fixedCategory: 'Milestone',
+      },
+      {
+        collection: 'favorites',
+        label: 'Uses & Gear',
+        blurb: 'The "Uses & Gear" exhibit (tools and setups)',
+        categories: ['Favorite Technologies', 'Favorite Software', 'Favorite Linux Tools', 'Favorite Gear', 'Favorite Setups'],
+      },
+    ],
+  },
+  {
+    id: 'home',
+    label: 'Home Page',
+    isConfig: true,
+    destinations: [
+      {
+        collection: 'home',
+        label: 'Home Blocks',
+        blurb: 'Landing-page gateways, quotes and profile',
+        categories: ['gateway', 'quote', 'principle', 'profile', 'section'],
+        categoryLabel: 'Block Type',
+      },
+    ],
+  },
+];
+
+// The five primary, content-facing sections (Home is configuration, shown apart).
+const PRIMARY_SECTIONS = WEBSITE_STRUCTURE.filter(s => !s.isConfig);
+
+// Find a destination by section id + backend collection.
+const getDestination = (sectionId: string, collection: string): PublishDestination | undefined =>
+  WEBSITE_STRUCTURE.find(s => s.id === sectionId)?.destinations.find(d => d.collection === collection);
+
+// Map a stored item (backend collection + category) back to a visible section.
+// `favorites` is intentionally shared between Tech ("Things I Like") and
+// Collections ("Uses & Gear"), so the category is used to disambiguate it.
+const resolveSection = (collection: string, category?: string): string => {
+  if (collection === 'favorites') {
+    return category === 'Things I Like' ? 'tech' : 'collection';
+  }
+  // The standalone gallery grids were retired; any legacy gallery item lives under Photography.
+  if (collection === 'gallery') return 'photography';
+  const section = WEBSITE_STRUCTURE.find(s => s.destinations.some(d => d.collection === collection));
+  return section?.id || 'journal';
+};
+
+// Home block types are lowercase ids — present them a little more nicely.
+const prettyCategory = (cat: string): string =>
+  cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : '';
+
 export default function Admin({ setView }: { setView: (v: string) => void }) {
   // Navigation & State management
   const [viewState, setViewState] = useState<'list' | 'editor' | 'deployment' | 'live-editor'>('list');
   const [allContent, setAllContent] = useState<CMSItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterCollection, setFilterCollection] = useState('all');
+  const [filterSection, setFilterSection] = useState('all');
   const [filterState, setFilterState] = useState<string>('all');
   
   // Editor state
   const [activeCollection, setActiveCollection] = useState<string>('journal');
+  const [activeSection, setActiveSection] = useState<string>('journal');
   const [isEditing, setIsEditing] = useState(false);
   const [originalSlug, setOriginalSlug] = useState('');
   
@@ -134,20 +289,6 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setGearInput('');
   };
 
-  // Retrieve current system parameters depending on Collection Type Selected
-  const collectionOptions = [
-    { value: 'journal', label: 'Journal' },
-    { value: 'tech', label: 'Tech Logs' },
-    { value: 'photography', label: 'Photography' },
-    { value: 'collection', label: 'Museum Collection' },
-    { value: 'portfolio', label: 'Portfolio Project' },
-    { value: 'gear', label: 'Gear' },
-    { value: 'timeline', label: 'Timeline' },
-    { value: 'favorites', label: 'Favorites' },
-    { value: 'home', label: 'Home Config' },
-    { value: 'gallery', label: 'Gallery' }
-  ];
-
   const categoryOptionsMap: Record<string, string[]> = {
     journal: ['Life', 'People', 'Travel', 'Thoughts', 'Milestones'],
     tech: ['Linux', 'Networking', 'Programming', 'Build Logs', 'Experiments', 'Tech News', 'Things I Like'],
@@ -190,18 +331,46 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                             (item.excerpt && item.excerpt.toLowerCase().includes(searchQuery.toLowerCase())) ||
                             item.category.toLowerCase().includes(searchQuery.toLowerCase());
       
-      const matchesCollection = filterCollection === 'all' || item.collection === filterCollection;
+      const matchesCollection = filterSection === 'all' || resolveSection(item.collection, item.category) === filterSection;
       const matchesState = filterState === 'all' || item.state === filterState;
       return matchesSearch && matchesCollection && matchesState;
     });
-  }, [allContent, searchQuery, filterCollection, filterState]);
+  }, [allContent, searchQuery, filterSection, filterState]);
 
-  // Handle active field alterations
-  const handleCollectionChange = (newVal: string) => {
-    setActiveCollection(newVal);
-    // Fill categories dynamically with sensible baseline
-    const cats = categoryOptionsMap[newVal] || [];
-    setFormCategory(cats[0] || '');
+  // ----- Publishing destination state & helpers (website-structure based) -----
+
+  // Derived context for the currently selected publish destination.
+  const currentSection = WEBSITE_STRUCTURE.find(s => s.id === activeSection);
+  const currentDestinations = currentSection?.destinations || [];
+  const currentDestination = getDestination(activeSection, activeCollection) || currentDestinations[0];
+
+  // Categories offered for the chosen area. The item's existing category is
+  // always kept in the list so editing can never silently drop it.
+  const categoryChoices = useMemo(() => {
+    const base = currentDestination?.categories || categoryOptionsMap[activeCollection] || [];
+    return formCategory && !base.includes(formCategory) ? [formCategory, ...base] : base;
+  }, [currentDestination, activeCollection, formCategory]);
+
+  // First sensible category for a destination.
+  const firstCategoryOf = (dest?: PublishDestination): string =>
+    dest?.fixedCategory || dest?.categories[0] || '';
+
+  // Selecting a website section moves to that section's first area.
+  const handleSectionSelect = (sectionId: string) => {
+    const section = WEBSITE_STRUCTURE.find(s => s.id === sectionId);
+    if (!section) return;
+    const dest = section.destinations[0];
+    setActiveSection(sectionId);
+    setActiveCollection(dest.collection);
+    setFormCategory(firstCategoryOf(dest));
+  };
+
+  // Selecting an area within the current section switches the backing collection.
+  const handleDestinationSelect = (collection: string) => {
+    const dest = getDestination(activeSection, collection);
+    if (!dest) return;
+    setActiveCollection(collection);
+    setFormCategory(firstCategoryOf(dest));
   };
 
   // Draft saver triggers
@@ -423,7 +592,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const resetFormFields = () => {
     setFormTitle('');
     setFormSlug('');
-    setFormCategory(categoryOptionsMap[activeCollection]?.[0] || '');
+    setFormCategory(firstCategoryOf(getDestination(activeSection, activeCollection)) || categoryOptionsMap[activeCollection]?.[0] || '');
     setFormDate(new Date().toISOString().split('T')[0]);
     setFormCoverImage('');
     setGalleryImages([]);
@@ -470,6 +639,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       if (res.ok) {
         const doc = await res.json();
         setActiveCollection(doc.collection);
+        setActiveSection(resolveSection(doc.collection, doc.data.category || doc.data.configType || ''));
         setIsEditing(true);
         setOriginalSlug(doc.slug);
         
@@ -1084,20 +1254,20 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   />
                 </div>
                 
-                <div className="flex gap-1.5 p-1 bg-zinc-950/60 border border-zinc-900 rounded-sm">
+                <div className="flex gap-1.5 p-1 bg-zinc-950/60 border border-zinc-900 rounded-sm flex-wrap">
                   <button
-                    onClick={() => setFilterCollection('all')}
-                    className={`px-3 py-1 font-sans text-[10px] uppercase tracking-wider rounded-sm transition-all cursor-pointer ${filterCollection === 'all' ? 'bg-orange-500/10 text-orange-400' : 'text-zinc-500 hover:text-zinc-200'}`}
+                    onClick={() => setFilterSection('all')}
+                    className={`px-3 py-1 font-sans text-[10px] uppercase tracking-wider rounded-sm transition-all cursor-pointer ${filterSection === 'all' ? 'bg-orange-500/10 text-orange-400' : 'text-zinc-500 hover:text-zinc-200'}`}
                   >
                     All
                   </button>
-                  {collectionOptions.map(col => (
+                  {WEBSITE_STRUCTURE.map(sec => (
                     <button
-                      key={col.value}
-                      onClick={() => setFilterCollection(col.value)}
-                      className={`px-3 py-1 font-sans text-[10px] uppercase tracking-wider rounded-sm transition-all cursor-pointer ${filterCollection === col.value ? 'bg-orange-500/10 text-orange-400' : 'text-zinc-500 hover:text-zinc-200'}`}
+                      key={sec.id}
+                      onClick={() => setFilterSection(sec.id)}
+                      className={`px-3 py-1 font-sans text-[10px] uppercase tracking-wider rounded-sm transition-all cursor-pointer ${filterSection === sec.id ? 'bg-orange-500/10 text-orange-400' : 'text-zinc-500 hover:text-zinc-200'}`}
                     >
-                      {col.value}
+                      {sec.label}
                     </button>
                   ))}
                 </div>
@@ -1292,7 +1462,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   <div className="flex-grow">
                     <h5 className="font-serif text-sm text-zinc-200">Unsaved Session Progress Detected</h5>
                     <p className="font-sans text-xs text-zinc-400 font-light mt-1">
-                      A local draft for this "{activeCollection}" structure exists from {lastDraftTime}.
+                      A local draft for <span className="text-zinc-200">{currentSection?.label || 'this section'}{currentDestination ? ` · ${currentDestination.label}` : ''}</span> exists from {lastDraftTime}.
                     </p>
                     <div className="flex items-center gap-3 mt-4">
                       <button 
@@ -1329,34 +1499,119 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
 
               <form onSubmit={handlePublish} className="space-y-8">
                 
-                {/* Meta Configuration block */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8 border-b border-zinc-900">
+                {/* ============================================================ */}
+                {/* PUBLISH DESTINATION — based on the site's visible structure  */}
+                {/* ============================================================ */}
+                <div className="pb-8 border-b border-zinc-900 space-y-6">
+                  {/* Step 1 — Website section */}
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Collection Storage Target</label>
-                    <select
-                      disabled={isEditing}
-                      value={activeCollection}
-                      onChange={(e) => handleCollectionChange(e.target.value)}
-                      className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-200 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50 cursor-pointer disabled:opacity-50"
-                    >
-                      {collectionOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
+                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-1">Website Section</label>
+                    <p className="font-sans text-[11px] text-zinc-500 font-light mb-3">Choose where on the site this should appear.</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {PRIMARY_SECTIONS.map(sec => {
+                        const isActive = activeSection === sec.id;
+                        return (
+                          <button
+                            key={sec.id}
+                            type="button"
+                            disabled={isEditing}
+                            onClick={() => handleSectionSelect(sec.id)}
+                            className={`px-4 py-2 font-sans text-xs tracking-wide rounded-sm border transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+                              isActive
+                                ? 'bg-orange-500/15 border-orange-500/50 text-orange-300'
+                                : 'bg-zinc-950 border-zinc-900 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700'
+                            }`}
+                          >
+                            {sec.label}
+                          </button>
+                        );
+                      })}
+                      {/* Home / site configuration — kept apart from the 5 content sections */}
+                      <span className="w-px h-6 bg-zinc-800 mx-1 hidden sm:block" aria-hidden="true" />
+                      <button
+                        type="button"
+                        disabled={isEditing}
+                        onClick={() => handleSectionSelect('home')}
+                        title="Edit landing-page blocks (site configuration)"
+                        className={`px-4 py-2 font-sans text-xs tracking-wide rounded-sm border transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-1.5 ${
+                          activeSection === 'home'
+                            ? 'bg-orange-500/15 border-orange-500/50 text-orange-300'
+                            : 'bg-zinc-950 border-zinc-900 text-zinc-500 hover:text-zinc-200 hover:border-zinc-700'
+                        }`}
+                      >
+                        <Settings className="w-3 h-3" />
+                        Home · Config
+                      </button>
+                    </div>
+                    {isEditing && (
+                      <p className="font-sans text-[10px] text-zinc-600 font-light mt-2 italic">
+                        Section is locked while editing an existing item.
+                      </p>
+                    )}
                   </div>
 
-                  <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Logical Category Tag</label>
-                    <select
-                      value={formCategory}
-                      onChange={(e) => setFormCategory(e.target.value)}
-                      className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-200 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50 cursor-pointer"
-                    >
-                      {(categoryOptionsMap[activeCollection] || []).map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Step 2 — Area within the section (only shown when there is a choice) */}
+                  {currentDestinations.length > 1 && (
+                    <div>
+                      <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-1">
+                        Area in {currentSection?.label}
+                      </label>
+                      <p className="font-sans text-[11px] text-zinc-500 font-light mb-3">Pick the part of this section the content belongs to.</p>
+                      <div className="flex flex-wrap gap-2">
+                        {currentDestinations.map(dest => {
+                          const isActive = activeCollection === dest.collection;
+                          return (
+                            <button
+                              key={dest.collection}
+                              type="button"
+                              disabled={isEditing}
+                              onClick={() => handleDestinationSelect(dest.collection)}
+                              className={`px-3.5 py-1.5 font-sans text-xs rounded-sm border transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+                                isActive
+                                  ? 'bg-zinc-100 border-zinc-100 text-zinc-900 font-medium'
+                                  : 'bg-zinc-950 border-zinc-900 text-zinc-400 hover:text-zinc-100 hover:border-zinc-700'
+                              }`}
+                            >
+                              {dest.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3 — Category (hidden when the area implies a single category) */}
+                  {!currentDestination?.fixedCategory && categoryChoices.length > 0 && (
+                    <div className="max-w-xs">
+                      <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                        {currentDestination?.categoryLabel || 'Category'}
+                      </label>
+                      <select
+                        value={formCategory}
+                        onChange={(e) => setFormCategory(e.target.value)}
+                        className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-200 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50 cursor-pointer"
+                      >
+                        {categoryChoices.map(cat => (
+                          <option key={cat} value={cat}>{prettyCategory(cat)}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Live, visual destination preview */}
+                  <DestinationPreview
+                    sections={PRIMARY_SECTIONS.map(s => ({ id: s.id, label: s.label }))}
+                    activeSectionId={activeSection}
+                    sectionLabel={currentSection?.label || ''}
+                    areaLabel={currentDestination?.label}
+                    showArea={currentDestinations.length > 1}
+                    isConfig={currentSection?.isConfig}
+                    categories={categoryChoices}
+                    activeCategory={formCategory}
+                    fixedCategory={currentDestination?.fixedCategory}
+                    blurb={currentDestination?.blurb}
+                    formatCategory={prettyCategory}
+                  />
                 </div>
 
                 {/* Form Core Input fields */}
@@ -1907,7 +2162,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                   </div>
 
                   {/* Post Customization Panel */}
-                  <PostCustomizationPanel value={formCustomization} onChange={setFormCustomization} />
+                  <PostCustomizationPanel
+                    value={formCustomization}
+                    onChange={setFormCustomization}
+                    preview={{ title: formTitle, excerpt: formExcerpt, coverImage: formCoverImage, category: formCategory }}
+                  />
 
                 </div>
 

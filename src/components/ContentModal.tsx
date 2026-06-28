@@ -15,6 +15,8 @@ import {
   getSpacingStyle,
   getAccentColor,
   getGradientStyle,
+  getTypographyStyle,
+  getTypographyFontFamily,
   hasGrainEffect,
   hasVignetteEffect,
   detectMusicProvider,
@@ -202,9 +204,15 @@ export default function ContentModal({
   const gradientStyle = getGradientStyle(customization);
   const showGrain = hasGrainEffect(customization);
   const showVignette = hasVignetteEffect(customization);
+  const typographyStyle = getTypographyStyle(customization);
+  const typographyFamily = getTypographyFontFamily(customization);
+  const hoverEffects = !!customization?.animation?.hoverEffects;
 
   // Heading style with accent color
-  const headingStyle: React.CSSProperties = accentColor ? { color: accentColor } : {};
+  const headingStyle: React.CSSProperties = {
+    ...(accentColor ? { color: accentColor } : {}),
+    ...(typographyFamily ? { fontFamily: typographyFamily } : {}),
+  };
   const linkStyle: React.CSSProperties = accentColor ? { color: accentColor } : {};
 
   return (
@@ -285,8 +293,8 @@ export default function ContentModal({
           initial={contentAnim.initial}
           animate={contentAnim.animate}
           transition={contentAnim.transition}
-          className={`p-6 md:p-12 lg:p-16 space-y-12 relative z-10 mx-auto w-full ${widthClass}`}
-          style={spacingStyle}
+          className={`p-6 md:p-12 lg:p-16 flex flex-col relative z-10 mx-auto w-full ${widthClass}`}
+          style={{ ...spacingStyle, ...typographyStyle }}
         >
           {/* Music Player Widget */}
           {customization?.music?.songUrl && (
@@ -302,7 +310,7 @@ export default function ContentModal({
               <SafeImage 
                 src={coverImage} 
                 alt={title} 
-                className="w-full h-full object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-700"
+                className={`w-full h-full object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-700 ${hoverEffects ? 'hover:scale-105' : ''}`}
                 referrerPolicy="no-referrer"
               />
             </div>

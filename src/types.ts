@@ -38,6 +38,10 @@ export interface PostCustomization {
     blur?: number;
     colorFilter?: 'none' | 'warm' | 'cool' | 'vintage' | 'noir';
   };
+  typography?: {
+    fontSize?: 'small' | 'default' | 'large' | 'x-large';
+    fontFamily?: 'serif' | 'sans' | 'mono';
+  };
 }
 
 // ============================================================

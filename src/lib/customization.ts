@@ -31,12 +31,13 @@ const WIDTH_MAP: Record<string, string> = {
   full: 'max-w-full',
 };
 
-// Spacing presets mapped to padding values
+// Spacing presets mapped to gap values. 'default' matches the previous
+// hard-coded space-y-12 (3rem) so existing posts are unchanged.
 const SPACING_MAP: Record<string, string> = {
-  compact: '0.75rem',
-  default: '1.5rem',
-  relaxed: '2.5rem',
-  spacious: '4rem',
+  compact: '1.5rem',
+  default: '3rem',
+  relaxed: '4.5rem',
+  spacious: '6rem',
 };
 
 // Animation speed mapped to duration in seconds
@@ -44,6 +45,23 @@ const SPEED_MAP: Record<string, number> = {
   slow: 1.4,
   normal: 0.8,
   fast: 0.4,
+};
+
+// Typography: text-size scale multiplier, applied via the --pts CSS variable
+const FONT_SCALE_MAP: Record<string, number> = {
+  small: 0.9,
+  default: 1,
+  large: 1.15,
+  'x-large': 1.3,
+};
+
+// Typography: font-family stacks, applied via the --pff CSS variable.
+// 'sans' matches the site default (--font-sans: Inter) so selecting it is a no-op;
+// 'serif' and 'mono' give a clearly distinct typeface.
+const FONT_FAMILY_MAP: Record<string, string> = {
+  serif: 'ui-serif, Georgia, Cambria, "Times New Roman", serif',
+  sans: '"Inter", ui-sans-serif, system-ui, sans-serif',
+  mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
 };
 
 export function getAnimationVariants(customization?: PostCustomization) {
@@ -177,8 +195,16 @@ export function getCoverImageStyles(customization?: PostCustomization): React.CS
     style.borderRadius = `${customization.style.borderRadius}px`;
   }
 
+  const filters: string[] = [];
   if (customization?.effects?.colorFilter && customization.effects.colorFilter !== 'none') {
-    style.filter = COLOR_FILTER_MAP[customization.effects.colorFilter] || 'none';
+    filters.push(COLOR_FILTER_MAP[customization.effects.colorFilter] || '');
+  }
+  if (customization?.effects?.blur && customization.effects.blur > 0) {
+    filters.push(`blur(${customization.effects.blur}px)`);
+  }
+  const combined = filters.filter(Boolean).join(' ');
+  if (combined) {
+    style.filter = combined;
   }
 
   return style;
@@ -201,6 +227,31 @@ export function getSpacingStyle(customization?: PostCustomization): React.CSSPro
   const spacing = customization?.layout?.spacing || 'default';
   const value = SPACING_MAP[spacing] || '1.5rem';
   return { gap: value };
+}
+
+/**
+ * Typography styles, returned as inline CSS custom properties so the markdown
+ * body (which reads --pts / --pff in index.css) scales/reskins live, plus a
+ * direct fontFamily so non-markdown text (e.g. the title) inherits it too.
+ */
+export function getTypographyStyle(customization?: PostCustomization): React.CSSProperties {
+  const t = customization?.typography || {};
+  const style: Record<string, string | number> = {};
+  if (t.fontSize && t.fontSize !== 'default' && FONT_SCALE_MAP[t.fontSize]) {
+    style['--pts'] = FONT_SCALE_MAP[t.fontSize];
+  }
+  if (t.fontFamily && t.fontFamily !== 'sans' && FONT_FAMILY_MAP[t.fontFamily]) {
+    style['--pff'] = FONT_FAMILY_MAP[t.fontFamily];
+    style.fontFamily = FONT_FAMILY_MAP[t.fontFamily];
+  }
+  return style as React.CSSProperties;
+}
+
+/** Resolved font-family stack for the selected option ('sans' = site default → no override). */
+export function getTypographyFontFamily(customization?: PostCustomization): string | undefined {
+  const f = customization?.typography?.fontFamily;
+  if (!f || f === 'sans') return undefined;
+  return FONT_FAMILY_MAP[f];
 }
 
 export function getAccentColor(customization?: PostCustomization): string | undefined {
@@ -401,15 +452,25 @@ export function generatePreviewCSS(customization?: PostCustomization): string {
     rules.push(`.markdown-body { text-align: ${customization.layout.textAlign}; }`);
   }
 
-  // Spacing
-  if (customization.layout?.spacing) {
-    const spacingValues: Record<string, string> = { compact: '0.75rem', default: '1.5rem', relaxed: '2.5rem', spacious: '4rem' };
-    rules.push(`.preview-content > * + * { margin-top: ${spacingValues[customization.layout.spacing] || '1.5rem'}; }`);
+  // Spacing (default 3rem already matches the iframe's space-y-12, so skip it)
+  if (customization.layout?.spacing && customization.layout.spacing !== 'default') {
+    const spacingValues: Record<string, string> = { compact: '1.5rem', default: '3rem', relaxed: '4.5rem', spacious: '6rem' };
+    rules.push(`.preview-content > * + * { margin-top: ${spacingValues[customization.layout.spacing] || '3rem'}; }`);
   }
 
-  // Color filter on cover image
-  if (customization.effects?.colorFilter && customization.effects.colorFilter !== 'none') {
-    rules.push(`.cover-image img { filter: ${COLOR_FILTER_MAP[customization.effects.colorFilter]}; }`);
+  // Color filter + background blur on cover image
+  {
+    const coverFilters: string[] = [];
+    if (customization.effects?.colorFilter && customization.effects.colorFilter !== 'none') {
+      coverFilters.push(COLOR_FILTER_MAP[customization.effects.colorFilter] || '');
+    }
+    if (customization.effects?.blur && customization.effects.blur > 0) {
+      coverFilters.push(`blur(${customization.effects.blur}px)`);
+    }
+    const coverFilter = coverFilters.filter(Boolean).join(' ');
+    if (coverFilter) {
+      rules.push(`.cover-image img { filter: ${coverFilter}; }`);
+    }
   }
 
   // Grain overlay
@@ -420,6 +481,19 @@ export function generatePreviewCSS(customization?: PostCustomization): string {
   // Vignette
   if (customization.effects?.vignette) {
     rules.push(`.vignette-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 998; box-shadow: inset 0 0 120px 40px rgba(0,0,0,0.6); }`);
+  }
+
+  // Typography — text size scale (mirrors index.css responsive base sizes)
+  if (customization.typography?.fontSize && customization.typography.fontSize !== 'default') {
+    const scale = FONT_SCALE_MAP[customization.typography.fontSize] || 1;
+    rules.push(`.markdown-body p, .markdown-body li { font-size: calc(0.875rem * ${scale}); }`);
+    rules.push(`@media (min-width: 768px) { .markdown-body p, .markdown-body li { font-size: calc(1rem * ${scale}); } }`);
+  }
+
+  // Typography — font family ('sans' is the site default → no override)
+  if (customization.typography?.fontFamily && customization.typography.fontFamily !== 'sans' && FONT_FAMILY_MAP[customization.typography.fontFamily]) {
+    const fam = FONT_FAMILY_MAP[customization.typography.fontFamily];
+    rules.push(`.markdown-body, .preview-content h1 { font-family: ${fam} !important; }`);
   }
 
   if (rules.length === 0) return '';
