@@ -1,6 +1,6 @@
 ---
 title: 'June''s Unseen Symphony,'
-category: People
+category: Thoughts
 date: '2026-06-28'
 excerpt: Unconditional.
 coverImage: /uploads/journal/1782633878697-150215554.jpg
