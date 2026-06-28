@@ -258,8 +258,163 @@
       "filePath": "content/photography/her.md",
       "lastReviewedAt": "2026-06-27T17:01:53.812Z",
       "publishedAt": "2026-06-27T17:01:59.916Z"
+    },
+    {
+      "id": "photography/tower-stories",
+      "collection": "photography",
+      "slug": "tower-stories",
+      "title": "Tower Stories",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-28T04:23:00.333Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-28T04:23:05.270Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-28T04:23:08.478Z",
+          "commitHash": "5d32ebbed470e170f93e4824d468d5e79854c233"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-28T04:23:00.334Z",
+      "updatedAt": "2026-06-28T04:23:08.478Z",
+      "filePath": "content/photography/tower-stories.md",
+      "lastReviewedAt": "2026-06-28T04:23:05.270Z",
+      "publishedAt": "2026-06-28T04:23:08.478Z"
+    },
+    {
+      "id": "photography/gulmarg",
+      "collection": "photography",
+      "slug": "gulmarg",
+      "title": "Gulmarg",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-28T04:24:50.319Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-28T04:24:55.050Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-28T04:24:59.529Z",
+          "commitHash": "5d32ebbed470e170f93e4824d468d5e79854c233"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-28T04:24:50.320Z",
+      "updatedAt": "2026-06-28T04:24:59.529Z",
+      "filePath": "content/photography/gulmarg.md",
+      "lastReviewedAt": "2026-06-28T04:24:55.050Z",
+      "publishedAt": "2026-06-28T04:24:59.529Z"
+    },
+    {
+      "id": "photography/gear",
+      "collection": "photography",
+      "slug": "gear",
+      "title": "GEAR",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-28T04:31:10.583Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-28T04:33:19.991Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-28T04:33:23.288Z",
+          "commitHash": "5d32ebbed470e170f93e4824d468d5e79854c233"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-28T04:31:10.583Z",
+      "updatedAt": "2026-06-28T04:33:23.288Z",
+      "filePath": "content/photography/gear.md",
+      "lastReviewedAt": "2026-06-28T04:33:19.991Z",
+      "publishedAt": "2026-06-28T04:33:23.288Z"
+    },
+    {
+      "id": "photography/wass",
+      "collection": "photography",
+      "slug": "wass",
+      "title": "Wass",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-28T04:33:10.650Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-28T04:33:27.250Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-28T04:33:31.119Z",
+          "commitHash": "5d32ebbed470e170f93e4824d468d5e79854c233"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-28T04:33:10.651Z",
+      "updatedAt": "2026-06-28T04:33:31.119Z",
+      "filePath": "content/photography/wass.md",
+      "lastReviewedAt": "2026-06-28T04:33:27.250Z",
+      "publishedAt": "2026-06-28T04:33:31.119Z"
+    },
+    {
+      "id": "photography/it-might",
+      "collection": "photography",
+      "slug": "it-might",
+      "title": "It Might",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-28T04:35:22.932Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-28T04:35:28.045Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-28T04:35:32.155Z",
+          "commitHash": "5d32ebbed470e170f93e4824d468d5e79854c233"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-28T04:35:22.933Z",
+      "updatedAt": "2026-06-28T04:35:32.155Z",
+      "filePath": "content/photography/it-might.md",
+      "lastReviewedAt": "2026-06-28T04:35:28.045Z",
+      "publishedAt": "2026-06-28T04:35:32.155Z"
     }
   ],
-  "lastUpdated": "2026-06-27T17:01:59.946Z",
+  "lastUpdated": "2026-06-28T04:35:32.186Z",
   "version": 1
 }
