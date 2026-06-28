@@ -5,11 +5,24 @@ date: '2023-12-15'
 excerpt: >-
   Pahalgam, Kashmir. A quiet morning immediately after the season's first
   snowfall. The light was transient and cold.
-coverImage: ''
+coverImage: /uploads/photography/1782633185852-244920274.jpeg
 galleryImages: []
 description: >-
   Pahalgam, Kashmir. A quiet morning immediately after the season's first
   snowfall. The light was transient and cold.
+gear: []
+captureMode: ''
+customization:
+  typography:
+    fontSize: default
+  animation:
+    preset: cinematic
+    speed: slow
+    hoverEffects: true
+  layout:
+    contentWidth: wide
+  style:
+    borderRadius: 3
 slug: chasing-first-light
 ---
 
