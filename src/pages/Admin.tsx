@@ -247,6 +247,13 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   // Post customization state
   const [formCustomization, setFormCustomization] = useState<PostCustomization>({});
 
+  // Journal-specific editorial fields (volume, reading time, tags, published)
+  const [formVolume, setFormVolume] = useState('');
+  const [formReadingTime, setFormReadingTime] = useState('');
+  const [formTags, setFormTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [formPublished, setFormPublished] = useState(true);
+
   // Status indicators
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [isUploading, setIsUploading] = useState(false);
@@ -288,6 +295,18 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       setFormGear(prev => [...prev, v]);
     }
     setGearInput('');
+  };
+
+  // Journal tag chip handlers
+  const handleAddTag = () => {
+    const v = tagInput.trim();
+    if (v && !formTags.includes(v)) {
+      setFormTags(prev => [...prev, v]);
+    }
+    setTagInput('');
+  };
+  const handleRemoveTag = (tag: string) => {
+    setFormTags(prev => prev.filter(t => t !== tag));
   };
 
   const categoryOptionsMap: Record<string, string[]> = {
@@ -426,6 +445,10 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       gear: formGear,
       captureMode: formCaptureMode,
       customization: formCustomization,
+      volume: formVolume,
+      readingTime: formReadingTime,
+      tags: formTags,
+      published: formPublished,
       savedAt: new Date().toISOString()
     };
     localStorage.setItem(getDraftKey(activeCollection), JSON.stringify(draftPayload));
@@ -466,6 +489,10 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         setFormGear(Array.isArray(parsed.gear) ? parsed.gear : []);
         setFormCaptureMode(parsed.captureMode || '');
         setFormCustomization(parsed.customization || {});
+        setFormVolume(parsed.volume != null ? String(parsed.volume) : '');
+        setFormReadingTime(parsed.readingTime || '');
+        setFormTags(Array.isArray(parsed.tags) ? parsed.tags : []);
+        setFormPublished(parsed.published !== false);
         setDraftAlert(false);
       } catch (e) {
         console.error('Error loading draft data', e);
@@ -542,6 +569,13 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.featured = formFeatured;
         serialData.order = formOrder;
         serialData.visible = formVisible;
+      } else if (activeCollection === 'journal') {
+        serialData.featuredImage = formCoverImage;
+        if (formReadingTime.trim()) serialData.readingTime = formReadingTime.trim();
+        const vol = parseInt(formVolume, 10);
+        if (!isNaN(vol)) serialData.volume = vol;
+        serialData.tags = formTags;
+        serialData.published = formPublished;
       } else {
         serialData.coverImage = formCoverImage;
       }
@@ -623,6 +657,11 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setFormCaptureMode('');
     setGearInput('');
     setFormCustomization({});
+    setFormVolume('');
+    setFormReadingTime('');
+    setFormTags([]);
+    setTagInput('');
+    setFormPublished(true);
     setIsEditing(false);
     setOriginalSlug('');
     setErrorMessage('');
@@ -650,7 +689,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         setFormSlug(doc.slug || '');
         setFormCategory(doc.data.category || doc.data.configType || '');
         setFormDate(doc.data.date || '');
-        setFormCoverImage(doc.data.coverImage || doc.data.projectImage || '');
+        setFormCoverImage(doc.data.featuredImage || doc.data.coverImage || doc.data.projectImage || '');
         setFormExcerpt(doc.data.excerpt || doc.data.description || '');
         setFormBody(doc.body || '');
 
@@ -708,6 +747,17 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         }
         if (doc.collection === 'gallery') {
           setFormFeatured(!!doc.data.featured);
+        }
+        if (doc.collection === 'journal') {
+          setFormVolume(doc.data.volume != null ? String(doc.data.volume) : '');
+          setFormReadingTime(doc.data.readingTime || '');
+          const tagList: string[] = Array.isArray(doc.data.tags)
+            ? doc.data.tags.map((t: any) => typeof t === 'string' ? t : (t.tag || t.value || Object.values(t)[0])).filter(Boolean)
+            : (typeof doc.data.tags === 'string' && doc.data.tags.trim()
+                ? doc.data.tags.split(',').map((s: string) => s.trim()).filter(Boolean)
+                : []);
+          setFormTags(tagList);
+          setFormPublished(doc.data.published !== false);
         }
 
         // Load post customization
@@ -827,6 +877,13 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.featured = formFeatured;
         serialData.order = formOrder;
         serialData.visible = formVisible;
+      } else if (activeCollection === 'journal') {
+        serialData.featuredImage = formCoverImage;
+        if (formReadingTime.trim()) serialData.readingTime = formReadingTime.trim();
+        const vol = parseInt(formVolume, 10);
+        if (!isNaN(vol)) serialData.volume = vol;
+        serialData.tags = formTags;
+        serialData.published = formPublished;
       } else {
         serialData.coverImage = formCoverImage;
       }
@@ -1669,6 +1726,84 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     </div>
                   </div>
 
+                  {/* Journal editorial metadata */}
+                  {activeCollection === 'journal' && (
+                    <div className="space-y-6 p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5" />
+                        Journal Editorial Fields
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Volume / Issue No.</label>
+                          <input
+                            type="number"
+                            min={1}
+                            value={formVolume}
+                            onChange={(e) => setFormVolume(e.target.value)}
+                            placeholder="Auto-assigned by date if blank"
+                            className="w-full bg-zinc-950 border border-zinc-900 font-mono text-xs text-zinc-300 py-2.5 px-4 rounded-sm focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Reading Time</label>
+                          <input
+                            type="text"
+                            value={formReadingTime}
+                            onChange={(e) => setFormReadingTime(e.target.value)}
+                            placeholder="e.g. 5 min read (auto if blank)"
+                            className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id="journal-published"
+                          checked={formPublished}
+                          onChange={(e) => setFormPublished(e.target.checked)}
+                          className="bg-zinc-950 border border-zinc-900 text-orange-500 focus:outline-none h-4 w-4 rounded cursor-pointer"
+                        />
+                        <label htmlFor="journal-published" className="font-sans text-xs text-zinc-400 select-none cursor-pointer">
+                          Published (visible on the live Journal page)
+                        </label>
+                      </div>
+
+                      <div>
+                        <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Tags</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                            placeholder="Enter a tag (e.g. Reflection) and press Enter"
+                            className="flex-grow bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-300 py-2 px-3 rounded-sm focus:outline-none focus:border-orange-500/30"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddTag}
+                            className="px-3 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs hover:bg-zinc-800 rounded cursor-pointer"
+                          >
+                            Add
+                          </button>
+                        </div>
+                        {formTags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {formTags.map(tag => (
+                              <span key={tag} className="font-mono text-[10px] text-zinc-300 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded flex items-center gap-1.5">
+                                {tag}
+                                <button type="button" onClick={() => handleRemoveTag(tag)} className="text-zinc-500 hover:text-red-400 font-sans font-semibold">×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Portfolio exclusive details */}
                   {activeCollection === 'portfolio' && (
                     <div className="space-y-6 p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
@@ -1953,7 +2088,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
 
                   {/* Visual Drop Area for Cover / Primary Image */}
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">Cover Banner Image Assets</label>
+                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">{activeCollection === 'journal' ? 'Featured Image (full-bleed cover)' : 'Cover Banner Image Assets'}</label>
                     <div className="flex gap-4">
                       <div className="flex-grow">
                         <input
@@ -2260,7 +2395,10 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                     category: formCategory,
                     date: formDate,
                     coverImage: formCoverImage,
+                    featuredImage: formCoverImage,
                     excerpt: formExcerpt,
+                    readingTime: formReadingTime,
+                    tags: formTags,
                     techStack,
                     githubLink,
                     liveLink,

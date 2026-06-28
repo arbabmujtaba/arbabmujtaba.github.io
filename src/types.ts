@@ -53,8 +53,19 @@ export interface JournalEntry {
   slug: string;
   date: string;
   category: "Life" | "People" | "Travel" | "Thoughts" | "Milestones";
+  /** Primary cinematic cover shown full-bleed inside the hero/archive cards. */
+  featuredImage?: string;
+  /** Legacy alias kept in sync with featuredImage for back-compat (modal, live-edit). */
   coverImage?: string;
   excerpt: string;
+  /** Display reading time, e.g. "5 min read". Auto-derived from the body when omitted. */
+  readingTime?: string;
+  /** Magazine-style issue number. Auto-assigned by publish order when omitted. */
+  volume?: number;
+  /** Editorial tags shown in the card metadata row. */
+  tags?: string[];
+  /** When false the entry is hidden from the site. Defaults to true. */
+  published?: boolean;
   body: string;
   customization?: PostCustomization;
 }

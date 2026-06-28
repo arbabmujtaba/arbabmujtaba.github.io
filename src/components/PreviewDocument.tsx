@@ -21,7 +21,7 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
   const title = frontmatter.title || 'Untitled';
   const date = frontmatter.date || '';
   const category = frontmatter.category || '';
-  const coverImage = frontmatter.coverImage || frontmatter.projectImage || '';
+  const coverImage = frontmatter.coverImage || frontmatter.featuredImage || frontmatter.projectImage || '';
   const excerpt = frontmatter.excerpt || frontmatter.description || '';
   const techStack = Array.isArray(frontmatter.techStack) ? frontmatter.techStack : [];
   const githubLink = frontmatter.githubLink || '';

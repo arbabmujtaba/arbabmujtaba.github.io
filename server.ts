@@ -147,7 +147,7 @@ app.get('/api/content', async (req, res) => {
           date: data.date || '',
           category: data.category || '',
           featured: !!data.featured,
-          coverImage: data.coverImage || data.projectImage || '',
+          coverImage: data.coverImage || data.featuredImage || data.projectImage || data.image || '',
           excerpt: data.excerpt || data.description || '',
           filePath: `content/${col}/${file}`,
           state: registryItem?.state || 'draft',

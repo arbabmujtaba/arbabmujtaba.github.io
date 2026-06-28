@@ -30,9 +30,13 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Slug", name: "slug", widget: "string" }
       - { label: "Date", name: "date", widget: "date" }
-      - { label: "Category", name: "category", widget: "select", options: ["Life", "People", "Travel", "Thoughts", "Milestones"] }
-      - { label: "Cover Image", name: "coverImage", widget: "image", required: false }
+      - { label: "Featured Image", name: "featuredImage", widget: "image", required: false, hint: "Full-bleed cinematic cover. Leave blank to use the default placeholder. No embedded text/logos — the site renders the title." }
       - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - { label: "Reading Time", name: "readingTime", widget: "string", required: false, hint: "e.g. 5 min read — auto-calculated from the body if left blank." }
+      - { label: "Volume", name: "volume", widget: "number", required: false, value_type: "int", min: 1, hint: "Magazine issue number — auto-assigned by publish order if left blank." }
+      - { label: "Tags", name: "tags", widget: "list", required: false, hint: "Editorial tags shown in the card metadata." }
+      - { label: "Category", name: "category", widget: "select", required: false, options: ["Life", "People", "Travel", "Thoughts", "Milestones"] }
+      - { label: "Published", name: "published", widget: "boolean", default: true, hint: "Uncheck to hide this entry from the live site." }
       - { label: "Body", name: "body", widget: "markdown" }
 
   - name: "tech"

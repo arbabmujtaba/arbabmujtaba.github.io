@@ -179,21 +179,90 @@ const homeGlob = (import.meta as any).glob('/content/home/**/*.md', { query: '?r
 const galleryGlob = (import.meta as any).glob('/content/gallery/**/*.md', { query: '?raw', eager: true });
 
 // Normalize listing maps to typed arrays
+/**
+ * Normalize a tags value coming from frontmatter. Supports a YAML array of
+ * strings, an array of `{ tag: "..." }` objects, or a single comma-delimited
+ * string, always returning a clean string[].
+ */
+function normalizeTags(raw: any): string[] {
+  if (Array.isArray(raw)) {
+    return raw
+      .map((t) => {
+        if (typeof t === 'string') return t;
+        if (t && typeof t === 'object') return (t.tag || t.value || Object.values(t)[0]) as string;
+        return '';
+      })
+      .map((s) => String(s).trim())
+      .filter(Boolean);
+  }
+  if (typeof raw === 'string' && raw.trim()) {
+    return raw.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+/**
+ * Resolve a display reading time. Honors an explicit frontmatter value
+ * ("5 min read" or a bare number) and otherwise estimates from the body
+ * at ~200 words per minute.
+ */
+function resolveReadingTime(body: string, explicit?: any): string {
+  if (explicit !== undefined && explicit !== null && String(explicit).trim() !== '') {
+    const s = String(explicit).trim();
+    return /^\d+$/.test(s) ? `${s} min read` : s;
+  }
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.ceil(words / 200));
+  return `${mins} min read`;
+}
+
+/** Parse a volume number from a number or a string like "Vol. 02" / "2". */
+function parseVolume(raw: any): number | undefined {
+  if (typeof raw === 'number' && !isNaN(raw)) return raw;
+  if (typeof raw === 'string' && raw.trim()) {
+    const n = parseInt(raw.replace(/[^\d]/g, ''), 10);
+    if (!isNaN(n)) return n;
+  }
+  return undefined;
+}
+
 export function getJournalEntries(): JournalEntry[] {
-  return Object.entries(journalGlob).map(([filePath, module]: [string, any]) => {
+  const entries = Object.entries(journalGlob).map(([filePath, module]: [string, any]) => {
     const rawContent = module.default;
     const { data, content } = parseMarkdown(rawContent);
+    const body = content || "";
+    // featuredImage is the canonical field; coverImage is the legacy alias.
+    const cover = data.featuredImage || data.coverImage || undefined;
     return {
       title: data.title || "Untitled",
       slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
       date: data.date || "2026-06-07",
-      category: data.category || "Life",
-      coverImage: data.coverImage,
+      category: data.category || "Thoughts",
+      featuredImage: cover,
+      coverImage: cover,
       excerpt: data.excerpt || "",
-      body: content || "",
+      readingTime: resolveReadingTime(body, data.readingTime),
+      volume: parseVolume(data.volume),
+      tags: normalizeTags(data.tags),
+      published: data.published !== false,
+      body,
       customization: data.customization as PostCustomization | undefined
-    };
-  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } as JournalEntry;
+  });
+
+  // Hide unpublished drafts, then order newest-first so the latest entry is featured.
+  const visible = entries
+    .filter((e) => e.published !== false)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Auto-assign magazine volume numbers where the author left them blank.
+  // Oldest published entry = Vol. 01, newest = the highest number.
+  const total = visible.length;
+  visible.forEach((e, i) => {
+    if (e.volume === undefined) e.volume = total - i;
+  });
+
+  return visible;
 }
 
 export function getTechEntries(): TechEntry[] {
