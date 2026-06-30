@@ -537,8 +537,101 @@
       "filePath": "content/tech/windows-cracked-apps.md",
       "lastReviewedAt": "2026-06-30T10:13:42.688Z",
       "publishedAt": "2026-06-30T10:13:46.731Z"
+    },
+    {
+      "id": "photography/everyone-has-dreams",
+      "collection": "photography",
+      "slug": "everyone-has-dreams",
+      "title": "Everyone Has Dreams",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-30T10:28:01.414Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-30T10:28:05.653Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-30T10:28:09.203Z",
+          "commitHash": "18c218704301713ae3dd303501dc1d148736ca7c"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-30T10:28:01.415Z",
+      "updatedAt": "2026-06-30T10:30:26.781Z",
+      "filePath": "content/photography/everyone-has-dreams.md",
+      "lastReviewedAt": "2026-06-30T10:28:05.653Z",
+      "publishedAt": "2026-06-30T10:28:09.203Z"
+    },
+    {
+      "id": "photography/isolated",
+      "collection": "photography",
+      "slug": "isolated",
+      "title": "Isolated",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-30T10:29:50.510Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-30T10:29:57.340Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-30T10:30:00.469Z",
+          "commitHash": "18c218704301713ae3dd303501dc1d148736ca7c"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-30T10:29:50.511Z",
+      "updatedAt": "2026-06-30T10:30:00.469Z",
+      "filePath": "content/photography/isolated.md",
+      "lastReviewedAt": "2026-06-30T10:29:57.340Z",
+      "publishedAt": "2026-06-30T10:30:00.469Z"
+    },
+    {
+      "id": "photography/wular",
+      "collection": "photography",
+      "slug": "wular",
+      "title": "Wular",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-30T10:31:20.979Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-30T10:31:24.399Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-30T10:31:27.944Z",
+          "commitHash": "18c218704301713ae3dd303501dc1d148736ca7c"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-30T10:31:20.980Z",
+      "updatedAt": "2026-06-30T10:31:27.944Z",
+      "filePath": "content/photography/wular.md",
+      "lastReviewedAt": "2026-06-30T10:31:24.399Z",
+      "publishedAt": "2026-06-30T10:31:27.944Z"
     }
   ],
-  "lastUpdated": "2026-06-30T10:21:49.434Z",
+  "lastUpdated": "2026-06-30T10:31:27.972Z",
   "version": 1
 }
