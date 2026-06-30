@@ -444,8 +444,101 @@
       "filePath": "content/journal/junes-unseen-symphony.md",
       "lastReviewedAt": "2026-06-28T08:06:58.656Z",
       "publishedAt": "2026-06-28T08:07:04.909Z"
+    },
+    {
+      "id": "tech/macos-crack-apps",
+      "collection": "tech",
+      "slug": "macos-crack-apps",
+      "title": "MacOs Crack Apps",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-30T10:09:39.702Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-30T10:09:43.333Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-30T10:09:46.421Z",
+          "commitHash": "57c1bf29e6746e7ad02f9e60fef40b0f0e196c1f"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-30T10:09:39.702Z",
+      "updatedAt": "2026-06-30T10:09:46.421Z",
+      "filePath": "content/tech/macos-crack-apps.md",
+      "lastReviewedAt": "2026-06-30T10:09:43.333Z",
+      "publishedAt": "2026-06-30T10:09:46.421Z"
+    },
+    {
+      "id": "tech/ios-crack-apps",
+      "collection": "tech",
+      "slug": "ios-crack-apps",
+      "title": "Ios Crack Apps",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-30T10:11:18.996Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-30T10:11:25.277Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-30T10:11:29.762Z",
+          "commitHash": "57c1bf29e6746e7ad02f9e60fef40b0f0e196c1f"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-30T10:11:18.997Z",
+      "updatedAt": "2026-06-30T10:11:29.762Z",
+      "filePath": "content/tech/ios-crack-apps.md",
+      "lastReviewedAt": "2026-06-30T10:11:25.277Z",
+      "publishedAt": "2026-06-30T10:11:29.762Z"
+    },
+    {
+      "id": "tech/windows-cracked-apps",
+      "collection": "tech",
+      "slug": "windows-cracked-apps",
+      "title": "Windows Cracked Apps",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-06-30T10:13:37.932Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-06-30T10:13:42.688Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-06-30T10:13:46.731Z",
+          "commitHash": "57c1bf29e6746e7ad02f9e60fef40b0f0e196c1f"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-06-30T10:13:37.933Z",
+      "updatedAt": "2026-06-30T10:13:46.731Z",
+      "filePath": "content/tech/windows-cracked-apps.md",
+      "lastReviewedAt": "2026-06-30T10:13:42.688Z",
+      "publishedAt": "2026-06-30T10:13:46.731Z"
     }
   ],
-  "lastUpdated": "2026-06-28T08:17:32.524Z",
+  "lastUpdated": "2026-06-30T10:13:46.759Z",
   "version": 1
 }
