@@ -661,8 +661,70 @@
       "filePath": "content/journal/the-missed-train.md",
       "lastReviewedAt": "2026-07-02T09:42:06.265Z",
       "publishedAt": "2026-07-02T09:42:09.675Z"
+    },
+    {
+      "id": "photography/friends",
+      "collection": "photography",
+      "slug": "friends",
+      "title": "Friends",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-02T11:21:36.655Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-02T11:21:43.817Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-02T11:21:47.372Z",
+          "commitHash": "03522cab06be0ca6e5f215892c7ded06bf19f14d"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-02T11:21:36.655Z",
+      "updatedAt": "2026-07-02T11:21:47.372Z",
+      "filePath": "content/photography/friends.md",
+      "lastReviewedAt": "2026-07-02T11:21:43.817Z",
+      "publishedAt": "2026-07-02T11:21:47.372Z"
+    },
+    {
+      "id": "photography/home-sweet-home",
+      "collection": "photography",
+      "slug": "home-sweet-home",
+      "title": "Home Sweet Home",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-02T11:23:07.091Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-02T11:23:10.603Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-02T11:23:13.803Z",
+          "commitHash": "03522cab06be0ca6e5f215892c7ded06bf19f14d"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-02T11:23:07.091Z",
+      "updatedAt": "2026-07-02T11:23:13.803Z",
+      "filePath": "content/photography/home-sweet-home.md",
+      "lastReviewedAt": "2026-07-02T11:23:10.603Z",
+      "publishedAt": "2026-07-02T11:23:13.803Z"
     }
   ],
-  "lastUpdated": "2026-07-02T09:42:09.707Z",
+  "lastUpdated": "2026-07-02T11:23:13.832Z",
   "version": 1
 }
