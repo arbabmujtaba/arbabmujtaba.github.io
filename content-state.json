@@ -630,8 +630,39 @@
       "filePath": "content/photography/wular.md",
       "lastReviewedAt": "2026-06-30T10:31:24.399Z",
       "publishedAt": "2026-06-30T10:31:27.944Z"
+    },
+    {
+      "id": "journal/the-missed-train",
+      "collection": "journal",
+      "slug": "the-missed-train",
+      "title": "The Missed Train",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-02T09:40:45.216Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-02T09:42:06.265Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-02T09:42:09.675Z",
+          "commitHash": "83c78731907af7dd42010e4f3682da3e74df5c68"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-02T09:40:45.217Z",
+      "updatedAt": "2026-07-02T09:42:09.675Z",
+      "filePath": "content/journal/the-missed-train.md",
+      "lastReviewedAt": "2026-07-02T09:42:06.265Z",
+      "publishedAt": "2026-07-02T09:42:09.675Z"
     }
   ],
-  "lastUpdated": "2026-06-30T10:31:27.972Z",
+  "lastUpdated": "2026-07-02T09:42:09.707Z",
   "version": 1
 }
