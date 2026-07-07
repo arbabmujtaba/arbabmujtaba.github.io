@@ -723,8 +723,26 @@
       "filePath": "content/photography/home-sweet-home.md",
       "lastReviewedAt": "2026-07-02T11:23:10.603Z",
       "publishedAt": "2026-07-02T11:23:13.803Z"
+    },
+    {
+      "id": "photography/the-end",
+      "collection": "photography",
+      "slug": "the-end",
+      "title": "The End",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-07T08:55:00.241Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-07T08:55:00.242Z",
+      "updatedAt": "2026-07-07T08:55:00.242Z",
+      "filePath": "content/photography/the-end.md"
     }
   ],
-  "lastUpdated": "2026-07-02T11:23:13.832Z",
+  "lastUpdated": "2026-07-07T08:55:00.242Z",
   "version": 1
 }
