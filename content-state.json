@@ -657,7 +657,7 @@
       ],
       "unsavedChanges": false,
       "createdAt": "2026-07-02T09:40:45.217Z",
-      "updatedAt": "2026-07-02T09:42:09.675Z",
+      "updatedAt": "2026-07-27T06:09:09.393Z",
       "filePath": "content/journal/the-missed-train.md",
       "lastReviewedAt": "2026-07-02T09:42:06.265Z",
       "publishedAt": "2026-07-02T09:42:09.675Z"
@@ -741,8 +741,26 @@
       "createdAt": "2026-07-07T08:55:00.242Z",
       "updatedAt": "2026-07-07T08:55:00.242Z",
       "filePath": "content/photography/the-end.md"
+    },
+    {
+      "id": "journal/the-missed-train-1",
+      "collection": "journal",
+      "slug": "the-missed-train-1",
+      "title": "The Missed Train",
+      "state": "draft",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-27T06:26:46.957Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-27T06:26:46.958Z",
+      "updatedAt": "2026-07-27T06:26:46.958Z",
+      "filePath": "content/journal/the-missed-train-1.md"
     }
   ],
-  "lastUpdated": "2026-07-07T08:55:00.242Z",
+  "lastUpdated": "2026-07-27T06:26:46.958Z",
   "version": 1
 }
