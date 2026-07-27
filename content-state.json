@@ -729,38 +729,157 @@
       "collection": "photography",
       "slug": "the-end",
       "title": "The End",
-      "state": "draft",
+      "state": "published",
       "versions": [
         {
           "version": 1,
           "state": "draft",
           "timestamp": "2026-07-07T08:55:00.241Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-27T06:36:04.248Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-27T06:36:08.481Z",
+          "commitHash": "cfabd59ce31f1dc77b741a6b831e14c76c209703"
         }
       ],
       "unsavedChanges": false,
       "createdAt": "2026-07-07T08:55:00.242Z",
-      "updatedAt": "2026-07-07T08:55:00.242Z",
-      "filePath": "content/photography/the-end.md"
+      "updatedAt": "2026-07-27T06:36:08.481Z",
+      "filePath": "content/photography/the-end.md",
+      "lastReviewedAt": "2026-07-27T06:36:04.248Z",
+      "publishedAt": "2026-07-27T06:36:08.481Z"
     },
     {
       "id": "journal/the-missed-train-1",
       "collection": "journal",
       "slug": "the-missed-train-1",
       "title": "The Missed Train",
-      "state": "draft",
+      "state": "published",
       "versions": [
         {
           "version": 1,
           "state": "draft",
           "timestamp": "2026-07-27T06:26:46.957Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-27T06:36:22.873Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-27T06:36:25.917Z",
+          "commitHash": "cfabd59ce31f1dc77b741a6b831e14c76c209703"
         }
       ],
       "unsavedChanges": false,
       "createdAt": "2026-07-27T06:26:46.958Z",
-      "updatedAt": "2026-07-27T06:26:46.958Z",
-      "filePath": "content/journal/the-missed-train-1.md"
+      "updatedAt": "2026-07-27T06:36:25.917Z",
+      "filePath": "content/journal/the-missed-train-1.md",
+      "lastReviewedAt": "2026-07-27T06:36:22.873Z",
+      "publishedAt": "2026-07-27T06:36:25.917Z"
+    },
+    {
+      "id": "photography/that-5-teaberg-guys",
+      "collection": "photography",
+      "slug": "that-5-teaberg-guys",
+      "title": "That 5 TeaBerg Guys",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-27T06:36:00.632Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-27T06:36:16.298Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-27T06:36:19.340Z",
+          "commitHash": "cfabd59ce31f1dc77b741a6b831e14c76c209703"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-27T06:36:00.633Z",
+      "updatedAt": "2026-07-27T06:36:19.340Z",
+      "filePath": "content/photography/that-5-teaberg-guys.md",
+      "lastReviewedAt": "2026-07-27T06:36:16.298Z",
+      "publishedAt": "2026-07-27T06:36:19.340Z"
+    },
+    {
+      "id": "photography/sunsetz",
+      "collection": "photography",
+      "slug": "sunsetz",
+      "title": "SunSetz",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-27T06:38:42.294Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-27T06:38:46.402Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-27T06:38:49.480Z",
+          "commitHash": "cfabd59ce31f1dc77b741a6b831e14c76c209703"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-27T06:38:42.295Z",
+      "updatedAt": "2026-07-27T06:38:49.480Z",
+      "filePath": "content/photography/sunsetz.md",
+      "lastReviewedAt": "2026-07-27T06:38:46.402Z",
+      "publishedAt": "2026-07-27T06:38:49.480Z"
+    },
+    {
+      "id": "photography/high",
+      "collection": "photography",
+      "slug": "high",
+      "title": "High",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-07-27T06:40:32.479Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-07-27T06:40:37.040Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-07-27T06:40:40.610Z",
+          "commitHash": "cfabd59ce31f1dc77b741a6b831e14c76c209703"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-07-27T06:40:32.479Z",
+      "updatedAt": "2026-07-27T06:40:40.610Z",
+      "filePath": "content/photography/high.md",
+      "lastReviewedAt": "2026-07-27T06:40:37.040Z",
+      "publishedAt": "2026-07-27T06:40:40.610Z"
     }
   ],
-  "lastUpdated": "2026-07-27T06:26:46.958Z",
+  "lastUpdated": "2026-07-27T06:40:40.636Z",
   "version": 1
 }
