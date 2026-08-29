@@ -108,13 +108,12 @@ export default function Portfolio() {
                       {normalizeImagePath(project.projectImage) ? (
                         <ParallaxImage 
                           src={project.projectImage}
-                          width={800}
                           alt={project.title}
                           className="w-full h-full opacity-60 mix-blend-luminosity"
                           imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
                         />
                       ) : (
-                        <SafeImage src={project.projectImage} alt={project.title} className="w-full h-full opacity-40" width={480} />
+                        <SafeImage src={project.projectImage} alt={project.title} className="w-full h-full opacity-40" />
                       )}
                       <div className="absolute inset-0 bg-gradient-to-tr from-zinc-950/80 to-transparent pointer-events-none"></div>
                     </div>

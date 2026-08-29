@@ -73,7 +73,6 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
         {isFeatured ? (
           <ParallaxImage
             src={cover}
-            width={1200}
             alt={entry.title}
             className="h-full w-full"
             imageClassName="grayscale-[12%] transition-all duration-[1200ms] group-hover:grayscale-0 group-hover:scale-[1.04]"
@@ -83,7 +82,6 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
             src={cover}
             alt={entry.title}
             className="h-full w-full object-cover grayscale-[15%] transition-all duration-[1200ms] group-hover:grayscale-0 group-hover:scale-[1.05]"
-            width={480}
             referrerPolicy="no-referrer"
           />
         )}
