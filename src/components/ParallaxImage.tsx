@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { normalizeImagePath, getOptimizedImagePath } from '../lib/image';
+import { normalizeImagePath, getOptimizedImagePath, getOptimizedSrcSet } from '../lib/image';
 
 interface ParallaxImageProps {
   src: string;
@@ -28,7 +28,7 @@ function findScrollParent(node: HTMLElement | null): HTMLElement | null {
   return null;
 }
 
-export default function ParallaxImage({ src, alt, className = '', imageClassName = '' }: ParallaxImageProps) {
+export default function ParallaxImage({ src, alt, className = '', imageClassName = '', width }: ParallaxImageProps) {
   const ref = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
@@ -36,6 +36,7 @@ export default function ParallaxImage({ src, alt, className = '', imageClassName
 
   const normalized = normalizeImagePath(src);
   const optimized = width && normalized ? getOptimizedImagePath(normalized, width) : null;
+  const srcSet = normalized ? getOptimizedSrcSet(normalized) : null;
   // Parallax runs on every device; it's only skipped when the visitor asked for
   // reduced motion or there's no image to show.
   const enabled = !shouldReduceMotion && !!normalized && !failed;
@@ -142,6 +143,8 @@ export default function ParallaxImage({ src, alt, className = '', imageClassName
       >
         <img
           src={optimized || normalized!}
+          srcSet={srcSet || undefined}
+          sizes="100vw"
           alt={alt}
           loading="lazy"
           className={`w-full h-full object-cover ${imageClassName}`}

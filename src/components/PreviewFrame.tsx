@@ -9,7 +9,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Monitor, Tablet, Smartphone, Loader2, RefreshCw, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { normalizeImagePath } from '../lib/image';
+import { normalizeImagePath, getOptimizedImagePath, getOptimizedSrcSet } from '../lib/image';
 import { generatePreviewCSS } from '../lib/customization';
 
 type ViewportMode = 'desktop' | 'tablet' | 'mobile';
@@ -94,9 +94,11 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
       .replace(/\n{2,}/g, '</p><p class="text-zinc-350 leading-relaxed mb-4">')
       .replace(/^(.+)$/gim, '<p class="text-zinc-350 leading-relaxed mb-4">$1</p>');
 
+    const coverOptimized = coverImage ? getOptimizedImagePath(coverImage, 1200) : null;
+    const coverSrcSet = coverImage ? getOptimizedSrcSet(coverImage) : null;
     const coverHtml = coverImage
       ? `<div class="cover-image relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950 mb-10">
-           <img src="${coverImage}" alt="${title}" class="w-full h-full object-cover grayscale-[15%]" referrerPolicy="no-referrer" onerror="this.style.display='none'" />
+           <img src="${coverOptimized || coverImage}" srcset="${coverSrcSet || ''}" sizes="(min-width: 1024px) 1200px, 100vw" alt="${title}" class="w-full h-full object-cover grayscale-[15%]" referrerPolicy="no-referrer" onerror="this.style.display='none'" />
          </div>`
       : '';
 

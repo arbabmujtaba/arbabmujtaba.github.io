@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
 const Home = lazy(() => import('./pages/Home'));
@@ -116,7 +117,8 @@ export default function App() {
             exit={{ opacity: 0, y: -24 }}
             transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Suspense fallback={<div className="p-8" aria-hidden="true" /> }>
+            <ErrorBoundary>
+              <Suspense fallback={<div className="p-8" aria-hidden="true" /> }>
               {view === 'home' && <Home setView={setView} />}
               {view === 'portfolio' && <Portfolio />}
               {view === 'journal' && <Journal />}
@@ -124,7 +126,8 @@ export default function App() {
               {view === 'photography' && <Photography />}
               {view === 'collection' && <Collection />}
               {view === 'admin' && <Admin setView={setView} />}
-            </Suspense>
+              </Suspense>
+            </ErrorBoundary>
 
             {view !== 'admin' && (
               <motion.div

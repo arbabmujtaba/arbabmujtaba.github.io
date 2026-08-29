@@ -45,6 +45,23 @@ export function getOptimizedImagePath(path: string | undefined | null, width: nu
 }
 
 /**
+ * Generate a WebP `srcset` string for a set of widths.
+ * Example output: "/_optimized/480/uploads/x.webp 480w, /_optimized/800/uploads/x.webp 800w"
+ */
+export function getOptimizedSrcSet(path: string | undefined | null, widths: number[] = [480, 800, 1200, 2048]): string | null {
+  const p = normalizeImagePath(path);
+  if (!p) return null;
+  const stripped = p.replace(/^\//, '');
+  const parts: string[] = [];
+  for (const w of widths) {
+    const webp = `/ _optimized/${w}/${stripped}`.replace('/ _optimized', '/_optimized');
+    const webpPath = webp.replace(/\.[^.]+$/, '.webp');
+    parts.push(`${webpPath} ${w}w`);
+  }
+  return parts.join(', ');
+}
+
+/**
  * Check whether a path is a valid image reference.
  */
 export function isValidImagePath(path: string | undefined | null): boolean {

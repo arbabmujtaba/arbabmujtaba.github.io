@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
+import SafeImage from './SafeImage';
 
 interface MagicalGatewayProps {
   label: string;
@@ -54,11 +55,13 @@ export default function MagicalGateway({
         }
         transition={{ duration: 14 + index, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <img
+        <SafeImage
           src={image}
           alt=""
-          aria-hidden="true"
+          aria-hidden
           className="h-full w-full object-cover opacity-36 grayscale transition-all duration-700 group-hover:opacity-58 group-hover:grayscale-[28%]"
+          width={1200}
+          sizes="100vw"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09] via-[#0a0a09]/55 to-[#0a0a09]/20" />

@@ -34,10 +34,12 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
         {/* Cover image banner */}
         {normalizeImagePath(coverImage) && (
           <div className="relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950">
-            <img
-              src={normalizeImagePath(coverImage)!}
+            <SafeImage
+              src={coverImage}
               alt={title}
               className="w-full h-full object-cover grayscale-[15%]"
+              width={1200}
+              sizes="(min-width: 1024px) 1200px, 100vw"
               referrerPolicy="no-referrer"
             />
           </div>
@@ -135,10 +137,12 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
                 const normalized = normalizeImagePath(img);
                 return normalized ? (
                   <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
-                    <img
-                      src={normalized}
+                    <SafeImage
+                      src={img}
                       alt={`Gallery slide ${idx + 1}`}
                       className="w-full h-full object-cover grayscale-[10%]"
+                      width={800}
+                      sizes="(min-width: 768px) 50vw, 100vw"
                       referrerPolicy="no-referrer"
                     />
                   </div>

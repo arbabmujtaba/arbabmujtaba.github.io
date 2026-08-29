@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { normalizeImagePath, getOptimizedImagePath } from '../lib/image';
+import { normalizeImagePath, getOptimizedImagePath, getOptimizedSrcSet } from '../lib/image';
 
 interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string | undefined;
@@ -22,8 +22,10 @@ export default function SafeImage({
 }: SafeImageProps) {
   // Optional width prop can be passed via props to request an optimized variant
   const width = (props as any).width as number | undefined;
+  const sizesProp = (props as any).sizes as string | undefined;
   const normalized = normalizeImagePath(src);
   const optimized = width && normalized ? getOptimizedImagePath(normalized, width) : null;
+  const srcSet = normalized ? getOptimizedSrcSet(normalized) : null;
   const [failed, setFailed] = useState(false);
 
   if (!normalized || failed) {
@@ -35,11 +37,13 @@ export default function SafeImage({
   return (
     <img
       src={optimized || normalized!}
+      srcSet={srcSet || undefined}
+      sizes={sizesProp}
       alt={alt}
       className={className}
       style={style}
       onError={() => setFailed(true)}
-      loading="lazy"
+      loading={(props as any).loading || 'lazy'}
       {...props}
     />
   );

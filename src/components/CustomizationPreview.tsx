@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Play, Music } from 'lucide-react';
 import { normalizeImagePath } from '../lib/image';
+import SafeImage from './SafeImage';
 import type { PostCustomization } from '../types';
 import {
   getContentAnimationVariants,
@@ -159,18 +160,16 @@ export default function CustomizationPreview({
             style={coverStyles}
           >
             {cover ? (
-              <img
-                src={cover}
-                alt=""
-                referrerPolicy="no-referrer"
-                className={`w-full h-full object-cover ${
-                  hover ? 'transition-transform duration-700 hover:scale-110' : ''
-                }`}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            ) : (
+                <SafeImage
+                  src={cover}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className={`w-full h-full object-cover ${hover ? 'transition-transform duration-700 hover:scale-110' : ''}`}
+                  width={800}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  onError={() => {}}
+                />
+              ) : (
               <div className="w-full h-full bg-gradient-to-br from-zinc-800/60 via-zinc-900 to-zinc-950 flex items-center justify-center">
                 <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-zinc-600">
                   cover image

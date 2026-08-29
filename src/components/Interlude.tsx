@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { normalizeImagePath } from '../lib/image';
+import SafeImage from './SafeImage';
 import type { HomeConfigEntry } from '../types';
 
 interface InterludeProps {
@@ -286,7 +287,15 @@ export default function Interlude({ entry, index }: InterludeProps) {
       {/* Optional faint image atmosphere */}
       {img && (
         <div className="pointer-events-none absolute inset-0 z-0">
-          <img src={img} alt="" className="h-full w-full object-cover opacity-[0.12] grayscale" referrerPolicy="no-referrer" />
+          <SafeImage
+            src={img}
+            alt=""
+            className="h-full w-full object-cover opacity-[0.12] grayscale"
+            referrerPolicy="no-referrer"
+            width={1200}
+            sizes="100vw"
+            loading="lazy"
+          />
           <div className="absolute inset-0 bg-[#0a0a09]/85" />
         </div>
       )}

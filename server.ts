@@ -11,6 +11,7 @@ import { transitionState, getItem, saveItem, createItem, deleteItem, initialize,
 import { PreviewDocument } from './src/components/PreviewDocument';
 import { PublishingService } from './src/services/PublishingService';
 import { DeploymentService } from './src/services/DeploymentService';
+import sharp from 'sharp';
 
 const app = express();
 const PORT = 3000;
@@ -109,6 +110,40 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
     // Return path relative to the public router domain
     const relativeUrl = `/uploads/${collection}/${req.file.filename}`;
     res.json({ success: true, url: relativeUrl });
+
+    // Optimize the uploaded image in background (non-blocking)
+    (async function optimizeUploadedImage() {
+      try {
+        const srcPath = req.file.path;
+        const widths = [480, 800, 1200, 2048];
+        const outBase = path.join(PUBLIC_DIR, '_optimized');
+        const relDir = collection;
+        await fs.ensureDir(path.join(outBase));
+
+        const ext = path.extname(srcPath).toLowerCase();
+        const baseName = path.basename(srcPath, ext);
+
+        for (const w of widths) {
+          const outDir = path.join(outBase, String(w), relDir);
+          await fs.ensureDir(outDir);
+          const outJpg = path.join(outDir, `${baseName}${ext}`);
+          const outWebp = path.join(outDir, `${baseName}.webp`);
+
+          // Resize and write files
+          await sharp(srcPath)
+            .resize({ width: w, withoutEnlargement: true })
+            .toFile(outJpg);
+
+          await sharp(srcPath)
+            .resize({ width: w, withoutEnlargement: true })
+            .webp({ quality: 80 })
+            .toFile(outWebp);
+        }
+        console.log('Optimized upload:', srcPath);
+      } catch (err: any) {
+        console.error('Background optimization failed:', err && err.message ? err.message : err);
+      }
+    })();
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -395,6 +430,19 @@ app.post('/api/publish', async (req, res) => {
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Development-only client error reporting endpoint used to capture runtime
+// exceptions from the browser during dev so errors can be diagnosed remotely.
+app.post('/__client-error', express.json(), (req, res) => {
+  try {
+    const payload = req.body || {};
+    console.error('[CLIENT ERROR]', payload.message || payload);
+    if (payload.stack) console.error(payload.stack);
+    res.sendStatus(204);
+  } catch (e) {
+    res.sendStatus(500);
   }
 });
 
