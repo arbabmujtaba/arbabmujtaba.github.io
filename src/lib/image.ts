@@ -30,6 +30,21 @@ export function normalizeImagePath(
 }
 
 /**
+ * Return a path to an optimized variant if it exists (convention-based).
+ * Example: '/uploads/photography/x.jpg' with width 800 -> '/_optimized/800/uploads/photography/x.webp'
+ */
+export function getOptimizedImagePath(path: string | undefined | null, width: number): string | null {
+  const p = normalizeImagePath(path);
+  if (!p) return null;
+  // strip leading slash for file path composition
+  const stripped = p.replace(/^\//, '');
+  // prefer webp variant if present; we assume the build step generates both .webp and original ext
+  const webp = `/ _optimized/${width}/${stripped}`.replace('/ _optimized', '/_optimized');
+  const webpPath = webp.replace(/\.[^.]+$/, '.webp');
+  return webpPath;
+}
+
+/**
  * Check whether a path is a valid image reference.
  */
 export function isValidImagePath(path: string | undefined | null): boolean {

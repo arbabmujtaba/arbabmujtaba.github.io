@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { normalizeImagePath } from '../lib/image';
+import { normalizeImagePath, getOptimizedImagePath } from '../lib/image';
 
 interface ParallaxImageProps {
   src: string;
   alt: string;
   className?: string;
   imageClassName?: string;
+  width?: number; // optional desired width for an optimized thumbnail
 }
 
 /**
@@ -34,6 +35,7 @@ export default function ParallaxImage({ src, alt, className = '', imageClassName
   const [failed, setFailed] = useState(false);
 
   const normalized = normalizeImagePath(src);
+  const optimized = width && normalized ? getOptimizedImagePath(normalized, width) : null;
   // Parallax runs on every device; it's only skipped when the visitor asked for
   // reduced motion or there's no image to show.
   const enabled = !shouldReduceMotion && !!normalized && !failed;
@@ -139,7 +141,7 @@ export default function ParallaxImage({ src, alt, className = '', imageClassName
         }
       >
         <img
-          src={normalized}
+          src={optimized || normalized!}
           alt={alt}
           loading="lazy"
           className={`w-full h-full object-cover ${imageClassName}`}

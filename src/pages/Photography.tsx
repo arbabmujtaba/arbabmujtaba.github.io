@@ -126,6 +126,7 @@ export default function Photography() {
                       {normalizeImagePath(photo.coverImage) ? (
                         <ParallaxImage
                           src={photo.coverImage}
+                          width={800}
                           alt={photo.title}
                           className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover/photo:border-orange-500/35 transition-colors"
                           imageClassName="grayscale-[20%] group-hover/photo:grayscale-0 transition-all duration-1000 scale-105 group-hover/photo:scale-100"
@@ -182,6 +183,7 @@ export default function Photography() {
                         {normalizeImagePath(photo.coverImage) ? (
                           <ParallaxImage
                             src={photo.coverImage}
+                           width={800}
                             alt={photo.title}
                             className="w-full aspect-[16/10] bg-zinc-900"
                             imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"

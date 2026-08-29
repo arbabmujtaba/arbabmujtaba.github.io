@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
-import Home from './pages/Home';
-import Portfolio from './pages/Portfolio';
-import Journal from './pages/Journal';
-import Tech from './pages/Tech';
-import Photography from './pages/Photography';
-import Collection from './pages/Collection';
-import Admin from './pages/Admin';
+const Home = lazy(() => import('./pages/Home'));
+const Portfolio = lazy(() => import('./pages/Portfolio'));
+const Journal = lazy(() => import('./pages/Journal'));
+const Tech = lazy(() => import('./pages/Tech'));
+const Photography = lazy(() => import('./pages/Photography'));
+const Collection = lazy(() => import('./pages/Collection'));
+const Admin = lazy(() => import('./pages/Admin'));
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import CursorAura from './components/CursorAura';
 import GlobalBackground from './components/GlobalBackground';
@@ -116,13 +116,15 @@ export default function App() {
             exit={{ opacity: 0, y: -24 }}
             transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
-            {view === 'home' && <Home setView={setView} />}
-            {view === 'portfolio' && <Portfolio />}
-            {view === 'journal' && <Journal />}
-            {view === 'tech' && <Tech />}
-            {view === 'photography' && <Photography />}
-            {view === 'collection' && <Collection />}
-            {view === 'admin' && <Admin setView={setView} />}
+            <Suspense fallback={<div className="p-8" aria-hidden="true" /> }>
+              {view === 'home' && <Home setView={setView} />}
+              {view === 'portfolio' && <Portfolio />}
+              {view === 'journal' && <Journal />}
+              {view === 'tech' && <Tech />}
+              {view === 'photography' && <Photography />}
+              {view === 'collection' && <Collection />}
+              {view === 'admin' && <Admin setView={setView} />}
+            </Suspense>
 
             {view !== 'admin' && (
               <motion.div
