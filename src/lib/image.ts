@@ -38,9 +38,10 @@ export function getOptimizedImagePath(path: string | undefined | null, width: nu
   if (!p) return null;
   // strip leading slash for file path composition
   const stripped = p.replace(/^\//, '');
-  // prefer webp variant if present; we assume the build step generates both .webp and original ext
-  const webp = `/ _optimized/${width}/${stripped}`.replace('/ _optimized', '/_optimized');
-  const webpPath = webp.replace(/\.[^.]+$/, '.webp');
+  // If the normalized path starts with the uploads directory, drop that
+  // prefix because optimized outputs live at `/_optimized/{width}/{collection}/...`.
+  const relative = stripped.replace(/^uploads\//, '');
+  const webpPath = `/_optimized/${width}/${relative}`.replace(/\.[^.]+$/, '.webp');
   return webpPath;
 }
 
@@ -52,10 +53,10 @@ export function getOptimizedSrcSet(path: string | undefined | null, widths: numb
   const p = normalizeImagePath(path);
   if (!p) return null;
   const stripped = p.replace(/^\//, '');
+  const relative = stripped.replace(/^uploads\//, '');
   const parts: string[] = [];
   for (const w of widths) {
-    const webp = `/ _optimized/${w}/${stripped}`.replace('/ _optimized', '/_optimized');
-    const webpPath = webp.replace(/\.[^.]+$/, '.webp');
+    const webpPath = `/_optimized/${w}/${relative}`.replace(/\.[^.]+$/, '.webp');
     parts.push(`${webpPath} ${w}w`);
   }
   return parts.join(', ');
