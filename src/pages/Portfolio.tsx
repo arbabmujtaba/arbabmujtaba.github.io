@@ -109,6 +109,7 @@ export default function Portfolio() {
                           alt={project.title}
                           className="w-full h-full opacity-60 mix-blend-luminosity"
                           imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                          sizes="(min-width: 1024px) 45vw, 100vw"
                         />
                       ) : (
                         <SafeImage src={project.projectImage} alt={project.title} className="w-full h-full opacity-40" />

@@ -38,12 +38,6 @@ export default function CinematicImageReveal({
   const frameOpacity = useTransform(progress, [0, 0.18, 0.86, 1], [0, 1, 1, 0.65]);
   const imageScale = useTransform(progress, [0, 1], [1.18, 1.02]);
   const imageY = useTransform(progress, [0, 1], ['-8%', '8%']);
-  const blurAmount = useTransform(progress, [0, 0.35], [12, 0]);
-  const brightness = useTransform(progress, [0, 0.45], [0.62, 1]);
-  const filter = useTransform(
-    [blurAmount, brightness],
-    ([blur, bright]) => `blur(${blur}px) brightness(${bright})`
-  );
 
   return (
     <section
@@ -56,12 +50,12 @@ export default function CinematicImageReveal({
       >
         <motion.img
           src={imageUrl}
-          srcSet={`${imageUrl.replace(/([?&])w=\d+/, '$1w=800')} 800w, ${imageUrl.replace(/([?&])w=\d+/, '$1w=1200')} 1200w, ${imageUrl.replace(/([?&])w=\d+/, '$1w=1800')} 1800w`}
+          srcSet={`${imageUrl.replace(/([?&])w=\d+/, '$1w=480')} 480w, ${imageUrl.replace(/([?&])w=\d+/, '$1w=768')} 768w, ${imageUrl.replace(/([?&])w=\d+/, '$1w=1280')} 1280w`}
           sizes="(max-width: 767px) 100vw, (max-width: 1280px) 90vw, 1152px"
           alt="A cinematic mountain landscape revealing the visual archive"
           loading="lazy"
           className="h-full w-full object-cover opacity-80 grayscale-[30%] transition-all duration-700 group-hover:grayscale-[12%]"
-          style={shouldAnimate ? { y: imageY, scale: imageScale, filter } : undefined}
+          style={shouldAnimate ? { y: imageY, scale: imageScale } : undefined}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09]/92 via-[#0a0a09]/20 to-[#0a0a09]/35" />

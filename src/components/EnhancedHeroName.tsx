@@ -14,12 +14,10 @@ export default function EnhancedHeroName() {
     hidden: {
       opacity: 0,
       y: shouldReduceMotion ? 0 : 64,
-      filter: shouldReduceMotion ? 'blur(0px)' : 'blur(10px)',
     },
     visible: {
       opacity: 1,
       y: 0,
-      filter: 'blur(0px)',
       transition: {
         duration: 0.85,
         ease: editorialEase,

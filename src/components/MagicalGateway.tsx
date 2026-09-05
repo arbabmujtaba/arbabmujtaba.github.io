@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { useMediaQuery } from '../lib/useMediaQuery';
+import { getLocalWebpSources, getUnsplashSrcSet } from '../lib/image';
 
 interface MagicalGatewayProps {
   label: string;
@@ -31,12 +32,14 @@ export default function MagicalGateway({
   const shouldReduceMotion = useReducedMotion();
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const shouldAnimate = !shouldReduceMotion && !isTouchDevice;
+  const localWebpSources = getLocalWebpSources(image, '(min-width: 768px) 50vw, 100vw');
+  const unsplashSrcSet = getUnsplashSrcSet(image);
 
   return (
     <motion.button
       type="button"
-      initial={{ opacity: 0, y: shouldAnimate ? 46 : 0, filter: shouldAnimate ? 'blur(8px)' : 'blur(0px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: shouldAnimate ? 46 : 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.28 }}
       transition={{ duration: 0.85, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
       whileHover={shouldAnimate ? { y: -6 } : undefined}
@@ -57,13 +60,22 @@ export default function MagicalGateway({
         }
         transition={{ duration: 14 + index, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <img
-          src={image}
-          alt=""
-          aria-hidden="true"
-          className="h-full w-full object-cover opacity-36 grayscale transition-all duration-700 group-hover:opacity-58 group-hover:grayscale-[28%]"
-          loading="lazy"
-        />
+        <picture className="block h-full w-full">
+          {localWebpSources && (
+            <source type="image/webp" srcSet={localWebpSources.srcSet} sizes={localWebpSources.sizes} />
+          )}
+          {unsplashSrcSet && (
+            <source srcSet={unsplashSrcSet} sizes="(min-width: 768px) 50vw, 100vw" />
+          )}
+          <img
+            src={image}
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover opacity-36 grayscale transition-all duration-700 group-hover:opacity-58 group-hover:grayscale-[28%]"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09] via-[#0a0a09]/55 to-[#0a0a09]/20" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(249,115,22,0.16),transparent_34%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
       </motion.div>

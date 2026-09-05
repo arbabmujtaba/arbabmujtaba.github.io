@@ -163,9 +163,9 @@ export default function Home({ setView }: HomeProps) {
   return (
     <motion.div
       key="home"
-      initial={{ opacity: 0, y: isTouchDevice ? 0 : 18, filter: isTouchDevice ? 'blur(0px)' : 'blur(10px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: isTouchDevice ? 0 : -22, filter: isTouchDevice ? 'blur(0px)' : 'blur(10px)' }}
+      initial={{ opacity: 0, y: isTouchDevice ? 0 : 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: isTouchDevice ? 0 : -22 }}
       transition={{ duration: isTouchDevice ? 0.2 : 0.9, ease: [0.16, 1, 0.3, 1] }}
       className="relative flex h-full flex-grow flex-col overflow-hidden"
     >

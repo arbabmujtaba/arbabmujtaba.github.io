@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { normalizeImagePath } from '../lib/image';
+import { getLocalWebpSources, normalizeImagePath } from '../lib/image';
 
 interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string | undefined;
@@ -21,6 +21,7 @@ export default function SafeImage({
   ...props
 }: SafeImageProps) {
   const normalized = normalizeImagePath(src);
+  const webpSources = getLocalWebpSources(normalized);
   const [failed, setFailed] = useState(false);
 
   if (!normalized || failed) {
@@ -30,15 +31,20 @@ export default function SafeImage({
   }
 
   return (
-    <img
-      src={normalized}
-      alt={alt}
-      className={className}
-      style={style}
-      onError={() => setFailed(true)}
-      loading="lazy"
-      decoding="async"
-      {...props}
-    />
+    <picture>
+      {webpSources && (
+        <source type="image/webp" srcSet={webpSources.srcSet} sizes={webpSources.sizes} />
+      )}
+      <img
+        src={normalized}
+        alt={alt}
+        className={className}
+        style={style}
+        onError={() => setFailed(true)}
+        loading="lazy"
+        decoding="async"
+        {...props}
+      />
+    </picture>
   );
 }
