@@ -6,6 +6,7 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 
 interface CinematicImageRevealProps {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -18,6 +19,8 @@ export default function CinematicImageReveal({
 }: CinematicImageRevealProps) {
   const targetRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
+  const shouldAnimate = !shouldReduceMotion && !isTouchDevice;
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -48,15 +51,17 @@ export default function CinematicImageReveal({
       className="relative z-20 flex min-h-[40vh] sm:min-h-[72vh] items-center px-6 py-20 md:min-h-screen md:px-12 lg:px-16"
     >
       <motion.div
-        style={shouldReduceMotion ? undefined : { scale: frameScale, opacity: frameOpacity }}
+        style={shouldAnimate ? { scale: frameScale, opacity: frameOpacity } : undefined}
         className="group relative mx-auto aspect-[4/3] sm:aspect-[16/10] w-full max-w-6xl overflow-hidden border border-zinc-800/55 bg-zinc-950 shadow-2xl shadow-black/55"
       >
         <motion.img
           src={imageUrl}
+          srcSet={`${imageUrl.replace(/([?&])w=\d+/, '$1w=800')} 800w, ${imageUrl.replace(/([?&])w=\d+/, '$1w=1200')} 1200w, ${imageUrl.replace(/([?&])w=\d+/, '$1w=1800')} 1800w`}
+          sizes="(max-width: 767px) 100vw, (max-width: 1280px) 90vw, 1152px"
           alt="A cinematic mountain landscape revealing the visual archive"
           loading="lazy"
           className="h-full w-full object-cover opacity-80 grayscale-[30%] transition-all duration-700 group-hover:grayscale-[12%]"
-          style={shouldReduceMotion ? undefined : { y: imageY, scale: imageScale, filter }}
+          style={shouldAnimate ? { y: imageY, scale: imageScale, filter } : undefined}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09]/92 via-[#0a0a09]/20 to-[#0a0a09]/35" />

@@ -3,20 +3,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
-import Home from './pages/Home';
-import Portfolio from './pages/Portfolio';
-import Journal from './pages/Journal';
-import Tech from './pages/Tech';
-import Photography from './pages/Photography';
-import Collection from './pages/Collection';
-import Admin from './pages/Admin';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import CursorAura from './components/CursorAura';
 import GlobalBackground from './components/GlobalBackground';
 import { resetAllScrolls } from './lib/scroll';
+import { useMediaQuery } from './lib/useMediaQuery';
+
+const Home = lazy(() => import('./pages/Home'));
+const Portfolio = lazy(() => import('./pages/Portfolio'));
+const Journal = lazy(() => import('./pages/Journal'));
+const Tech = lazy(() => import('./pages/Tech'));
+const Photography = lazy(() => import('./pages/Photography'));
+const Collection = lazy(() => import('./pages/Collection'));
+const Admin = lazy(() => import('./pages/Admin'));
 
 const PATH_TO_VIEW: Record<string, string> = {
   '/': 'home',
@@ -45,6 +47,7 @@ function getViewFromPath(path: string): string {
 
 export default function App() {
   const [view, setViewState] = useState(() => getViewFromPath(window.location.pathname));
+  const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
 
   const setView = useCallback((newView: string) => {
     const path = VIEW_TO_PATH[newView] || '/';
@@ -64,8 +67,6 @@ export default function App() {
   // Scroll to top on view change
   useEffect(() => {
     resetAllScrolls();
-    const timer = setTimeout(() => resetAllScrolls(), 800);
-    return () => clearTimeout(timer);
   }, [view]);
 
   // Keep routing synchronized on back/forward
@@ -111,27 +112,29 @@ export default function App() {
           <motion.div
             key={view}
             className="relative flex min-h-0 flex-1 flex-col"
-            initial={{ opacity: 0, y: 26 }}
+            initial={{ opacity: 0, y: isTouchDevice ? 0 : 26 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
-            transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: isTouchDevice ? 0 : -24 }}
+            transition={{ duration: isTouchDevice ? 0.2 : 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
-            {view === 'home' && <Home setView={setView} />}
-            {view === 'portfolio' && <Portfolio />}
-            {view === 'journal' && <Journal />}
-            {view === 'tech' && <Tech />}
-            {view === 'photography' && <Photography />}
-            {view === 'collection' && <Collection />}
-            {view === 'admin' && <Admin setView={setView} />}
+            <Suspense fallback={<div className="flex flex-1 bg-[#0a0a09]" />}>
+              {view === 'home' && <Home setView={setView} />}
+              {view === 'portfolio' && <Portfolio />}
+              {view === 'journal' && <Journal />}
+              {view === 'tech' && <Tech />}
+              {view === 'photography' && <Photography />}
+              {view === 'collection' && <Collection />}
+              {view === 'admin' && <Admin setView={setView} />}
+            </Suspense>
 
             {view !== 'admin' && (
               <motion.div
                 aria-hidden="true"
                 className="pointer-events-none fixed inset-0 z-[90]"
-                initial={{ opacity: 0.55 }}
+                initial={{ opacity: isTouchDevice ? 0.3 : 0.55 }}
                 animate={{ opacity: 0 }}
-                exit={{ opacity: 0.34 }}
-                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ opacity: isTouchDevice ? 0.18 : 0.34 }}
+                transition={{ duration: isTouchDevice ? 0.2 : 0.55, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   background:
                     'radial-gradient(circle at center, rgba(249,115,22,0.045), transparent 46%), rgba(10,10,9,0.58)',

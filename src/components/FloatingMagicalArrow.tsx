@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, Sparkle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 
 // Get and sort the unique scroll target offsets within the scrollable container
 const getScrollTargets = (container: HTMLElement) => {
@@ -53,8 +54,14 @@ const getScrollTargets = (container: HTMLElement) => {
 export default function FloatingMagicalArrow() {
   const [isScrollable, setIsScrollable] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const supportsDesktopControl = useMediaQuery('(min-width: 768px) and (hover: hover) and (pointer: fine)');
 
   useEffect(() => {
+    if (!supportsDesktopControl) {
+      setIsScrollable(false);
+      return;
+    }
+
     const updateScrollState = () => {
       // Find the active, currently displayed scroll container in the viewport
       const container = Array.from(document.querySelectorAll('.custom-scrollbar')).find(
@@ -91,7 +98,9 @@ export default function FloatingMagicalArrow() {
       window.removeEventListener('scroll', handleScroll, true);
       clearInterval(interval);
     };
-  }, []);
+  }, [supportsDesktopControl]);
+
+  if (!supportsDesktopControl) return null;
 
   const scrollDown = (e: React.MouseEvent) => {
     // Avoid double events or bubbles

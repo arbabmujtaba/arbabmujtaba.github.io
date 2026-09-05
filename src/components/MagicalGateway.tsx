@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 
 interface MagicalGatewayProps {
   label: string;
@@ -28,15 +29,17 @@ export default function MagicalGateway({
   featured = false,
 }: MagicalGatewayProps) {
   const shouldReduceMotion = useReducedMotion();
+  const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
+  const shouldAnimate = !shouldReduceMotion && !isTouchDevice;
 
   return (
     <motion.button
       type="button"
-      initial={{ opacity: 0, y: 46, filter: 'blur(8px)' }}
+      initial={{ opacity: 0, y: shouldAnimate ? 46 : 0, filter: shouldAnimate ? 'blur(8px)' : 'blur(0px)' }}
       whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       viewport={{ once: true, amount: 0.28 }}
       transition={{ duration: 0.85, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={shouldReduceMotion ? undefined : { y: -6 }}
+      whileHover={shouldAnimate ? { y: -6 } : undefined}
       whileTap={{ scale: 0.985 }}
       onClick={onClick}
       className={`group relative min-h-[14rem] sm:min-h-[18rem] overflow-hidden border border-zinc-800/55 bg-zinc-950/35 text-left outline-none backdrop-blur-sm transition-colors duration-500 hover:border-orange-400/50 focus-visible:border-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400/30 md:min-h-[26rem] ${
@@ -46,7 +49,7 @@ export default function MagicalGateway({
       <motion.div
         className="absolute inset-0"
         animate={
-          shouldReduceMotion
+          !shouldAnimate
             ? undefined
             : {
                 scale: [1.04, 1.08, 1.04],
@@ -74,7 +77,7 @@ export default function MagicalGateway({
             className="absolute h-1 w-1 rounded-full bg-orange-300 shadow-[0_0_18px_rgba(251,146,60,0.95)]"
             style={{ left: spark.x, top: spark.y }}
             animate={
-              shouldReduceMotion
+              !shouldAnimate
                 ? undefined
                 : {
                     opacity: [0, 0.9, 0],
@@ -112,7 +115,7 @@ export default function MagicalGateway({
             </span>
             <motion.span
               className="flex h-10 w-10 items-center justify-center border border-zinc-700/60 text-zinc-400 transition-colors duration-500 group-hover:border-orange-400/55 group-hover:text-orange-200"
-              animate={shouldReduceMotion ? undefined : { x: [0, 3, 0], y: [0, -3, 0] }}
+              animate={shouldAnimate ? { x: [0, 3, 0], y: [0, -3, 0] } : undefined}
               transition={{ duration: 2.3, repeat: Infinity, ease: 'easeInOut' }}
             >
               <ArrowUpRight className="h-4 w-4" strokeWidth={1.3} />

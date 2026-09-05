@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { normalizeImagePath } from '../lib/image';
+import { useMediaQuery } from '../lib/useMediaQuery';
 
 interface ParallaxImageProps {
   src: string;
@@ -31,12 +32,11 @@ export default function ParallaxImage({ src, alt, className = '', imageClassName
   const ref = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const supportsParallax = useMediaQuery('(min-width: 768px) and (hover: hover) and (pointer: fine)');
   const [failed, setFailed] = useState(false);
 
   const normalized = normalizeImagePath(src);
-  // Parallax runs on every device; it's only skipped when the visitor asked for
-  // reduced motion or there's no image to show.
-  const enabled = !shouldReduceMotion && !!normalized && !failed;
+  const enabled = supportsParallax && !shouldReduceMotion && !!normalized && !failed;
 
   useEffect(() => {
     if (!enabled) return;

@@ -5,6 +5,7 @@ import {
   useReducedMotion,
   useSpring,
 } from 'motion/react';
+import { useMediaQuery } from '../lib/useMediaQuery';
 
 /* ────────────────────────────────────────────────────────────────
  *  HERO PORTRAIT — single configurable image source.
@@ -34,22 +35,23 @@ const GRAIN_URL =
  */
 function usePointerParallax(strength: number) {
   const reduce = useReducedMotion();
+  const supportsPointerParallax = useMediaQuery('(min-width: 1024px) and (hover: hover) and (pointer: fine)');
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 55, damping: 18, restDelta: 0.001 });
   const sy = useSpring(y, { stiffness: 55, damping: 18, restDelta: 0.001 });
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !supportsPointerParallax) return;
     const onMove = (e: PointerEvent) => {
       x.set((e.clientX / window.innerWidth - 0.5) * strength);
       y.set((e.clientY / window.innerHeight - 0.5) * strength);
     };
     window.addEventListener('pointermove', onMove);
     return () => window.removeEventListener('pointermove', onMove);
-  }, [reduce, strength, x, y]);
+  }, [reduce, supportsPointerParallax, strength, x, y]);
 
-  return reduce ? { x: 0, y: 0 } : { x: sx, y: sy };
+  return reduce || !supportsPointerParallax ? { x: 0, y: 0 } : { x: sx, y: sy };
 }
 
 /* ════════════════════════════════════════════════════════════════

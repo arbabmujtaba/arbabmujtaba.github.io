@@ -14,6 +14,7 @@ import MagicalGateway from '../components/MagicalGateway';
 import Interlude from '../components/Interlude';
 import ScrollIndicator from '../components/ScrollIndicator';
 import { getHomeConfig } from '../lib/cms';
+import { useMediaQuery } from '../lib/useMediaQuery';
 import { HomeConfigEntry } from '../types';
 
 interface HomeProps {
@@ -134,6 +135,7 @@ function SectionHeading({
 export default function Home({ setView }: HomeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const { scrollY } = useScroll({ container: containerRef });
 
   const smoothScrollY = useSpring(scrollY, {
@@ -161,10 +163,10 @@ export default function Home({ setView }: HomeProps) {
   return (
     <motion.div
       key="home"
-      initial={{ opacity: 0, y: 18, filter: 'blur(10px)' }}
+      initial={{ opacity: 0, y: isTouchDevice ? 0 : 18, filter: isTouchDevice ? 'blur(0px)' : 'blur(10px)' }}
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: -22, filter: 'blur(10px)' }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      exit={{ opacity: 0, y: isTouchDevice ? 0 : -22, filter: isTouchDevice ? 'blur(0px)' : 'blur(10px)' }}
+      transition={{ duration: isTouchDevice ? 0.2 : 0.9, ease: [0.16, 1, 0.3, 1] }}
       className="relative flex h-full flex-grow flex-col overflow-hidden"
     >
       <div
