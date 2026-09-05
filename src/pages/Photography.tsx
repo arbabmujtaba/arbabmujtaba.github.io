@@ -71,16 +71,12 @@ export default function Photography() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
+      <div className="page-shell flex-grow overflow-y-auto custom-scrollbar pt-0 relative z-10">
 
-        {/* Hero Section */}
-        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[2.5rem] sm:text-[4rem] md:text-[7rem] lg:text-[12rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            PHOTOGRAPHY
-          </div>
+        <div className="page-intro" data-mark="FRAMES">
           <motion.p
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 relative z-10 flex items-center gap-4"
+            className="page-eyebrow"
           >
             <span>Home</span>
             <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
@@ -88,13 +84,13 @@ export default function Photography() {
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
+            className="page-title"
           >
             Photography
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
+            className="page-description"
           >
             A collection of moments gathered over the years. This is less of a portfolio and more of a personal visual diary, focusing on memories, people, and the stories carried within light.
           </motion.div>
@@ -107,12 +103,13 @@ export default function Photography() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-32 group border-t border-zinc-800/80 pt-12"
+            className="mb-24 md:mb-32 group content-rule pt-8 md:pt-12"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
               <div className="lg:col-span-3">
                 <div className="sticky top-24">
-                  <h2 className="font-serif text-3xl md:text-4xl text-zinc-200">Favorites</h2>
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400/80">Selected frames</p>
+                  <h2 className="font-serif text-4xl leading-none tracking-tight md:text-5xl text-zinc-200">Favorites</h2>
                   <p className="font-sans text-sm text-zinc-400 font-light mt-2">The most meaningful frames.</p>
                 </div>
               </div>
@@ -162,7 +159,7 @@ export default function Photography() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-zinc-800/80 pt-12"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 content-rule pt-8 md:pt-12"
               >
                 <div className="lg:col-span-3">
                   <div className="sticky top-24">
@@ -178,7 +175,7 @@ export default function Photography() {
                       onClick={() => setSelectedPhoto(photo)}
                       className="group cursor-pointer block"
                     >
-                      <div className="relative overflow-hidden mb-6 border border-zinc-850">
+                      <div className="image-frame mb-6">
                         {normalizeImagePath(photo.coverImage) ? (
                           <ParallaxImage
                             src={photo.coverImage}
@@ -215,7 +212,7 @@ export default function Photography() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-24 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-zinc-800/80 pt-12"
+            className="mb-24 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 content-rule pt-8 md:pt-12"
           >
             <div className="lg:col-span-3">
                <div className="sticky top-24">

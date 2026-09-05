@@ -27,16 +27,12 @@ export default function Journal() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-5xl mx-auto">
+      <div className="page-shell flex-grow overflow-y-auto custom-scrollbar pt-0 relative z-10">
 
-        {/* Hero Section */}
-        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            JOURNAL
-          </div>
+        <div className="page-intro" data-mark="JOURNAL">
           <motion.p
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 relative z-10 flex items-center gap-4"
+            className="page-eyebrow"
           >
             <span>Home</span>
             <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
@@ -44,13 +40,13 @@ export default function Journal() {
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
+            className="page-title"
           >
             Journal
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
+            className="page-description"
           >
             A personal archive of thoughts, late-night reflections, and milestones. Writing as a tool for figuring things out and finding stability in the noise of creating something real.
           </motion.div>
@@ -58,7 +54,7 @@ export default function Journal() {
 
         {/* Featured Story — the newest published entry, as a cinematic hero card */}
         {featuredEntry && (
-          <div className="mb-24 md:mb-32">
+          <div className="mb-24 md:mb-36">
             <JournalCard
               entry={featuredEntry}
               variant="featured"
@@ -75,10 +71,11 @@ export default function Journal() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-end justify-between border-t border-zinc-800/80 pt-10 mb-10 md:mb-12"
+              className="flex items-end justify-between content-rule pt-7 mb-10 md:mb-14"
             >
               <div>
-                <h2 className="font-serif text-3xl md:text-4xl text-zinc-200">The Archive</h2>
+                <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400/80">Past volumes</p>
+                <h2 className="font-serif text-4xl leading-none tracking-tight md:text-5xl text-zinc-200">The Archive</h2>
                 <p className="mt-2 max-w-md font-sans text-sm text-zinc-400 font-light">
                   Earlier entries from the journal — every chapter kept in full editorial detail.
                 </p>
@@ -88,7 +85,7 @@ export default function Journal() {
               </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
               {archiveEntries.map((entry, idx) => (
                 <JournalCard
                   key={entry.slug}

@@ -52,16 +52,13 @@ export default function Collection() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
+      <div className="page-shell flex-grow overflow-y-auto custom-scrollbar pt-0 relative z-10">
 
         {/* Hero Section */}
-        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            COLLECTION
-          </div>
+        <div className="page-intro" data-mark="INDEX">
           <motion.p
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 relative z-10 flex items-center gap-4"
+            className="page-eyebrow"
           >
             <span>Home</span>
             <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
@@ -69,13 +66,13 @@ export default function Collection() {
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
+            className="page-title"
           >
             Collection
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed relative z-10"
+            className="page-description"
           >
             A personal museum archive. Documenting the timelines, tools, literature, and soundscapes that shape my engineering journey and creative output.
           </motion.div>
@@ -88,20 +85,20 @@ export default function Collection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-32 relative"
+            className="mb-24 md:mb-32 relative"
           >
-            <div className="border-b border-zinc-800/80 pb-4 mb-16 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
-              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 01 — Journey</h2>
+            <div className="content-rule pb-4 mb-12 md:mb-16 flex items-end justify-between">
+              <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Exhibit 01 — Journey</h2>
               <Clock className="w-4 h-4 text-orange-500/80" strokeWidth={1} />
             </div>
 
-            <div className="relative border-l border-zinc-800/50 pl-8 md:pl-12 space-y-16 py-4 max-w-4xl">
+            <div className="relative border-l border-zinc-800/50 pl-8 md:pl-12 space-y-12 md:space-y-16 py-4 max-w-4xl">
               {timelineMilestones.map((milestone) => (
                 <div key={milestone.slug} className="relative group">
                   <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-[#0a0a09]/72 border-2 border-zinc-700 group-hover:border-orange-500 transition-colors"></div>
                   <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-8 mb-3">
                     <span className="font-mono text-sm md:text-base text-orange-500 shrink-0">{milestone.year}</span>
-                    <h3 className="font-serif text-2xl md:text-3xl text-zinc-200">{milestone.title}</h3>
+                    <h3 className="font-serif text-3xl leading-none tracking-tight md:text-4xl text-zinc-200">{milestone.title}</h3>
                   </div>
                   <p className="font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed md:ml-[4.5rem]">
                     {milestone.description}
@@ -122,8 +119,8 @@ export default function Collection() {
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col relative"
             >
-              <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
-                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 02 — Uses & Gear</h2>
+              <div className="content-rule pb-4 mb-10 flex items-end justify-between pt-7">
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Exhibit 02 — Uses & Gear</h2>
                 <Terminal className="w-4 h-4 text-orange-500" strokeWidth={1} />
               </div>
 
@@ -155,8 +152,8 @@ export default function Collection() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
             className="flex flex-col relative"
           >
-            <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
-              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 03 — Inspirations</h2>
+            <div className="content-rule pb-4 mb-10 flex items-end justify-between pt-7">
+            <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Exhibit 03 — Inspirations</h2>
               <Compass className="w-4 h-4 text-orange-500" strokeWidth={1} />
             </div>
 
@@ -205,9 +202,9 @@ export default function Collection() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col relative max-w-4xl mb-32"
           >
-            <div className="border-b border-zinc-800/80 pb-4 mb-12 flex items-end justify-between sticky top-0 bg-[#0a0a09]/72 backdrop-blur-sm z-20 pt-10">
-              <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Exhibit 04 — Music</h2>
-              <Disc3 className="w-4 h-4 text-orange-500/80 animate-[spin_4s_linear_infinite]" strokeWidth={1} />
+            <div className="content-rule pb-4 mb-10 flex items-end justify-between pt-7">
+              <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Exhibit 04 — Music</h2>
+              <Disc3 className="w-4 h-4 text-orange-500/80" strokeWidth={1} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">

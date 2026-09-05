@@ -35,16 +35,13 @@ export default function Portfolio() {
       transition={{ duration: 0.8 }}
       className="flex-grow flex flex-col relative overflow-hidden"
     >
-      <div className="flex-grow overflow-y-auto custom-scrollbar px-4 sm:px-6 md:p-12 lg:p-16 pt-0 relative z-10 w-full max-w-7xl mx-auto">
+      <div className="page-shell flex-grow overflow-y-auto custom-scrollbar pt-0 relative z-10">
         
         {/* Hero Section */}
-        <div className="mb-16 md:mb-24 lg:mb-32 mt-8 sm:mt-12 md:mt-32 max-w-4xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 -translate-x-[5%] -translate-y-[25%] text-[3rem] sm:text-[5rem] md:text-[8rem] lg:text-[14rem] font-serif font-bold tracking-tighter opacity-100 select-none pointer-events-none text-outline z-0">
-            PORTFOLIO
-          </div>
+        <div className="page-intro" data-mark="WORK">
           <motion.p 
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 relative z-10 flex items-center gap-4"
+            className="page-eyebrow"
           >
             <span>Home</span>
             <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
@@ -52,13 +49,13 @@ export default function Portfolio() {
           </motion.p>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="font-serif font-medium text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] leading-none text-zinc-100 tracking-tighter relative z-10"
+            className="page-title"
           >
             Portfolio
           </motion.h1>
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="mt-12 max-w-xl font-sans text-sm md:text-base text-zinc-400 font-light leading-relaxed space-y-4 relative z-10"
+            className="page-description"
           >
             <p className="text-lg">
               A collection of engineering case studies. Building with an emphasis on performance, precision, and robust architectures.
@@ -74,11 +71,12 @@ export default function Portfolio() {
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="mb-32"
         >
-          <div className="border-b border-zinc-800/80 pb-4 mb-16">
-            <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Case Studies</h2>
+          <div className="content-rule pt-7 mb-12 md:mb-20 flex items-baseline justify-between">
+            <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Selected case studies</h2>
+            <span className="font-mono text-[10px] text-zinc-600">00{projects.length}</span>
           </div>
 
-          <div className="space-y-16 md:space-y-24 lg:space-y-32 mb-16 md:mb-24 lg:mb-32">
+          <div className="space-y-12 md:space-y-16 lg:space-y-20 mb-16 md:mb-24 lg:mb-32">
             {projects.map((project, idx) => {
               // Extract string array tags
               const tags: string[] = Array.isArray(project.techStack) 
@@ -89,12 +87,12 @@ export default function Portfolio() {
                 <div 
                   key={idx} 
                   onClick={() => setSelectedProject(project)}
-                  className="group flex flex-col lg:flex-row gap-8 lg:gap-16 cursor-pointer"
+                  className="group grid cursor-pointer gap-8 border-b border-zinc-800/70 pb-12 last:border-0 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-center lg:gap-16 lg:pb-16"
                 >
-                  <div className="lg:w-[45%] order-2 lg:order-1 flex flex-col justify-center">
-                    <span className="font-sans text-[9px] text-orange-500 mb-4 tracking-[0.2em] font-light">0{idx + 1}</span>
-                    <h3 className="font-serif text-3xl md:text-4xl text-zinc-100 mb-6 group-hover:text-amber-100 transition-colors">{project.title}</h3>
-                    <p className="font-sans text-zinc-400 text-sm font-light leading-relaxed mb-8 max-w-md">
+                  <div className="order-2 flex flex-col justify-center lg:order-1">
+                    <span className="font-mono text-[10px] text-orange-400 mb-5 tracking-[0.2em]">0{idx + 1} / CASE STUDY</span>
+                    <h3 className="font-serif text-4xl leading-[0.95] tracking-tight md:text-5xl text-zinc-100 mb-6 group-hover:text-orange-100 transition-colors">{project.title}</h3>
+                    <p className="font-sans text-zinc-400 text-sm font-light leading-relaxed mb-8 max-w-md md:text-base">
                       {project.description}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -103,8 +101,8 @@ export default function Portfolio() {
                       ))}
                     </div>
                   </div>
-                  <div className="lg:w-[55%] order-1 lg:order-2">
-                    <div className="aspect-[4/3] bg-zinc-900 border border-zinc-800/50 relative overflow-hidden flex items-center justify-center group-hover:border-orange-500/30 transition-colors duration-700">
+                  <div className="order-1 lg:order-2">
+                    <div className="image-frame aspect-[4/3] flex items-center justify-center">
                       {normalizeImagePath(project.projectImage) ? (
                         <ParallaxImage 
                           src={project.projectImage}
@@ -123,9 +121,9 @@ export default function Portfolio() {
             })}
           </div>
 
-          <div className="border-t border-zinc-800/80 pt-16 mt-32 mb-24">
+          <div className="content-rule pt-8 mt-24 mb-24">
              <div className="mb-12">
-                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-zinc-500">Technical Context</h2>
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Technical context</h2>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
                 {technicalSkills.map((section, idx) => (
