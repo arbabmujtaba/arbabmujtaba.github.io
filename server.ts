@@ -8,7 +8,7 @@ import { createServer as createViteServer } from 'vite';
 import http from 'http';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { transitionState, getItem, saveItem, createItem, deleteItem, initialize, getStateStats, ContentState } from './src/lib/contentState';
+import { transitionState, getItem, getAllItems, saveItem, createItem, deleteItem, initialize, getStateStats, ContentState } from './src/lib/contentState';
 import { PreviewDocument } from './src/components/PreviewDocument';
 import { PublishingService } from './src/services/PublishingService';
 import { DeploymentService } from './src/services/DeploymentService';
@@ -113,6 +113,22 @@ app.use((req, res, next) => {
 // Enable robust JSON parsing for incoming editor requests
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+/**
+ * Respond 500 and leave a trace.
+ *
+ * Handlers used to answer `res.status(500).json({ error: error.message })` and
+ * log nothing, so a failed request showed up in the browser as "Failed to load
+ * dynamic contents" with no corresponding line anywhere on the server — there
+ * was no way to find out what had actually thrown. Anything that reaches here
+ * now names the route and prints the stack.
+ */
+function fail(res: Response, error: unknown, context: string): void {
+  const err = error instanceof Error ? error : new Error(String(error));
+  console.error(`[api] ${context} failed: ${err.message}`);
+  if (err.stack) console.error(err.stack);
+  res.status(500).json({ error: err.message, context });
+}
 
 /**
  * MUTATION GUARD
@@ -258,6 +274,19 @@ app.get('/api/content', async (req, res) => {
     const collections = COLLECTIONS;
     const allItems: any[] = [];
 
+    /**
+     * One registry read for the whole request.
+     *
+     * This previously called getItem() per markdown file, and getItem re-reads
+     * and re-parses content-state.json every time — around a hundred reads of
+     * the same file to serve one listing. Besides the waste, it left a wide
+     * window in which a concurrent registry write could make a read fail and
+     * turn the whole listing into a 500.
+     */
+    const registryIndex = new Map(
+      (await getAllItems()).map((item) => [`${item.collection}/${item.slug}`, item])
+    );
+
     for (const col of collections) {
       const colDir = path.join(CONTENT_DIR, col);
       if (!(await fs.pathExists(colDir))) continue;
@@ -268,11 +297,30 @@ app.get('/api/content', async (req, res) => {
 
         const filePath = path.join(colDir, file);
         const raw = await fs.readFile(filePath, 'utf-8');
-        const { data, content } = matter(raw);
+
+        /**
+         * Parse per file, and survive a bad one.
+         *
+         * A single malformed front-matter block used to throw out of this loop
+         * and turn the whole listing into a 500 — one stray character in one
+         * gear file made the entire admin unusable, and because the browser's
+         * markdown parser is more forgiving the public site looked fine, so
+         * there was nothing to point at. Now the broken file is reported as an
+         * item carrying its own error, which is what lets it be found and fixed.
+         */
+        let data: Record<string, any> = {};
+        let frontMatterError: string | undefined;
+        try {
+          ({ data } = matter(raw) as { data: Record<string, any> });
+        } catch (parseError: any) {
+          frontMatterError = String(parseError?.message || parseError).split('\n')[0];
+          console.error(`[api] invalid front-matter in content/${col}/${file}: ${frontMatterError}`);
+        }
+
         const slug = data.slug || file.replace('.md', '');
 
         // Merge publishing state from registry
-        const registryItem = await getItem(col, slug);
+        const registryItem = registryIndex.get(`${col}/${slug}`);
 
         allItems.push({
           collection: col,
@@ -284,6 +332,7 @@ app.get('/api/content', async (req, res) => {
           coverImage: data.coverImage || data.featuredImage || data.projectImage || data.image || '',
           excerpt: data.excerpt || data.description || '',
           filePath: `content/${col}/${file}`,
+          frontMatterError,
           state: registryItem?.state || 'draft',
           unsavedChanges: registryItem?.unsavedChanges || false,
           publishedAt: registryItem?.publishedAt
@@ -300,7 +349,7 @@ app.get('/api/content', async (req, res) => {
 
     res.json(allItems);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    fail(res, error, 'GET /api/content');
   }
 });
 
@@ -928,6 +977,16 @@ async function startServer() {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
+
+  /**
+   * Last-resort error handler. Registered after every route and after the Vite
+   * middleware, so anything that throws without its own try/catch still names
+   * itself in the server log instead of surfacing as a bare 500 in the browser.
+   */
+  app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
+    if (res.headersSent) return next(error);
+    fail(res, error, `${req.method} ${req.originalUrl}`);
+  });
 
   app.listen(PORT, HOST, () => {
     console.log(`Server is booted at http://localhost:${PORT} (bound to ${HOST} only)`);

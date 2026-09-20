@@ -10,37 +10,6 @@ import { JournalEntry } from '../types';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-/* --------------------------------------------------------------------------
-   BONE SURFACE INK CORRECTION
-   --------------------------------------------------------------------------
-   `data-surface="bone"` inverts the whole subtree, but the two faintest ink
-   slots collapse toward the paper when it does. Measured against the bone
-   background (`--rushes-bone`):
-
-     --ink-5 (text-zinc-500)  2.75:1   fails even the 3:1 large-text floor
-     --ink-4 (text-zinc-400)  3.89:1   fails the 4.5:1 body-text floor
-     --ink-6 (text-zinc-600)  2.11:1   fails everything
-     --ink-3 (text-zinc-300)  6.52:1   passes AA for body text
-
-   The dim resting states live inside primitives (NumberedItem, Accordion,
-   RecLabel) and inside the shared `.page-description` rule in index.css —
-   neither of which this page may edit — so the correction is applied once, at
-   the token level, for this subtree only: zinc-400 and zinc-500 resolve to the
-   zinc-300 ink, and zinc-600 steps up to the old zinc-400 value. Both objects
-   reference the surface's own tokens, so there are no colour literals here and
-   the dark surface is untouched.
-
-   Two elements are needed because custom properties resolve against the values
-   cascaded on the *same* element: --ink-6 must read --ink-4 before --ink-4 is
-   itself reassigned, so the faint step is set on the outer element and the
-   muted steps on the inner one.
-   -------------------------------------------------------------------------- */
-const BONE_FAINT_INK = { '--ink-6': 'var(--ink-4)' } as React.CSSProperties;
-const BONE_MUTED_INK = {
-  '--ink-4': 'var(--ink-3)',
-  '--ink-5': 'var(--ink-3)',
-} as React.CSSProperties;
-
 export default function Journal() {
   const openEntry = useOpenEntry();
   const shouldReduceMotion = useReducedMotion();
@@ -70,15 +39,8 @@ export default function Journal() {
       transition={{ duration: shouldReduceMotion || isTouchDevice ? 0.2 : 0.8, ease: EASE }}
       className="relative flex h-full flex-grow flex-col overflow-hidden"
     >
-      {/* The reading page is printed on paper. bg-canvas resolves to bone inside
-          the surface, so the sheet is opaque and fills the frame; the modal is
-          deliberately mounted outside it and stays on the dark surface. */}
-      <div
-        data-surface="bone"
-        style={BONE_FAINT_INK}
-        className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto bg-canvas"
-      >
-        <div style={BONE_MUTED_INK} className="flex min-h-full flex-col">
+      <div className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto">
+        <div className="flex min-h-full flex-col">
           <div className="page-shell">
             <header className="page-intro" data-mark="JOURNAL">
               <RecLabel>journal</RecLabel>

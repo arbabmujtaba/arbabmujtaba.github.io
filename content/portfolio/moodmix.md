@@ -8,7 +8,7 @@ techStack:
   - Spatial Audio
 githubLink: ""
 liveLink: ""
-projectImage: ""
+projectImage: "/uploads/photography/1782621003839-87347598.jpg"
 featured: false
 ---
 

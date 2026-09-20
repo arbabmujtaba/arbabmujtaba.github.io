@@ -39,11 +39,18 @@ older code, this file wins. Verified against the reference screenshots in
 | `text-alarm` / `bg-alarm` | deep red `#c22e1f` — REC dot, destructive | |
 | `text-moss` | `#7fa654` — success / published | |
 | `text-signal` / `bg-signal` | acid lime `#e4fe00` | **admin in-flight states only.** Never on public pages — it appears nowhere in the reference. |
-| `bg-bone` | `#f4f2ed` | only via `data-surface="bone"` |
+| `bg-bone` | `#f4f2ed` | only via `data-surface="bone"` — **no page opts in today** |
 
 Every `zinc-*` and `orange-*` utility is re-pointed at surface-aware slots, so adding
 `data-surface="bone"` to any wrapper inverts that whole subtree with no other changes. `orange-*` is
 legacy — write `accent` in new code.
+
+The Journal and Collection indexes were briefly set on the bone surface. They are back on the dark
+canvas at the owner's request: on an otherwise near-black site, a full-page paper surface read as a
+rendering fault rather than an editorial choice. The surface itself is kept because it is where a
+long-form reading view would go if one is ever wanted — but if you opt a subtree in, re-measure the
+two faintest ink steps first: against bone, `--ink-5` lands at 2.75:1 and `--ink-6` at 2.11:1, both
+below the floor, which is why the removed pages each carried a token correction.
 
 ## 3. Primitives — `src/components/rushes` (import from the barrel)
 

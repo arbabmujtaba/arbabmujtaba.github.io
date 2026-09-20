@@ -23,25 +23,6 @@ import { CollectionEntry, GearItem } from '../types';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-/* --------------------------------------------------------------------------
-   BONE SURFACE INK CORRECTION
-   --------------------------------------------------------------------------
-   Identical to Journal.tsx — see the long note there. Measured against the bone
-   background (`--rushes-bone`), --ink-5 (text-zinc-500) lands at 2.75:1, --ink-4
-   (text-zinc-400, and the shared `.page-description` rule) at 3.89:1 and
-   --ink-6 (text-zinc-600) at 2.11:1, all below the 4.5:1 body-text floor, while
-   --ink-3 (text-zinc-300) measures 6.52:1. The dim resting states belong to the
-   primitives and to index.css, so the two faintest steps are lifted once at the
-   token level for this subtree. No colour literals: every value is one of the
-   surface's own tokens. Two elements are required because --ink-6 must read
-   --ink-4 before --ink-4 is itself reassigned.
-   -------------------------------------------------------------------------- */
-const BONE_FAINT_INK = { '--ink-6': 'var(--ink-4)' } as React.CSSProperties;
-const BONE_MUTED_INK = {
-  '--ink-4': 'var(--ink-3)',
-  '--ink-5': 'var(--ink-3)',
-} as React.CSSProperties;
-
 /** Gear tiers, in catalogue order. Categories with no entries are skipped. */
 const GEAR_TIERS: GearItem['category'][] = [
   'Cameras',
@@ -190,15 +171,14 @@ export default function Collection() {
       transition={{ duration: shouldReduceMotion || isTouchDevice ? 0.2 : 0.8, ease: EASE }}
       className="relative flex h-full flex-grow flex-col overflow-hidden"
     >
-      {/* The catalogue is printed on paper, same as the journal. The modal is
-          mounted outside this subtree so it keeps the dark surface. */}
+      {/* The catalogue sits on the dark canvas, like every other page. The bone
+          surface remains available in index.css for a future long-form reading
+          view; nothing opts into it today. */}
       <div
         ref={scrollRef}
-        data-surface="bone"
-        style={BONE_FAINT_INK}
-        className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto bg-canvas"
+        className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto"
       >
-        <div style={BONE_MUTED_INK} className="flex min-h-full flex-col">
+        <div className="flex min-h-full flex-col">
           <div className="page-shell">
             <header className="page-intro" data-mark="INDEX">
               <RecLabel>index</RecLabel>

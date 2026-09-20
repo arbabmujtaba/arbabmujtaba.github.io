@@ -2,7 +2,7 @@
 title: "Fuji X-T4 // Everyday Carry"
 slug: fuji-x-t4
 category: Cameras
-description: "Compact APS-C mirrorless camera for everyday photography and travel.")
+description: "Compact APS-C mirrorless camera for everyday photography and travel."
 image: ""
 order: 2
 visible: true

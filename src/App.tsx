@@ -6,6 +6,7 @@
 import { lazy, Suspense, useState, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
+import CursorWand from './components/CursorWand';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import GlobalBackground from './components/GlobalBackground';
 import { PillButton } from './components/rushes';
@@ -149,6 +150,10 @@ export default function App() {
     <EntryNavigationProvider value={openEntry}>
       <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 overflow-x-hidden">
         <GlobalBackground />
+
+        {/* Pointer follower. Outside the framed layout so it can cross the frame,
+            and skipped on the admin surface, where precision matters more. */}
+        {!isAdmin && <CursorWand />}
 
         {/* Outer Border Frame */}
         <div className="flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800 relative z-10 flex flex-col overflow-hidden">

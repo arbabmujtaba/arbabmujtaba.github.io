@@ -7,7 +7,7 @@ techStack:
   - Geospatial
 githubLink: ""
 liveLink: ""
-projectImage: ""
+projectImage: "/uploads/photography/1782620609532-894300443.jpg"
 featured: false
 ---
 

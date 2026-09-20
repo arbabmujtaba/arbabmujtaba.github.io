@@ -29,6 +29,24 @@ Columns used throughout:
 | `gateway-collection` (05 // Curator) | `/uploads/photography/1782621000816-524714599.jpg` | 640×1297 | portrait | 0.12 MB | 114 / 85 / 52% | Night desk with a retro radio, a mug and a lit screen — objects and music, the curator's shelf rather than the engineer's bench. Caveat below. |
 | Section backdrops | **none — do not assign one** | — | — | — | — | See "No candidate" below. |
 
+## Project plates
+
+`projectImage` in `content/portfolio/*.md`. These were empty after the Unsplash placeholders came
+out, so the three featured projects rendered as bare grain on the home page. Each is now matched to
+a frame whose *subject* relates to the project — no stock imagery, and nothing decorative standing
+in for a screenshot the owner does not have.
+
+| Project | File | Why this one |
+|---|---|---|
+| Kashmiri AI Assistant *(featured)* | `/uploads/photography/1782633185852-244920274.jpeg` | A Kashmir river valley under cloud, 3000×4000. The project interprets and generates conversational Kashmiri, so the place *is* the subject matter, and it is the strongest landscape in the archive for the largest plate on the home page. |
+| Network Simulator *(featured)* | `/uploads/photography/1782620402626-664910063.jpg` | A floodlight mast silhouetted against a sunburst — the nearest thing in the archive to a transmission tower, for a tool that models packet transfer and topologies. Unreferenced anywhere else, so it collides with nothing. |
+| Student Attendance System *(featured)* | `/uploads/photography/1783414461952-773184125.jpeg` | The owner's desk: laptop, handwritten notes. A coursework build belongs on the coursework bench. Shared with `gateway-portfolio`, which is the same idea in a different slot. |
+| DAVV Login Portal | `/uploads/collection/1781797866868-433918712.png` | A screenshot of the owner's own repository. IMAGE_MAP rejects screenshots as *decorative backdrops*, but as the plate for a piece of software a code artefact is on-subject rather than decoration. |
+| MoodMix | `/uploads/photography/1782621003839-87347598.jpg` | Headphones and earbuds on the desk, for a spatial-audio and DSP project. |
+| GeoProject | `/uploads/photography/1782620609532-894300443.jpg` | Gulmarg: meadow, treeline, hut. Terrain for a geospatial analysis tool. Only 736×981, which is fine at card size and nowhere near full-bleed. |
+| SpecWars | **none — deliberately** | A React/Node real-time web app. There is no photograph of it, and inventing one would be decoration pretending to be evidence. `FrameCard` falls back to the hairline grid, and `Portfolio.tsx` drops it from the plate grid while keeping it in the numbered index. |
+| Spotify Backend | **none — deliberately** | Same reasoning. The only remaining audio frame is a near-duplicate of MoodMix's, and two almost identical plates on one page read as a mistake. |
+
 ### Caveats on the above
 
 - **EXIF orientation.** `photography/1785134270800-642096424.jpeg` is the only file in the archive

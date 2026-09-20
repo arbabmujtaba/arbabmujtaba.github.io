@@ -7,7 +7,7 @@ techStack:
   - MySQL
 githubLink: ""
 liveLink: ""
-projectImage: ""
+projectImage: "/uploads/collection/1781797866868-433918712.png"
 featured: false
 ---
 
