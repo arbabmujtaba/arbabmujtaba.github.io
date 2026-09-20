@@ -91,7 +91,9 @@ export class DeploymentService {
           }
         : null,
       websiteUrl,
-      repoUrl,
+      // getRepoUrl resolves to undefined when there is no origin remote, but the
+      // status is serialised to JSON, where undefined would drop the key entirely.
+      repoUrl: repoUrl ?? null,
       latestResult: lastCompleted?.status === 'success' ? 'success' : lastCompleted?.status === 'error' ? 'failed' : 'unknown',
       publishingQueue: pending,
       stats: {

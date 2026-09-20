@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { getLiveEditBridgeScript } from '../lib/liveEditBridge';
 import { mapElementToContent, type ClickedElementPayload, type MappedElement, type ContentItem } from '../lib/elementMapper';
+import type { ToastType } from './Toast';
 
 // Types
 interface CMSItem {
@@ -51,7 +52,7 @@ const PAGE_OPTIONS = [
 interface LiveEditorProps {
   content: CMSItem[];
   onNavigateToEditor: (item: CMSItem) => void;
-  onToast: (type: string, msg: string) => void;
+  onToast: (type: ToastType, msg: string) => void;
 }
 
 export default function LiveEditor({ content, onNavigateToEditor, onToast }: LiveEditorProps) {

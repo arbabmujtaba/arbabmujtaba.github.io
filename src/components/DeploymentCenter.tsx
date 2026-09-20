@@ -164,7 +164,7 @@ export default function DeploymentCenter() {
         <div className="border border-zinc-900 bg-zinc-950/50 p-5 rounded-sm">
           <span className="block font-mono text-[9px] uppercase tracking-widest text-zinc-500 mb-3">Pending</span>
           <span className="font-serif text-3xl font-medium text-zinc-100">{status?.stats.pendingCount || 0}</span>
-          {status?.stats.pendingCount > 0 && (
+          {(status?.stats.pendingCount ?? 0) > 0 && (
             <Loader2 className="w-4 h-4 text-orange-500 animate-spin mt-2" />
           )}
         </div>
