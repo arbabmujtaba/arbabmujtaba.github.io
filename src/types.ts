@@ -57,6 +57,10 @@ export interface JournalEntry {
   featuredImage?: string;
   /** Legacy alias kept in sync with featuredImage for back-compat (modal, live-edit). */
   coverImage?: string;
+  /** Short clip (.mp4/.webm) or .gif shown as a motion plate in the entry. */
+  video?: string;
+  /** Still frame shown before the clip plays, and while a GIF is paused. */
+  videoPoster?: string;
   excerpt: string;
   /** Display reading time, e.g. "5 min read". Auto-derived from the body when omitted. */
   readingTime?: string;
@@ -76,6 +80,9 @@ export interface TechEntry {
   date: string;
   category: "Tech News" | "Things I Like" | "Build Logs" | "Experiments" | "Linux" | "Networking" | "Programming";
   coverImage?: string;
+  /** Short clip (.mp4/.webm) or .gif shown as a motion plate in the entry. */
+  video?: string;
+  videoPoster?: string;
   excerpt: string;
   body: string;
   customization?: PostCustomization;
@@ -94,6 +101,9 @@ export interface PhotographyEntry {
   gear?: string[];
   /** Optional capture mode / technique line (e.g. "Natural Light", "35mm f/1.8"). */
   captureMode?: string;
+  /** Short clip (.mp4/.webm) or .gif — a frame that moves. */
+  video?: string;
+  videoPoster?: string;
   customization?: PostCustomization;
 }
 
@@ -102,6 +112,9 @@ export interface CollectionEntry {
   slug: string;
   category: "Uses" | "Music" | "Books" | "Gear" | "Timeline" | "Inspirations" | "Favorites";
   coverImage?: string;
+  /** Short clip (.mp4/.webm) or .gif shown as a motion plate in the entry. */
+  video?: string;
+  videoPoster?: string;
   description: string;
   body: string;
   customization?: PostCustomization;
@@ -115,6 +128,9 @@ export interface PortfolioProject {
   githubLink?: string;
   liveLink?: string;
   projectImage: string;
+  /** Screen recording or demo clip — the thing a static plate cannot show. */
+  video?: string;
+  videoPoster?: string;
   featured: boolean;
   body: string;
   customization?: PostCustomization;
@@ -184,12 +200,19 @@ export interface PhotoGalleryItem {
 export interface HomeConfigEntry {
   title: string;
   slug: string;
-  configType: "gateway" | "quote" | "principle" | "profile" | "section";
+  /**
+   * `reel` is a short clip on the home page — the one block that moves on its
+   * own. Everything else is a still composition.
+   */
+  configType: "gateway" | "quote" | "principle" | "profile" | "section" | "reel";
   /** For interlude blocks (configType "quote"): which visual template to render. */
   variant?: "quote" | "statement" | "marquee" | "stat";
   label?: string;
   description?: string;
   image?: string;
+  /** For `reel` blocks: the clip, and the still shown before it plays. */
+  video?: string;
+  videoPoster?: string;
   author?: string;
   text?: string;
   navTarget?: string;

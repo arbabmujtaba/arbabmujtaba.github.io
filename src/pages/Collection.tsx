@@ -126,6 +126,9 @@ export default function Collection() {
         title: item.title,
         meta: item.category,
         body: plainText(item.description),
+        // Both are authored in the CMS and were previously dropped on the floor.
+        icon: item.icon,
+        href: item.link,
       })),
     [favoriteItems]
   );
@@ -189,7 +192,7 @@ export default function Collection() {
                 transition={{ duration: shouldReduceMotion ? 0.3 : 0.95, delay: 0.1, ease: EASE }}
                 className="page-title mt-7"
               >
-                collection
+                Collection
               </motion.h1>
 
               <motion.p
@@ -249,7 +252,7 @@ export default function Collection() {
                           paper, which fails at chip size. */}
                       <TagChip>{milestone.year}</TagChip>
 
-                      <h3 className="mt-5 font-display text-2xl font-medium lowercase leading-[1.02] tracking-[-0.04em] text-zinc-50 md:text-4xl">
+                      <h3 className="mt-5 font-display text-2xl font-medium leading-[1.02] tracking-[-0.04em] text-zinc-50 md:text-4xl">
                         {milestone.title}
                       </h3>
 
@@ -300,6 +303,7 @@ export default function Collection() {
                                   : blurb
                             }
                             meta={isPhone ? undefined : figure}
+                            thumbnail={item.image}
                           />
                         );
                       })}

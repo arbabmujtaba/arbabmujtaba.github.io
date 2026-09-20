@@ -1,5 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react';
+import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
+import { normalizeImagePath } from '../../lib/image';
 
 interface NumberedItemProps {
   /** Position in the list; rendered zero-padded. */
@@ -16,6 +18,11 @@ interface NumberedItemProps {
    * while a plain left click still runs `onClick` (the quick look).
    */
   href?: string;
+  /**
+   * Small square still shown before the number. Gear entries carry an `image`
+   * in their front-matter which previously had nowhere to render.
+   */
+  thumbnail?: string;
   className?: string;
 }
 
@@ -38,19 +45,32 @@ export default function NumberedItem({
   meta,
   onClick,
   href,
+  thumbnail,
   className = '',
 }: NumberedItemProps) {
   const shouldReduceMotion = useReducedMotion();
   const interactive = typeof onClick === 'function';
   const number = String(index).padStart(2, '0');
 
+  const resolvedThumbnail = normalizeImagePath(thumbnail);
+
   const content = (
     <>
+      {resolvedThumbnail && (
+        <span className="image-frame h-12 w-12 shrink-0 overflow-hidden md:h-14 md:w-14">
+          <SafeImage
+            src={resolvedThumbnail}
+            alt={label}
+            className="h-full w-full object-cover"
+          />
+        </span>
+      )}
+
       <span className="w-7 shrink-0 pt-2 font-mono text-[11px] leading-none text-zinc-500 transition-colors group-hover/item:text-accent">
         {number}
       </span>
 
-      <span className="min-w-0 flex-1 font-display text-2xl font-medium lowercase leading-[1.05] tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 group-focus-visible/item:text-zinc-50 md:text-4xl lg:text-5xl">
+      <span className="min-w-0 flex-1 font-display text-2xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 group-focus-visible/item:text-zinc-50 md:text-4xl lg:text-5xl">
         {label}
       </span>
 

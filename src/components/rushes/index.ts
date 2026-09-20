@@ -17,6 +17,7 @@ export { default as CountUp } from './CountUp';
 export { default as TagChip } from './TagChip';
 export { default as Accordion } from './Accordion';
 export { default as FrameCard } from './FrameCard';
+export { default as MotionPlate } from './MotionPlate';
 export { default as PillButton } from './PillButton';
 export { default as QuotePanel } from './QuotePanel';
 export { default as ImageTypeMask } from './ImageTypeMask';

@@ -299,7 +299,7 @@ export default function Photography() {
             transition={{ duration: 1, delay: 0.25, ease: EASE }}
             className="page-title mt-7"
           >
-            photography
+            Photography
           </motion.h1>
 
           <motion.div
@@ -390,7 +390,7 @@ export default function Photography() {
                       <TagChip tone="accent">{leadPhoto.category}</TagChip>
                     </div>
 
-                    <h2 className="mt-4 font-display text-3xl font-medium lowercase leading-[0.95] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-6xl">
+                    <h2 className="mt-4 font-display text-3xl font-medium leading-[0.95] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-6xl">
                       {leadPhoto.title}
                     </h2>
 

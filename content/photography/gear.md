@@ -1,5 +1,5 @@
 ---
-title: GEAR
+title: Gear
 category: Gear
 date: '2026-06-28'
 excerpt: ''

@@ -50,6 +50,10 @@ export interface DetailEntry {
   /** Pre-formatted display date, matching the rest of the site. */
   date?: string;
   coverImage?: string;
+  /** Short clip or GIF, rendered as a motion plate above the body. */
+  video?: string;
+  /** Still shown before the clip plays. Falls back to the cover image. */
+  videoPoster?: string;
   excerpt?: string;
   body: string;
   metadata?: DetailMetadata;
@@ -99,6 +103,8 @@ function fromJournal(): DetailEntry[] {
     coverImage:
       normalizeImagePath(entry.featuredImage || entry.coverImage) ||
       DEFAULT_JOURNAL_COVER,
+    video: entry.video,
+    videoPoster: entry.videoPoster,
     excerpt: entry.excerpt,
     body: entry.body,
     customization: entry.customization,
@@ -116,6 +122,8 @@ function fromTech(): DetailEntry[] {
     date: displayDate(entry.date),
     // Deliberately no cover: the only two tech covers in the archive are
     // screenshots at 480px and 320px, which cannot fill a 16:9 plate.
+    video: entry.video,
+    videoPoster: entry.videoPoster,
     excerpt: entry.excerpt,
     body: entry.body,
     customization: entry.customization,
@@ -132,6 +140,8 @@ function fromPhotography(): DetailEntry[] {
     isoDate: entry.date,
     date: displayDate(entry.date),
     coverImage: normalizeImagePath(entry.coverImage) || undefined,
+    video: entry.video,
+    videoPoster: entry.videoPoster,
     excerpt: entry.description,
     body: entry.story,
     metadata: {
@@ -151,6 +161,8 @@ function fromPortfolio(): DetailEntry[] {
     title: entry.title,
     category: 'Case Study',
     coverImage: ownerArchiveImage(entry.projectImage),
+    video: entry.video,
+    videoPoster: entry.videoPoster,
     excerpt: entry.description,
     body: entry.body,
     metadata: {
@@ -170,6 +182,8 @@ function fromCollection(): DetailEntry[] {
     title: entry.title,
     category: entry.category,
     coverImage: normalizeImagePath(entry.coverImage) || undefined,
+    video: entry.video,
+    videoPoster: entry.videoPoster,
     excerpt: entry.description,
     body: entry.body,
     customization: entry.customization,

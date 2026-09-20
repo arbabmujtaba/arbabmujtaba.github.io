@@ -149,7 +149,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
                 </span>
               </div>
 
-              <h2 className="mt-5 font-display text-3xl font-medium lowercase leading-[0.96] tracking-[-0.05em] text-zinc-50 md:text-4xl lg:text-5xl">
+              <h2 className="mt-5 font-display text-3xl font-medium leading-[0.96] tracking-[-0.05em] text-zinc-50 md:text-4xl lg:text-5xl">
                 {entry.title}
               </h2>
 
@@ -214,7 +214,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
               {prefix}
 
               <div className="min-w-0 flex-1">
-                <h3 className="font-display text-xl font-medium lowercase leading-[1.05] tracking-[-0.04em] text-zinc-50 md:text-2xl">
+                <h3 className="font-display text-xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-50 md:text-2xl">
                   {entry.title}
                 </h3>
 

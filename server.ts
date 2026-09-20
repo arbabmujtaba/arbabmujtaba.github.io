@@ -198,15 +198,34 @@ const storage = multer.diskStorage({
   }
 });
 
+/**
+ * UPLOAD TYPES
+ * Stills and short motion clips. GIF is accepted because it is what a phone
+ * screen recording usually becomes, and mp4/webm because a GIF of any real
+ * length is an order of magnitude larger than the equivalent video.
+ *
+ * The cap exists because uploads are committed to the repository and
+ * redeployed on every build: `public/uploads` is already the largest thing in
+ * the tree, and an unbounded clip would dominate it.
+ */
+const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'] as const;
+const ALLOWED_MOTION_EXTENSIONS = ['.gif', '.mp4', '.webm'] as const;
+const MAX_UPLOAD_BYTES = 40 * 1024 * 1024; // 40 MB
+
 const upload = multer({
   storage,
+  limits: { fileSize: MAX_UPLOAD_BYTES },
   fileFilter: (req, file, cb) => {
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedExtensions.includes(ext)) {
+    const allowed = [...ALLOWED_IMAGE_EXTENSIONS, ...ALLOWED_MOTION_EXTENSIONS] as readonly string[];
+    if (allowed.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Only JPG, JPEG, PNG, and WEBP image uploads are supported.'));
+      cb(
+        new Error(
+          `Unsupported file type "${ext || 'unknown'}". Images: ${ALLOWED_IMAGE_EXTENSIONS.join(', ')}. Motion: ${ALLOWED_MOTION_EXTENSIONS.join(', ')}.`
+        )
+      );
     }
   }
 });

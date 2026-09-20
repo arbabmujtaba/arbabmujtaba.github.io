@@ -160,7 +160,7 @@ const WEBSITE_STRUCTURE: WebsiteSection[] = [
         collection: 'home',
         label: 'Home Blocks',
         blurb: 'Landing-page gateways, quotes and profile',
-        categories: ['gateway', 'quote', 'principle', 'profile', 'section'],
+        categories: ['gateway', 'quote', 'principle', 'profile', 'section', 'reel'],
         categoryLabel: 'Block Type',
       },
     ],
@@ -187,6 +187,12 @@ const resolveSection = (collection: string, category?: string): string => {
   return section?.id || 'journal';
 };
 
+/**
+ * Collections whose types carry `video` / `videoPoster`. The motion controls are
+ * only offered here, so the form cannot write a field the renderer ignores.
+ */
+const MOTION_COLLECTIONS = ['journal', 'tech', 'photography', 'portfolio', 'collection', 'home'];
+
 // Home block types are lowercase ids — present them a little more nicely.
 const prettyCategory = (cat: string): string =>
   cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : '';
@@ -212,6 +218,9 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [formCategory, setFormCategory] = useState('');
   const [formDate, setFormDate] = useState('');
   const [formCoverImage, setFormCoverImage] = useState('');
+  // Motion fields: a short clip (mp4/webm/gif) and the still shown before it plays.
+  const [formVideo, setFormVideo] = useState('');
+  const [formVideoPoster, setFormVideoPoster] = useState('');
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [formExcerpt, setFormExcerpt] = useState('');
   const [formBody, setFormBody] = useState('');
@@ -278,6 +287,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   // Drag and drop areas
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const posterInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
   // Available gear options for the photography gear selector (read from the gear CMS collection)
@@ -318,7 +329,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     gear: ['Cameras', 'Lenses', 'Tools', 'Software', 'Audio', 'Other'],
     timeline: ['Milestone'],
     favorites: ['Favorite Technologies', 'Favorite Software', 'Favorite Linux Tools', 'Favorite Gear', 'Favorite Setups', 'Things I Like'],
-    home: ['gateway', 'quote', 'principle', 'profile', 'section'],
+    home: ['gateway', 'quote', 'principle', 'profile', 'section', 'reel'],
     gallery: ['Life', 'Travel', 'Connected', 'Favorites', 'Behind The Shot']
   };
 
@@ -423,6 +434,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
       category: formCategory,
       date: formDate,
       coverImage: formCoverImage,
+      video: formVideo,
+      videoPoster: formVideoPoster,
       galleryImages,
       excerpt: formExcerpt,
       body: formBody,
@@ -467,6 +480,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         setFormCategory(parsed.category || '');
         setFormDate(parsed.date || '');
         setFormCoverImage(parsed.coverImage || '');
+        setFormVideo(parsed.video || '');
+        setFormVideoPoster(parsed.videoPoster || '');
         setGalleryImages(parsed.galleryImages || []);
         setFormExcerpt(parsed.excerpt || '');
         setFormBody(parsed.body || '');
@@ -580,6 +595,17 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         serialData.coverImage = formCoverImage;
       }
 
+      /**
+       * Motion fields, written for every collection whose type carries them
+       * (journal, tech, photography, portfolio, collection and home reels).
+       * Empty strings are omitted rather than written as empty keys, so an entry
+       * without a clip stays clean in the front-matter.
+       */
+      if (MOTION_COLLECTIONS.includes(activeCollection)) {
+        if (formVideo.trim()) serialData.video = formVideo.trim();
+        if (formVideoPoster.trim()) serialData.videoPoster = formVideoPoster.trim();
+      }
+
       // Add post customization if any fields are set
       if (formCustomization && Object.keys(formCustomization).length > 0) {
         serialData.customization = formCustomization;
@@ -626,6 +652,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
 
   // Reset inputs
   const resetFormFields = () => {
+    setFormVideo('');
+    setFormVideoPoster('');
     setFormTitle('');
     setFormSlug('');
     setFormCategory(firstCategoryOf(getDestination(activeSection, activeCollection)) || categoryOptionsMap[activeCollection]?.[0] || '');
@@ -748,6 +776,8 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
         if (doc.collection === 'gallery') {
           setFormFeatured(!!doc.data.featured);
         }
+        setFormVideo(doc.data.video || '');
+        setFormVideoPoster(doc.data.videoPoster || '');
         if (doc.collection === 'journal') {
           setFormVolume(doc.data.volume != null ? String(doc.data.volume) : '');
           setFormReadingTime(doc.data.readingTime || '');
@@ -953,7 +983,13 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     setIsDragging(false);
   };
 
-  const handleImageFile = async (file: File, isGallery: boolean = false) => {
+  /** Where an uploaded asset should land in the form. */
+  type UploadTarget = 'cover' | 'gallery' | 'video' | 'videoPoster';
+
+  const handleImageFile = async (file: File, target: UploadTarget | boolean = 'cover') => {
+    // Historic call sites pass a boolean for "is this a gallery upload".
+    const slot: UploadTarget =
+      target === true ? 'gallery' : target === false ? 'cover' : target;
     if (!file) return;
     setIsUploading(true);
     setErrorMessage('');
@@ -972,17 +1008,21 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
 
       if (res.ok) {
         const parsed = await res.json();
-        if (isGallery) {
+        if (slot === 'gallery') {
           setGalleryImages(prev => [...prev, parsed.url]);
+        } else if (slot === 'video') {
+          setFormVideo(parsed.url);
+        } else if (slot === 'videoPoster') {
+          setFormVideoPoster(parsed.url);
         } else {
           setFormCoverImage(parsed.url);
         }
       } else {
         const parsedErr = await res.json();
-        setErrorMessage(parsedErr.error || 'Image compression/filesystem error.');
+        setErrorMessage(parsedErr.error || 'Upload failed (filesystem or file-type error).');
       }
     } catch (e: any) {
-      setErrorMessage('Could not execute image uploads (API server is offline).');
+      setErrorMessage('Could not upload (API server is offline).');
     } finally {
       setIsUploading(false);
       setIsDragging(false);
@@ -2145,6 +2185,108 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                       </div>
                     )}
                   </div>
+
+                  {/* ---------- MOTION CLIP ----------
+                      Only offered for collections whose renderer reads these
+                      fields, so the form cannot write something nothing shows. */}
+                  {MOTION_COLLECTIONS.includes(activeCollection) && (
+                    <div>
+                      <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                        Motion clip — video or GIF {activeCollection === 'home' ? '(use configType "reel" to show it on the home page)' : '(plays above the cover, with controls)'}
+                      </label>
+
+                      <div className="flex gap-4">
+                        <div className="flex-grow">
+                          <input
+                            type="text"
+                            value={formVideo}
+                            onChange={(e) => setFormVideo(e.target.value)}
+                            placeholder="e.g. /uploads/home/reel.mp4 — .mp4, .webm or .gif"
+                            className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-350 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => videoInputRef.current?.click()}
+                          className="px-4 py-2 border border-zinc-805 bg-zinc-950 hover:bg-zinc-900 text-xs text-zinc-400 hover:text-white transition-all rounded cursor-pointer"
+                        >
+                          Upload Clip
+                        </button>
+                        <input
+                          type="file"
+                          ref={videoInputRef}
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) handleImageFile(e.target.files[0], 'video');
+                          }}
+                          accept="video/mp4, video/webm, image/gif"
+                          className="hidden"
+                        />
+                      </div>
+
+                      <p className="mt-2 font-mono text-[10px] text-zinc-400">
+                        SUPPORTS: MP4, WEBM, GIF — up to 40 MB. Muted autoplay in view, with play, mute and restart controls.
+                      </p>
+
+                      <div className="mt-4 flex gap-4">
+                        <div className="flex-grow">
+                          <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                            Clip poster (still shown before play)
+                          </label>
+                          <input
+                            type="text"
+                            value={formVideoPoster}
+                            onChange={(e) => setFormVideoPoster(e.target.value)}
+                            placeholder="Defaults to the cover image when left empty"
+                            className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-350 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => posterInputRef.current?.click()}
+                          className="mt-7 px-4 py-2 border border-zinc-805 bg-zinc-950 hover:bg-zinc-900 text-xs text-zinc-400 hover:text-white transition-all rounded cursor-pointer"
+                        >
+                          Upload Poster
+                        </button>
+                        <input
+                          type="file"
+                          ref={posterInputRef}
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) handleImageFile(e.target.files[0], 'videoPoster');
+                          }}
+                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          className="hidden"
+                        />
+                      </div>
+
+                      {formVideo && (
+                        <div className="mt-4 flex items-center justify-between gap-4 p-3 border border-zinc-900 bg-zinc-950/50 rounded-sm">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {/\.gif$/i.test(formVideo) ? (
+                              <img src={formVideo} alt="Clip preview" className="w-20 h-12 object-cover border border-zinc-800 bg-zinc-950" />
+                            ) : (
+                              <video
+                                src={formVideo}
+                                poster={formVideoPoster || formCoverImage || undefined}
+                                muted
+                                loop
+                                playsInline
+                                controls
+                                className="w-32 h-20 object-cover border border-zinc-800 bg-zinc-950"
+                              />
+                            )}
+                            <span className="font-mono text-[10px] text-zinc-400 truncate">{formVideo}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { setFormVideo(''); setFormVideoPoster(''); }}
+                            className="shrink-0 font-sans text-xs text-zinc-500 hover:text-red-400 cursor-pointer"
+                          >
+                            Remove clip
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Photography exclusive multiple images gallery widget */}
                   {activeCollection === 'photography' && (

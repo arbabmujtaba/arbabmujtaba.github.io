@@ -92,6 +92,8 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
             excerpt={entry.excerpt}
             body={entry.body}
             metadata={entry.metadata}
+            video={entry.video}
+            videoPoster={entry.videoPoster}
             customization={entry.customization}
           />
         </article>
@@ -115,7 +117,7 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
                   />
                   previous
                 </span>
-                <span className="font-display text-xl font-medium lowercase leading-tight tracking-[-0.035em] text-zinc-400 transition-colors group-hover:text-zinc-50 md:text-2xl">
+                <span className="font-display text-xl font-medium leading-tight tracking-[-0.035em] text-zinc-400 transition-colors group-hover:text-zinc-50 md:text-2xl">
                   {neighbours.previous.title}
                 </span>
               </AppLink>
@@ -136,7 +138,7 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
                     className="transition-transform duration-300 group-hover:translate-x-1"
                   />
                 </span>
-                <span className="font-display text-xl font-medium lowercase leading-tight tracking-[-0.035em] text-zinc-400 transition-colors group-hover:text-zinc-50 md:text-2xl">
+                <span className="font-display text-xl font-medium leading-tight tracking-[-0.035em] text-zinc-400 transition-colors group-hover:text-zinc-50 md:text-2xl">
                   {neighbours.next.title}
                 </span>
               </AppLink>

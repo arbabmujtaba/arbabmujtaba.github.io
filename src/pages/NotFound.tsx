@@ -73,7 +73,7 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
                 <span className="w-7 shrink-0 font-mono text-[11px] text-zinc-500 transition-colors group-hover/item:text-accent">
                   00
                 </span>
-                <span className="font-display text-2xl font-medium lowercase tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 md:text-4xl">
+                <span className="font-display text-2xl font-medium capitalize tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 md:text-4xl">
                   home
                 </span>
               </AppLink>
@@ -88,7 +88,7 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
                   <span className="w-7 shrink-0 font-mono text-[11px] text-zinc-500 transition-colors group-hover/item:text-accent">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-display text-2xl font-medium lowercase tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 md:text-4xl">
+                  <span className="font-display text-2xl font-medium capitalize tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 md:text-4xl">
                     {COLLECTION_LABEL[collection]}
                   </span>
                 </AppLink>

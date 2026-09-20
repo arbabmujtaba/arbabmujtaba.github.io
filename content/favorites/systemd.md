@@ -1,5 +1,5 @@
 ---
-title: WireShark
+title: Wireshark
 slug: systemd
 category: Favorite Linux Tools
 description: 'System and service manager for managing processes, services, and system state.'

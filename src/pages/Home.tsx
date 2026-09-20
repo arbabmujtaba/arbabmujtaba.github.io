@@ -5,6 +5,7 @@ import SafeImage from '../components/SafeImage';
 import {
   CountUp,
   FrameCard,
+  MotionPlate,
   Marquee,
   NumberedItem,
   QuotePanel,
@@ -92,6 +93,13 @@ export default function Home({ setView }: HomeProps) {
   const gateways = homeConfig.filter((entry) => entry.configType === 'gateway');
   const principles = homeConfig.filter((entry) => entry.configType === 'principle');
   const profile = homeConfig.find((entry) => entry.configType === 'profile');
+
+  /**
+   * Reel blocks — the only thing on this page that moves by itself. Authored in
+   * `content/home/` as `configType: reel` with a `video` (mp4/webm/gif) and an
+   * optional `videoPoster`. Absent by default: no clip, no section.
+   */
+  const reels = homeConfig.filter((entry) => entry.configType === 'reel' && !!entry.video);
 
   const quotes = useMemo(
     () =>
@@ -246,6 +254,36 @@ export default function Home({ setView }: HomeProps) {
           </p>
         </Section>
 
+        {/* ===================== REEL ===================== */}
+        {reels.length > 0 && (
+          <Section>
+            <RecLabel>reel</RecLabel>
+            <div className="mt-7 flex flex-col justify-between gap-8 md:flex-row md:items-end">
+              <StackedHeading
+                lines={['frames that', 'keep moving']}
+                body="Short clips from the same archive — the parts a still photograph cannot hold."
+              />
+            </div>
+
+            <div
+              className={`mt-14 grid grid-cols-1 gap-10 md:gap-6 ${
+                reels.length > 1 ? 'md:grid-cols-2' : ''
+              }`}
+            >
+              {reels.map((reel) => (
+                <MotionPlate
+                  key={reel.slug}
+                  src={reel.video!}
+                  poster={reel.videoPoster || reel.image}
+                  title={reel.title}
+                  caption={reel.label || reel.description}
+                  aspect={reels.length > 1 ? 'aspect-[4/3]' : 'aspect-[16/9]'}
+                />
+              ))}
+            </div>
+          </Section>
+        )}
+
         {/* ===================== FEATURED WORK ===================== */}
         {featured.length > 0 && (
           <Section>
@@ -325,7 +363,7 @@ export default function Home({ setView }: HomeProps) {
                   transition={{ duration: 0.75, delay: index * 0.08, ease: EASE }}
                 >
                   <TagChip tone="accent">{milestone.year}</TagChip>
-                  <h3 className="mt-5 font-display text-xl font-medium lowercase leading-tight tracking-[-0.03em] text-zinc-100">
+                  <h3 className="mt-5 font-display text-xl font-medium leading-tight tracking-[-0.03em] text-zinc-100">
                     {milestone.title}
                   </h3>
                   <p className="mt-3 text-xs font-light leading-relaxed text-zinc-400">
@@ -359,7 +397,7 @@ export default function Home({ setView }: HomeProps) {
                 {gear.map((item) => (
                   <span
                     key={item.slug}
-                    className="font-display text-2xl font-medium lowercase tracking-[-0.03em] text-zinc-600 md:text-4xl"
+                    className="font-display text-2xl font-medium tracking-[-0.03em] text-zinc-600 md:text-4xl"
                   >
                     {item.title}
                   </span>
@@ -381,14 +419,26 @@ export default function Home({ setView }: HomeProps) {
             }
           />
 
-          <div className="mt-14 border-t border-zinc-800">
+          {/*
+            Gateway plates. Each gateway carries an `image` in
+            content/home/*.md — assigned by subject in .kiro/IMAGE_MAP.md — and
+            until now nothing rendered it: the section index was numbered rows
+            only, so five deliberately chosen photographs were dead weight in the
+            front-matter. The numbering survives as the plate's index line.
+          */}
+          <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
             {gateways.map((gateway, index) => (
-              <NumberedItem
+              <FrameCard
                 key={gateway.slug}
-                index={index + 1}
-                label={gateway.title}
-                description={gateway.description}
+                title={gateway.title}
+                image={gateway.image}
+                index={`${String(index + 1).padStart(2, '0')}/`}
+                tag={gateway.label?.replace(/^\d+\s*\/\/\s*/, '')}
+                excerpt={gateway.description}
+                aspect="aspect-[4/3]"
+                href={`/${targetOf(gateway)}`}
                 onClick={() => setView(targetOf(gateway))}
+                className="min-h-[44px]"
               />
             ))}
           </div>

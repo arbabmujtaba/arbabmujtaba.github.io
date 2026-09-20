@@ -51,7 +51,7 @@ export default function Journal() {
                 transition={{ duration: shouldReduceMotion ? 0.3 : 0.95, delay: 0.1, ease: EASE }}
                 className="page-title mt-7"
               >
-                journal
+                Journal
               </motion.h1>
 
               <motion.p

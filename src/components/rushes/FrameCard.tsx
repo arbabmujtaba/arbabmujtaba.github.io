@@ -69,7 +69,7 @@ export default function FrameCard({
               {index}
             </span>
           )}
-          <h3 className="font-display text-lg font-medium lowercase leading-tight tracking-[-0.03em] text-zinc-100 transition-colors group-hover:text-zinc-50 md:text-xl">
+          <h3 className="font-display text-lg font-medium leading-tight tracking-[-0.03em] text-zinc-100 transition-colors group-hover:text-zinc-50 md:text-xl">
             {title}
           </h3>
           {excerpt && (

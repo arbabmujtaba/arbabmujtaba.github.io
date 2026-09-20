@@ -277,7 +277,10 @@ html {
   font-weight: 500;
   line-height: 0.92;
   letter-spacing: -0.055em;
-  text-transform: lowercase;
+  /* No text-transform. Names are rendered as written — the reference's
+     all-lowercase display type looked like a spelling mistake on proper nouns.
+     Lowercase survives only on the hand-written editorial headings, where it is
+     a deliberate voice rather than a name. */
   color: var(--ink-0);
 }
 

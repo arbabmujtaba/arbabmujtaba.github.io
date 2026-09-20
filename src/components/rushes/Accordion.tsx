@@ -1,6 +1,7 @@
 import { useId, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Plus } from 'lucide-react';
+import { ArrowUpRight, Plus } from 'lucide-react';
+import { resolveIcon } from '../../lib/icons';
 
 export interface AccordionEntry {
   id: string;
@@ -8,6 +9,10 @@ export interface AccordionEntry {
   /** Short line shown on the right of the trigger row. */
   meta?: string;
   body?: string;
+  /** Lucide icon name from the entry's front-matter. Unknown names are ignored. */
+  icon?: string;
+  /** Reference link for the entry, shown inside the open panel. */
+  href?: string;
 }
 
 interface AccordionProps {
@@ -47,6 +52,20 @@ export default function Accordion({ items, className = '' }: AccordionProps) {
               onClick={() => setOpenId(isOpen ? null : item.id)}
               className="flex min-h-[64px] w-full items-center gap-5 py-5 text-left transition-colors hover:text-zinc-50"
             >
+              {(() => {
+                /* The `icon` field has been in the content all along; this is
+                   the first surface to render it. */
+                const Icon = resolveIcon(item.icon);
+                return Icon ? (
+                  <Icon
+                    size={15}
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                    className="shrink-0 text-zinc-500"
+                  />
+                ) : null;
+              })()}
+
               <span className="min-w-0 flex-1 text-base leading-snug text-zinc-100 md:text-lg">
                 {item.title}
               </span>
@@ -68,7 +87,7 @@ export default function Accordion({ items, className = '' }: AccordionProps) {
             </button>
 
             <AnimatePresence initial={false}>
-              {isOpen && item.body && (
+              {isOpen && (item.body || item.href) && (
                 <motion.div
                   id={panelId}
                   role="region"
@@ -83,9 +102,27 @@ export default function Accordion({ items, className = '' }: AccordionProps) {
                   transition={{ duration: shouldReduceMotion ? 0.2 : 0.45, ease: EASE }}
                   className="overflow-hidden"
                 >
-                  <p className="max-w-2xl pb-6 text-sm font-light leading-relaxed text-zinc-400">
-                    {item.body}
-                  </p>
+                  <div className="pb-6">
+                    <p className="max-w-2xl text-sm font-light leading-relaxed text-zinc-400">
+                      {item.body}
+                    </p>
+
+                    {item.href && (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/link mt-4 inline-flex min-h-[44px] items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent"
+                      >
+                        reference
+                        <ArrowUpRight
+                          size={12}
+                          strokeWidth={1.8}
+                          className="transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+                        />
+                      </a>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

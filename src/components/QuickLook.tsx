@@ -36,6 +36,8 @@ export default function QuickLook({ collection, slug, onClose }: QuickLookProps)
       excerpt={entry.excerpt}
       body={entry.body}
       metadata={entry.metadata}
+      video={entry.video}
+      videoPoster={entry.videoPoster}
       customization={entry.customization}
     />
   );

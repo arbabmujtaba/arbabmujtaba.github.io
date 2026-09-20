@@ -1,8 +1,8 @@
 ---
-title: Ios Crack Apps
+title: iOS Crack Apps
 category: Experiments
 date: '2026-06-30'
-excerpt: List of stores where you can find cracked ios apps.
+excerpt: Where to find sideloaded and cracked iOS apps, and what each store is good for.
 coverImage: ''
 slug: ios-crack-apps
 ---

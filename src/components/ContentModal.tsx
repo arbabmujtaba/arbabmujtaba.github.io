@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink, Camera } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from './SafeImage';
+import MotionPlate from './rushes/MotionPlate';
 import { normalizeImagePath } from '../lib/image';
 import type { PostCustomization } from '../types';
 import {
@@ -44,6 +45,9 @@ interface ContentModalProps {
     captureMode?: string;
   };
   customization?: PostCustomization;
+  /** Short clip or GIF rendered above the cover, with its own controls. */
+  video?: string;
+  videoPoster?: string;
   /**
    * `overlay` (default) is the right-hand quick-look drawer: fixed, with a
    * backdrop, a close button and a body scroll lock.
@@ -180,6 +184,8 @@ export default function ContentModal({
   body,
   metadata,
   customization,
+  video,
+  videoPoster,
   variant = 'overlay'
 }: ContentModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -306,6 +312,17 @@ export default function ContentModal({
           {/* Music Player Widget */}
           {customization?.music?.songUrl && (
             <MusicPlayer music={customization.music} />
+          )}
+
+          {/* Motion plate. Placed above the cover because a clip is the more
+              specific artefact: when an entry has both, the moving one leads. */}
+          {video && (
+            <MotionPlate
+              src={video}
+              poster={videoPoster || coverImage}
+              title={title}
+              aspect="aspect-[16/9]"
+            />
           )}
 
           {/* Cover image banner */}

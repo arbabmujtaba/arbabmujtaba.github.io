@@ -240,6 +240,8 @@ export function getJournalEntries(): JournalEntry[] {
       category: data.category || "Thoughts",
       featuredImage: cover,
       coverImage: cover,
+      video: data.video || undefined,
+      videoPoster: data.videoPoster || undefined,
       excerpt: data.excerpt || "",
       readingTime: resolveReadingTime(body, data.readingTime),
       volume: parseVolume(data.volume),
@@ -275,6 +277,8 @@ export function getTechEntries(): TechEntry[] {
       date: data.date || "2026-06-07",
       category: data.category || "Programming",
       coverImage: data.coverImage,
+      video: data.video || undefined,
+      videoPoster: data.videoPoster || undefined,
       excerpt: data.excerpt || "",
       body: content || "",
       customization: data.customization as PostCustomization | undefined
@@ -326,6 +330,8 @@ export function getPhotographyEntries(): PhotographyEntry[] {
       story: content || "",
       gear,
       captureMode: data.captureMode || "",
+      video: data.video || undefined,
+      videoPoster: data.videoPoster || undefined,
       customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -340,6 +346,8 @@ export function getCollectionEntries(): CollectionEntry[] {
       slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
       category: data.category || "Uses",
       coverImage: data.coverImage,
+      video: data.video || undefined,
+      videoPoster: data.videoPoster || undefined,
       description: data.description || "",
       body: content || "",
       customization: data.customization as PostCustomization | undefined
@@ -371,6 +379,8 @@ export function getPortfolioProjects(): PortfolioProject[] {
       githubLink: data.githubLink,
       liveLink: data.liveLink,
       projectImage: data.projectImage || "",
+      video: data.video || undefined,
+      videoPoster: data.videoPoster || undefined,
       featured: !!data.featured,
       body: content || "",
       customization: data.customization as PostCustomization | undefined
@@ -458,6 +468,8 @@ export function getHomeConfig(): HomeConfigEntry[] {
       label: data.label || "",
       description: data.description || "",
       image: data.image || "",
+      video: data.video || undefined,
+      videoPoster: data.videoPoster || undefined,
       author: data.author || "",
       text: data.text || "",
       navTarget: data.navTarget || "",
