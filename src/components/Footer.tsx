@@ -119,6 +119,14 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
             <div className="mt-10 space-y-1.5 font-mono text-[10px] lowercase tracking-[0.08em] text-zinc-400">
               <p>© {new Date().getFullYear()} arbab mujtaba. all rights reserved.</p>
               <p>computer engineering, iet davv — srinagar &amp; indore.</p>
+              {/* Release mark. Bump alongside the version in package.json and the git tag. */}
+              <p className="flex items-center gap-2 pt-1 text-zinc-500">
+                <span
+                  aria-hidden="true"
+                  className="inline-block h-1 w-1 rounded-full bg-accent"
+                />
+                version 2.0
+              </p>
             </div>
           </div>
 
