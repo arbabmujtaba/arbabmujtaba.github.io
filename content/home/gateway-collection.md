@@ -10,7 +10,7 @@ label: 05 // Curator
 description: >-
   Books, music, objects, and references that leave a trace on taste, thought,
   and craft.
-image: /uploads/home/1781841191101-361910064.jpeg
+image: /uploads/photography/1782621000816-524714599.jpg
 author: ''
 text: ''
 navTarget: collection

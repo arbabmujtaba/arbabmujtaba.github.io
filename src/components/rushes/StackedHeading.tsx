@@ -44,7 +44,10 @@ export default function StackedHeading({
                 shouldReduceMotion ? { opacity: 0 } : { y: '105%', opacity: 0 }
               }
               whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true, amount: 0.6 }}
+              /* `some` rather than a ratio: the span starts translated fully out
+                 of its clipping wrapper, so a percentage threshold can never be
+                 satisfied and the heading would stay permanently hidden. */
+              viewport={{ once: true, amount: 'some' }}
               transition={{
                 duration: shouldReduceMotion ? 0.3 : 0.95,
                 delay: shouldReduceMotion ? 0 : index * 0.12,
@@ -60,10 +63,14 @@ export default function StackedHeading({
       {body && (
         <motion.p
           className="mt-6 max-w-lg text-sm font-light leading-relaxed text-zinc-400 md:text-base"
-          initial={{ opacity: 0, y: 14 }}
+          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
+          viewport={{ once: true, amount: 'some' }}
+          transition={{
+            duration: shouldReduceMotion ? 0.3 : 0.8,
+            delay: shouldReduceMotion ? 0 : 0.2,
+            ease: EASE,
+          }}
         >
           {body}
         </motion.p>

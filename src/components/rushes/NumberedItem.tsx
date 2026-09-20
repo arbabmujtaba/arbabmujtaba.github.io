@@ -1,4 +1,5 @@
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
+import { shouldInterceptClick } from '../../lib/navigation';
 
 interface NumberedItemProps {
   /** Position in the list; rendered zero-padded. */
@@ -9,6 +10,12 @@ interface NumberedItemProps {
   /** Far-right figure — a spec, a year, a count. Rendered in the accent. */
   meta?: string;
   onClick?: () => void;
+  /**
+   * In-site destination. Supplied alongside `onClick`, the row becomes a real
+   * anchor so the index is crawlable and each line can be opened in a new tab,
+   * while a plain left click still runs `onClick` (the quick look).
+   */
+  href?: string;
   className?: string;
 }
 
@@ -30,8 +37,10 @@ export default function NumberedItem({
   description,
   meta,
   onClick,
+  href,
   className = '',
 }: NumberedItemProps) {
+  const shouldReduceMotion = useReducedMotion();
   const interactive = typeof onClick === 'function';
   const number = String(index).padStart(2, '0');
 
@@ -63,12 +72,24 @@ export default function NumberedItem({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.7, ease: EASE }}
+      transition={{ duration: shouldReduceMotion ? 0.3 : 0.7, ease: EASE }}
     >
-      {interactive ? (
+      {href ? (
+        <a
+          href={href}
+          className={shared}
+          onClick={(event) => {
+            if (!interactive || !shouldInterceptClick(event)) return;
+            event.preventDefault();
+            onClick?.();
+          }}
+        >
+          {content}
+        </a>
+      ) : interactive ? (
         <button type="button" onClick={onClick} className={shared}>
           {content}
         </button>

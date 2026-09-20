@@ -44,6 +44,13 @@ interface ContentModalProps {
     captureMode?: string;
   };
   customization?: PostCustomization;
+  /**
+   * `overlay` (default) is the right-hand quick-look drawer: fixed, with a
+   * backdrop, a close button and a body scroll lock.
+   * `page` renders the same content inline as the article body of a detail
+   * route, so `/journal/<slug>` and the quick look can never drift apart.
+   */
+  variant?: 'overlay' | 'page';
 }
 
 function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']> }) {
@@ -172,11 +179,17 @@ export default function ContentModal({
   excerpt,
   body,
   metadata,
-  customization
+  customization,
+  variant = 'overlay'
 }: ContentModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const isPage = variant === 'page';
 
   useEffect(() => {
+    // Only the drawer owns the page scroll. In `page` mode the document must
+    // stay scrollable, since the article *is* the page.
+    if (isPage) return;
+
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       requestAnimationFrame(() => {
@@ -188,7 +201,7 @@ export default function ContentModal({
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isOpen]);
+  }, [isOpen, isPage]);
 
   if (!isOpen) return null;
 
@@ -215,80 +228,74 @@ export default function ContentModal({
   };
   const linkStyle: React.CSSProperties = accentColor ? { color: accentColor } : {};
 
-  return (
-    <div className="fixed inset-0 z-[110] flex justify-end">
-      {/* Backdrop overlay */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
-      />
+  /** Customization-driven surface treatments, shared by both variants. */
+  const decorations = (
+    <>
+      {/* Gradient overlay */}
+      {gradientStyle && (
+        <div
+          className="absolute inset-0 pointer-events-none z-[1] opacity-20"
+          style={gradientStyle}
+        />
+      )}
 
-      {/* Main Drawer container */}
-      <motion.div
-        ref={modalRef}
-        initial={animVariants.initial}
-        animate={animVariants.animate}
-        exit={animVariants.exit}
-        transition={animVariants.transition}
-        style={containerStyles}
-        className="relative w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl h-full bg-[#0d0d0c] border-l border-zinc-900 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar"
-      >
-        {/* Gradient overlay */}
-        {gradientStyle && (
-          <div
-            className="absolute inset-0 pointer-events-none z-[1] opacity-20"
-            style={gradientStyle}
-          />
+      {/* Grain overlay */}
+      {showGrain && (
+        <div
+          className="absolute inset-0 pointer-events-none z-[2] opacity-[0.04]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }}
+        />
+      )}
+
+      {/* Vignette overlay */}
+      {showVignette && (
+        <div
+          className="absolute inset-0 pointer-events-none z-[2]"
+          style={{ boxShadow: 'inset 0 0 120px 40px rgba(0,0,0,0.6)' }}
+        />
+      )}
+    </>
+  );
+
+  /** Category + date strip. Sticky with a close action only in the drawer. */
+  const header = (
+    <div
+      className={`z-30 px-6 md:px-12 py-6 border-b border-zinc-900/50 flex justify-between items-center ${
+        isPage
+          ? 'relative bg-canvas-raised'
+          : 'sticky top-0 bg-canvas-raised/90 backdrop-blur-md'
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        <span
+          className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded"
+          style={accentColor ? { color: accentColor, backgroundColor: `${accentColor}15` } : {}}
+        >
+          {category}
+        </span>
+        {date && (
+          <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+            <Calendar className="w-3 h-3 text-zinc-600" />
+            {date}
+          </span>
         )}
+      </div>
 
-        {/* Grain overlay */}
-        {showGrain && (
-          <div
-            className="absolute inset-0 pointer-events-none z-[2] opacity-[0.04]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-            }}
-          />
-        )}
+      {!isPage && (
+        <button
+          onClick={onClose}
+          className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-900 rounded-full transition-all cursor-pointer outline-none"
+          aria-label="Close details"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+    </div>
+  );
 
-        {/* Vignette overlay */}
-        {showVignette && (
-          <div
-            className="absolute inset-0 pointer-events-none z-[2]"
-            style={{ boxShadow: 'inset 0 0 120px 40px rgba(0,0,0,0.6)' }}
-          />
-        )}
-
-        {/* Header action panel */}
-        <div className="sticky top-0 z-30 bg-[#0d0d0c]/90 backdrop-blur-md px-6 md:px-12 py-6 border-b border-zinc-900/50 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <span
-              className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded"
-              style={accentColor ? { color: accentColor, backgroundColor: `${accentColor}15` } : {}}
-            >
-              {category}
-            </span>
-            {date && (
-              <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-                <Calendar className="w-3 h-3 text-zinc-600" />
-                {date}
-              </span>
-            )}
-          </div>
-          
-          <button 
-            onClick={onClose}
-            className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-900 rounded-full transition-all cursor-pointer outline-none"
-            aria-label="Close details"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Content canvas */}
+  const canvas = (
         <motion.div
           initial={contentAnim.initial}
           animate={contentAnim.animate}
@@ -449,6 +456,47 @@ export default function ContentModal({
             </div>
           )}
         </motion.div>
+  );
+
+  // Inline article: no backdrop, no fixed positioning, no scroll lock. The
+  // detail route owns the page chrome and the back navigation.
+  if (isPage) {
+    return (
+      <article
+        className="relative w-full overflow-hidden border border-zinc-800 bg-canvas-raised"
+        style={containerStyles}
+      >
+        {decorations}
+        {header}
+        {canvas}
+      </article>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-[110] flex justify-end">
+      {/* Backdrop overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
+      />
+
+      {/* Main drawer container */}
+      <motion.div
+        ref={modalRef}
+        initial={animVariants.initial}
+        animate={animVariants.animate}
+        exit={animVariants.exit}
+        transition={animVariants.transition}
+        style={containerStyles}
+        className="relative w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl h-full bg-canvas-raised border-l border-zinc-900 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar"
+      >
+        {decorations}
+        {header}
+        {canvas}
       </motion.div>
     </div>
   );

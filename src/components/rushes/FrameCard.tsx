@@ -1,6 +1,7 @@
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import TagChip from './TagChip';
+import { shouldInterceptClick } from '../../lib/navigation';
 
 interface FrameCardProps {
   title: string;
@@ -11,6 +12,12 @@ interface FrameCardProps {
   excerpt?: string;
   aspect?: string;
   onClick?: () => void;
+  /**
+   * In-site destination. Supplied alongside `onClick`, the card becomes a real
+   * anchor: crawlable, cmd-clickable, and openable in a new tab, while a plain
+   * left click still runs `onClick` (the quick look).
+   */
+  href?: string;
   priority?: boolean;
   className?: string;
 }
@@ -34,9 +41,11 @@ export default function FrameCard({
   excerpt,
   aspect = 'aspect-[4/3]',
   onClick,
+  href,
   priority = false,
   className = '',
 }: FrameCardProps) {
+  const shouldReduceMotion = useReducedMotion();
   const interactive = typeof onClick === 'function';
 
   const body = (
@@ -75,20 +84,30 @@ export default function FrameCard({
     </>
   );
 
+  const shell = 'group block w-full cursor-pointer text-left';
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 26 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.85, ease: EASE }}
+      transition={{ duration: shouldReduceMotion ? 0.3 : 0.85, ease: EASE }}
       className={className}
     >
-      {interactive ? (
-        <button
-          type="button"
-          onClick={onClick}
-          className="group block w-full cursor-pointer text-left"
+      {href ? (
+        <a
+          href={href}
+          className={shell}
+          onClick={(event) => {
+            if (!interactive || !shouldInterceptClick(event)) return;
+            event.preventDefault();
+            onClick?.();
+          }}
         >
+          {body}
+        </a>
+      ) : interactive ? (
+        <button type="button" onClick={onClick} className={shell}>
           {body}
         </button>
       ) : (

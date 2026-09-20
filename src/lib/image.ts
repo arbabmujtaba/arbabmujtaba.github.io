@@ -37,6 +37,30 @@ export function isValidImagePath(path: string | undefined | null): boolean {
 }
 
 /**
+ * Resolve an image only when it belongs to the owner's own archive.
+ *
+ * The design system's first rule is that every image on the site is the
+ * owner's. Anything outside `/uploads/` is also invisible to
+ * `getLocalWebpSources`, so it would bypass the WebP srcset entirely.
+ * Guarding here means a surface renders an owner photograph or no plate at
+ * all, and it keeps that guarantee even if a remote URL is ever pasted back
+ * into the front-matter. A photograph uploaded through the CMS appears with no
+ * further change, because uploads land under `/uploads/` and are picked up by
+ * the derivative pipeline.
+ */
+export function ownerArchiveImage(
+  path: string | undefined | null
+): string | undefined {
+  const normalized = normalizeImagePath(path);
+  if (!normalized) return undefined;
+
+  const bare = normalized.split('?')[0].split('#')[0];
+  const isOwnerArchive = bare.startsWith('/uploads/') || bare === '/portrait.jpg';
+
+  return isOwnerArchive ? normalized : undefined;
+}
+
+/**
  * Extract file extension from a path/URL (lowercased).
  */
 export function getImageExtension(path: string): string {

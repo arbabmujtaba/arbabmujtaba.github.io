@@ -1,30 +1,76 @@
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import ExploreArrow from '../components/ExploreArrow';
-import ParallaxImage from '../components/ParallaxImage';
+import { useMemo } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import Footer from '../components/Footer';
-import ContentModal from '../components/ContentModal';
-import SafeImage from '../components/SafeImage';
+import {
+  FrameCard,
+  NumberedItem,
+  RecLabel,
+  StackedHeading,
+  TagChip,
+} from '../components/rushes';
 import { getPortfolioProjects } from '../lib/cms';
-import { normalizeImagePath } from '../lib/image';
-import { PortfolioProject } from '../types';
+import { detailPath } from '../lib/collections';
+import { useOpenEntry } from '../lib/entryNavigation';
+import { ownerArchiveImage } from '../lib/image';
+import { useMediaQuery } from '../lib/useMediaQuery';
+import type { PortfolioProject } from '../types';
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * The owner's stack, carried over verbatim from the pre-retheme page. Kept in
+ * the page rather than the CMS because it is presentation grouping, not content.
+ */
 const technicalSkills = [
-  { category: "Java", items: ["Swing", "JDBC", "OOP", "Desktop Applications"] },
-  { category: "Python", items: ["Scripting", "Network Tools", "Machine Learning"] },
-  { category: "PHP", items: ["Authentication Systems", "MySQL"] },
-  { category: "React", items: ["Hooks", "Components", "Frontend Applications"] },
-  { category: "Node.js", items: ["Express", "REST APIs", "MongoDB", "MERN"] },
-  { category: "TypeScript", items: ["Interfaces", "Scalable Applications"] },
-  { category: "C++", items: ["DSP", "Audio Engineering", "Spatial Audio"] },
-  { category: "Networking", items: ["LoRaWAN", "Packet Simulation", "Network Topologies"] }
+  { category: 'Java', items: ['Swing', 'JDBC', 'OOP', 'Desktop Applications'] },
+  { category: 'Python', items: ['Scripting', 'Network Tools', 'Machine Learning'] },
+  { category: 'PHP', items: ['Authentication Systems', 'MySQL'] },
+  { category: 'React', items: ['Hooks', 'Components', 'Frontend Applications'] },
+  { category: 'Node.js', items: ['Express', 'REST APIs', 'MongoDB', 'MERN'] },
+  { category: 'TypeScript', items: ['Interfaces', 'Scalable Applications'] },
+  { category: 'C++', items: ['DSP', 'Audio Engineering', 'Spatial Audio'] },
+  { category: 'Networking', items: ['LoRaWAN', 'Packet Simulation', 'Network Topologies'] },
 ];
 
+/**
+ * techStack arrives either as plain strings or as `{ tech }` objects depending
+ * on whether the entry was hand-written or produced by the CMS list widget.
+ * Normalised defensively so a malformed row can never break the index.
+ */
+function techList(stack: PortfolioProject['techStack'] | undefined): string[] {
+  const items = (Array.isArray(stack) ? stack : []) as Array<
+    string | { tech?: string } | null | undefined
+  >;
+
+  return items
+    .map((item) => (typeof item === 'string' ? item : item?.tech ?? ''))
+    .map((tech) => tech.trim())
+    .filter((tech) => tech.length > 0);
+}
+
+/**
+ * Project plates use the shared owner-archive guard: a project renders its
+ * photograph only when that photograph is the owner's, otherwise no plate.
+ */
 export default function Portfolio() {
-  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const openEntry = useOpenEntry();
+  const shouldReduceMotion = useReducedMotion();
+  const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
+  const flatten = shouldReduceMotion || isTouchDevice;
 
   // Load from CMS dynamically
   const projects = useMemo(() => getPortfolioProjects(), []);
+
+  /** Only projects with one of the owner's own photographs get an image plate. */
+  const plates = useMemo(
+    () =>
+      projects
+        .map((project) => ({ project, image: ownerArchiveImage(project.projectImage) }))
+        .filter((plate): plate is { project: PortfolioProject; image: string } =>
+          Boolean(plate.image)
+        ),
+    [projects]
+  );
 
   return (
     <motion.div
@@ -32,143 +78,150 @@ export default function Portfolio() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      className="flex-grow flex flex-col relative overflow-hidden"
+      transition={{ duration: flatten ? 0.25 : 0.8, ease: EASE }}
+      className="relative flex flex-grow flex-col overflow-hidden"
     >
-      <div className="page-shell flex-grow overflow-y-auto custom-scrollbar pt-0 relative z-10">
-        
-        {/* Hero Section */}
+      <div className="page-shell custom-scrollbar relative z-10 flex-grow overflow-y-auto pt-0">
+        {/* ===================== INTRO ===================== */}
         <div className="page-intro" data-mark="WORK">
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <motion.div
             className="page-eyebrow"
+            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
           >
-            <span>Home</span>
-            <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
-            <span>Portfolio</span>
-          </motion.p>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
+            <RecLabel>work</RecLabel>
+          </motion.div>
+
+          <motion.h1
             className="page-title"
+            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.25, ease: EASE }}
           >
             Portfolio
           </motion.h1>
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
+
+          <motion.div
             className="page-description"
+            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.35, ease: EASE }}
           >
-            <p className="text-lg">
-              A collection of engineering case studies. Building with an emphasis on performance, precision, and robust architectures.
+            <p>
+              A collection of engineering case studies. Building with an emphasis on
+              performance, precision, and robust architectures.
             </p>
           </motion.div>
         </div>
 
-        {/* Featured Projects */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+        {/* ===================== THE INDEX ===================== */}
+        <motion.section
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-32"
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
+          className="border-t border-zinc-800 pt-7"
         >
-          <div className="content-rule pt-7 mb-12 md:mb-20 flex items-baseline justify-between">
-            <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Selected case studies</h2>
-            <span className="font-mono text-[10px] text-zinc-600">00{projects.length}</span>
+          <div className="flex items-baseline justify-between gap-4">
+            <RecLabel>index</RecLabel>
+            <span className="shrink-0 font-mono text-[10px] tracking-[0.2em] text-zinc-500">
+              {String(projects.length).padStart(3, '0')}
+            </span>
           </div>
 
-          <div className="space-y-12 md:space-y-16 lg:space-y-20 mb-16 md:mb-24 lg:mb-32">
-            {projects.map((project, idx) => {
-              // Extract string array tags
-              const tags: string[] = Array.isArray(project.techStack) 
-                ? project.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
-                : [];
+          <StackedHeading
+            lines={['selected', 'case studies']}
+            body="Open a line for the full write-up — stack, constraints, and what shipped."
+            className="mt-7"
+          />
 
-              return (
-                <div 
-                  key={idx} 
-                  onClick={() => setSelectedProject(project)}
-                  className="group grid cursor-pointer gap-8 border-b border-zinc-800/70 pb-12 last:border-0 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-center lg:gap-16 lg:pb-16"
-                >
-                  <div className="order-2 flex flex-col justify-center lg:order-1">
-                    <span className="font-mono text-[10px] text-orange-400 mb-5 tracking-[0.2em]">0{idx + 1} / CASE STUDY</span>
-                    <h3 className="font-serif text-4xl leading-[0.95] tracking-tight md:text-5xl text-zinc-100 mb-6 group-hover:text-orange-100 transition-colors">{project.title}</h3>
-                    <p className="font-sans text-zinc-400 text-sm font-light leading-relaxed mb-8 max-w-md md:text-base">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map((tag, tagIdx) => (
-                        <span key={tagIdx} className="font-sans text-[9px] uppercase tracking-widest text-zinc-500 border border-zinc-850 px-3 py-1 bg-zinc-900/30">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="order-1 lg:order-2">
-                    <div className="image-frame aspect-[4/3] flex items-center justify-center">
-                      {normalizeImagePath(project.projectImage) ? (
-                        <ParallaxImage 
-                          src={project.projectImage}
-                          alt={project.title}
-                          className="w-full h-full opacity-60 mix-blend-luminosity"
-                          imageClassName="grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
-                          sizes="(min-width: 1024px) 45vw, 100vw"
-                        />
-                      ) : (
-                        <SafeImage src={project.projectImage} alt={project.title} className="w-full h-full opacity-40" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-zinc-950/80 to-transparent pointer-events-none"></div>
-                    </div>
-                  </div>
+          <div className="mt-12 border-t border-zinc-800 md:mt-16">
+            {projects.map((project, index) => (
+              <NumberedItem
+                key={project.slug || `project-${index}`}
+                index={index + 1}
+                label={project.title}
+                description={project.description}
+                meta={techList(project.techStack)[0]}
+                href={detailPath('portfolio', project.slug)}
+                onClick={() => openEntry('portfolio', project.slug)}
+                className="min-h-[44px]"
+              />
+            ))}
+          </div>
+        </motion.section>
+
+        {/* ===================== IMAGE PLATES ===================== */}
+        {plates.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
+            className="mt-24 border-t border-zinc-800 pt-7 md:mt-32"
+          >
+            <RecLabel>plates</RecLabel>
+            <StackedHeading
+              lines={['the work', 'in frames']}
+              size="text-3xl md:text-5xl lg:text-6xl"
+              className="mt-7"
+            />
+
+            <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 md:mt-16">
+              {plates.map(({ project, image }, index) => (
+                <FrameCard
+                  key={project.slug || `plate-${index}`}
+                  title={project.title}
+                  image={image}
+                  index={String(index + 1).padStart(2, '0')}
+                  tag={techList(project.techStack)[0]}
+                  excerpt={project.description}
+                  aspect="aspect-[4/3] sm:aspect-[16/10]"
+                  priority={index === 0}
+                  href={detailPath('portfolio', project.slug)}
+                  onClick={() => openEntry('portfolio', project.slug)}
+                  className="min-h-[44px]"
+                />
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ===================== TECHNICAL CONTEXT ===================== */}
+        <motion.section
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
+          className="mt-24 border-t border-zinc-800 pb-24 pt-7 md:mt-32 md:pb-32"
+        >
+          <RecLabel>stack</RecLabel>
+          <StackedHeading
+            lines={['technical', 'context']}
+            body="The languages and systems the case studies above are built on."
+            className="mt-7"
+          />
+
+          <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 md:mt-16 lg:grid-cols-4">
+            {technicalSkills.map((section, index) => (
+              <div key={section.category} className="min-w-0">
+                <h3 className="flex items-baseline gap-3 border-b border-zinc-800 pb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400">
+                  <span className="text-accent">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="min-w-0 break-words">{section.category}</span>
+                </h3>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {section.items.map((item) => (
+                    <TagChip key={item}>{item}</TagChip>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-
-          <div className="content-rule pt-8 mt-24 mb-24">
-             <div className="mb-12">
-                <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-orange-400/80">Technical context</h2>
-             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-                {technicalSkills.map((section, idx) => (
-                  <div key={idx}>
-                    <h3 className="font-serif italic text-xl text-zinc-200 mb-6">{section.category}</h3>
-                    <ul className="space-y-4">
-                      {section.items.map((item, itemIdx) => (
-                        <li key={itemIdx} className="font-sans font-light text-sm text-zinc-400 relative pl-4">
-                          <span className="absolute left-0 top-[0.4rem] w-1 h-1 rounded-full bg-orange-500/50"></span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-             </div>
-          </div>
-        </motion.div>
+        </motion.section>
 
         <Footer />
       </div>
-
-      {/* Immersive overlay metadata viewer */}
-      <AnimatePresence>
-        {selectedProject && (
-          <ContentModal 
-            isOpen={!!selectedProject}
-            onClose={() => setSelectedProject(null)}
-            title={selectedProject.title}
-            category="Case Study"
-            coverImage={selectedProject.projectImage}
-            excerpt={selectedProject.description}
-            body={selectedProject.body}
-            metadata={{
-              githubLink: selectedProject.githubLink,
-              liveLink: selectedProject.liveLink,
-              techStack: Array.isArray(selectedProject.techStack) 
-                ? selectedProject.techStack.map((item: any) => typeof item === 'string' ? item : item.tech || '')
-                : []
-            }}
-            customization={selectedProject.customization}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }

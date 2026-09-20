@@ -1,0 +1,9 @@
+# arbabmujtaba.github.io
+# The archive is public and crawlable. Only the authoring surfaces are not.
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /preview/
+
+Sitemap: https://arbabmujtaba.github.io/sitemap.xml

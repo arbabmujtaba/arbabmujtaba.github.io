@@ -7,7 +7,7 @@ techStack:
   - Networking
 githubLink: "https://github.com/arbabandjones/network-simulator"
 liveLink: ""
-projectImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80"
+projectImage: ""
 featured: true
 ---
 

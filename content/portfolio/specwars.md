@@ -7,7 +7,7 @@ techStack:
   - Node.js
 githubLink: ""
 liveLink: ""
-projectImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80"
+projectImage: ""
 featured: false
 ---
 

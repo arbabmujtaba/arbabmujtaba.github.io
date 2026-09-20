@@ -8,7 +8,7 @@ techStack:
   - Swing
 githubLink: "https://github.com/arbabandjones/student-attendance"
 liveLink: ""
-projectImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80"
+projectImage: ""
 featured: true
 ---
 

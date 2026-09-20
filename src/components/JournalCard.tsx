@@ -1,12 +1,13 @@
-import { motion } from 'motion/react';
-import { Disc3 } from 'lucide-react';
-import ParallaxImage from './ParallaxImage';
+import { motion, useReducedMotion } from 'motion/react';
+import { ArrowUpRight, Disc3 } from 'lucide-react';
 import SafeImage from './SafeImage';
-import ExploreArrow from './ExploreArrow';
+import { TagChip } from './rushes';
+import { detailPath } from '../lib/collections';
+import { shouldInterceptClick } from '../lib/navigation';
 import { JournalEntry } from '../types';
 
 /**
- * Default cinematic cover used when an entry has no uploaded image.
+ * Default cover used when an entry has no uploaded image.
  * Lives in /public/assets so it resolves at a stable URL in dev and on
  * GitHub Pages, and contains no embedded text/logos (typography is always
  * rendered by the site on top of it).
@@ -23,10 +24,12 @@ interface JournalCardProps {
   index?: number;
 }
 
-/** Pretty magazine volume label: 2 -> "Vol. 02". */
-function volumeLabel(volume?: number): string {
-  if (!volume || volume < 1) return 'Vol. 01';
-  return `Vol. ${String(volume).padStart(2, '0')}`;
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+/** Volume as the zero-padded plate number: 2 -> "02". */
+function volumeNumber(volume?: number): string {
+  const n = !volume || volume < 1 ? 1 : volume;
+  return String(n).padStart(2, '0');
 }
 
 function formatDate(date: string): string {
@@ -36,152 +39,211 @@ function formatDate(date: string): string {
 }
 
 /**
- * JournalCard — the single, reusable editorial card used for EVERY journal
- * entry. The `featured` variant is the large cinematic hero (newest entry);
- * the `archive` variant is the smaller image-first card used in the grid.
+ * JournalCard — the single, reusable card used for EVERY journal entry.
  *
- * Both variants share one design system: a full-bleed cover image, a dark
- * gradient overlay for legibility, the volume + metadata eyebrow, serif title,
- * excerpt, tags and the "Read … Essay" CTA. There is intentionally no separate
- * layout for new posts — publishing an entry requires zero manual adjustment.
+ * Both variants share one anatomy: a framed photographic plate, the volume
+ * number set large in the accent as the numbered prefix, a lowercase display
+ * title, the excerpt, and the metadata line. The `featured` variant is the
+ * two-column hero (newest entry) and carries the "on rotation" record when the
+ * entry has one; `archive` is the plate-over-caption card used in the grid.
+ *
+ * Caption sits *beside* or *beneath* the plate rather than on top of it. That is
+ * the difference that makes the card work on the bone surface: no text is ever
+ * laid over a photograph, so nothing depends on a dark scrim for legibility and
+ * the same component reads correctly on either surface.
  */
 export default function JournalCard({ entry, variant, onOpen, index = 0 }: JournalCardProps) {
+  const shouldReduceMotion = useReducedMotion();
   const isFeatured = variant === 'featured';
+
   const cover = entry.featuredImage || entry.coverImage || DEFAULT_JOURNAL_COVER;
   const date = formatDate(entry.date);
   const music = entry.customization?.music;
   const hasMusic = !!(music && (music.songTitle || music.songArtist));
+  const tags = (entry.tags || []).filter(Boolean).slice(0, isFeatured ? 3 : 2);
+
+  const plate = (
+    <div className="image-frame aspect-[4/3] w-full sm:aspect-[16/10]">
+      <SafeImage
+        src={cover}
+        alt={entry.title}
+        loading={isFeatured ? 'eager' : 'lazy'}
+        className="h-full w-full object-cover grayscale-[12%] transition-[transform,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
+        fallback={<div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />}
+      />
+    </div>
+  );
+
+  /* Volume number as the numbered prefix. Display size keeps the accent well
+     clear of the small-text contrast floor on the paper surface. */
+  const prefix = (
+    <span
+      className={`shrink-0 font-display font-medium leading-none tracking-[-0.045em] text-accent ${
+        isFeatured ? 'text-3xl md:text-5xl' : 'text-3xl'
+      }`}
+    >
+      {volumeNumber(entry.volume)}
+    </span>
+  );
+
+  const metaLine = (
+    <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400">
+      <span>vol. {volumeNumber(entry.volume)}</span>
+      {date && (
+        <>
+          <span aria-hidden="true" className="h-px w-4 bg-zinc-700" />
+          <span>{date}</span>
+        </>
+      )}
+      {entry.readingTime && (
+        <>
+          <span aria-hidden="true" className="h-px w-4 bg-zinc-700" />
+          <span>{entry.readingTime}</span>
+        </>
+      )}
+    </div>
+  );
+
+  const cta = (
+    <span className="mt-7 inline-flex min-h-[44px] items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-100 transition-colors group-hover:text-zinc-50">
+      {isFeatured ? 'read full entry' : 'read entry'}
+      <ArrowUpRight
+        size={14}
+        strokeWidth={1.6}
+        aria-hidden="true"
+        className="transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+      />
+    </span>
+  );
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: isFeatured ? 30 : 24 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: isFeatured ? 24 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: isFeatured ? 1 : 0.8, delay: isFeatured ? 0 : index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-      onClick={() => onOpen(entry)}
-      className={[
-        'group relative isolate flex w-full cursor-pointer flex-col justify-end overflow-hidden',
-        'rounded-sm border border-zinc-800/80 bg-zinc-900/40',
-        'shadow-2xl shadow-black/40 transition-colors duration-500 hover:border-orange-500/40',
-        isFeatured
-          ? 'min-h-[34rem] sm:min-h-[38rem] md:min-h-[44rem] lg:min-h-[46rem]'
-          : 'min-h-[24rem] sm:min-h-[26rem]',
-      ].join(' ')}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{
+        duration: shouldReduceMotion ? 0.3 : isFeatured ? 0.95 : 0.8,
+        delay: shouldReduceMotion || isFeatured ? 0 : index * 0.08,
+        ease: EASE,
+      }}
     >
-      {/* Cover image — full-bleed background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+      <a
+        href={detailPath('journal', entry.slug)}
+        onClick={(event) => {
+          if (!shouldInterceptClick(event)) return;
+          event.preventDefault();
+          onOpen(entry);
+        }}
+        aria-label={`Read ${entry.title}`}
+        className="group block w-full cursor-pointer text-left"
+      >
         {isFeatured ? (
-          <ParallaxImage
-            src={cover}
-            alt={entry.title}
-            className="h-full w-full"
-            imageClassName="grayscale-[12%] transition-all duration-[1200ms] group-hover:grayscale-0 group-hover:scale-[1.04]"
-          />
-        ) : (
-          <SafeImage
-            src={cover}
-            alt={entry.title}
-            className="h-full w-full object-cover grayscale-[15%] transition-all duration-[1200ms] group-hover:grayscale-0 group-hover:scale-[1.05]"
-            referrerPolicy="no-referrer"
-          />
-        )}
-      </div>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-10">
+            <div className="md:col-span-7">{plate}</div>
 
-      {/* Dark gradient overlays for text readability */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-black/95 via-black/55 to-black/15" />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-black/70 via-black/10 to-transparent" />
-      {/* Subtle top sheen + vignette so the frame reads as cinematic */}
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-70 [box-shadow:inset_0_0_140px_30px_rgba(0,0,0,0.55)]" />
-
-      {/* Content layer */}
-      <div className={isFeatured ? 'relative p-8 md:p-12 lg:p-16' : 'relative p-6 md:p-8'}>
-        {/* Eyebrow: featured badge + volume */}
-        <div className="mb-5 flex flex-wrap items-center gap-4">
-          {isFeatured && (
-            <>
-              <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-orange-400">
-                Featured Entry
-              </span>
-              <span className="h-1 w-1 rounded-full bg-zinc-500/70" />
-            </>
-          )}
-          <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-zinc-300">
-            {volumeLabel(entry.volume)}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h3
-          className={[
-            'font-serif text-zinc-50 [text-shadow:0_2px_30px_rgba(0,0,0,0.6)]',
-            isFeatured
-              ? 'text-3xl leading-[1.1] md:text-5xl lg:text-6xl'
-              : 'text-2xl leading-[1.12] md:text-3xl',
-          ].join(' ')}
-        >
-          {entry.title}
-        </h3>
-
-        {/* Excerpt */}
-        {entry.excerpt && (
-          <p
-            className={[
-              'mt-5 font-sans font-light text-zinc-300',
-              isFeatured
-                ? 'max-w-2xl text-sm leading-relaxed line-clamp-4 md:text-base'
-                : 'max-w-xl text-xs leading-relaxed line-clamp-2 md:text-sm',
-            ].join(' ')}
-          >
-            {entry.excerpt}
-          </p>
-        )}
-
-        {/* Metadata row: date • reading time • tags */}
-        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
-          {date && (
-            <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-400">{date}</span>
-          )}
-          {entry.readingTime && (
-            <>
-              <span className="h-1 w-1 rounded-full bg-zinc-600" />
-              <span className="font-sans text-[9px] uppercase tracking-[0.2em] text-zinc-400">
-                {entry.readingTime}
-              </span>
-            </>
-          )}
-          {entry.tags && entry.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {entry.tags.slice(0, isFeatured ? 4 : 2).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-zinc-700/50 bg-black/30 px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] text-zinc-300 backdrop-blur-sm"
-                >
-                  {tag}
+            <div className="flex min-w-0 flex-col md:col-span-5 md:justify-center">
+              <div className="flex items-center gap-4">
+                {prefix}
+                <span className="min-w-0 font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-zinc-400">
+                  latest volume
                 </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* On Rotation music widget — featured only, rendered when the entry carries music */}
-        {isFeatured && hasMusic && (
-          <div className="mt-8 flex w-full max-w-sm items-center gap-6 rounded-sm border border-zinc-700/50 bg-zinc-950/60 p-4 backdrop-blur-md">
-            <Disc3 className="h-8 w-8 animate-[spin_5s_linear_infinite] text-orange-400" strokeWidth={1} />
-            <div className="flex flex-col">
-              <span className="mb-1 font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-400">On Rotation</span>
-              <div className="flex items-baseline gap-2">
-                {music?.songTitle && <span className="font-serif italic text-zinc-100">{music.songTitle}</span>}
-                {music?.songArtist && <span className="font-sans text-xs text-zinc-400">— {music.songArtist}</span>}
               </div>
+
+              <h2 className="mt-5 font-display text-3xl font-medium lowercase leading-[0.96] tracking-[-0.05em] text-zinc-50 md:text-4xl lg:text-5xl">
+                {entry.title}
+              </h2>
+
+              {entry.excerpt && (
+                <p className="mt-5 max-w-xl text-sm font-light leading-relaxed text-zinc-300 line-clamp-5 md:text-base">
+                  {entry.excerpt}
+                </p>
+              )}
+
+              {metaLine}
+
+              {(tags.length > 0 || entry.category) && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {/* Default tone, not accent: the ember measures 3.14:1 against
+                      the paper, which is fine for the display-size volume figure
+                      above but fails at chip size. */}
+                  {entry.category && <TagChip>{entry.category}</TagChip>}
+                  {tags.map((tag) => (
+                    <TagChip key={tag}>{tag}</TagChip>
+                  ))}
+                </div>
+              )}
+
+              {/* On rotation — the record the entry was written to. Capped at
+                  max-w-sm and truncating, so a long title cannot widen the
+                  column on a 320px screen. The disc no longer spins: the motion
+                  contract allows no infinite loops outside the marquee. */}
+              {hasMusic && (
+                <div className="mt-8 flex w-full max-w-sm items-center gap-4 border border-zinc-800 bg-canvas-raised p-4">
+                  <Disc3
+                    aria-hidden="true"
+                    size={26}
+                    strokeWidth={1}
+                    className="shrink-0 text-accent"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                      on rotation
+                    </span>
+                    {music?.songTitle && (
+                      <span className="mt-1.5 block truncate font-display text-sm font-medium text-zinc-100">
+                        {music.songTitle}
+                      </span>
+                    )}
+                    {music?.songArtist && (
+                      <span className="block truncate font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-400">
+                        {music.songArtist}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {cta}
             </div>
           </div>
-        )}
+        ) : (
+          <div className="flex min-w-0 flex-col">
+            {plate}
 
-        {/* CTA — same location & style across every entry */}
-        <div className="mt-8">
-          <ExploreArrow label={isFeatured ? 'Read Full Essay' : 'Read Essay'} direction="up-right" />
-        </div>
-      </div>
+            <div className="mt-5 flex min-w-0 items-start gap-4">
+              {prefix}
+
+              <div className="min-w-0 flex-1">
+                <h3 className="font-display text-xl font-medium lowercase leading-[1.05] tracking-[-0.04em] text-zinc-50 md:text-2xl">
+                  {entry.title}
+                </h3>
+
+                {entry.excerpt && (
+                  <p className="mt-3 max-w-md text-xs font-light leading-relaxed text-zinc-300 line-clamp-3 md:text-sm">
+                    {entry.excerpt}
+                  </p>
+                )}
+              </div>
+
+              {entry.category && (
+                <TagChip className="mt-1 hidden shrink-0 sm:inline-flex">{entry.category}</TagChip>
+              )}
+            </div>
+
+            {metaLine}
+
+            {tags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <TagChip key={tag}>{tag}</TagChip>
+                ))}
+              </div>
+            )}
+
+            {cta}
+          </div>
+        )}
+      </a>
     </motion.article>
   );
 }

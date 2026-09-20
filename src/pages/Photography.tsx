@@ -1,14 +1,23 @@
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Camera, Aperture, Focus } from 'lucide-react';
-import ExploreArrow from '../components/ExploreArrow';
-import ParallaxImage from '../components/ParallaxImage';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'motion/react';
+import { Aperture, Camera, Focus } from 'lucide-react';
 import Footer from '../components/Footer';
-import ContentModal from '../components/ContentModal';
 import SafeImage from '../components/SafeImage';
+import { FrameCard, RecLabel, StackedHeading, TagChip } from '../components/rushes';
 import { getPhotographyEntries, getGearItems } from '../lib/cms';
-import { normalizeImagePath } from '../lib/image';
-import { PhotographyEntry, GearItem } from '../types';
+import { detailPath } from '../lib/collections';
+import { useOpenEntry } from '../lib/entryNavigation';
+import { shouldInterceptClick } from '../lib/navigation';
+import { useMediaQuery } from '../lib/useMediaQuery';
+import type { GearItem, PhotographyEntry } from '../types';
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 // Preferred ordering and copy for the photo-story categories. Anything not
 // listed here is still rendered (appended after these) so no category is dropped.
@@ -20,12 +29,162 @@ const STORY_CATEGORY_DESCRIPTIONS: Record<string, string> = {
   'Connected': 'People, relationships, and the moments shared with them.',
 };
 
+const ALL_CATEGORIES = 'all';
+
+/** Plate numbers are darkroom contact-sheet labels: `plate 04`. */
+const plateLabel = (position: number) => `plate ${String(position).padStart(2, '0')}`;
+
+/**
+ * Plate rhythm. Rows repeat 1-up → 2-up → 3-up so the grid never settles into a
+ * single cadence. `startAt` lets a section open on a different row width when a
+ * dedicated lead plate already sits above it.
+ */
+const RHYTHM = [1, 2, 3];
+
+function rhythmRows<T>(items: T[], startAt = 0): T[][] {
+  const rows: T[][] = [];
+  let cursor = 0;
+  let step = startAt;
+
+  while (cursor < items.length) {
+    const size = RHYTHM[step % RHYTHM.length];
+    rows.push(items.slice(cursor, cursor + size));
+    cursor += size;
+    step += 1;
+  }
+
+  return rows;
+}
+
+/**
+ * Mobile-first aspect pairs. At 320px the shell measures ~288px, so every
+ * mobile aspect stays at or below 4:3 — a bare 21/9 plate would collapse to a
+ * 120px sliver, which the layout audit rejected.
+ */
+const ROW_ASPECT: Record<number, string> = {
+  1: 'aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]',
+  2: 'aspect-[4/3] sm:aspect-[16/10]',
+  3: 'aspect-[4/3] sm:aspect-[3/4]',
+};
+
+const ROW_COLUMNS: Record<number, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+};
+
+function gearIcon(category: string) {
+  if (category === 'Cameras') return Camera;
+  if (category === 'Lenses') return Aperture;
+  return Focus;
+}
+
+function Section({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`relative border-t border-zinc-800 py-16 md:py-24 ${className}`}>
+      {children}
+    </section>
+  );
+}
+
+/** Capture metadata — camera / lens / mode, straight from the entry. */
+function CaptureMeta({
+  entry,
+  className = '',
+}: {
+  entry: PhotographyEntry;
+  className?: string;
+}) {
+  const bits = [
+    entry.gear?.length ? entry.gear.join(' / ') : null,
+    entry.captureMode || null,
+  ].filter((bit): bit is string => Boolean(bit));
+
+  if (bits.length === 0) return null;
+
+  return (
+    <p
+      className={`font-mono text-[9px] uppercase leading-relaxed tracking-[0.2em] text-zinc-500 ${className}`}
+    >
+      {bits.join('  ·  ')}
+    </p>
+  );
+}
+
+/** A run of plates laid out in the 1/2/3 rhythm. */
+function PlateRows({
+  entries,
+  plateOf,
+  onSelect,
+  startAt = 0,
+  showMeta = false,
+  className = '',
+}: {
+  entries: PhotographyEntry[];
+  plateOf: (entry: PhotographyEntry) => number;
+  onSelect: (entry: PhotographyEntry) => void;
+  startAt?: number;
+  showMeta?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`space-y-12 md:space-y-16 ${className}`}>
+      {rhythmRows(entries, startAt).map((row, rowIndex) => (
+        <div
+          key={`row-${rowIndex}-${row.length}`}
+          className={`grid gap-10 md:gap-6 ${ROW_COLUMNS[row.length]}`}
+        >
+          {row.map((entry) => (
+            <div key={entry.slug || entry.title} className="min-w-0">
+              <FrameCard
+                title={entry.title}
+                image={entry.coverImage}
+                tag={entry.category}
+                index={plateLabel(plateOf(entry))}
+                excerpt={entry.description}
+                aspect={ROW_ASPECT[row.length]}
+                href={detailPath('photography', entry.slug)}
+                onClick={() => onSelect(entry)}
+              />
+              {showMeta && <CaptureMeta entry={entry} className="mt-3" />}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Photography() {
-  const [selectedPhoto, setSelectedPhoto] = useState<PhotographyEntry | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const openEntry = useOpenEntry();
+  const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORIES);
+
+  const shouldReduceMotion = useReducedMotion();
+  const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
+  const shouldParallax = !shouldReduceMotion && !isTouchDevice;
+
+  /** Opening a frame pushes `/photography/<slug>`; App renders the quick look. */
+  const handleOpen = useCallback(
+    (entry: PhotographyEntry) => openEntry('photography', entry.slug),
+    [openEntry]
+  );
+
+  const { scrollY } = useScroll({ container: containerRef });
+  const leadImageY = useTransform(scrollY, [0, 800], ['0%', '8%']);
 
   // Load from CMS
   const allPhotos = useMemo(() => getPhotographyEntries(), []);
-  const gearItems = useMemo(() => getGearItems().filter(g => g.visible).sort((a, b) => a.order - b.order), []);
+  const gearItems = useMemo(
+    () => getGearItems().filter((g) => g.visible).sort((a, b) => a.order - b.order),
+    []
+  );
 
   // Group gear by category
   const gearByCategory = useMemo(() => {
@@ -38,237 +197,365 @@ export default function Photography() {
 
   // Filter dynamic favorites
   const favorites = useMemo(() => {
-    return allPhotos.filter(p => p.category === 'Favorites');
+    return allPhotos.filter((p) => p.category === 'Favorites');
   }, [allPhotos]);
 
-  // Group photo "stories" (everything except the Favorites showcase) by their
-  // own category, so each category routes to its own correctly-labelled section
-  // (a "Travel" photo appears under "Travel", not lumped into "Behind The Shot").
-  const storySections = useMemo(() => {
-    const grouped = allPhotos
-      .filter(p => p.category !== 'Favorites')
-      .reduce((acc, photo) => {
-        const cat = photo.category || 'Behind The Shot';
-        (acc[cat] = acc[cat] || []).push(photo);
-        return acc;
-      }, {} as Record<string, PhotographyEntry[]>);
+  // Everything that is not part of the Favorites showcase, in the preferred
+  // category order — so a "Travel" frame files under Travel, never lumped into
+  // "Behind The Shot".
+  const stories = useMemo(() => {
+    const rest = allPhotos.filter((p) => p.category !== 'Favorites');
+    const rank = (category: string) => {
+      const index = STORY_CATEGORY_ORDER.indexOf(category);
+      return index === -1 ? STORY_CATEGORY_ORDER.length : index;
+    };
+    return [...rest].sort(
+      (a, b) => rank(a.category || 'Behind The Shot') - rank(b.category || 'Behind The Shot')
+    );
+  }, [allPhotos]);
 
-    const known = STORY_CATEGORY_ORDER.filter(c => grouped[c]?.length);
-    const extras = Object.keys(grouped).filter(c => !STORY_CATEGORY_ORDER.includes(c));
-    return [...known, ...extras].map(category => ({
-      title: category,
-      description: STORY_CATEGORY_DESCRIPTIONS[category] || `Photo stories filed under ${category}.`,
-      photos: grouped[category],
+  // The lead plate is the first favorite, or the first frame on file when no
+  // favorites are flagged — either way it is never repeated further down.
+  const leadFromFavorites = favorites.length > 0;
+  const leadPhoto = leadFromFavorites ? favorites[0] : stories[0];
+  const restFavorites = leadFromFavorites ? favorites.slice(1) : [];
+  const archiveStories = useMemo(
+    () => (leadFromFavorites ? stories : stories.slice(1)),
+    [stories, leadFromFavorites]
+  );
+
+  const storyCategories = useMemo(() => {
+    const counts = archiveStories.reduce((acc, photo) => {
+      const category = photo.category || 'Behind The Shot';
+      acc[category] = (acc[category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const known = STORY_CATEGORY_ORDER.filter((category) => counts[category]);
+    const extras = Object.keys(counts).filter(
+      (category) => !STORY_CATEGORY_ORDER.includes(category)
+    );
+
+    return [...known, ...extras].map((category) => ({
+      category,
+      count: counts[category],
+      description:
+        STORY_CATEGORY_DESCRIPTIONS[category] || `Photo stories filed under ${category}.`,
     }));
-  }, [allPhotos]);
+  }, [archiveStories]);
+
+  const visibleStories = useMemo(
+    () =>
+      activeCategory === ALL_CATEGORIES
+        ? archiveStories
+        : archiveStories.filter(
+            (photo) => (photo.category || 'Behind The Shot') === activeCategory
+          ),
+    [archiveStories, activeCategory]
+  );
+
+  const activeDescription =
+    activeCategory === ALL_CATEGORIES
+      ? 'Every frame on file, newest cameras and oldest memories alike.'
+      : storyCategories.find((entry) => entry.category === activeCategory)?.description || '';
+
+  // One contact sheet, numbered once: favorites first, then the archive. The
+  // number travels with the entry so filtering never renumbers a plate.
+  const plateNumbers = useMemo(() => {
+    const map = new Map<PhotographyEntry, number>();
+    [...favorites, ...stories].forEach((entry, index) => map.set(entry, index + 1));
+    return map;
+  }, [favorites, stories]);
+
+  const plateOf = (entry: PhotographyEntry) => plateNumbers.get(entry) ?? 1;
+
 
   return (
     <motion.div
       key="photography"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      className="flex-grow flex flex-col relative overflow-hidden"
+      initial={{ opacity: 0, y: isTouchDevice ? 0 : 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: isTouchDevice ? 0 : -18 }}
+      transition={{ duration: isTouchDevice ? 0.2 : 0.8, ease: EASE }}
+      className="relative flex flex-grow flex-col overflow-hidden"
     >
-      <div className="page-shell flex-grow overflow-y-auto custom-scrollbar pt-0 relative z-10">
-
+      <div
+        ref={containerRef}
+        className="page-shell custom-scrollbar relative z-10 flex-grow overflow-y-auto pt-0"
+      >
+        {/* ===================== INTRO ===================== */}
         <div className="page-intro" data-mark="FRAMES">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="page-eyebrow"
-          >
-            <span>Home</span>
-            <span className="w-1 h-1 rounded-full bg-orange-500/50"></span>
-            <span>Photography</span>
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ease: [0.16, 1, 0.3, 1], duration: 1 }}
-            className="page-title"
-          >
-            Photography
-          </motion.h1>
           <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ease: [0.16, 1, 0.3, 1], duration: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
+          >
+            <RecLabel>frames</RecLabel>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.25, ease: EASE }}
+            className="page-title mt-7"
+          >
+            photography
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.35, ease: EASE }}
             className="page-description"
           >
-            A collection of moments gathered over the years. This is less of a portfolio and more of a personal visual diary, focusing on memories, people, and the stories carried within light.
+            A collection of moments gathered over the years. This is less of a portfolio and
+            more of a personal visual diary, focusing on memories, people, and the stories
+            carried within light.
           </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
+            className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
+          >
+            <span>
+              <span className="text-accent">{allPhotos.length}</span> plates
+            </span>
+            <span aria-hidden="true" className="text-zinc-700">
+              /
+            </span>
+            <span>
+              <span className="text-accent">{storyCategories.length + (favorites.length ? 1 : 0)}</span>{' '}
+              categories
+            </span>
+            <span aria-hidden="true" className="text-zinc-700">
+              /
+            </span>
+            <span>darkroom open</span>
+          </motion.p>
         </div>
 
-        {/* Favorites dynamic section */}
-        {favorites.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-24 md:mb-32 group content-rule pt-8 md:pt-12"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-              <div className="lg:col-span-3">
-                <div className="sticky top-24">
-                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-orange-400/80">Selected frames</p>
-                  <h2 className="font-serif text-4xl leading-none tracking-tight md:text-5xl text-zinc-200">Favorites</h2>
-                  <p className="font-sans text-sm text-zinc-400 font-light mt-2">The most meaningful frames.</p>
-                </div>
-              </div>
-              <div className="lg:col-span-9 space-y-24 mt-8 lg:mt-0">
-                {favorites.map((photo, idx) => (
-                   <div
-                     key={idx}
-                     onClick={() => setSelectedPhoto(photo)}
-                     className="cursor-pointer group/photo"
-                   >
-                      {normalizeImagePath(photo.coverImage) ? (
-                        <ParallaxImage
-                          src={photo.coverImage}
-                          alt={photo.title}
-                          className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8 group-hover/photo:border-orange-500/35 transition-colors"
-                          imageClassName="grayscale-[20%] group-hover/photo:grayscale-0 transition-all duration-1000 scale-105 group-hover/photo:scale-100"
-                          sizes="(min-width: 1024px) 75vw, 100vw"
-                        />
-                      ) : (
-                        <div className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-900 border border-zinc-800/50 block w-full mb-8" />
-                      )}
-                      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                        <div className="max-w-md">
-                          <h3 className="font-serif text-2xl text-zinc-200 mb-2 group-hover/photo:text-orange-200 transition-colors">{photo.title}</h3>
-                          <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed">{photo.description}</p>
-                        </div>
-                        {(photo.gear?.length || photo.captureMode) ? (
-                          <div className="text-left md:text-right font-mono text-[9px] uppercase tracking-widest text-zinc-500 font-light space-y-1 mt-4 md:mt-0">
-                            {photo.gear && photo.gear.length > 0 && <p>{photo.gear.join(' / ')}</p>}
-                            {photo.captureMode && <p>{photo.captureMode}</p>}
-                          </div>
-                        ) : null}
-                      </div>
-                   </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Dynamic Photo Stories — each category routes to its own section */}
-        {storySections.length > 0 && (
-          <div className="space-y-16 md:space-y-24 lg:space-y-32 mb-32">
-            {storySections.map((section) => (
-              <motion.section
-                key={section.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 content-rule pt-8 md:pt-12"
+        {/* ===================== LEAD PLATE ===================== */}
+        {leadPhoto && (
+          <section className="relative pb-16 md:pb-24">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.9, ease: EASE }}
+            >
+              <a
+                href={detailPath('photography', leadPhoto.slug)}
+                onClick={(event) => {
+                  if (!shouldInterceptClick(event)) return;
+                  event.preventDefault();
+                  handleOpen(leadPhoto);
+                }}
+                className="group block w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
-                <div className="lg:col-span-3">
-                  <div className="sticky top-24">
-                    <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">{section.title}</h2>
-                    <p className="font-sans text-sm text-zinc-400 font-light pr-4">{section.description}</p>
+                <div className="image-frame w-full overflow-hidden aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]">
+                  <motion.div
+                    className="absolute inset-0 overflow-hidden"
+                    style={shouldParallax ? { y: leadImageY } : undefined}
+                  >
+                    <SafeImage
+                      src={leadPhoto.coverImage}
+                      alt={leadPhoto.title}
+                      loading="eager"
+                      sizes="100vw"
+                      className={`w-full object-cover transition-transform duration-[1200ms] ease-out ${
+                        shouldParallax ? 'h-[112%]' : 'h-full'
+                      } ${shouldReduceMotion ? '' : 'group-hover:scale-[1.02]'}`}
+                      fallback={
+                        <div
+                          className="hairline-grid h-full w-full bg-canvas-deep"
+                          aria-hidden="true"
+                        />
+                      }
+                    />
+                  </motion.div>
+
+                  {/* Legibility band only — the frame itself stays unmuted. */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-canvas/90 via-canvas/25 to-transparent"
+                  />
+
+                  <div className="absolute inset-x-0 bottom-0 z-10 p-5 md:p-8 lg:p-10">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-300">
+                        {plateLabel(plateOf(leadPhoto))}
+                      </span>
+                      <TagChip tone="accent">{leadPhoto.category}</TagChip>
+                    </div>
+
+                    <h2 className="mt-4 font-display text-3xl font-medium lowercase leading-[0.95] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-6xl">
+                      {leadPhoto.title}
+                    </h2>
+
+                    {leadPhoto.description && (
+                      <p className="mt-3 line-clamp-2 max-w-xl text-sm font-light leading-relaxed text-zinc-300 sm:line-clamp-none">
+                        {leadPhoto.description}
+                      </p>
+                    )}
+
+                    <CaptureMeta entry={leadPhoto} className="mt-4" />
                   </div>
                 </div>
-
-                <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:mt-0">
-                  {section.photos.map((photo, idx) => (
-                    <article
-                      key={photo.slug || idx}
-                      onClick={() => setSelectedPhoto(photo)}
-                      className="group cursor-pointer block"
-                    >
-                      <div className="image-frame mb-6">
-                        {normalizeImagePath(photo.coverImage) ? (
-                          <ParallaxImage
-                            src={photo.coverImage}
-                            alt={photo.title}
-                            className="w-full aspect-[16/10] bg-zinc-900"
-                            imageClassName="opacity-80 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700 scale-100 group-hover:scale-105"
-                            sizes="(min-width: 1024px) 42vw, 100vw"
-                          />
-                        ) : (
-                          <div className="w-full aspect-[16/10] bg-zinc-900" />
-                        )}
-                        <div className="absolute inset-0 pointer-events-none border border-transparent group-hover:border-orange-500/20 transition-colors duration-700 z-10"></div>
-                      </div>
-                      <div className="flex flex-col gap-4">
-                        <div>
-                          <h3 className="font-serif text-2xl text-zinc-200 mb-3 group-hover:text-amber-100 transition-colors">{photo.title}</h3>
-                          <p className="font-sans text-sm text-zinc-400 font-light leading-relaxed line-clamp-2">{photo.description}</p>
-                        </div>
-                        <div className="mt-2">
-                          <ExploreArrow label="Explore Story" direction="up-right" />
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </motion.section>
-            ))}
-          </div>
+              </a>
+            </motion.div>
+          </section>
         )}
 
-        {/* Dynamic Gear */}
+        {/* ===================== FAVORITES ===================== */}
+        {restFavorites.length > 0 && (
+          <Section>
+            <RecLabel>selected</RecLabel>
+            <StackedHeading
+              lines={['selected', 'frames']}
+              body="The most meaningful frames."
+              className="mt-7"
+            />
+            <PlateRows
+              entries={restFavorites}
+              plateOf={plateOf}
+              onSelect={handleOpen}
+              startAt={1}
+              showMeta
+              className="mt-12 md:mt-16"
+            />
+          </Section>
+        )}
+
+        {/* ===================== ARCHIVE + CATEGORY FILTER ===================== */}
+        {archiveStories.length > 0 && (
+          <Section>
+            <RecLabel>archive</RecLabel>
+            <StackedHeading
+              lines={['photo stories', 'filed by light']}
+              body="Each frame carries the note that came with it."
+              className="mt-7"
+            />
+
+            {storyCategories.length > 1 && (
+              <div
+                role="group"
+                aria-label="Filter frames by category"
+                className="mt-10 flex flex-wrap items-center gap-2"
+              >
+                {[
+                  { category: ALL_CATEGORIES, label: 'all', count: archiveStories.length },
+                  ...storyCategories.map((entry) => ({
+                    category: entry.category,
+                    label: entry.category,
+                    count: entry.count,
+                  })),
+                ].map((chip) => {
+                  const isActive = activeCategory === chip.category;
+                  return (
+                    <button
+                      key={chip.category}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => setActiveCategory(chip.category)}
+                      className="inline-flex min-h-[44px] items-center focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                    >
+                      <TagChip
+                        tone={isActive ? 'accent' : 'default'}
+                        className={`transition-colors ${
+                          isActive ? '' : 'hover:border-zinc-700 hover:text-zinc-200'
+                        }`}
+                      >
+                        {chip.label}
+                        <span className="ml-2 opacity-60">{chip.count}</span>
+                      </TagChip>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.p
+                key={`caption-${activeCategory}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: EASE }}
+                className="mt-6 max-w-lg text-sm font-light leading-relaxed text-zinc-400"
+              >
+                {activeDescription}
+              </motion.p>
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`plates-${activeCategory}`}
+                initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: shouldReduceMotion ? 0.25 : 0.55, ease: EASE }}
+              >
+                <PlateRows
+                  entries={visibleStories}
+                  plateOf={plateOf}
+                  onSelect={handleOpen}
+                  className="mt-12 md:mt-16"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </Section>
+        )}
+
+        {/* ===================== KIT ===================== */}
         {Object.keys(gearByCategory).length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-24 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 content-rule pt-8 md:pt-12"
-          >
-            <div className="lg:col-span-3">
-               <div className="sticky top-24">
-                <h2 className="font-serif text-3xl md:text-4xl text-zinc-200 mb-2">The Tools</h2>
-                <p className="font-sans text-sm text-zinc-400 font-light pr-4">What&apos;s in the bag.</p>
-               </div>
-            </div>
-            <div className="lg:col-span-9 mt-8 lg:mt-0 grid grid-cols-1 sm:grid-cols-3 gap-12">
-              {Object.entries(gearByCategory).map(([category, items]) => (
-                 <div key={category}>
-                   <div className="font-sans text-[10px] uppercase tracking-[0.3em] text-orange-500 mb-6 flex items-center gap-3">
-                     {category === 'Cameras' ? <Camera className="w-3.5 h-3.5" /> : category === 'Lenses' ? <Aperture className="w-3.5 h-3.5" /> : <Focus className="w-3.5 h-3.5" />}
-                     {category}
-                   </div>
-                   <ul className="space-y-4">
-                     {items.map((item) => (
-                       <li key={item.slug} className="font-sans text-sm text-zinc-400 font-light tracking-wide flex items-baseline">
-                          <span className="w-1.5 h-1.5 rounded-full bg-zinc-800 mr-3 inline-block shrink-0"></span>
+          <Section>
+            <RecLabel>kit</RecLabel>
+            <StackedHeading
+              lines={['the tools', 'in the bag']}
+              body="What's in the bag."
+              className="mt-7"
+            />
+
+            <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3 md:mt-16">
+              {Object.entries(gearByCategory).map(([category, items], index) => {
+                const Icon = gearIcon(category);
+                return (
+                  <motion.div
+                    key={category}
+                    initial={{ opacity: 0, y: 22 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{ duration: 0.8, delay: index * 0.08, ease: EASE }}
+                    className="border border-zinc-800 bg-canvas-raised p-6"
+                  >
+                    <div className="flex items-center gap-3 text-accent">
+                      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+                        {category}
+                      </span>
+                    </div>
+
+                    <ul className="mt-6 border-t border-zinc-800">
+                      {items.map((item) => (
+                        <li
+                          key={item.slug}
+                          className="border-b border-zinc-800 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400"
+                        >
                           {item.title}
-                       </li>
-                     ))}
-                   </ul>
-                 </div>
-              ))}
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                );
+              })}
             </div>
-          </motion.div>
+          </Section>
         )}
 
         <Footer />
       </div>
-
-      {/* Photography Immersive Case Study detail */}
-      <AnimatePresence>
-        {selectedPhoto && (
-          <ContentModal
-            isOpen={!!selectedPhoto}
-            onClose={() => setSelectedPhoto(null)}
-            title={selectedPhoto.title}
-            category={selectedPhoto.category}
-            date={new Date(selectedPhoto.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
-            coverImage={selectedPhoto.coverImage}
-            excerpt={selectedPhoto.description}
-            body={selectedPhoto.story}
-            metadata={{
-              galleryImages: Array.isArray(selectedPhoto.galleryImages)
-                ? selectedPhoto.galleryImages.map(img => typeof img === 'string' ? img : Object.values(img)[0] as string)
-                : [],
-              gear: selectedPhoto.gear,
-              captureMode: selectedPhoto.captureMode
-            }}
-            customization={selectedPhoto.customization}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
