@@ -4,6 +4,10 @@
  * Run with: npx tsx tests/contentState.test.ts
  */
 
+import { existsSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+
 import {
   isValidTransition,
   assertValidTransition,
@@ -224,7 +228,29 @@ async function runTests() {
   if (failed > 0) process.exit(1);
 }
 
-runTests().catch(e => {
+/**
+ * The registry is a tracked file at the project root and these tests write to
+ * it: every run bumped `lastUpdated`, so a clean checkout came back dirty and
+ * the diff had to be discarded by hand. Snapshot it first, restore it after,
+ * and the suite leaves no trace whether it passes or fails.
+ */
+const REGISTRY_PATH = path.join(process.cwd(), 'content-state.json');
+
+async function withRegistryRestored(run: () => Promise<void>): Promise<void> {
+  const snapshot = existsSync(REGISTRY_PATH)
+    ? await readFile(REGISTRY_PATH, 'utf8')
+    : null;
+
+  try {
+    await run();
+  } finally {
+    if (snapshot !== null) {
+      await writeFile(REGISTRY_PATH, snapshot, 'utf8');
+    }
+  }
+}
+
+withRegistryRestored(runTests).catch(e => {
   console.error(e);
   process.exit(1);
 });

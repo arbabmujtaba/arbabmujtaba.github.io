@@ -10,7 +10,10 @@
     "optimize:images": "tsx scripts/optimize-images.ts",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "tsx tests/contentState.test.ts && tsx tests/routing.test.ts",
+    "verify:dist": "tsx scripts/verify-dist.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

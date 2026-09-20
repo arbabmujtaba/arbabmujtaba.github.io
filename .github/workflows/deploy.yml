@@ -31,8 +31,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The build alone was the only gate here, so a type error or a broken
+      # route could ship. These run before it for a fast, specific failure.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
+
+      # Asserts every public route has a shell GitHub Pages can serve. Without
+      # this, deep links can silently regress to 404 while the build stays green.
+      - name: Verify dist
+        run: npm run verify:dist
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
