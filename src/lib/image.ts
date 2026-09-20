@@ -119,21 +119,6 @@ export function getLocalWebpSources(
 }
 
 /**
- * Unsplash accepts width parameters, allowing its existing CDN to serve a
- * correctly-sized image without changing CMS content.
- */
-export function getUnsplashSrcSet(
-  path: string | undefined | null
-): string | undefined {
-  const normalized = normalizeImagePath(path);
-  if (!normalized?.startsWith('https://images.unsplash.com/')) return undefined;
-
-  return [480, 768, 1280]
-    .map((width) => `${normalized.replace(/([?&])w=\d+/, `$1w=${width}`)} ${width}w`)
-    .join(', ');
-}
-
-/**
  * Normalize an array of image paths, filtering out invalid ones.
  */
 export function normalizeImagePaths(paths: (string | undefined | null)[]): string[] {

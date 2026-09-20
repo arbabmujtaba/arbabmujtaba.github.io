@@ -31,10 +31,24 @@ const ICON_LINKS = [
 ];
 
 interface FooterProps {
-  /** Photograph revealed through the wordmark. Assigned in IMAGE_MAP. */
+  /**
+   * Photograph revealed through the wordmark. Defaults to the frame assigned in
+   * `.kiro/IMAGE_MAP.md`, so every page gets the same closing plate rather than
+   * only the one page that happened to pass a prop.
+   */
   wordmarkImage?: string;
   setView?: (view: string) => void;
 }
+
+/**
+ * The wordmark stencil. Chosen by rendering the wordmark over every candidate:
+ * two clean bands — ember sky over a black ridge — so contrast is high with
+ * almost no fine detail, and it is the only frame where every letter stays
+ * legible. `ImageTypeMask` loads the original as a CSS background with no
+ * derivative, so its 33 kB matters; a larger file would be fetched at full size
+ * and the softness through the letterforms is the intended effect.
+ */
+const WORDMARK_IMAGE = '/uploads/photography/1781674009809-689730206.jpeg';
 
 const SECTIONS = [
   { id: 'portfolio', label: 'Work' },
@@ -53,7 +67,7 @@ const SECTIONS = [
  * previous non-functional email input has been replaced with real mailto and
  * profile links.
  */
-export default function Footer({ wordmarkImage, setView }: FooterProps) {
+export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: FooterProps) {
   return (
     <footer className="relative z-10 mt-32 w-full border-t border-zinc-800 bg-canvas/60 backdrop-blur-sm">
       <div className="px-4 pt-20 md:px-12 md:pt-28 lg:px-16">

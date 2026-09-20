@@ -30,8 +30,13 @@ interface HomeProps {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-/** Hero backdrop. Reassign in .kiro/IMAGE_MAP.md once the audit lands. */
-const HERO_IMAGE = '/uploads/home/1781841191101-361910064.jpeg';
+/**
+ * Hero backdrop. Assigned in `.kiro/IMAGE_MAP.md`: at mean luminance 50 it is
+ * the darkest large photograph in the archive, so the bone hero type stays
+ * legible over it, and it carries atmosphere without a subject competing with
+ * the wordmark. Do not swap it for a brighter frame without re-measuring.
+ */
+const HERO_IMAGE = '/uploads/photography/1785134270800-642096424.jpeg';
 
 /**
  * techStack arrives either as plain strings or as `{ tech }` objects, depending
@@ -389,7 +394,7 @@ export default function Home({ setView }: HomeProps) {
           </div>
         </Section>
 
-        <Footer wordmarkImage={HERO_IMAGE} setView={setView} />
+        <Footer setView={setView} />
       </div>
     </motion.div>
   );
