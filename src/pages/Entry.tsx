@@ -74,7 +74,7 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
             {indexLabel} index
           </AppLink>
 
-          <RecLabel quiet className="text-zinc-600">
+          <RecLabel quiet className="text-zinc-400">
             {indexLabel} / {entry.slug}
           </RecLabel>
         </nav>

@@ -116,7 +116,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
               being written.
             </p>
 
-            <div className="mt-10 space-y-1.5 font-mono text-[10px] lowercase tracking-[0.08em] text-zinc-600">
+            <div className="mt-10 space-y-1.5 font-mono text-[10px] lowercase tracking-[0.08em] text-zinc-400">
               <p>© {new Date().getFullYear()} arbab mujtaba. all rights reserved.</p>
               <p>computer engineering, iet davv — srinagar &amp; indore.</p>
             </div>
@@ -124,7 +124,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
 
           <nav className="grid grid-cols-2 gap-8 md:col-span-6 md:justify-items-end">
             <div>
-              <h3 className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+              <h3 className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
                 Sections
               </h3>
               <ul className="space-y-3.5">
@@ -143,7 +143,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
             </div>
 
             <div>
-              <h3 className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+              <h3 className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
                 Elsewhere
               </h3>
               <ul className="space-y-3.5">

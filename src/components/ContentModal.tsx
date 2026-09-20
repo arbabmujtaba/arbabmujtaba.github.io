@@ -163,7 +163,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
           <source src={songUrl} />
         </audio>
       ) : (
-        <p className="font-mono text-[10px] text-zinc-600 mt-3">Audio source unavailable (invalid URL)</p>
+        <p className="font-mono text-[10px] text-zinc-400 mt-3">Audio source unavailable (invalid URL)</p>
       )}
     </div>
   );
@@ -276,8 +276,8 @@ export default function ContentModal({
           {category}
         </span>
         {date && (
-          <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
-            <Calendar className="w-3 h-3 text-zinc-600" />
+          <span className="font-sans text-[10px] uppercase tracking-widest text-zinc-400 flex items-center gap-1.5">
+            <Calendar className="w-3 h-3 text-zinc-500" />
             {date}
           </span>
         )}

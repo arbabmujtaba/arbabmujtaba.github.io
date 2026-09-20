@@ -54,13 +54,13 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
             or it may never have been written.
           </p>
 
-          <p className="mt-6 font-mono text-[11px] tracking-[0.12em] text-zinc-600">
+          <p className="mt-6 font-mono text-[11px] tracking-[0.12em] text-zinc-400">
             requested: <span className="text-zinc-400">{path}</span>
           </p>
         </div>
 
         <div className="content-rule pt-10">
-          <RecLabel quiet className="text-zinc-600">
+          <RecLabel quiet className="text-zinc-400">
             sections
           </RecLabel>
 
