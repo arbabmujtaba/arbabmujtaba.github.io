@@ -7,8 +7,8 @@ import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Navigation from './components/Navigation';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
-import CursorAura from './components/CursorAura';
 import GlobalBackground from './components/GlobalBackground';
+import { PillButton } from './components/rushes';
 import { resetAllScrolls } from './lib/scroll';
 import { useMediaQuery } from './lib/useMediaQuery';
 
@@ -80,31 +80,48 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a09] text-zinc-100 flex flex-col relative box-border selection:bg-orange-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 overflow-x-hidden">
       <GlobalBackground />
 
-      <CursorAura />
-
       {/* Outer Border Frame */}
-      <div className="flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800/50 relative z-10 flex flex-col overflow-hidden">
+      <div className="flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800 relative z-10 flex flex-col overflow-hidden">
         
-        {/* Header containing Name and Navigation */}
+        {/* Header: mark left, sections centre, standing invitation right */}
         {view !== 'admin' && (
-          <header className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center pt-5 px-4 md:px-12 lg:px-16 md:pt-8 relative z-20 gap-0 sm:gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: view === 'home' ? 0 : 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-              className={`font-serif text-2xl tracking-tighter text-zinc-200 cursor-pointer hover:text-white transition-colors z-50 mix-blend-difference mt-1 md:mt-5 ${view === 'home' ? 'pointer-events-none' : ''}`}
+          <header className="relative z-20 flex w-full items-center justify-between gap-6 px-4 pt-5 md:px-12 md:pt-8 lg:px-16">
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setView('home')}
+              aria-label="Home"
+              className="font-display text-xl font-semibold uppercase tracking-[-0.04em] text-zinc-100 transition-colors hover:text-accent md:text-2xl"
             >
-              Arbab <span className="italic text-orange-500/80">Mujtaba</span>
-            </motion.div>
-            
-            <div className="pt-0 md:pt-5 z-50">
+              AM<span className="text-accent">.</span>
+            </motion.button>
+
+            <div className="hidden md:block">
               <Navigation activeView={view} setView={setView} />
             </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <PillButton href="mailto:arbabandjones@gmail.com" className="hidden sm:inline-flex">
+                get in touch
+              </PillButton>
+            </motion.div>
           </header>
+        )}
+
+        {/* Mobile bottom bar lives outside the header */}
+        {view !== 'admin' && (
+          <div className="md:hidden">
+            <Navigation activeView={view} setView={setView} />
+          </div>
         )}
 
         {/* Main Content Area Routing */}
@@ -117,7 +134,7 @@ export default function App() {
             exit={{ opacity: 0, y: isTouchDevice ? 0 : -24 }}
             transition={{ duration: isTouchDevice ? 0.2 : 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Suspense fallback={<div className="flex flex-1 bg-[#0a0a09]" />}>
+            <Suspense fallback={<div className="flex flex-1 bg-canvas" />}>
               {view === 'home' && <Home setView={setView} />}
               {view === 'portfolio' && <Portfolio />}
               {view === 'journal' && <Journal />}
@@ -131,14 +148,11 @@ export default function App() {
               <motion.div
                 aria-hidden="true"
                 className="pointer-events-none fixed inset-0 z-[90]"
-                initial={{ opacity: isTouchDevice ? 0.3 : 0.55 }}
+                initial={{ opacity: isTouchDevice ? 0.24 : 0.45 }}
                 animate={{ opacity: 0 }}
-                exit={{ opacity: isTouchDevice ? 0.18 : 0.34 }}
+                exit={{ opacity: isTouchDevice ? 0.16 : 0.3 }}
                 transition={{ duration: isTouchDevice ? 0.2 : 0.55, ease: [0.16, 1, 0.3, 1] }}
-                style={{
-                  background:
-                    'radial-gradient(circle at center, rgba(249,115,22,0.045), transparent 46%), rgba(10,10,9,0.58)',
-                }}
+                style={{ backgroundColor: 'var(--bg-deep)' }}
               />
             )}
           </motion.div>
@@ -146,11 +160,11 @@ export default function App() {
 
         {view !== 'admin' && <FloatingMagicalArrow />}
         
-        {/* Decorative corner accents */}
-        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-zinc-500/30"></div>
-        <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-zinc-500/30"></div>
-        <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-zinc-500/30"></div>
-        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-500/30"></div>
+        {/* Camera framing marks */}
+        <div className="pointer-events-none absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-zinc-700"></div>
+        <div className="pointer-events-none absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-zinc-700"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-zinc-700"></div>
+        <div className="pointer-events-none absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-zinc-700"></div>
       </div>
     </div>
   );

@@ -452,10 +452,10 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
             }}
           >
             <div
-              className="w-full h-full bg-[#0a0a09] border border-zinc-900 shadow-2xl shadow-black/50 overflow-hidden rounded-sm"
+              className="w-full h-full bg-canvas border border-zinc-900 shadow-2xl shadow-black/50 overflow-hidden rounded-sm"
             >
               {iframeLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a09] z-10">
+                <div className="absolute inset-0 flex items-center justify-center bg-canvas z-10">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
                     <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Loading site...</span>

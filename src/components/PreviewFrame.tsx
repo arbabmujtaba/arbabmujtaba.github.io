@@ -159,7 +159,7 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a09]">
+    <div className="flex flex-col h-full bg-canvas">
       {/* Device Toolbar */}
       <div className="border-b border-zinc-900 bg-zinc-950/80 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
             style={{ width: config.width * scale, height: frameHeight * scale }}
           >
             <div
-              className="absolute top-0 left-0 bg-[#0a0a09] border border-zinc-900 shadow-2xl shadow-black/50 overflow-hidden"
+              className="absolute top-0 left-0 bg-canvas border border-zinc-900 shadow-2xl shadow-black/50 overflow-hidden"
               // Render the device frame at its true logical size, then scale it
               // down to fit the available pane. transform-origin top-left keeps it
               // aligned with the reserved footprint above.
@@ -233,7 +233,7 @@ export default function PreviewFrame({ collection, slug, liveContent }: PreviewF
               }}
             >
               {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a09] z-10">
+                <div className="absolute inset-0 flex items-center justify-center bg-canvas z-10">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
                     <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Loading preview…</span>

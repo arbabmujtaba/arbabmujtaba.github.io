@@ -1515,7 +1515,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
           <div className="flex-grow flex overflow-hidden">
             
             {/* LEFT INPUT FORM EDIT AREA */}
-            <div className="w-full lg:w-1/2 h-full overflow-y-auto border-r border-zinc-900 custom-scrollbar p-6 md:p-12 relative bg-[#0a0a09]">
+            <div className="w-full lg:w-1/2 h-full overflow-y-auto border-r border-zinc-900 custom-scrollbar p-6 md:p-12 relative bg-canvas">
               
               {/* Draft restore warning banner */}
               {draftAlert && (

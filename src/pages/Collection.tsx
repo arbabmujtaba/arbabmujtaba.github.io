@@ -95,7 +95,7 @@ export default function Collection() {
             <div className="relative border-l border-zinc-800/50 pl-8 md:pl-12 space-y-12 md:space-y-16 py-4 max-w-4xl">
               {timelineMilestones.map((milestone) => (
                 <div key={milestone.slug} className="relative group">
-                  <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-[#0a0a09]/72 border-2 border-zinc-700 group-hover:border-orange-500 transition-colors"></div>
+                  <div className="absolute -left-[37px] md:-left-[53px] top-1.5 w-3 h-3 rounded-full bg-canvas/72 border-2 border-zinc-700 group-hover:border-orange-500 transition-colors"></div>
                   <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-8 mb-3">
                     <span className="font-mono text-sm md:text-base text-orange-500 shrink-0">{milestone.year}</span>
                     <h3 className="font-serif text-3xl leading-none tracking-tight md:text-4xl text-zinc-200">{milestone.title}</h3>

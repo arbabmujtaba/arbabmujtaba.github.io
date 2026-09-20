@@ -58,7 +58,7 @@ export default function CinematicImageReveal({
           style={shouldAnimate ? { y: imageY, scale: imageScale } : undefined}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09]/92 via-[#0a0a09]/20 to-[#0a0a09]/35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-canvas/92 via-canvas/20 to-canvas/35" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_22%,transparent_0%,rgba(10,10,9,0.20)_48%,rgba(10,10,9,0.74)_100%)]" />
 
         <motion.div

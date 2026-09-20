@@ -152,7 +152,7 @@ export default function PostCustomization({ value, onChange, preview }: PostCust
       style: {
         ...value.style,
         gradient: {
-          from: value.style?.gradient?.from ?? '#0a0a09',
+          from: value.style?.gradient?.from ?? '#1a1a18',
           to: value.style?.gradient?.to ?? '#1a1a18',
           angle: value.style?.gradient?.angle ?? 180,
           enabled,
@@ -202,7 +202,7 @@ export default function PostCustomization({ value, onChange, preview }: PostCust
       </div>
 
       {/* Live preview — stays visible while adjusting options */}
-      <div className="p-3 border-b border-zinc-900 bg-[#0a0a09] sticky top-0 z-20">
+      <div className="p-3 border-b border-zinc-900 bg-canvas sticky top-0 z-20">
         <CustomizationPreview
           value={value}
           title={preview?.title}
@@ -344,7 +344,7 @@ export default function PostCustomization({ value, onChange, preview }: PostCust
                 <div className="grid grid-cols-3 gap-3 mt-3">
                   <div>
                     <label className="block font-mono text-[8px] uppercase tracking-wider text-zinc-600 mb-1">From</label>
-                    <input type="color" value={s.gradient?.from || '#0a0a09'} onChange={(ev) => updateGradient('from', ev.target.value)} className="w-full h-7 rounded-sm border border-zinc-800 cursor-pointer bg-transparent" />
+                    <input type="color" value={s.gradient?.from || '#1a1a18'} onChange={(ev) => updateGradient('from', ev.target.value)} className="w-full h-7 rounded-sm border border-zinc-800 cursor-pointer bg-transparent" />
                   </div>
                   <div>
                     <label className="block font-mono text-[8px] uppercase tracking-wider text-zinc-600 mb-1">To</label>

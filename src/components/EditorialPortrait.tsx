@@ -115,7 +115,7 @@ export default function EditorialPortrait() {
         }}
       >
         {failed ? (
-          <div className="h-full w-full bg-gradient-to-br from-zinc-800/70 via-zinc-900 to-[#0a0a09]" />
+          <div className="h-full w-full bg-gradient-to-br from-zinc-800/70 via-zinc-900 to-canvas" />
         ) : (
           <motion.img
             src={PORTRAIT_IMAGE_SRC}
@@ -129,8 +129,8 @@ export default function EditorialPortrait() {
         )}
 
         {/* Dark-to-orange gradient blending */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09] via-[#0a0a09]/15 to-[#0a0a09]/55" />
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[#0a0a09]/85" />
+        <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/15 to-canvas/55" />
+        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-canvas/85" />
         <motion.div
           className="absolute inset-0 mix-blend-soft-light"
           style={{

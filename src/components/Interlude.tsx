@@ -207,8 +207,8 @@ function MarqueeBody({ entry, index, rm }: { entry: HomeConfigEntry; index: numb
       <IndexMarker index={index} label={entry.label} rm={rm} />
       <span className="sr-only">{phrase}</span>
       <div aria-hidden="true" className="relative w-full overflow-hidden py-3">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0a0a09] to-transparent md:w-52" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0a0a09] to-transparent md:w-52" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-canvas to-transparent md:w-52" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-canvas to-transparent md:w-52" />
         <motion.div
           className="flex w-max flex-nowrap whitespace-nowrap"
           animate={rm ? undefined : { x: ['0%', '-50%'] }}
@@ -287,7 +287,7 @@ export default function Interlude({ entry, index }: InterludeProps) {
       {img && (
         <div className="pointer-events-none absolute inset-0 z-0">
           <img src={img} alt="" className="h-full w-full object-cover opacity-[0.12] grayscale" referrerPolicy="no-referrer" />
-          <div className="absolute inset-0 bg-[#0a0a09]/85" />
+          <div className="absolute inset-0 bg-canvas/85" />
         </div>
       )}
 

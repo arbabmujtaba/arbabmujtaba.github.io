@@ -76,7 +76,7 @@ export default function MagicalGateway({
             decoding="async"
           />
         </picture>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09] via-[#0a0a09]/55 to-[#0a0a09]/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/55 to-canvas/20" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(249,115,22,0.16),transparent_34%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
       </motion.div>
 

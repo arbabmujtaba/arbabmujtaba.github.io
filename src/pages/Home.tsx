@@ -80,7 +80,7 @@ function ArchiveSection({ children, containerRef, className = '' }: ArchiveSecti
         observerRef.current = node;
       }}
       style={shouldReduceMotion ? undefined : { y, opacity, scale }}
-      className={`relative z-20 border-t border-zinc-800/20 bg-[#0a0a09]/58 px-4 py-16 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
+      className={`relative z-20 border-t border-zinc-800/20 bg-canvas/58 px-4 py-16 backdrop-blur-sm md:px-12 md:py-32 lg:px-16 ${className}`}
       data-seen={seen ? 'true' : 'false'}
     >
       {children}
