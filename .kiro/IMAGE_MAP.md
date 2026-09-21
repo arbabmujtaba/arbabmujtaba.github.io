@@ -133,15 +133,21 @@ Every path above resolves through `getLocalWebpSources` in `src/lib/image.ts`, w
 `<picture><source srcset>` at `/uploads/optimized/<path-without-extension>-{480,768,1536}.webp`. A
 `<source>` has no fallback, so a missing derivative is a broken image.
 
-Uploading through `/admin` takes care of itself: `src/services/ImageDerivativeService.ts` converts
-each upload in the background, and the publishing pipeline waits for that queue and stages the
-derivatives in the same commit as the original. The commands below are the sweep for anything copied
-into `public/uploads/` by hand, and for rebuilding everything after a width or quality change:
+Uploading through `/admin` takes care of itself: `src/services/ImageDerivativeService.ts` rewrites
+each upload as a full-size WebP original and converts the derivatives in the background, and the
+publishing pipeline waits for that queue and stages them in the same commit as the original. The
+commands below are the sweep for anything copied into `public/uploads/` by hand, and for rebuilding
+everything after a width or quality change:
 
 ```
 npx tsx scripts/optimize-images.ts           # incremental — only stale/missing derivatives
 npx tsx scripts/optimize-images.ts --force   # rebuild all of them
 ```
 
-39 sources × 3 widths = 117 derivatives. The script exits non-zero if any of them fails, so it is
+An original that predates the layer — the JPEGs and PNGs listed above — is still a JPEG on disk.
+`npm run convert:uploads` rewrites those as WebP, repoints every reference in `content/`, and
+regenerates the derivatives; pass a filename fragment to convert a single frame, or `--dry-run` to
+see what it would touch. The filenames in the table above change extension when you do.
+
+41 sources × 3 widths = 123 derivatives. The script exits non-zero if any of them fails, so it is
 safe to gate a build on.

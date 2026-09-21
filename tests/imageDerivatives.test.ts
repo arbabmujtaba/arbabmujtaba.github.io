@@ -19,7 +19,7 @@ import {
   basePathFor,
   derivativeOutputs,
   isStillImage,
-  needsTranscode,
+  needsWebpOriginal,
   publicUrlFor,
   PATHS,
 } from '../src/services/ImageDerivativeService';
@@ -94,11 +94,20 @@ async function runTests() {
         const publicPath = `/uploads/general/sample${ext}`;
         const written = pipelineUrls(publicPath);
         assertEqual(written.length, WIDTHS.length, `${ext} should yield ${WIDTHS.length} outputs`);
-        // A .heic original is transcoded to .webp before this point, but the
-        // mapping must still be defined — otherwise the transcode has nowhere
-        // to put its derivatives.
+        // An upload is rewritten as `.webp` before this point, but the mapping
+        // must be defined for the source extension too — the sweep still has to
+        // find derivatives for the JPEGs already in the archive.
         assertEqual(written.join('|'), rendererUrls(publicPath).join('|'), `${ext} mapping`);
       }
+    }),
+
+    test('a converted upload lands on the same derivative paths as its source', () => {
+      // `1737-42.jpg` becomes `1737-42.webp`, and the stem is what the mapping
+      // keys on — so conversion never orphans a derivative.
+      assertEqual(
+        pipelineUrls('/uploads/journal/1737000000000-42.webp').join('|'),
+        pipelineUrls('/uploads/journal/1737000000000-42.jpg').join('|')
+      );
     }),
 
     test('derivative filenames carry every width in WIDTHS', () => {
@@ -132,19 +141,25 @@ async function runTests() {
     }),
 
     // ------------------------------------------------------- format classification
-    test('motion clips are not still images', () => {
-      for (const file of ['clip.mp4', 'clip.webm', 'loop.gif']) {
-        assertTrue(!isStillImage(file), `${file} must not be queued for conversion`);
+    test('every upload becomes a WebP original except one already WebP', () => {
+      for (const ext of SOURCE_EXTENSIONS) {
+        const file = `frame${ext}`;
+        assertTrue(isStillImage(file), `${file} must be accepted as a still`);
+        assertEqual(
+          needsWebpOriginal(file),
+          ext !== '.webp',
+          `${ext} conversion decision`
+        );
       }
+      // Case does not decide it either.
+      assertTrue(needsWebpOriginal('frame.JPG'), 'uppercase .JPG must still convert');
+      assertTrue(!needsWebpOriginal('frame.WEBP'), 'uppercase .WEBP is already converted');
     }),
 
-    test('web-safe originals stay as the <img> fallback, others are transcoded', () => {
-      for (const file of ['a.jpg', 'a.jpeg', 'a.png', 'a.webp']) {
-        assertTrue(!needsTranscode(file), `${file} must be kept as-is`);
-      }
-      for (const file of ['a.heic', 'a.HEIF', 'a.tif', 'a.tiff', 'a.avif', 'a.bmp']) {
-        assertTrue(needsTranscode(file), `${file} must become a webp original`);
-        assertTrue(isStillImage(file), `${file} must be accepted as a still`);
+    test('motion clips are never converted', () => {
+      for (const file of ['clip.mp4', 'clip.webm', 'loop.gif']) {
+        assertTrue(!isStillImage(file), `${file} must not be queued for conversion`);
+        assertTrue(!needsWebpOriginal(file), `${file} must not be rewritten`);
       }
     }),
   ];

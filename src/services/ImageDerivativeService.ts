@@ -42,24 +42,33 @@ export const WEBP_OPTIONS: WebpOptions = {
 };
 
 /**
- * Formats a browser can render directly, so the original stays on disk as the
- * `<img src>` fallback behind the WebP sources.
+ * Formats sharp can read and accept as an upload. Everything here except
+ * `.webp` is rewritten *as* a WebP original on the way in — a JPEG off a camera
+ * and a HEIC off a phone both end up as the same kind of file, so what the
+ * front-matter points at, what gets committed, and what the page loads are all
+ * WebP.
  */
-export const WEB_SAFE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'] as const;
+export const SOURCE_EXTENSIONS: readonly string[] = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.heic',
+  '.heif',
+  '.avif',
+  '.tif',
+  '.tiff',
+  '.bmp',
+];
 
 /**
- * Formats sharp can read but browsers cannot be trusted to display. A camera
- * roll is full of these. They are transcoded to a real `.webp` original on
- * upload — keeping one would leave the fallback `<img>` pointing at a file
- * Chrome refuses to paint.
+ * WebP's hard dimension ceiling. A frame larger than this in either axis cannot
+ * be a WebP at all, so its original is kept rather than failing the upload.
  */
-export const TRANSCODE_EXTENSIONS = ['.heic', '.heif', '.avif', '.tif', '.tiff', '.bmp'] as const;
+export const WEBP_MAX_DIMENSION = 16383;
 
-/** Every still image extension the pipeline accepts as an input. */
-export const SOURCE_EXTENSIONS: readonly string[] = [
-  ...WEB_SAFE_EXTENSIONS,
-  ...TRANSCODE_EXTENSIONS,
-];
+/** Quality for the full-size WebP original — higher than a derivative's. */
+export const WEBP_ORIGINAL_QUALITY = 88;
 
 /** Directory name inside uploads that holds generated output (never an input). */
 export const OPTIMIZED_DIRNAME = 'optimized';
@@ -176,10 +185,13 @@ export function isStillImage(filePath: string): boolean {
   return SOURCE_EXTENSIONS.includes(path.extname(filePath).toLowerCase());
 }
 
-export function needsTranscode(filePath: string): boolean {
-  return (TRANSCODE_EXTENSIONS as readonly string[]).includes(
-    path.extname(filePath).toLowerCase()
-  );
+/**
+ * True for every still that is not already WebP. The `.webp` check is the whole
+ * rule: an upload is converted unless it arrives converted.
+ */
+export function needsWebpOriginal(filePath: string): boolean {
+  const ext = path.extname(filePath).toLowerCase();
+  return isStillImage(filePath) && ext !== '.webp';
 }
 
 // ============================================================
@@ -284,26 +296,46 @@ export async function generateDerivatives(
 }
 
 /**
- * Turn a format browsers cannot render into a full-size WebP original beside
- * it, then drop the source. Returns the path to use from here on, so the
- * caller hands back a URL that actually resolves.
+ * Rewrite an upload as a full-size WebP original and drop the file it came
+ * from, so the URL handed back to the editor — and everything committed from
+ * then on — is WebP. A JPEG is converted for the same reason a HEIC is: the
+ * archive should hold one format, at one quality, and be the smaller thing to
+ * push.
  *
- * Web-safe originals are returned untouched: they are the fallback the
- * `<picture>` element falls back *to*.
+ * The conversion happens here rather than in the background queue because the
+ * response carries the filename: the editor cannot be told about a file that
+ * does not exist yet. Only the responsive derivatives are deferred.
+ *
+ * Two cases keep their original untouched — one that is already WebP, and one
+ * too large for WebP to represent at all. The second would otherwise fail the
+ * upload outright, and a frame that big is still better on the page as a JPEG
+ * than absent.
  */
 export async function normalizeUploadToWebp(
   absolutePath: string
-): Promise<{ path: string; converted: boolean; from?: string }> {
-  if (!needsTranscode(absolutePath)) {
+): Promise<{ path: string; converted: boolean; from?: string; reason?: string }> {
+  if (!needsWebpOriginal(absolutePath)) {
     return { path: absolutePath, converted: false };
   }
 
   const from = path.extname(absolutePath).toLowerCase();
+  const metadata = await sharp(absolutePath).metadata();
+  const longestEdge = Math.max(metadata.width ?? 0, metadata.height ?? 0);
+
+  if (longestEdge > WEBP_MAX_DIMENSION) {
+    return {
+      path: absolutePath,
+      converted: false,
+      from,
+      reason: `${longestEdge}px exceeds WebP's ${WEBP_MAX_DIMENSION}px limit — original kept`,
+    };
+  }
+
   const target = uniquePath(`${stripExtension(absolutePath)}.webp`);
 
   const buffer = await sharp(absolutePath)
-    .rotate()
-    .webp({ ...WEBP_OPTIONS, quality: 88 }) // the new original: keep more than a derivative does
+    .rotate() // bake EXIF orientation in; WebP has no orientation tag to carry it
+    .webp({ ...WEBP_OPTIONS, quality: WEBP_ORIGINAL_QUALITY })
     .toBuffer();
 
   await writeFile(target, buffer);

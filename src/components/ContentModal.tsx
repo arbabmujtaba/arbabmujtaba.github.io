@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink, Camera } from 'lucide-react';
+import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink, Camera, Maximize2 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from './SafeImage';
+import Lightbox, { type LightboxFrame } from './Lightbox';
 import MotionPlate from './rushes/MotionPlate';
 import { normalizeImagePath } from '../lib/image';
 import type { PostCustomization } from '../types';
@@ -191,6 +192,14 @@ export default function ContentModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const isPage = variant === 'page';
 
+  /**
+   * Full-size viewing. Every photograph in an entry — the cover, the gallery,
+   * anything embedded in the body — opens the original in the lightbox, because
+   * the plate on the page is cropped to a 16/9 or 4/3 box and the frame itself
+   * is the point.
+   */
+  const [lightbox, setLightbox] = useState<{ frames: LightboxFrame[]; index: number } | null>(null);
+
   useEffect(() => {
     // Only the drawer owns the page scroll. In `page` mode the document must
     // stay scrollable, since the article *is* the page.
@@ -233,6 +242,49 @@ export default function ContentModal({
     ...(typographyFamily ? { fontFamily: typographyFamily } : {}),
   };
   const linkStyle: React.CSSProperties = accentColor ? { color: accentColor } : {};
+
+  /**
+   * The photographs of this entry, in reading order: cover first, then the
+   * gallery. A body image that is not one of them opens on its own rather than
+   * being forced into the set.
+   */
+  const entryFrames: LightboxFrame[] = [
+    coverImage,
+    ...(metadata?.galleryImages || []),
+  ]
+    .map((image) => normalizeImagePath(image))
+    .filter((image, index, all): image is string => Boolean(image) && all.indexOf(image) === index)
+    .map((image, index) => ({
+      src: image,
+      alt: index === 0 ? title : `${title} — frame ${index + 1}`,
+      title,
+      index: index === 0 ? 'cover' : `frame ${String(index + 1).padStart(2, '0')}`,
+      caption: index === 0 ? excerpt : undefined,
+      meta: [metadata?.gear?.length ? metadata.gear.join(' / ') : null, metadata?.captureMode || null]
+        .filter(Boolean)
+        .join('  ·  '),
+    }));
+
+  const openFrame = (image: string | undefined) => {
+    const normalized = normalizeImagePath(image);
+    if (!normalized) return;
+    const index = entryFrames.findIndex((frame) => frame.src === normalized);
+    setLightbox(
+      index >= 0
+        ? { frames: entryFrames, index }
+        : { frames: [{ src: normalized, alt: title, title }], index: 0 }
+    );
+  };
+
+  const lightboxOverlay = (
+    <Lightbox
+      frames={lightbox?.frames || []}
+      openIndex={lightbox ? lightbox.index : null}
+      onClose={() => setLightbox(null)}
+      onNavigate={(index) => setLightbox((current) => (current ? { ...current, index } : current))}
+    />
+  );
+
 
   /** Customization-driven surface treatments, shared by both variants. */
   const decorations = (
@@ -327,8 +379,11 @@ export default function ContentModal({
 
           {/* Cover image banner */}
           {normalizeImagePath(coverImage) && (
-            <div
-              className="relative aspect-[16/9] w-full overflow-hidden border border-zinc-900 bg-zinc-950"
+            <button
+              type="button"
+              onClick={() => openFrame(coverImage)}
+              aria-label={`${title} — open the full frame`}
+              className="group relative block aspect-[16/9] w-full cursor-zoom-in overflow-hidden border border-zinc-900 bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               style={coverStyles}
             >
               <SafeImage 
@@ -337,7 +392,14 @@ export default function ContentModal({
                 className={`w-full h-full object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-700 ${hoverEffects ? 'hover:scale-105' : ''}`}
                 referrerPolicy="no-referrer"
               />
-            </div>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 border border-zinc-700/60 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+              >
+                <Maximize2 className="h-3 w-3" />
+                full frame
+              </span>
+            </button>
           )}
 
           {/* Core Title and description */}
@@ -441,7 +503,8 @@ export default function ContentModal({
                   <SafeImage
                     src={src}
                     alt={alt || ''}
-                    className="max-w-full rounded-sm border border-zinc-900 my-4"
+                    onClick={() => openFrame(typeof src === 'string' ? src : undefined)}
+                    className="max-w-full cursor-zoom-in rounded-sm border border-zinc-900 my-4"
                     {...rest}
                   />
                 ),
@@ -460,14 +523,27 @@ export default function ContentModal({
                   .map((img, idx) => ({ img, idx, normalized: normalizeImagePath(img) }))
                   .filter(({ normalized }) => normalized)
                   .map(({ img, idx, normalized }) => (
-                    <div key={idx} className="aspect-[4/3] overflow-hidden border border-zinc-900 bg-zinc-950">
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => openFrame(normalized!)}
+                      aria-label={`Gallery slide ${idx + 1} — open the full frame`}
+                      className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden border border-zinc-900 bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                    >
                       <SafeImage 
                         src={normalized!} 
                         alt={`Gallery slide ${idx + 1}`} 
                         className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700 hover:scale-105"
                         referrerPolicy="no-referrer"
                       />
-                    </div>
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1.5 border border-zinc-700/60 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                      >
+                        <Maximize2 className="h-3 w-3" />
+                        full frame
+                      </span>
+                    </button>
                   ))}
               </div>
             </div>
@@ -486,6 +562,7 @@ export default function ContentModal({
         {decorations}
         {header}
         {canvas}
+        {lightboxOverlay}
       </article>
     );
   }
@@ -515,6 +592,9 @@ export default function ContentModal({
         {header}
         {canvas}
       </motion.div>
+
+      {/* Above the drawer: the frame is the whole screen, not a panel inside it. */}
+      {lightboxOverlay}
     </div>
   );
 }

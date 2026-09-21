@@ -24,6 +24,7 @@ has no API.
 | `npm run build` | production build, then the route shells, 404.html and sitemap.xml |
 | `npm run verify:dist` | asserts every public route resolves the way GitHub Pages serves it |
 | `npm run optimize:images` | regenerates WebP derivatives (`--force` to rebuild all) |
+| `npm run convert:uploads` | rewrites pre-existing originals as WebP and repoints every reference |
 
 ## Content
 
@@ -48,14 +49,16 @@ contrast. `src/lib/image.ts` points a `<picture><source>` at WebP derivatives, a
 `<source>` has no fallback a missing derivative renders broken — so conversion is automatic rather
 than remembered. `src/services/ImageDerivativeService.ts` owns the whole contract:
 
-- uploading through `/admin` queues the 480/768/1536 WebP derivatives in the background, and a
-  format a browser cannot paint (HEIC, TIFF, AVIF, BMP) is transcoded to a WebP *original* first, so
-  the URL written into the front-matter is always a file the page can load
+- uploading through `/admin` rewrites the upload as a full-size WebP original — a JPEG as much as a
+  HEIC — and queues the 480/768/1536 derivatives in the background, so the URL written into the
+  front-matter is always WebP and always a file the page can load
 - publishing waits for that queue, regenerates anything missing or stale, and stages the derivatives
   in the same commit as the original — a push cannot carry an image without them, and an unreadable
   file fails the pipeline instead of reaching the live site
 - `npm run optimize:images` is the sweep for anything copied into `public/uploads/` by hand, and
   `POST /api/uploads/optimization` is the same sweep from the running dev server
+- `npm run convert:uploads` converts originals that predate the layer: it rewrites them as WebP,
+  repoints every reference in `content/`, regenerates the derivatives, and reports what it saved
 
 ## Authoring
 
@@ -84,6 +87,12 @@ A hand-rolled router in `src/App.tsx` parses `window.location.pathname` (`src/li
 Clicking a card opens a quick-look drawer *and* pushes the entry's URL; loading that URL cold renders
 the full page instead. Both use one renderer (`ContentModal`, `variant="overlay" | "page"`), so the
 two presentations cannot drift apart.
+
+Photography is the exception: a plate is a photograph before it is a document, so clicking one opens
+the original at full size in `src/components/Lightbox.tsx` — arrow keys walk the contact sheet, and
+the caption links through to the entry. The card stays a real anchor to `/photography/<slug>`, so
+cmd-click, middle-click and crawlers still get the document. Inside an entry, the cover, the gallery
+and any image in the body open the same overlay.
 
 Because GitHub Pages is a static host, `scripts/postbuild.ts` writes `dist/<route>/index.html` for
 every route so deep links are served with HTTP 200 and their own `<title>`, description, canonical

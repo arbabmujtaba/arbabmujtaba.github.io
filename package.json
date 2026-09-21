@@ -9,11 +9,12 @@
     "build": "vite build && tsx scripts/postbuild.ts",
     "build:server": "vite build && tsx scripts/postbuild.ts && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "optimize:images": "tsx scripts/optimize-images.ts",
+    "convert:uploads": "tsx scripts/convert-uploads-to-webp.ts",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "test": "tsx tests/contentState.test.ts && tsx tests/routing.test.ts && tsx tests/imageDerivatives.test.ts",
+    "test": "tsx tests/contentState.test.ts && tsx tests/routing.test.ts && tsx tests/imageDerivatives.test.ts && tsx tests/safeImage.test.tsx && tsx tests/lightbox.test.tsx",
     "verify:dist": "tsx scripts/verify-dist.ts"
   },
   "dependencies": {

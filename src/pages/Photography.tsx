@@ -8,6 +8,7 @@ import {
 } from 'motion/react';
 import { Aperture, Camera, Focus } from 'lucide-react';
 import Footer from '../components/Footer';
+import Lightbox from '../components/Lightbox';
 import SafeImage from '../components/SafeImage';
 import { FrameCard, RecLabel, StackedHeading, TagChip } from '../components/rushes';
 import { getPhotographyEntries, getGearItems } from '../lib/cms';
@@ -165,16 +166,11 @@ export default function Photography() {
   const containerRef = useRef<HTMLDivElement>(null);
   const openEntry = useOpenEntry();
   const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORIES);
+  const [openFrame, setOpenFrame] = useState<number | null>(null);
 
   const shouldReduceMotion = useReducedMotion();
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const shouldParallax = !shouldReduceMotion && !isTouchDevice;
-
-  /** Opening a frame pushes `/photography/<slug>`; App renders the quick look. */
-  const handleOpen = useCallback(
-    (entry: PhotographyEntry) => openEntry('photography', entry.slug),
-    [openEntry]
-  );
 
   const { scrollY } = useScroll({ container: containerRef });
   const leadImageY = useTransform(scrollY, [0, 800], ['0%', '8%']);
@@ -268,6 +264,49 @@ export default function Photography() {
   }, [favorites, stories]);
 
   const plateOf = (entry: PhotographyEntry) => plateNumbers.get(entry) ?? 1;
+
+  /**
+   * The lightbox set, in the order the plates appear on screen — lead, then
+   * favorites, then whatever the category filter is showing. Stepping with the
+   * arrow keys therefore walks the page rather than some hidden ordering.
+   */
+  const lightboxEntries = useMemo(
+    () => [leadPhoto, ...restFavorites, ...visibleStories].filter(Boolean) as PhotographyEntry[],
+    [leadPhoto, restFavorites, visibleStories]
+  );
+
+  const lightboxFrames = useMemo(
+    () =>
+      lightboxEntries.map((entry) => ({
+        src: entry.coverImage,
+        alt: entry.title,
+        title: entry.title,
+        index: plateLabel(plateOf(entry)),
+        caption: entry.description,
+        meta: [entry.gear?.length ? entry.gear.join(' / ') : null, entry.captureMode || null]
+          .filter(Boolean)
+          .join('  ·  '),
+        href: detailPath('photography', entry.slug),
+        // The frame opens full size; the story stays one click away, and opens
+        // as the quick look so the contact sheet is still behind it.
+        onOpenStory: () => openEntry('photography', entry.slug),
+      })),
+    [lightboxEntries, openEntry, plateNumbers]
+  );
+
+  /**
+   * A plate is a photograph first: clicking it opens the frame at full size
+   * rather than the entry. The card is still a real anchor to
+   * `/photography/<slug>`, so cmd-click, middle-click and crawlers get the
+   * document, and the overlay carries a link to it.
+   */
+  const handleOpen = useCallback(
+    (entry: PhotographyEntry) => {
+      const index = lightboxEntries.indexOf(entry);
+      setOpenFrame(index === -1 ? null : index);
+    },
+    [lightboxEntries]
+  );
 
 
   return (
@@ -556,6 +595,13 @@ export default function Photography() {
 
         <Footer />
       </div>
+
+      <Lightbox
+        frames={lightboxFrames}
+        openIndex={openFrame}
+        onClose={() => setOpenFrame(null)}
+        onNavigate={setOpenFrame}
+      />
     </motion.div>
   );
 }

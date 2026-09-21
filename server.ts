@@ -273,12 +273,13 @@ function slugify(text: string): string {
  * Handles visual image uploads, returning relative URL paths for reference in frontmatter.
  *
  * THE WEBP LAYER
- * Every still that lands here is converted for the site automatically, so
+ * Every still that lands here becomes WebP automatically, so
  * `npm run optimize:images` is no longer something to remember:
  *
- *   1. A format browsers cannot render (HEIC, TIFF, BMP, AVIF) is transcoded to
- *      a full-size `.webp` original *before* responding, because the returned
- *      URL has to be the file the page will actually load.
+ *   1. The upload is rewritten as a full-size `.webp` original — a JPEG as much
+ *      as a HEIC — *before* responding, because the URL in the response is what
+ *      gets written into the front-matter and committed. An image too large for
+ *      WebP to represent keeps its original and says so.
  *   2. The responsive 480/768/1536 derivatives are then queued and generated in
  *      the background, so the admin gets its URL back immediately instead of
  *      waiting on libvips. Progress is readable at GET /api/uploads/optimization,
@@ -306,14 +307,18 @@ app.post(
 
       let storedPath = req.file.path;
       let converted: { from: string; to: string } | undefined;
+      let conversionNote: string | undefined;
 
-      // Step 1 — normalize an unrenderable original. Awaited: the URL depends on it.
+      // Step 1 — rewrite as a WebP original. Awaited: the URL depends on it.
       try {
         const normalized = await normalizeUploadToWebp(storedPath);
         if (normalized.converted) {
           storedPath = normalized.path;
           converted = { from: normalized.from ?? '', to: '.webp' };
-          console.log(`[upload] ${normalized.from} transcoded to webp: ${path.basename(storedPath)}`);
+          console.log(`[upload] ${normalized.from} converted to webp: ${path.basename(storedPath)}`);
+        } else if (normalized.reason) {
+          conversionNote = normalized.reason;
+          console.warn(`[upload] ${path.basename(storedPath)}: ${normalized.reason}`);
         }
       } catch (error: any) {
         await fs.remove(storedPath).catch(() => {});
@@ -331,6 +336,7 @@ app.post(
         success: true,
         url: relativeUrl,
         converted,
+        note: conversionNote,
         optimization: getOptimizationStatus(),
       });
     } catch (error: any) {
