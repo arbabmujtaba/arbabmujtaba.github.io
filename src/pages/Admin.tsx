@@ -270,6 +270,18 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   const [draftAlert, setDraftAlert] = useState(false);
   const [lastDraftTime, setLastDraftTime] = useState<string | null>(null);
 
+  /**
+   * Background WebP conversion.
+   *
+   * The upload endpoint answers as soon as the original is on disk and converts
+   * the 480/768/1536 derivatives behind the response, so the only way to know
+   * the archive is complete is to watch the queue. Publishing waits for it
+   * server-side regardless — this is visibility, not a gate.
+   */
+  const [webpQueue, setWebpQueue] = useState<{ pending: number; active: string | null } | null>(null);
+  const [webpNote, setWebpNote] = useState<string | null>(null);
+  const webpPollingRef = useRef(false);
+
   // Publishing modal state
   const [publishModalOpen, setPublishModalOpen] = useState(false);
   const [publishJobId, setPublishJobId] = useState<string | null>(null);
@@ -986,6 +998,40 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
   /** Where an uploaded asset should land in the form. */
   type UploadTarget = 'cover' | 'gallery' | 'video' | 'videoPoster';
 
+  /**
+   * Follow the server's WebP queue until it drains. One poller at a time; every
+   * upload just re-arms it.
+   */
+  const trackWebpConversion = async () => {
+    if (webpPollingRef.current) return;
+    webpPollingRef.current = true;
+    try {
+      // ~3 minutes at 600ms — long enough for a batch of large frames.
+      for (let attempt = 0; attempt < 300; attempt += 1) {
+        const res = await fetch('/api/uploads/optimization');
+        if (!res.ok) break;
+        const status = await res.json();
+        const pending = (status.queued || 0) + (status.active ? 1 : 0);
+        setWebpQueue(pending > 0 ? { pending, active: status.active ?? null } : null);
+        if (status.idle) {
+          if (Array.isArray(status.failures) && status.failures.length > 0) {
+            const last = status.failures[status.failures.length - 1];
+            setErrorMessage(`WebP conversion failed for ${last.label}: ${last.error}`);
+          }
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 600));
+      }
+    } catch {
+      // The API server is local; if it went away the next upload will say so.
+    } finally {
+      webpPollingRef.current = false;
+      setWebpQueue(null);
+      // Let the "ready" line stand briefly, then get out of the way.
+      setTimeout(() => setWebpNote(null), 6000);
+    }
+  };
+
   const handleImageFile = async (file: File, target: UploadTarget | boolean = 'cover') => {
     // Historic call sites pass a boolean for "is this a gallery upload".
     const slot: UploadTarget =
@@ -993,6 +1039,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
     if (!file) return;
     setIsUploading(true);
     setErrorMessage('');
+    setWebpNote(null);
     
     const formData = new FormData();
     // MUST append collection BEFORE image so multer's diskStorage
@@ -1016,6 +1063,15 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
           setFormVideoPoster(parsed.url);
         } else {
           setFormCoverImage(parsed.url);
+        }
+
+        // A format the browser cannot paint was rewritten as a WebP original,
+        // so the URL in the form is not the file that was chosen — say so.
+        if (parsed.converted?.from) {
+          setWebpNote(`${parsed.converted.from.replace('.', '').toUpperCase()} converted to WebP on upload.`);
+        }
+        if (slot !== 'video') {
+          void trackWebpConversion();
         }
       } else {
         const parsedErr = await res.json();
@@ -1592,6 +1648,24 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                 </div>
               )}
 
+              {/* Background WebP conversion — the derivatives every <picture>
+                  source points at, generated as uploads land. */}
+              {(webpQueue || webpNote) && (
+                <div className="border border-orange-500/25 bg-orange-500/5 px-5 py-3 mb-8 flex items-center gap-3">
+                  {webpQueue ? (
+                    <Loader2 className="w-4 h-4 text-orange-500 animate-spin shrink-0" />
+                  ) : (
+                    <Check className="w-4 h-4 text-orange-400 shrink-0" />
+                  )}
+                  <span className="font-sans text-xs text-zinc-350">
+                    {webpQueue
+                      ? `Converting to WebP — ${webpQueue.pending} image(s) left${webpQueue.active ? `: ${webpQueue.active}` : ''}`
+                      : 'WebP derivatives ready.'}
+                    {webpNote ? ` ${webpNote}` : ''}
+                  </span>
+                </div>
+              )}
+
               {saveStatus === 'error' && (
                 <div className="border border-red-500/30 bg-red-500/5 px-5 py-4 mb-8 flex flex-col gap-2">
                   <span className="font-sans text-xs text-red-400 font-medium">Failed to write content:</span>
@@ -2150,7 +2224,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                         type="file"
                         ref={fileInputRef}
                         onChange={(e) => handleManualUpload(e, false)}
-                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                        accept="image/png, image/jpeg, image/jpg, image/webp, image/avif, image/tiff, image/bmp, image/heic, image/heif, .heic, .heif"
                         className="hidden"
                       />
                     </div>
@@ -2170,7 +2244,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                         <div className="flex flex-col items-center gap-2 text-zinc-500 text-center cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                           <UploadCloud className="w-7 h-7 text-zinc-650" />
                           <span className="font-sans text-xs font-light">Drag & drop cover file here or click to choose device files</span>
-                          <span className="block text-[10px] text-zinc-600 font-mono">SUPPORTS: PNG, JPG, JPEG, WEBP</span>
+                          <span className="block text-[10px] text-zinc-600 font-mono">SUPPORTS: JPG, PNG, WEBP, HEIC, TIFF, AVIF, BMP — converted to WebP automatically</span>
                         </div>
                       )}
                     </div>
@@ -2253,7 +2327,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                           onChange={(e) => {
                             if (e.target.files?.[0]) handleImageFile(e.target.files[0], 'videoPoster');
                           }}
-                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          accept="image/png, image/jpeg, image/jpg, image/webp, image/avif, image/tiff, image/bmp, image/heic, image/heif, .heic, .heif"
                           className="hidden"
                         />
                       </div>
@@ -2310,7 +2384,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                           multiple
                           ref={galleryInputRef}
                           onChange={(e) => handleManualUpload(e, true)}
-                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          accept="image/png, image/jpeg, image/jpg, image/webp, image/avif, image/tiff, image/bmp, image/heic, image/heif, .heic, .heif"
                           className="hidden"
                         />
                       </div>

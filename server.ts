@@ -12,9 +12,20 @@ import { transitionState, getItem, getAllItems, saveItem, createItem, deleteItem
 import { PreviewDocument } from './src/components/PreviewDocument';
 import { PublishingService } from './src/services/PublishingService';
 import { DeploymentService } from './src/services/DeploymentService';
+import {
+  SOURCE_EXTENSIONS,
+  getOptimizationStatus,
+  normalizeUploadToWebp,
+  optimizeAll,
+  queueDerivatives,
+} from './src/services/ImageDerivativeService';
 
 const app = express();
-const PORT = 3000;
+/**
+ * 3000 by default. Overridable so a second instance can be started alongside a
+ * running one (checking an API change without taking the live editor down).
+ */
+const PORT = Number(process.env.PORT) || 3000;
 const HOST = '127.0.0.1';
 
 /**
@@ -204,11 +215,16 @@ const storage = multer.diskStorage({
  * screen recording usually becomes, and mp4/webm because a GIF of any real
  * length is an order of magnitude larger than the equivalent video.
  *
+ * The still list comes from the WebP layer (ImageDerivativeService) rather than
+ * being repeated here: anything sharp can read is accepted, and the formats a
+ * browser cannot render — HEIC off a phone, TIFF off a scanner — are transcoded
+ * to a real WebP original before the URL is handed back.
+ *
  * The cap exists because uploads are committed to the repository and
  * redeployed on every build: `public/uploads` is already the largest thing in
  * the tree, and an unbounded clip would dominate it.
  */
-const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'] as const;
+const ALLOWED_IMAGE_EXTENSIONS = SOURCE_EXTENSIONS;
 const ALLOWED_MOTION_EXTENSIONS = ['.gif', '.mp4', '.webm'] as const;
 const MAX_UPLOAD_BYTES = 40 * 1024 * 1024; // 40 MB
 
@@ -254,7 +270,20 @@ function slugify(text: string): string {
 
 /**
  * POST /api/upload
- * Handles visual image uploads, returning relative URL paths for reference in frontmatter
+ * Handles visual image uploads, returning relative URL paths for reference in frontmatter.
+ *
+ * THE WEBP LAYER
+ * Every still that lands here is converted for the site automatically, so
+ * `npm run optimize:images` is no longer something to remember:
+ *
+ *   1. A format browsers cannot render (HEIC, TIFF, BMP, AVIF) is transcoded to
+ *      a full-size `.webp` original *before* responding, because the returned
+ *      URL has to be the file the page will actually load.
+ *   2. The responsive 480/768/1536 derivatives are then queued and generated in
+ *      the background, so the admin gets its URL back immediately instead of
+ *      waiting on libvips. Progress is readable at GET /api/uploads/optimization,
+ *      and the publishing pipeline waits for the queue before it stages — an
+ *      image can never be pushed without the derivatives its <source> points at.
  */
 app.post(
   '/api/upload',
@@ -265,7 +294,7 @@ app.post(
       next();
     });
   },
-  (req, res) => {
+  async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'No image file uploaded' });
@@ -274,14 +303,65 @@ app.post(
       if (!collection) {
         return res.status(400).json({ error: INVALID_COLLECTION_MESSAGE });
       }
+
+      let storedPath = req.file.path;
+      let converted: { from: string; to: string } | undefined;
+
+      // Step 1 — normalize an unrenderable original. Awaited: the URL depends on it.
+      try {
+        const normalized = await normalizeUploadToWebp(storedPath);
+        if (normalized.converted) {
+          storedPath = normalized.path;
+          converted = { from: normalized.from ?? '', to: '.webp' };
+          console.log(`[upload] ${normalized.from} transcoded to webp: ${path.basename(storedPath)}`);
+        }
+      } catch (error: any) {
+        await fs.remove(storedPath).catch(() => {});
+        return res.status(400).json({
+          error: `Could not read this image (${path.extname(req.file.originalname) || 'unknown format'}): ${error.message}`,
+        });
+      }
+
+      // Step 2 — derivatives in the background.
+      void queueDerivatives(storedPath);
+
       // Return path relative to the public router domain
-      const relativeUrl = `/uploads/${collection}/${req.file.filename}`;
-      res.json({ success: true, url: relativeUrl });
+      const relativeUrl = `/uploads/${collection}/${path.basename(storedPath)}`;
+      res.json({
+        success: true,
+        url: relativeUrl,
+        converted,
+        optimization: getOptimizationStatus(),
+      });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      fail(res, error, 'POST /api/upload');
     }
   }
 );
+
+/**
+ * GET /api/uploads/optimization
+ * Background WebP queue state, so the admin can show conversion as it happens
+ * rather than leaving it invisible.
+ */
+app.get('/api/uploads/optimization', (_req, res) => {
+  res.json(getOptimizationStatus());
+});
+
+/**
+ * POST /api/uploads/optimization
+ * Sweep the whole archive — the backstop for images copied into public/uploads
+ * by hand instead of uploaded through the admin. Body: { force?: boolean }.
+ */
+app.post('/api/uploads/optimization', async (req, res) => {
+  try {
+    const force = req.body?.force === true;
+    const summary = await optimizeAll({ force });
+    res.json({ success: summary.failed === 0, summary, optimization: getOptimizationStatus() });
+  } catch (error: any) {
+    fail(res, error, 'POST /api/uploads/optimization');
+  }
+});
 
 /**
  * GET /api/content

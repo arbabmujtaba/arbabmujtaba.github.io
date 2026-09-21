@@ -14,12 +14,13 @@ npm run build      # vite build + post-build route shells, 404.html and sitemap.
 ```
 
 `npm run dev` starts `server.ts`, which serves the site *and* the authoring API. It binds
-`127.0.0.1` only. The deployed site is fully static and has no API.
+`127.0.0.1` only, on port 3000 unless `PORT` says otherwise. The deployed site is fully static and
+has no API.
 
 | Command | What it does |
 |---|---|
 | `npm run typecheck` | `tsc --noEmit`, strict |
-| `npm test` | content-state transitions and routing |
+| `npm test` | content-state transitions, routing, and the WebP derivative contract |
 | `npm run build` | production build, then the route shells, 404.html and sitemap.xml |
 | `npm run verify:dist` | asserts every public route resolves the way GitHub Pages serves it |
 | `npm run optimize:images` | regenerates WebP derivatives (`--force` to rebuild all) |
@@ -43,9 +44,18 @@ page through `configType` entries (`profile`, `gateway`, `quote`, `principle`).
 
 Images live in `public/uploads/`. Every image on the site is the owner's own photograph;
 `.kiro/IMAGE_MAP.md` records which frame fills which slot and why, with measured luminance and
-contrast. `src/lib/image.ts` points a `<picture><source>` at WebP derivatives — and because a
-`<source>` has no fallback, **run `npm run optimize:images` after adding or replacing anything
-under `public/uploads/`**, or that image renders broken.
+contrast. `src/lib/image.ts` points a `<picture><source>` at WebP derivatives, and because a
+`<source>` has no fallback a missing derivative renders broken — so conversion is automatic rather
+than remembered. `src/services/ImageDerivativeService.ts` owns the whole contract:
+
+- uploading through `/admin` queues the 480/768/1536 WebP derivatives in the background, and a
+  format a browser cannot paint (HEIC, TIFF, AVIF, BMP) is transcoded to a WebP *original* first, so
+  the URL written into the front-matter is always a file the page can load
+- publishing waits for that queue, regenerates anything missing or stale, and stages the derivatives
+  in the same commit as the original — a push cannot carry an image without them, and an unreadable
+  file fails the pipeline instead of reaching the live site
+- `npm run optimize:images` is the sweep for anything copied into `public/uploads/` by hand, and
+  `POST /api/uploads/optimization` is the same sweep from the running dev server
 
 ## Authoring
 

@@ -25,6 +25,7 @@ import matter from 'gray-matter';
 import { GitService, GitError } from './GitService';
 import { MarkdownService } from './MarkdownService';
 import { ValidationService } from './ValidationService';
+import { ensureDerivatives } from './ImageDerivativeService';
 import {
   transitionState,
   getItem,
@@ -308,7 +309,31 @@ export class PublishingService {
       const referencedImagePaths = await this.collectLocalImagePaths(payload);
       const allImagePaths = [...new Set([...imagePaths, ...referencedImagePaths])];
 
-      this.updateStep(job, 'save_images', allImagePaths.length > 0 ? 'success' : 'skipped', allImagePaths.length > 0 ? `${allImagePaths.length} image(s) saved` : 'No new images', { paths: allImagePaths });
+      /**
+       * --- Step 2c: WebP derivatives ---
+       *
+       * Uploads are converted in the background the moment they land, so this
+       * is usually a no-op that just collects the filenames. It is still
+       * awaited rather than assumed: `ensureDerivatives` drains the background
+       * queue and regenerates anything missing or stale, which is what makes it
+       * impossible to push an original whose <source> has no file behind it —
+       * the failure mode that used to require remembering
+       * `npm run optimize:images`. It also covers images copied into
+       * public/uploads by hand and never seen by the upload endpoint.
+       */
+      this.updateStep(job, 'save_images', 'running', 'Converting images to WebP...');
+      const derivativePaths = await ensureDerivatives(allImagePaths);
+      const stagedAssetPaths = [...allImagePaths, ...derivativePaths];
+
+      this.updateStep(
+        job,
+        'save_images',
+        stagedAssetPaths.length > 0 ? 'success' : 'skipped',
+        stagedAssetPaths.length > 0
+          ? `${allImagePaths.length} image(s), ${derivativePaths.length} WebP derivative(s)`
+          : 'No new images',
+        { paths: allImagePaths, derivatives: derivativePaths }
+      );
 
       // --- Step 3: Validate Markdown ---
       this.updateStep(job, 'validate_markdown', 'running', 'Validating markdown...');
@@ -341,7 +366,7 @@ export class PublishingService {
 
       // --- Step 7: Stage Files ---
       this.updateStep(job, 'stage_files', 'running', 'Staging changes...');
-      const allPaths = [...savedPaths, ...allImagePaths];
+      const allPaths = [...savedPaths, ...stagedAssetPaths];
       if (allPaths.length > 0) {
         await this.gitService.stageFiles(allPaths);
       }

@@ -131,8 +131,12 @@ Near-duplicates — keep one of each pair, the rest are redundant rather than un
 
 Every path above resolves through `getLocalWebpSources` in `src/lib/image.ts`, which emits a
 `<picture><source srcset>` at `/uploads/optimized/<path-without-extension>-{480,768,1536}.webp`. A
-`<source>` has no fallback, so a missing derivative is a broken image. After adding, replacing or
-re-cropping anything under `public/uploads/`:
+`<source>` has no fallback, so a missing derivative is a broken image.
+
+Uploading through `/admin` takes care of itself: `src/services/ImageDerivativeService.ts` converts
+each upload in the background, and the publishing pipeline waits for that queue and stages the
+derivatives in the same commit as the original. The commands below are the sweep for anything copied
+into `public/uploads/` by hand, and for rebuilding everything after a width or quality change:
 
 ```
 npx tsx scripts/optimize-images.ts           # incremental — only stale/missing derivatives
