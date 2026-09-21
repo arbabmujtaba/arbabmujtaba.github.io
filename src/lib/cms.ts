@@ -2,7 +2,6 @@ import {
   JournalEntry, 
   TechEntry, 
   PhotographyEntry, 
-  CollectionEntry, 
   PortfolioProject,
   GearItem,
   TimelineMilestone,
@@ -170,7 +169,6 @@ function parseYamlBlock(yamlString: string): Record<string, any> {
 const journalGlob = (import.meta as any).glob('/content/journal/**/*.md', { query: '?raw', eager: true });
 const techGlob = (import.meta as any).glob('/content/tech/**/*.md', { query: '?raw', eager: true });
 const photographyGlob = (import.meta as any).glob('/content/photography/**/*.md', { query: '?raw', eager: true });
-const collectionGlob = (import.meta as any).glob('/content/collection/**/*.md', { query: '?raw', eager: true });
 const portfolioGlob = (import.meta as any).glob('/content/portfolio/**/*.md', { query: '?raw', eager: true });
 const gearGlob = (import.meta as any).glob('/content/gear/**/*.md', { query: '?raw', eager: true });
 const timelineGlob = (import.meta as any).glob('/content/timeline/**/*.md', { query: '?raw', eager: true });
@@ -335,24 +333,6 @@ export function getPhotographyEntries(): PhotographyEntry[] {
       customization: data.customization as PostCustomization | undefined
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-}
-
-export function getCollectionEntries(): CollectionEntry[] {
-  return Object.entries(collectionGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
-    const { data, content } = parseMarkdown(rawContent);
-    return {
-      title: data.title || "Untitled",
-      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
-      category: data.category || "Uses",
-      coverImage: data.coverImage,
-      video: data.video || undefined,
-      videoPoster: data.videoPoster || undefined,
-      description: data.description || "",
-      body: content || "",
-      customization: data.customization as PostCustomization | undefined
-    };
-  });
 }
 
 export function getPortfolioProjects(): PortfolioProject[] {

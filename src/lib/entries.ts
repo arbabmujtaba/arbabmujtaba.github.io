@@ -19,7 +19,6 @@
  */
 
 import {
-  getCollectionEntries,
   getJournalEntries,
   getPhotographyEntries,
   getPortfolioProjects,
@@ -174,22 +173,6 @@ function fromPortfolio(): DetailEntry[] {
   }));
 }
 
-function fromCollection(): DetailEntry[] {
-  return getCollectionEntries().map((entry) => ({
-    collection: 'collection' as const,
-    slug: entry.slug,
-    path: detailPath('collection', entry.slug),
-    title: entry.title,
-    category: entry.category,
-    coverImage: normalizeImagePath(entry.coverImage) || undefined,
-    video: entry.video,
-    videoPoster: entry.videoPoster,
-    excerpt: entry.description,
-    body: entry.body,
-    customization: entry.customization,
-  }));
-}
-
 /** Journal cover placeholder, duplicated from JournalCard to avoid importing a component into lib. */
 const DEFAULT_JOURNAL_COVER = '/assets/journal-placeholder.svg';
 
@@ -198,7 +181,6 @@ const LOADERS: Record<DetailCollection, () => DetailEntry[]> = {
   journal: fromJournal,
   tech: fromTech,
   photography: fromPhotography,
-  collection: fromCollection,
 };
 
 /**

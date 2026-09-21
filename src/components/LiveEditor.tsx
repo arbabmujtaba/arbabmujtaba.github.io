@@ -46,7 +46,6 @@ const PAGE_OPTIONS = [
   { value: '/tech', label: 'Tech' },
   { value: '/photography', label: 'Photography' },
   { value: '/portfolio', label: 'Portfolio' },
-  { value: '/collection', label: 'Collection' },
 ];
 
 interface LiveEditorProps {

@@ -107,19 +107,6 @@ export interface PhotographyEntry {
   customization?: PostCustomization;
 }
 
-export interface CollectionEntry {
-  title: string;
-  slug: string;
-  category: "Uses" | "Music" | "Books" | "Gear" | "Timeline" | "Inspirations" | "Favorites";
-  coverImage?: string;
-  /** Short clip (.mp4/.webm) or .gif shown as a motion plate in the entry. */
-  video?: string;
-  videoPoster?: string;
-  description: string;
-  body: string;
-  customization?: PostCustomization;
-}
-
 export interface PortfolioProject {
   title: string; // "Project Name" mapped to title for consistency
   slug: string;

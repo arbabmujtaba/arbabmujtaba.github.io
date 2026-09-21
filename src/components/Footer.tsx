@@ -55,7 +55,6 @@ const SECTIONS = [
   { id: 'journal', label: 'Journal' },
   { id: 'tech', label: 'Logs' },
   { id: 'photography', label: 'Frames' },
-  { id: 'collection', label: 'Index' },
 ];
 
 /**

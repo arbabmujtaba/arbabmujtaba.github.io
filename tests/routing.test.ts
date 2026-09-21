@@ -154,10 +154,12 @@ async function runTests() {
       assertTrue(!shouldInterceptClick(click({ defaultPrevented: true })), 'already handled');
     }),
 
-    test('isDetailCollection accepts only the five document collections', () => {
+    test('isDetailCollection accepts only the four document collections', () => {
       for (const collection of DETAIL_COLLECTIONS) {
         assertTrue(isDetailCollection(collection), `${collection} should be a detail collection`);
       }
+      assertEqual(DETAIL_COLLECTIONS.length, 4, 'four document collections');
+      assertTrue(!isDetailCollection('collection'), 'the index section was retired');
       assertTrue(!isDetailCollection('gear'), 'gear is not a detail collection');
       assertTrue(!isDetailCollection('home'), 'home is not a detail collection');
       assertTrue(!isDetailCollection(''), 'empty string is not a collection');

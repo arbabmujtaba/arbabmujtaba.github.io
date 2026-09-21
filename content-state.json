@@ -39,44 +39,6 @@
       "filePath": "content/photography/chasing-first-light.md"
     },
     {
-      "id": "collection/less-but-better",
-      "collection": "collection",
-      "slug": "less-but-better",
-      "title": "Less, but better",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-06-11T04:05:30.026Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-06-11T04:05:30.026Z",
-      "updatedAt": "2026-06-11T04:05:30.026Z",
-      "publishedAt": "2026-06-11T04:05:30.026Z",
-      "filePath": "content/collection/less-but-better.md"
-    },
-    {
-      "id": "collection/selected-ambient-works",
-      "collection": "collection",
-      "slug": "selected-ambient-works",
-      "title": "Selected Ambient Works 85-92",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-06-11T04:05:30.026Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-06-11T04:05:30.026Z",
-      "updatedAt": "2026-06-11T04:05:30.026Z",
-      "publishedAt": "2026-06-11T04:05:30.026Z",
-      "filePath": "content/collection/selected-ambient-works.md"
-    },
-    {
       "id": "portfolio/davv-login",
       "collection": "portfolio",
       "slug": "davv-login-portal",

@@ -37,7 +37,6 @@ const COLLECTIONS = [
   'journal',
   'tech',
   'photography',
-  'collection',
   'portfolio',
   'gear',
   'timeline',

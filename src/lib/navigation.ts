@@ -23,7 +23,6 @@ export const LIST_VIEWS = [
   'journal',
   'tech',
   'photography',
-  'collection',
   'admin',
 ] as const;
 
@@ -40,7 +39,6 @@ const PATH_TO_VIEW: Record<string, ListView> = {
   '/journal': 'journal',
   '/tech': 'tech',
   '/photography': 'photography',
-  '/collection': 'collection',
   '/admin': 'admin',
 };
 
@@ -50,7 +48,6 @@ export const VIEW_TO_PATH: Record<ListView, string> = {
   journal: '/journal',
   tech: '/tech',
   photography: '/photography',
-  collection: '/collection',
   admin: '/admin',
 };
 

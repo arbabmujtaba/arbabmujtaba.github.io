@@ -29,7 +29,7 @@ has no API.
 ## Content
 
 Markdown in `content/`, bundled at build time by `src/lib/cms.ts` — there is no runtime fetch.
-Ten collections; five of them are documents with their own URL:
+Nine collections; four of them are documents with their own URL:
 
 | Collection | Route | Shape |
 |---|---|---|
@@ -37,11 +37,11 @@ Ten collections; five of them are documents with their own URL:
 | `journal` | `/journal/<slug>` | dated entry, volume number, tags |
 | `tech` | `/tech/<slug>` | build logs and notes |
 | `photography` | `/photography/<slug>` | frame, gallery, gear, capture mode |
-| `collection` | `/collection/<slug>` | index entries with a body |
 
-The rest — `gear`, `timeline`, `favorites`, `home`, `gallery` — are fragments composed into pages
+The rest — `gear`, `favorites`, `home`, `gallery`, `timeline` — are fragments composed into pages
 rather than documents, so they have no route of their own. `content/home/` drives the entire home
-page through `configType` entries (`profile`, `gateway`, `quote`, `principle`).
+page through `configType` entries (`profile`, `gateway`, `quote`, `principle`). `timeline/` is
+currently unused: it only ever appeared on the retired index page.
 
 Images live in `public/uploads/`. Every image on the site is the owner's own photograph;
 `.kiro/IMAGE_MAP.md` records which frame fills which slot and why, with measured luminance and

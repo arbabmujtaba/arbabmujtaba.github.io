@@ -38,7 +38,6 @@ const PAGE_COLLECTION_MAP: Record<string, string> = {
   '/tech': 'tech',
   '/photography': 'photography',
   '/portfolio': 'portfolio',
-  '/collection': 'collection',
 };
 
 function normalizeText(text: string): string {

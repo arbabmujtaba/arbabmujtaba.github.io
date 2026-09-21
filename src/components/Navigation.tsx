@@ -5,7 +5,6 @@ const navItems = [
   { id: 'journal', num: '02', label: 'Journal' },
   { id: 'tech', num: '03', label: 'Logs' },
   { id: 'photography', num: '04', label: 'Frames' },
-  { id: 'collection', num: '05', label: 'Index' },
 ];
 
 interface NavigationProps {

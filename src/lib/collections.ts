@@ -14,7 +14,6 @@ export const DETAIL_COLLECTIONS = [
   'journal',
   'tech',
   'photography',
-  'collection',
 ] as const;
 
 export type DetailCollection = (typeof DETAIL_COLLECTIONS)[number];
@@ -25,7 +24,6 @@ export const COLLECTION_LABEL: Record<DetailCollection, string> = {
   journal: 'journal',
   tech: 'logs',
   photography: 'frames',
-  collection: 'index',
 };
 
 export function isDetailCollection(value: string): value is DetailCollection {

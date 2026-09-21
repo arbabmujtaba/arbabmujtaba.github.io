@@ -127,31 +127,6 @@ const WEBSITE_STRUCTURE: WebsiteSection[] = [
     ],
   },
   {
-    id: 'collection',
-    label: 'Collections',
-    destinations: [
-      {
-        collection: 'collection',
-        label: 'Museum Collection',
-        blurb: 'Inspirations, books and music exhibits',
-        categories: ['Inspirations', 'Books', 'Music'],
-      },
-      {
-        collection: 'timeline',
-        label: 'Timeline / Journey',
-        blurb: 'Milestones on the journey timeline',
-        categories: ['Milestone'],
-        fixedCategory: 'Milestone',
-      },
-      {
-        collection: 'favorites',
-        label: 'Uses & Gear',
-        blurb: 'The "Uses & Gear" exhibit (tools and setups)',
-        categories: ['Favorite Technologies', 'Favorite Software', 'Favorite Linux Tools', 'Favorite Gear', 'Favorite Setups'],
-      },
-    ],
-  },
-  {
     id: 'home',
     label: 'Home Page',
     isConfig: true,
@@ -178,9 +153,9 @@ const getDestination = (sectionId: string, collection: string): PublishDestinati
 // `favorites` is intentionally shared between Tech ("Things I Like") and
 // Collections ("Uses & Gear"), so the category is used to disambiguate it.
 const resolveSection = (collection: string, category?: string): string => {
-  if (collection === 'favorites') {
-    return category === 'Things I Like' ? 'tech' : 'collection';
-  }
+  // `favorites` used to be split between Tech ("Things I Like") and the Index
+  // page ("Uses & Gear"); with the Index gone, every favorite belongs to Tech.
+  if (collection === 'favorites') return 'tech';
   // The standalone gallery grids were retired; any legacy gallery item lives under Photography.
   if (collection === 'gallery') return 'photography';
   const section = WEBSITE_STRUCTURE.find(s => s.destinations.some(d => d.collection === collection));
@@ -191,7 +166,7 @@ const resolveSection = (collection: string, category?: string): string => {
  * Collections whose types carry `video` / `videoPoster`. The motion controls are
  * only offered here, so the form cannot write a field the renderer ignores.
  */
-const MOTION_COLLECTIONS = ['journal', 'tech', 'photography', 'portfolio', 'collection', 'home'];
+const MOTION_COLLECTIONS = ['journal', 'tech', 'photography', 'portfolio', 'home'];
 
 // Home block types are lowercase ids — present them a little more nicely.
 const prettyCategory = (cat: string): string =>
@@ -1274,7 +1249,6 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                 { col: 'journal', accent: 'border-l-orange-500' },
                 { col: 'tech', accent: 'border-l-blue-500' },
                 { col: 'photography', accent: 'border-l-green-500' },
-                { col: 'collection', accent: 'border-l-purple-500' },
                 { col: 'portfolio', accent: 'border-l-pink-500' },
               ].map(({ col, accent }, index) => {
                 const count = allContent.filter(v => v.collection === col).length;
@@ -2209,7 +2183,7 @@ export default function Admin({ setView }: { setView: (v: string) => void }) {
                           type="text"
                           value={formCoverImage}
                           onChange={(e) => setFormCoverImage(e.target.value)}
-                          placeholder="e.g. /uploads/collection/cover.png OR enter external image citation link"
+                          placeholder="e.g. /uploads/photography/cover.webp OR enter external image citation link"
                           className="w-full bg-zinc-950 border border-zinc-900 font-sans text-xs text-zinc-350 py-2.5 px-3 rounded-sm focus:outline-none focus:border-orange-500/50"
                         />
                       </div>

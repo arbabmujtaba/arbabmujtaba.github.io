@@ -9,7 +9,6 @@ const ALLOWED_COLLECTIONS = [
   'journal',
   'tech',
   'photography',
-  'collection',
   'portfolio',
 ];
 

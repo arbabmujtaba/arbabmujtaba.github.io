@@ -29,7 +29,6 @@ const Portfolio = lazy(() => import('./pages/Portfolio'));
 const Journal = lazy(() => import('./pages/Journal'));
 const Tech = lazy(() => import('./pages/Tech'));
 const Photography = lazy(() => import('./pages/Photography'));
-const Collection = lazy(() => import('./pages/Collection'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Entry = lazy(() => import('./pages/Entry'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -212,7 +211,6 @@ export default function App() {
                 {route.kind === 'list' && route.view === 'journal' && <Journal />}
                 {route.kind === 'list' && route.view === 'tech' && <Tech />}
                 {route.kind === 'list' && route.view === 'photography' && <Photography />}
-                {route.kind === 'list' && route.view === 'collection' && <Collection />}
                 {route.kind === 'list' && route.view === 'admin' && <Admin setView={setView} />}
                 {route.kind === 'entry' && (
                   <Entry

@@ -26,7 +26,6 @@ export const DETAIL_COLLECTIONS = [
   'journal',
   'tech',
   'photography',
-  'collection',
 ] as const;
 
 export type DetailCollection = (typeof DETAIL_COLLECTIONS)[number];
@@ -38,7 +37,6 @@ export const LIST_ROUTES = [
   '/journal',
   '/tech',
   '/photography',
-  '/collection',
 ] as const;
 
 export interface RouteRecord {
@@ -82,11 +80,6 @@ const LIST_META: Record<string, { title: string; description: string }> = {
     title: 'Frames — Arbab Mujtaba',
     description:
       'Photographs of light, place, and passing weather, with the story and the gear behind selected frames.',
-  },
-  '/collection': {
-    title: 'Index — Arbab Mujtaba',
-    description:
-      'A working index: the gear in use, the timeline so far, and the small things worth keeping a note of.',
   },
 };
 
@@ -139,13 +132,10 @@ async function collectionRoutes(collection: DetailCollection): Promise<RouteReco
       (typeof data.slug === 'string' && data.slug.trim()) || file.replace(/\.md$/, '');
 
     // The manifest must mirror what the site actually links to, or a clickable
-    // card leads to a URL with no shell (a 404 on GitHub Pages).
-    //
-    // Only `collection` rows are conditional: Collection.tsx links a row solely
-    // when the entry has a body. Everywhere else the card always opens — ten
-    // photography frames carry no story text but still have a cover, a
-    // description, gear and a gallery, so they are real pages.
-    if (collection === 'collection' && content.trim().length === 0) continue;
+    // card leads to a URL with no shell (a 404 on GitHub Pages). Every card on
+    // every listing opens — ten photography frames carry no story text but
+    // still have a cover, a description, gear and a gallery, so they are real
+    // pages.
 
     const description =
       (typeof data.excerpt === 'string' && data.excerpt.trim()) ||
