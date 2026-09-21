@@ -878,8 +878,70 @@
       "filePath": "content/photography/high.md",
       "lastReviewedAt": "2026-07-27T06:40:37.040Z",
       "publishedAt": "2026-07-27T06:40:40.610Z"
+    },
+    {
+      "id": "photography/narrative",
+      "collection": "photography",
+      "slug": "narrative",
+      "title": "Narrative",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-09-21T11:55:09.753Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-09-21T11:55:21.370Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-09-21T11:55:28.533Z",
+          "commitHash": "c06ab25a9b7031015f77b4e9b569681d47c0926b"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-09-21T11:55:09.760Z",
+      "updatedAt": "2026-09-21T11:55:28.533Z",
+      "filePath": "content/photography/narrative.md",
+      "lastReviewedAt": "2026-09-21T11:55:21.370Z",
+      "publishedAt": "2026-09-21T11:55:28.533Z"
+    },
+    {
+      "id": "photography/purpose",
+      "collection": "photography",
+      "slug": "purpose",
+      "title": "Purpose",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-09-21T11:59:13.703Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-09-21T11:59:17.765Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-09-21T11:59:20.720Z",
+          "commitHash": "c06ab25a9b7031015f77b4e9b569681d47c0926b"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-09-21T11:59:13.704Z",
+      "updatedAt": "2026-09-21T11:59:20.720Z",
+      "filePath": "content/photography/purpose.md",
+      "lastReviewedAt": "2026-09-21T11:59:17.765Z",
+      "publishedAt": "2026-09-21T11:59:20.720Z"
     }
   ],
-  "lastUpdated": "2026-09-05T08:46:37.700Z",
+  "lastUpdated": "2026-09-21T11:59:20.728Z",
   "version": 1
 }
