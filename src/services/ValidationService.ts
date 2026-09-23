@@ -164,5 +164,3 @@ export class ValidationService {
     return !isNaN(date.getTime());
   }
 }
-
-export default ValidationService;

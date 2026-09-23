@@ -112,11 +112,6 @@ export function navigate(path: string, options: NavigateOptions = {}): void {
   window.dispatchEvent(new Event(NAVIGATION_EVENT));
 }
 
-/** Navigate to one of the top-level views. */
-export function navigateToView(view: ListView): void {
-  navigate(VIEW_TO_PATH[view] ?? '/');
-}
-
 /** True when the current history entry was created by a quick-look overlay. */
 export function isQuickLookState(): boolean {
   const state = window.history.state as { quickLook?: boolean } | null;

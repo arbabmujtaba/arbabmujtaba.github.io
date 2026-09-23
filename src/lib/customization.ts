@@ -264,7 +264,7 @@ export function getAccentColor(customization?: PostCustomization): string | unde
  * Validates that a string is a safe CSS color value (hex, named, rgb/hsl function).
  * Rejects values containing characters that could break inline style attributes.
  */
-export function isValidCSSColor(value: string): boolean {
+function isValidCSSColor(value: string): boolean {
   if (!value || typeof value !== 'string') return false;
   const trimmed = value.trim();
   // Reject empty, overly long, or values with dangerous characters
@@ -316,15 +316,6 @@ export function hasGrainEffect(customization?: PostCustomization): boolean {
 
 export function hasVignetteEffect(customization?: PostCustomization): boolean {
   return customization?.effects?.vignette === true;
-}
-
-export function getBlurIntensity(customization?: PostCustomization): number {
-  return customization?.effects?.blur || 0;
-}
-
-export function getColorFilterValue(customization?: PostCustomization): string {
-  const filter = customization?.effects?.colorFilter || 'none';
-  return COLOR_FILTER_MAP[filter] || 'none';
 }
 
 /**

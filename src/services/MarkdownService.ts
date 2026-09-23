@@ -97,5 +97,3 @@ export class MarkdownService {
     return content;
   }
 }
-
-export default MarkdownService;

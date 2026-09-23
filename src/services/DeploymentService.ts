@@ -178,5 +178,3 @@ export class DeploymentService {
     return null;
   }
 }
-
-export default DeploymentService;

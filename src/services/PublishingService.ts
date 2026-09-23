@@ -516,5 +516,3 @@ export class PublishingService {
     return result;
   }
 }
-
-export default PublishingService;

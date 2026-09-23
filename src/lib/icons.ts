@@ -78,6 +78,3 @@ export function resolveIcon(name: string | undefined | null): LucideIcon | null 
   if (!name) return null;
   return ICONS[name.trim()] ?? null;
 }
-
-/** Every name the admin may offer, for a picker. */
-export const ICON_NAMES = Object.keys(ICONS).sort();

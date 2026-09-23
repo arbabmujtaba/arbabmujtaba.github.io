@@ -12,7 +12,7 @@ import { JournalEntry } from '../types';
  * GitHub Pages, and contains no embedded text/logos (typography is always
  * rendered by the site on top of it).
  */
-export const DEFAULT_JOURNAL_COVER = '/assets/journal-placeholder.svg';
+const DEFAULT_JOURNAL_COVER = '/assets/journal-placeholder.svg';
 
 type JournalCardVariant = 'featured' | 'archive';
 

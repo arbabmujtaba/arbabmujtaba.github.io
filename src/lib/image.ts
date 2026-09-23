@@ -30,13 +30,6 @@ export function normalizeImagePath(
 }
 
 /**
- * Check whether a path is a valid image reference.
- */
-export function isValidImagePath(path: string | undefined | null): boolean {
-  return normalizeImagePath(path) !== null;
-}
-
-/**
  * Resolve an image only when it belongs to the owner's own archive.
  *
  * The design system's first rule is that every image on the site is the
@@ -58,29 +51,6 @@ export function ownerArchiveImage(
   const isOwnerArchive = bare.startsWith('/uploads/') || bare === '/portrait.jpg';
 
   return isOwnerArchive ? normalized : undefined;
-}
-
-/**
- * Extract file extension from a path/URL (lowercased).
- */
-export function getImageExtension(path: string): string {
-  if (!path) return '';
-  try {
-    // Strip query strings and hashes
-    const clean = path.split('?')[0].split('#')[0];
-    const ext = clean.split('.').pop()?.toLowerCase() || '';
-    return ext;
-  } catch {
-    return '';
-  }
-}
-
-/**
- * Check whether a path has a recognized image extension.
- */
-export function isImagePath(path: string): boolean {
-  const ext = getImageExtension(path);
-  return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif', 'bmp'].includes(ext);
 }
 
 export interface ResponsiveImageSources {
@@ -118,9 +88,3 @@ export function getLocalWebpSources(
   };
 }
 
-/**
- * Normalize an array of image paths, filtering out invalid ones.
- */
-export function normalizeImagePaths(paths: (string | undefined | null)[]): string[] {
-  return paths.map(normalizeImagePath).filter((p): p is string => p !== null);
-}

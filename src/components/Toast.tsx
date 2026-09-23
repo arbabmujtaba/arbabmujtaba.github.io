@@ -67,5 +67,3 @@ function ToastNotification({ toast, onRemove }: { toast: ToastItem; onRemove: (i
     </motion.div>
   );
 }
-
-export default ToastContainer;

@@ -151,5 +151,3 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
     </div>
   );
 }
-
-export default PreviewDocument;

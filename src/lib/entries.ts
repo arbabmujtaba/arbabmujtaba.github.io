@@ -187,7 +187,7 @@ const LOADERS: Record<DetailCollection, () => DetailEntry[]> = {
  * All entries in a collection, in the same order the listing page shows them,
  * so prev/next on a detail page matches the index the reader came from.
  */
-export function getDetailEntries(collection: DetailCollection): DetailEntry[] {
+function getDetailEntries(collection: DetailCollection): DetailEntry[] {
   return LOADERS[collection]();
 }
 

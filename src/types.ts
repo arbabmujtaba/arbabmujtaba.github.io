@@ -171,19 +171,6 @@ export interface FavoriteItem {
   customization?: PostCustomization;
 }
 
-export interface PhotoGalleryItem {
-  title: string;
-  slug: string;
-  category: "Life" | "Travel" | "Connected" | "Favorites" | "Behind The Shot";
-  description?: string;
-  image: string;
-  featured: boolean;
-  order: number;
-  visible: boolean;
-  body: string;
-  customization?: PostCustomization;
-}
-
 export interface HomeConfigEntry {
   title: string;
   slug: string;

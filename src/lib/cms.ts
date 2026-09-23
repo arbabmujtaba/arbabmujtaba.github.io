@@ -7,7 +7,6 @@ import {
   TimelineMilestone,
   FavoriteItem,
   HomeConfigEntry,
-  PhotoGalleryItem,
   PostCustomization
 } from '../types';
 
@@ -174,7 +173,6 @@ const gearGlob = (import.meta as any).glob('/content/gear/**/*.md', { query: '?r
 const timelineGlob = (import.meta as any).glob('/content/timeline/**/*.md', { query: '?raw', eager: true });
 const favoritesGlob = (import.meta as any).glob('/content/favorites/**/*.md', { query: '?raw', eager: true });
 const homeGlob = (import.meta as any).glob('/content/home/**/*.md', { query: '?raw', eager: true });
-const galleryGlob = (import.meta as any).glob('/content/gallery/**/*.md', { query: '?raw', eager: true });
 
 // Normalize listing maps to typed arrays
 /**
@@ -461,21 +459,3 @@ export function getHomeConfig(): HomeConfigEntry[] {
   }).sort((a, b) => a.order - b.order);
 }
 
-export function getGalleryItems(): PhotoGalleryItem[] {
-  return Object.entries(galleryGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
-    const { data, content } = parseMarkdown(rawContent);
-    return {
-      title: data.title || "Untitled",
-      slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
-      category: data.category || "Life",
-      description: data.description || "",
-      image: data.image || "",
-      featured: !!data.featured,
-      order: typeof data.order === 'number' ? data.order : 0,
-      visible: data.visible !== false,
-      body: content || "",
-      customization: data.customization as PostCustomization | undefined
-    };
-  }).sort((a, b) => a.order - b.order);
-}

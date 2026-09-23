@@ -454,82 +454,9 @@ export async function transitionState(
   return updatedItem;
 }
 
-/**
- * Marks content as having unsaved changes
- * 
- * @param collection - The collection name
- * @param slug - The content slug
- * @param hasChanges - Whether there are uncommitted edits
- */
-export async function markUnsavedChanges(
-  collection: string,
-  slug: string,
-  hasChanges: boolean
-): Promise<void> {
-  const registry = await ensureRegistry();
-  
-  const itemIndex = registry.items.findIndex(
-    item => item.collection === collection && item.slug === slug
-  );
-  
-  if (itemIndex < 0) {
-    return; // Silently ignore if item doesn't exist in registry
-  }
-  
-  registry.items[itemIndex].unsavedChanges = hasChanges;
-  await saveRegistry(registry);
-}
-
 // ============================================================
 // QUERY FUNCTIONS
 // ============================================================
-
-/**
- * Gets all content items filtered by state
- * 
- * @param state - The state to filter by
- * @returns Array of ContentItems in the specified state
- */
-export async function getItemsByState(state: ContentState): Promise<ContentItem[]> {
-  const registry = await ensureRegistry();
-  return registry.items.filter(item => item.state === state);
-}
-
-/**
- * Gets all content items in a collection
- * 
- * @param collection - The collection name
- * @returns Array of ContentItems in the collection
- */
-export async function getItemsByCollection(collection: string): Promise<ContentItem[]> {
-  const registry = await ensureRegistry();
-  return registry.items.filter(item => item.collection === collection);
-}
-
-/**
- * Gets recent content items, optionally filtered by state
- * 
- * @param limit - Maximum number of items to return (default: 10)
- * @param state - Optional state filter
- * @returns Array of recent ContentItems
- */
-export async function getRecentItems(
-  limit: number = 10,
-  state?: ContentState
-): Promise<ContentItem[]> {
-  const registry = await ensureRegistry();
-  
-  let items = registry.items;
-  
-  if (state) {
-    items = items.filter(item => item.state === state);
-  }
-  
-  // Sort by updatedAt descending
-  items.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  
-  return items.slice(0, limit);
-}
 
 /**
  * Gets all content items
@@ -681,104 +608,6 @@ export async function migrate(force: boolean = false): Promise<{
 // BULK OPERATIONS
 // ============================================================
 
-/**
- * Syncs the registry with the actual filesystem
- * Ensures all content files have registry entries
- * 
- * @returns Object with sync results
- */
-export async function syncRegistry(): Promise<{
-  added: number;
-  removed: number;
-  total: number;
-}> {
-  const registry = await ensureRegistry();
-  const existingPaths = new Set(registry.items.map(i => i.filePath));
-  const now = new Date().toISOString();
-  
-  let added = 0;
-  let removed = 0;
-  
-  // Add missing files
-  for (const collection of SUPPORTED_COLLECTIONS) {
-    const colDir = path.join(CONTENT_DIR, collection);
-    
-    if (!(await fs.pathExists(colDir))) continue;
-    
-    const files = await fs.readdir(colDir);
-    
-    for (const file of files) {
-      if (!file.endsWith('.md')) continue;
-      
-      const filePath = `content/${collection}/${file}`;
-      
-      if (!existingPaths.has(filePath)) {
-        const slug = file.replace('.md', '');
-        
-        try {
-          const raw = await fs.readFile(path.join(colDir, file), 'utf-8');
-          const { data } = matter(raw);
-          
-          const item: ContentItem = {
-            id: generateId(collection, slug),
-            collection,
-            slug: data.slug || slug,
-            title: data.title || 'Untitled',
-            state: 'draft',
-            versions: [
-              {
-                version: 1,
-                state: 'draft',
-                timestamp: now,
-              },
-            ],
-            unsavedChanges: false,
-            createdAt: now,
-            updatedAt: now,
-            filePath,
-          };
-          
-          registry.items.push(item);
-          added++;
-        } catch (error) {
-          console.error(`Error reading ${filePath}:`, error);
-        }
-      }
-    }
-  }
-  
-  // Remove entries for deleted files
-  const existingFiles = new Set<string>();
-  for (const collection of SUPPORTED_COLLECTIONS) {
-    const colDir = path.join(CONTENT_DIR, collection);
-    if (await fs.pathExists(colDir)) {
-      const files = await fs.readdir(colDir);
-      for (const file of files) {
-        if (file.endsWith('.md')) {
-          existingFiles.add(`content/${collection}/${file}`);
-        }
-      }
-    }
-  }
-  
-  const toRemove = registry.items.filter(item => !existingFiles.has(item.filePath));
-  for (const item of toRemove) {
-    const idx = registry.items.findIndex(i => i.id === item.id);
-    if (idx >= 0) {
-      registry.items.splice(idx, 1);
-      removed++;
-    }
-  }
-  
-  await saveRegistry(registry);
-  
-  return {
-    added,
-    removed,
-    total: registry.items.length,
-  };
-}
-
 // ============================================================
 // INITIALIZATION
 // ============================================================
@@ -840,18 +669,13 @@ const contentState = {
   createItem,
   deleteItem,
   transitionState,
-  markUnsavedChanges,
   
   // Queries
-  getItemsByState,
-  getItemsByCollection,
-  getRecentItems,
   getAllItems,
   getStateStats,
   
   // Migration & sync
   migrate,
-  syncRegistry,
   initialize,
 };
 
