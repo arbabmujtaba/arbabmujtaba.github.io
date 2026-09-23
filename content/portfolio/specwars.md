@@ -7,7 +7,7 @@ techStack:
   - Node.js
 githubLink: ""
 liveLink: ""
-projectImage: ""
+projectImage: "/uploads/portfolio/specwars.webp"
 featured: false
 ---
 

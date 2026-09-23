@@ -8,7 +8,7 @@ techStack:
   - Spatial Audio
 githubLink: ""
 liveLink: ""
-projectImage: "/uploads/photography/1782621003839-87347598.jpg"
+projectImage: "/uploads/portfolio/moodmix.webp"
 featured: false
 ---
 

@@ -7,7 +7,7 @@ techStack:
   - MySQL
 githubLink: ""
 liveLink: ""
-projectImage: "/uploads/collection/1781797866868-433918712.png"
+projectImage: "/uploads/portfolio/davv-login.webp"
 featured: false
 ---
 

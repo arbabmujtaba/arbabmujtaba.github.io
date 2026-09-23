@@ -8,7 +8,7 @@ techStack:
   - MongoDB
 githubLink: ""
 liveLink: ""
-projectImage: ""
+projectImage: "/uploads/portfolio/spotify-backend.webp"
 featured: false
 ---
 

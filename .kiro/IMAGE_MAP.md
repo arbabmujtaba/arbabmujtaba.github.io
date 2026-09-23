@@ -151,3 +151,25 @@ see what it would touch. The filenames in the table above change extension when 
 
 41 sources × 3 widths = 123 derivatives. The script exits non-zero if any of them fails, so it is
 safe to gate a build on.
+
+## Portfolio plates — externally sourced (exception to the owner-photograph rule)
+
+Project cards previously borrowed unrelated frames from the photography archive, and two had no
+plate at all. They now carry subject-relevant images sourced through Openverse, downloaded into
+`public/uploads/portfolio/`, converted to WebP and given the standard 480/768/1536 derivatives, so
+they travel the same pipeline as an owner frame. All are CC0 or Public Domain Mark — no attribution
+is legally required, but provenance is recorded here.
+
+| Plate | Subject | License | Source |
+|---|---|---|---|
+| `portfolio/network-simulator.webp` | Ethernet switch, patched | CC0 | flickr 16480450157 |
+| `portfolio/geoproject.webp` | Aerial/satellite view, Jamestown Island | CC0 | rawpixel (NASA PIA12055) |
+| `portfolio/moodmix.webp` | SSL X-Desk analogue summing mixer | CC0 | Wikimedia Commons |
+| `portfolio/kashmiri-ai.webp` | Vegetable seller on Dal Lake | CC0 | Wikimedia Commons |
+| `portfolio/spotify-backend.webp` | Server room | CC0 | rawpixel |
+| `portfolio/davv-login.webp` | HTML/PHP/JavaScript source on screen | CC0 | flickr 31906693748 |
+| `portfolio/student-attendance.webp` | Classroom blackboard | CC0 | flickr 17990211551 |
+| `portfolio/specwars.webp` | 286 CPU die-up | CC0 | flickr 3536246838 |
+
+Replace any of these with an owner frame by dropping the photograph into `public/uploads/` through
+`/admin` and repointing `projectImage`; nothing else needs to change.

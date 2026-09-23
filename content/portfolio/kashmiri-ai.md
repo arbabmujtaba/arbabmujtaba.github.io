@@ -7,7 +7,7 @@ techStack:
   - NLP
 githubLink: "https://github.com/arbabandjones/kashmiri-ai"
 liveLink: ""
-projectImage: "/uploads/photography/1782633185852-244920274.jpeg"
+projectImage: "/uploads/portfolio/kashmiri-ai.webp"
 featured: true
 ---
 
