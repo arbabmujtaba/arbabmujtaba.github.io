@@ -902,8 +902,39 @@
       "filePath": "content/photography/purpose.md",
       "lastReviewedAt": "2026-09-21T12:39:07.744Z",
       "publishedAt": "2026-09-21T12:39:10.414Z"
+    },
+    {
+      "id": "home/untitled",
+      "collection": "home",
+      "slug": "untitled",
+      "title": "untitled",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-09-26T10:16:22.428Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-09-26T10:16:25.932Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-09-26T10:16:28.231Z",
+          "commitHash": "e92e5f6f16e8f2ad85bde8671daef4080bd78469"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-09-26T10:16:22.435Z",
+      "updatedAt": "2026-09-26T10:16:28.231Z",
+      "filePath": "content/home/untitled.md",
+      "lastReviewedAt": "2026-09-26T10:16:25.932Z",
+      "publishedAt": "2026-09-26T10:16:28.231Z"
     }
   ],
-  "lastUpdated": "2026-09-21T12:39:10.425Z",
+  "lastUpdated": "2026-09-26T10:16:28.243Z",
   "version": 1
 }
