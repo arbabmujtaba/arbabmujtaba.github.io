@@ -995,8 +995,39 @@
       "filePath": "content/photography/crazy-cool-jagah.md",
       "lastReviewedAt": "2026-09-28T17:21:59.659Z",
       "publishedAt": "2026-09-28T17:22:02.519Z"
+    },
+    {
+      "id": "journal/the-missed-train-2",
+      "collection": "journal",
+      "slug": "the-missed-train-2",
+      "title": "THE MISSED TRAIN",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-09-28T17:59:08.577Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-09-28T17:59:14.464Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-09-28T17:59:16.747Z",
+          "commitHash": "83d6d59b5f37663ca5cc3da68030fd5e0a3763d6"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-09-28T17:59:08.578Z",
+      "updatedAt": "2026-09-28T18:04:58.893Z",
+      "filePath": "content/journal/the-missed-train-2.md",
+      "lastReviewedAt": "2026-09-28T17:59:14.464Z",
+      "publishedAt": "2026-09-28T17:59:16.747Z"
     }
   ],
-  "lastUpdated": "2026-09-28T17:22:02.530Z",
+  "lastUpdated": "2026-09-28T18:04:58.893Z",
   "version": 1
 }
