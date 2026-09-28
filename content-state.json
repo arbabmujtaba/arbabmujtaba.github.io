@@ -904,37 +904,99 @@
       "publishedAt": "2026-09-21T12:39:10.414Z"
     },
     {
-      "id": "home/untitled",
-      "collection": "home",
-      "slug": "untitled",
-      "title": "untitled",
+      "id": "photography/shots",
+      "collection": "photography",
+      "slug": "shots",
+      "title": "SHOTS",
       "state": "published",
       "versions": [
         {
           "version": 1,
           "state": "draft",
-          "timestamp": "2026-09-26T10:16:22.428Z"
+          "timestamp": "2026-09-28T17:14:32.819Z"
         },
         {
           "version": 2,
           "state": "review",
-          "timestamp": "2026-09-26T10:16:25.932Z"
+          "timestamp": "2026-09-28T17:14:37.685Z"
         },
         {
           "version": 3,
           "state": "published",
-          "timestamp": "2026-09-26T10:16:28.231Z",
-          "commitHash": "e92e5f6f16e8f2ad85bde8671daef4080bd78469"
+          "timestamp": "2026-09-28T17:14:40.524Z",
+          "commitHash": "4416582875c478622e021a6821b26e71d0e634b8"
         }
       ],
       "unsavedChanges": false,
-      "createdAt": "2026-09-26T10:16:22.435Z",
-      "updatedAt": "2026-09-26T10:16:28.231Z",
-      "filePath": "content/home/untitled.md",
-      "lastReviewedAt": "2026-09-26T10:16:25.932Z",
-      "publishedAt": "2026-09-26T10:16:28.231Z"
+      "createdAt": "2026-09-28T17:14:32.826Z",
+      "updatedAt": "2026-09-28T17:14:40.524Z",
+      "filePath": "content/photography/shots.md",
+      "lastReviewedAt": "2026-09-28T17:14:37.685Z",
+      "publishedAt": "2026-09-28T17:14:40.524Z"
+    },
+    {
+      "id": "photography/226639n758827e",
+      "collection": "photography",
+      "slug": "226639n758827e",
+      "title": "22.6639N,75.8827E",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-09-28T17:18:46.413Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-09-28T17:18:49.665Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-09-28T17:18:51.989Z",
+          "commitHash": "4416582875c478622e021a6821b26e71d0e634b8"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-09-28T17:18:46.415Z",
+      "updatedAt": "2026-09-28T17:18:51.989Z",
+      "filePath": "content/photography/226639n758827e.md",
+      "lastReviewedAt": "2026-09-28T17:18:49.665Z",
+      "publishedAt": "2026-09-28T17:18:51.989Z"
+    },
+    {
+      "id": "photography/crazy-cool-jagah",
+      "collection": "photography",
+      "slug": "crazy-cool-jagah",
+      "title": "crazy-cool-jagah!",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-09-28T17:21:29.109Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-09-28T17:21:59.659Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-09-28T17:22:02.519Z",
+          "commitHash": "4416582875c478622e021a6821b26e71d0e634b8"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-09-28T17:21:29.113Z",
+      "updatedAt": "2026-09-28T17:22:02.519Z",
+      "filePath": "content/photography/crazy-cool-jagah.md",
+      "lastReviewedAt": "2026-09-28T17:21:59.659Z",
+      "publishedAt": "2026-09-28T17:22:02.519Z"
     }
   ],
-  "lastUpdated": "2026-09-26T10:16:28.243Z",
+  "lastUpdated": "2026-09-28T17:22:02.530Z",
   "version": 1
 }
