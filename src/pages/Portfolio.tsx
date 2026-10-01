@@ -179,6 +179,7 @@ export default function Portfolio() {
                   excerpt={project.description}
                   aspect="aspect-[4/3] sm:aspect-[16/10]"
                   priority={index === 0}
+                  customization={project.customization}
                   href={detailPath('portfolio', project.slug)}
                   onClick={() => openEntry('portfolio', project.slug)}
                   className="min-h-[44px]"

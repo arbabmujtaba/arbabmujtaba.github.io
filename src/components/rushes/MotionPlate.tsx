@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import SafeImage from '../SafeImage';
@@ -17,6 +17,12 @@ interface MotionPlateProps {
   autoPlay?: boolean;
   loop?: boolean;
   className?: string;
+  /** CSS `filter` for the picture only — the controls stay untouched. */
+  mediaFilter?: string;
+  /** Grain / vignette layers, drawn over the picture and under the controls. */
+  overlay?: ReactNode;
+  /** Inline style for the frame, e.g. a corner radius. */
+  frameStyle?: React.CSSProperties;
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -52,6 +58,9 @@ export default function MotionPlate({
   autoPlay = true,
   loop = true,
   className = '',
+  mediaFilter,
+  overlay,
+  frameStyle,
 }: MotionPlateProps) {
   const shouldReduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -162,7 +171,10 @@ export default function MotionPlate({
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: shouldReduceMotion ? 0.3 : 0.85, ease: EASE }}
     >
-      <div className={`image-frame group/plate relative w-full overflow-hidden ${aspect}`}>
+      <div
+        className={`image-frame group/plate relative w-full overflow-hidden ${aspect}`}
+        style={frameStyle}
+      >
         {gif ? (
           /* Deliberately a plain <img>, not SafeImage: SafeImage emits a
              <picture><source> pointing at WebP derivatives, the optimizer only
@@ -175,6 +187,7 @@ export default function MotionPlate({
             decoding="async"
             onError={() => setFailed(true)}
             className="h-full w-full object-cover"
+            style={mediaFilter ? { filter: mediaFilter } : undefined}
           />
         ) : (
           <video
@@ -191,8 +204,11 @@ export default function MotionPlate({
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
             className="h-full w-full object-cover"
+            style={mediaFilter ? { filter: mediaFilter } : undefined}
           />
         )}
+
+        {overlay}
 
         {/* Controls. Always reachable by keyboard; they fade up on hover on a
             pointer device and stay visible on touch, where there is no hover. */}

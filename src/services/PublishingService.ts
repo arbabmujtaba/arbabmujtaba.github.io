@@ -27,7 +27,7 @@ import { MarkdownService } from './MarkdownService';
 import { ValidationService } from './ValidationService';
 import { ensureDerivatives } from './ImageDerivativeService';
 import {
-  transitionState,
+  markPublished,
   getItem,
   saveItem,
   ContentItem,
@@ -403,9 +403,9 @@ export class PublishingService {
       // --- Complete ---
       this.updateStep(job, 'complete', 'success', 'Published successfully!');
 
-      // Transition content state to published
+      // Transition content state to published, walking draft→review→published if needed
       try {
-        await transitionState(payload.collection, payload.slug, 'published', {
+        await markPublished(payload.collection, payload.slug, {
           notes: `Published via pipeline job ${job.id}`,
         });
       } catch (e: any) {

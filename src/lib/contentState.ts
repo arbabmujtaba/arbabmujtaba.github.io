@@ -258,38 +258,37 @@ export async function scanContentDir(): Promise<ContentItem[]> {
       
       const filePath = path.join(colDir, file);
       const slug = file.replace('.md', '');
-      
+
+      // A file that will not parse is still a file on disk. Registering it
+      // (rather than skipping it) keeps reconcile() from treating it as deleted.
+      let data: Record<string, any> = {};
       try {
         const raw = await fs.readFile(filePath, 'utf-8');
-        const { data } = matter(raw);
-        
-        const item: ContentItem = {
-          id: generateId(collection, slug),
-          collection,
-          slug: data.slug || slug,
-          title: data.title || data.projectImage ? (data.title || 'Untitled Project') : (data.title || 'Untitled'),
-          state: 'published',  // Existing files are assumed published
-          versions: [
-            {
-              version: 1,
-              state: 'published',
-              timestamp: data.date ? new Date(data.date).toISOString() : now,
-            },
-          ],
-          unsavedChanges: false,
-          createdAt: data.date ? new Date(data.date).toISOString() : now,
-          updatedAt: data.date ? new Date(data.date).toISOString() : now,
-          publishedAt: data.date ? new Date(data.date).toISOString() : now,
-          filePath: `content/${collection}/${file}`,
-        };
-        
-        items.push(item);
+        data = matter(raw).data as Record<string, any>;
       } catch (error) {
         console.error(`Error scanning ${filePath}:`, error);
       }
+
+      const parsedDate = data.date ? new Date(data.date) : null;
+      const stamp =
+        parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : now;
+
+      items.push({
+        id: generateId(collection, slug),
+        collection,
+        slug: data.slug || slug,
+        title: data.title || data.label || 'Untitled',
+        state: 'published', // Existing files are live, so they are published
+        versions: [{ version: 1, state: 'published', timestamp: stamp }],
+        unsavedChanges: false,
+        createdAt: stamp,
+        updatedAt: stamp,
+        publishedAt: stamp,
+        filePath: `content/${collection}/${file}`,
+      });
     }
   }
-  
+
   return items;
 }
 
@@ -459,6 +458,34 @@ export async function transitionState(
 // ============================================================
 
 /**
+ * Marks an item published, walking the lifecycle from wherever it is.
+ *
+ * Publishing pushes the file to the live site, so afterwards the registry must say
+ * "published" no matter where the item started. A bare `transitionState(…, 'published')`
+ * fails from `draft` (draft→review→published is the only route) and from `archived`,
+ * which used to leave a pushed item labelled "draft" forever.
+ */
+export async function markPublished(
+  collection: string,
+  slug: string,
+  opts?: TransitionOptions
+): Promise<ContentItem> {
+  let item = await getItem(collection, slug);
+  if (!item) throw new ContentNotFoundError(collection, slug);
+
+  const route: Record<ContentState, ContentState[]> = {
+    archived: ['draft', 'review', 'published'],
+    draft: ['review', 'published'],
+    review: ['published'],
+    published: [],
+  };
+  for (const next of route[item.state]) {
+    item = await transitionState(collection, slug, next, next === 'published' ? opts : undefined);
+  }
+  return item;
+}
+
+/**
  * Gets all content items
  * 
  * @returns All ContentItems in the registry
@@ -499,7 +526,7 @@ export async function getStateStats(): Promise<Record<ContentState, number>> {
  * 
  * This function:
  * 1. Scans the content/ directory for markdown files
- * 2. Creates registry entries for new files (marked as draft)
+ * 2. Creates registry entries for new files (marked as published: they are already live)
  * 3. Updates existing entries to match current file state
  * 4. Preserves version history for existing items
  * 
@@ -557,19 +584,11 @@ export async function migrate(force: boolean = false): Promise<{
     );
     
     if (existingIndex < 0) {
-      // New file - add to registry as draft
-      registry.items.push({
-        ...scannedItem,
-        state: 'draft',
-        versions: [
-          {
-            version: 1,
-            state: 'draft',
-            timestamp: new Date().toISOString(),
-          },
-        ],
-        publishedAt: undefined,
-      });
+      // A file with no registry entry was not authored through the admin (the
+      // admin always registers what it creates), so it came in with git or a
+      // hand edit — and every file under content/ is bundled into the site.
+      // It is live, so it is registered as published, never as a phantom draft.
+      registry.items.push(scannedItem);
       newCount++;
     } else {
       // Update title and metadata if changed
@@ -605,6 +624,79 @@ export async function migrate(force: boolean = false): Promise<{
 }
 
 // ============================================================
+// RECONCILIATION
+// ============================================================
+
+export interface ReconcileResult {
+  /** Files on disk that had no registry entry and were registered as published. */
+  added: number;
+  /** Registry entries whose markdown file no longer exists. */
+  removed: number;
+  /** Entries whose slug no longer matched the file and were re-pointed. */
+  relinked: number;
+}
+
+/**
+ * Brings the registry back in line with `content/`, without touching the state
+ * of anything that is already tracked.
+ *
+ * - A file with no entry is registered as `published`. Every file under
+ *   `content/` is bundled into the site, so an unregistered file is live; the
+ *   admin used to report all of them as drafts.
+ * - An entry whose file is gone is dropped (renames done by hand leave these).
+ * - An entry whose file now declares a different slug is re-pointed at it.
+ *
+ * Writes only when something changed.
+ */
+export async function reconcile(): Promise<ReconcileResult> {
+  const result: ReconcileResult = { added: 0, removed: 0, relinked: 0 };
+
+  if (!(await fs.pathExists(getRegistryPath()))) {
+    const migrated = await migrate(false);
+    result.added = migrated.newItems;
+    return result;
+  }
+
+  const registry = await ensureRegistry();
+  const scanned = await scanContentDir();
+  const scannedByPath = new Map(scanned.map((item) => [item.filePath, item]));
+  const trackedPaths = new Set<string>();
+
+  const kept: ContentItem[] = [];
+  for (const entry of registry.items) {
+    const onDisk = scannedByPath.get(entry.filePath);
+    if (!onDisk) {
+      result.removed += 1;
+      continue;
+    }
+    if (entry.slug !== onDisk.slug) {
+      entry.slug = onDisk.slug;
+      result.relinked += 1;
+    }
+    trackedPaths.add(entry.filePath);
+    kept.push(entry);
+  }
+
+  for (const item of scanned) {
+    if (trackedPaths.has(item.filePath)) continue;
+    kept.push(item);
+    result.added += 1;
+  }
+
+  if (result.added || result.removed || result.relinked) {
+    registry.items = kept;
+    await saveRegistry(registry);
+    if (DEBUG) {
+      console.log(
+        `[contentState] Reconciled registry: +${result.added} registered, -${result.removed} stale, ${result.relinked} relinked.`
+      );
+    }
+  }
+
+  return result;
+}
+
+// ============================================================
 // BULK OPERATIONS
 // ============================================================
 
@@ -634,6 +726,10 @@ export async function initialize(options: {
   } else if (forceMigrate && registryExists) {
     if (DEBUG) console.log('[contentState] Force migration requested. Re-scanning content directory...');
     await migrate(true);
+  } else if (registryExists && autoMigrate) {
+    // The registry drifts whenever content/ changes outside the admin (a git
+    // pull, a rename in the editor). Bring it back in line on every start.
+    await reconcile();
   }
   
   return ensureRegistry();
@@ -676,6 +772,7 @@ const contentState = {
   
   // Migration & sync
   migrate,
+  reconcile,
   initialize,
 };
 

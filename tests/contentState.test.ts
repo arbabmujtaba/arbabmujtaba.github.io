@@ -20,6 +20,9 @@ import {
   InvalidTransitionError,
   ContentNotFoundError,
   ensureRegistry,
+  reconcile,
+  markPublished,
+  scanContentDir,
   type ContentState,
 } from '../src/lib/contentState';
 
@@ -221,6 +224,72 @@ async function runTests() {
     assertEqual(afterReview.review, (before.review || 0) + 1);
 
     await deleteItem('test-collection', 'test-stats');
+  })();
+
+  // --- reconcile ---
+
+  await test('reconcile registers untracked files as published, never as drafts', async () => {
+    const registryPath = path.join(process.cwd(), 'content-state.json');
+    const raw = JSON.parse(await readFile(registryPath, 'utf8'));
+    const dropped = raw.items.shift();
+    assertTrue(!!dropped, 'fixture registry should not be empty');
+    await writeFile(registryPath, JSON.stringify(raw, null, 2), 'utf8');
+
+    const result = await reconcile();
+    assertTrue(result.added >= 1, 'the dropped file should have been registered again');
+
+    const restored = await getItem(dropped.collection, dropped.slug);
+    assertEqual(restored?.state, 'published');
+  })();
+
+  await test('reconcile drops entries whose file no longer exists', async () => {
+    await createItem('journal', 'ghost-entry-without-file', 'Ghost', 'content/journal/ghost-entry-without-file.md');
+    assertTrue(!!(await getItem('journal', 'ghost-entry-without-file')));
+
+    const result = await reconcile();
+    assertTrue(result.removed >= 1, 'the ghost entry should have been removed');
+    assertEqual(await getItem('journal', 'ghost-entry-without-file'), null);
+  })();
+
+  await test('reconcile leaves tracked states alone and is idempotent', async () => {
+    const [first] = await scanContentDir();
+    const registry = await ensureRegistry();
+    const target = registry.items.find((item) => item.filePath === first.filePath);
+    assertTrue(!!target, 'scanned file should be registered after reconcile');
+    target!.state = 'archived';
+    await saveItem(target!);
+
+    const result = await reconcile();
+    assertEqual(result.added + result.removed + result.relinked, 0);
+    assertEqual((await getItem(target!.collection, target!.slug))?.state, 'archived');
+  })();
+
+  // --- markPublished ---
+  await test('markPublished takes a draft all the way to published', async () => {
+    await createItem('test-collection', 'mp-draft', 'Draft', 'content/test-collection/mp-draft.md');
+    const item = await markPublished('test-collection', 'mp-draft', { notes: 'pipeline' });
+    assertEqual(item.state, 'published');
+    assertTrue(!!item.publishedAt, 'publishedAt should be set');
+    await deleteItem('test-collection', 'mp-draft');
+  })();
+
+  await test('markPublished revives an archived item and is idempotent when already published', async () => {
+    await createItem('test-collection', 'mp-arch', 'Archived', 'content/test-collection/mp-arch.md');
+    await markPublished('test-collection', 'mp-arch');
+    await transitionState('test-collection', 'mp-arch', 'archived');
+    assertEqual((await markPublished('test-collection', 'mp-arch')).state, 'published');
+    assertEqual((await markPublished('test-collection', 'mp-arch')).state, 'published');
+    await deleteItem('test-collection', 'mp-arch');
+  })();
+
+  await test('markPublished on an unknown item throws ContentNotFoundError', async () => {
+    let caught: any;
+    try {
+      await markPublished('test-collection', 'nope-nope');
+    } catch (e) {
+      caught = e;
+    }
+    assertEqual(caught?.name, 'ContentNotFoundError');
   })();
 
   // --- Summary ---

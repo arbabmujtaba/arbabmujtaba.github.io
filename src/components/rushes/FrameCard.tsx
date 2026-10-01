@@ -2,6 +2,8 @@ import { motion, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import TagChip from './TagChip';
 import { shouldInterceptClick } from '../../lib/navigation';
+import { getCardImageStyle } from '../../lib/customization';
+import type { PostCustomization } from '../../types';
 
 interface FrameCardProps {
   title: string;
@@ -20,6 +22,8 @@ interface FrameCardProps {
   href?: string;
   priority?: boolean;
   className?: string;
+  /** The entry's customization — the card honours its focal point. */
+  customization?: PostCustomization;
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -44,6 +48,7 @@ export default function FrameCard({
   href,
   priority = false,
   className = '',
+  customization,
 }: FrameCardProps) {
   const shouldReduceMotion = useReducedMotion();
   const interactive = typeof onClick === 'function';
@@ -55,6 +60,7 @@ export default function FrameCard({
           src={image}
           alt={title}
           loading={priority ? 'eager' : 'lazy'}
+          style={getCardImageStyle(customization)}
           className="h-full w-full object-cover opacity-90 transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
           fallback={
             <div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />

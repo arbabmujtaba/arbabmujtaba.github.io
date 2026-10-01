@@ -1026,8 +1026,1205 @@
       "filePath": "content/journal/the-missed-train-2.md",
       "lastReviewedAt": "2026-09-28T17:59:14.464Z",
       "publishedAt": "2026-09-28T17:59:16.747Z"
+    },
+    {
+      "id": "gear/black-pro-mist",
+      "collection": "gear",
+      "slug": "black-pro-mist",
+      "title": "Black Pro-Mist 1/4",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/black-pro-mist.md"
+    },
+    {
+      "id": "gear/capture-one-pro",
+      "collection": "gear",
+      "slug": "capture-one-pro",
+      "title": "Capture One Pro",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/capture-one-pro.md"
+    },
+    {
+      "id": "gear/fuji-x-t4",
+      "collection": "gear",
+      "slug": "fuji-x-t4",
+      "title": "Fuji X-T4 // Everyday Carry",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/fuji-x-t4.md"
+    },
+    {
+      "id": "gear/fujinon-56mm",
+      "collection": "gear",
+      "slug": "fujinon-56mm",
+      "title": "Fujinon 56mm F1.2",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/fujinon-56mm.md"
+    },
+    {
+      "id": "gear/kodak-portra-400",
+      "collection": "gear",
+      "slug": "kodak-portra-400",
+      "title": "Kodak Portra 400",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/kodak-portra-400.md"
+    },
+    {
+      "id": "gear/nikon-f3",
+      "collection": "gear",
+      "slug": "nikon-f3",
+      "title": "Nikon F3 // 35mm Analog",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/nikon-f3.md"
+    },
+    {
+      "id": "gear/sigma-24-70mm",
+      "collection": "gear",
+      "slug": "sigma-24-70mm",
+      "title": "Sigma 24-70mm F2.8 Art",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/sigma-24-70mm.md"
+    },
+    {
+      "id": "gear/sony-35mm",
+      "collection": "gear",
+      "slug": "sony-35mm",
+      "title": "Sony 35mm F1.4 GM",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/sony-35mm.md"
+    },
+    {
+      "id": "gear/sony-a7iii",
+      "collection": "gear",
+      "slug": "sony-a7iii",
+      "title": "Samsung S24 Ultra",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/gear/sony-a7iii.md"
+    },
+    {
+      "id": "timeline/2019-the-beginning",
+      "collection": "timeline",
+      "slug": "2019-the-beginning",
+      "title": "The Beginning",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/timeline/2019-the-beginning.md"
+    },
+    {
+      "id": "timeline/2021-first-significant-build",
+      "collection": "timeline",
+      "slug": "2021-first-significant-build",
+      "title": "First Significant Build",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/timeline/2021-first-significant-build.md"
+    },
+    {
+      "id": "timeline/2022-network-systems",
+      "collection": "timeline",
+      "slug": "2022-network-systems",
+      "title": "Network Systems",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/timeline/2022-network-systems.md"
+    },
+    {
+      "id": "timeline/2023-dsp-spatial-audio",
+      "collection": "timeline",
+      "slug": "2023-dsp-spatial-audio",
+      "title": "DSP & Spatial Audio",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/timeline/2023-dsp-spatial-audio.md"
+    },
+    {
+      "id": "timeline/2024-scale-architecture",
+      "collection": "timeline",
+      "slug": "2024-scale-architecture",
+      "title": "Scale & Architecture",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/timeline/2024-scale-architecture.md"
+    },
+    {
+      "id": "favorites/ai-til",
+      "collection": "favorites",
+      "slug": "ai-til",
+      "title": "AI",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/ai-til.md"
+    },
+    {
+      "id": "favorites/audio-engineering-til",
+      "collection": "favorites",
+      "slug": "audio-engineering-til",
+      "title": "Audio Engineering",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/audio-engineering-til.md"
+    },
+    {
+      "id": "favorites/blank-keycaps",
+      "collection": "favorites",
+      "slug": "blank-keycaps",
+      "title": "Blank Keycaps",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/blank-keycaps.md"
+    },
+    {
+      "id": "favorites/cpp-til",
+      "collection": "favorites",
+      "slug": "cpp-til",
+      "title": "C++",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/cpp-til.md"
+    },
+    {
+      "id": "favorites/cpp",
+      "collection": "favorites",
+      "slug": "cpp",
+      "title": "C++",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/cpp.md"
+    },
+    {
+      "id": "favorites/dsp-til",
+      "collection": "favorites",
+      "slug": "dsp-til",
+      "title": "DSP",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/dsp-til.md"
+    },
+    {
+      "id": "favorites/express-til",
+      "collection": "favorites",
+      "slug": "express-til",
+      "title": "Express",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/express-til.md"
+    },
+    {
+      "id": "favorites/figma",
+      "collection": "favorites",
+      "slug": "figma",
+      "title": "Figma",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/figma.md"
+    },
+    {
+      "id": "favorites/focusrite-scarlett",
+      "collection": "favorites",
+      "slug": "focusrite-scarlett",
+      "title": "Digitech DTR 425",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/focusrite-scarlett.md"
+    },
+    {
+      "id": "favorites/ghostty",
+      "collection": "favorites",
+      "slug": "ghostty",
+      "title": "Ghostty",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/ghostty.md"
+    },
+    {
+      "id": "favorites/grep",
+      "collection": "favorites",
+      "slug": "grep",
+      "title": "grep",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/grep.md"
+    },
+    {
+      "id": "favorites/hhkb-professional",
+      "collection": "favorites",
+      "slug": "hhkb-professional",
+      "title": "HHKB Professional",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/hhkb-professional.md"
+    },
+    {
+      "id": "favorites/htop",
+      "collection": "favorites",
+      "slug": "htop",
+      "title": "htop",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/htop.md"
+    },
+    {
+      "id": "favorites/java",
+      "collection": "favorites",
+      "slug": "java-til",
+      "title": "Java",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/java.md"
+    },
+    {
+      "id": "favorites/linux-til",
+      "collection": "favorites",
+      "slug": "linux-til",
+      "title": "Linux",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/linux-til.md"
+    },
+    {
+      "id": "favorites/lorawan-til",
+      "collection": "favorites",
+      "slug": "lorawan-til",
+      "title": "LoRaWAN",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/lorawan-til.md"
+    },
+    {
+      "id": "favorites/macbook-pro",
+      "collection": "favorites",
+      "slug": "macbook-pro",
+      "title": "MacBook Pro",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/macbook-pro.md"
+    },
+    {
+      "id": "favorites/mongodb-til",
+      "collection": "favorites",
+      "slug": "mongodb-til",
+      "title": "MongoDB",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/mongodb-til.md"
+    },
+    {
+      "id": "favorites/mysql-til",
+      "collection": "favorites",
+      "slug": "mysql-til",
+      "title": "MySQL",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/mysql-til.md"
+    },
+    {
+      "id": "favorites/neovim-tmux",
+      "collection": "favorites",
+      "slug": "neovim-tmux",
+      "title": "Neovim & Tmux",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/neovim-tmux.md"
+    },
+    {
+      "id": "favorites/networking-til",
+      "collection": "favorites",
+      "slug": "networking-til",
+      "title": "Networking",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/networking-til.md"
+    },
+    {
+      "id": "favorites/nodejs-express",
+      "collection": "favorites",
+      "slug": "nodejs-express",
+      "title": "Node.js & Express",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/nodejs-express.md"
+    },
+    {
+      "id": "favorites/nodejs-til",
+      "collection": "favorites",
+      "slug": "nodejs-til",
+      "title": "Node.js",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/nodejs-til.md"
+    },
+    {
+      "id": "favorites/notebook-pen",
+      "collection": "favorites",
+      "slug": "notebook-pen",
+      "title": "Notebook & Pen",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/notebook-pen.md"
+    },
+    {
+      "id": "favorites/python-til",
+      "collection": "favorites",
+      "slug": "python-til",
+      "title": "Python",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/python-til.md"
+    },
+    {
+      "id": "favorites/python",
+      "collection": "favorites",
+      "slug": "python",
+      "title": "Python",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/python.md"
+    },
+    {
+      "id": "favorites/raycast",
+      "collection": "favorites",
+      "slug": "raycast",
+      "title": "Raycast",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/raycast.md"
+    },
+    {
+      "id": "favorites/react-til",
+      "collection": "favorites",
+      "slug": "react-til",
+      "title": "React",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/react-til.md"
+    },
+    {
+      "id": "favorites/react",
+      "collection": "favorites",
+      "slug": "react",
+      "title": "React",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/react.md"
+    },
+    {
+      "id": "favorites/rsync",
+      "collection": "favorites",
+      "slug": "rsync",
+      "title": "rsync",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/rsync.md"
+    },
+    {
+      "id": "favorites/sed-awk",
+      "collection": "favorites",
+      "slug": "sed-awk",
+      "title": "Wifite",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/sed-awk.md"
+    },
+    {
+      "id": "favorites/single-ultrawide",
+      "collection": "favorites",
+      "slug": "single-ultrawide",
+      "title": "Single Ultrawide Monitor",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/single-ultrawide.md"
+    },
+    {
+      "id": "favorites/sony-fuji-cameras",
+      "collection": "favorites",
+      "slug": "sony-fuji-cameras",
+      "title": "Sony A7III",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/sony-fuji-cameras.md"
+    },
+    {
+      "id": "favorites/swing-til",
+      "collection": "favorites",
+      "slug": "swing-til",
+      "title": "Swing",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/swing-til.md"
+    },
+    {
+      "id": "favorites/systemd",
+      "collection": "favorites",
+      "slug": "systemd",
+      "title": "Wireshark",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/systemd.md"
+    },
+    {
+      "id": "favorites/typescript",
+      "collection": "favorites",
+      "slug": "typescript",
+      "title": "TypeScript",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/typescript.md"
+    },
+    {
+      "id": "favorites/warm-desk-lamp",
+      "collection": "favorites",
+      "slug": "warm-desk-lamp",
+      "title": "Warm Desk Lamp",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/favorites/warm-desk-lamp.md"
+    },
+    {
+      "id": "home/gateway-journal",
+      "collection": "home",
+      "slug": "gateway-journal",
+      "title": "Journal",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/gateway-journal.md"
+    },
+    {
+      "id": "home/gateway-photography",
+      "collection": "home",
+      "slug": "gateway-photography",
+      "title": "Photography",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/gateway-photography.md"
+    },
+    {
+      "id": "home/gateway-portfolio",
+      "collection": "home",
+      "slug": "gateway-portfolio",
+      "title": "Portfolio",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/gateway-portfolio.md"
+    },
+    {
+      "id": "home/gateway-tech",
+      "collection": "home",
+      "slug": "gateway-tech",
+      "title": "Tech",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/gateway-tech.md"
+    },
+    {
+      "id": "home/principle-craft",
+      "collection": "home",
+      "slug": "principle-craft",
+      "title": "Built Carefully",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/principle-craft.md"
+    },
+    {
+      "id": "home/principle-memory",
+      "collection": "home",
+      "slug": "principle-memory",
+      "title": "Collected Slowly",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/principle-memory.md"
+    },
+    {
+      "id": "home/principle-wonder",
+      "collection": "home",
+      "slug": "principle-wonder",
+      "title": "Kept Alive",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/principle-wonder.md"
+    },
+    {
+      "id": "home/profile-bio",
+      "collection": "home",
+      "slug": "profile-bio",
+      "title": "Profile Bio",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/profile-bio.md"
+    },
+    {
+      "id": "home/quote-curiosity",
+      "collection": "home",
+      "slug": "quote-curiosity",
+      "title": "Every project begins with a small, stubborn question.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/quote-curiosity.md"
+    },
+    {
+      "id": "home/quote-stories",
+      "collection": "home",
+      "slug": "quote-stories",
+      "title": "Some things are written. Others are captured.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/quote-stories.md"
+    },
+    {
+      "id": "home/quote-technology",
+      "collection": "home",
+      "slug": "quote-technology",
+      "title": "Technology only matters when it touches a real life.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/quote-technology.md"
+    },
+    {
+      "id": "home/reel-dusk-poplars",
+      "collection": "home",
+      "slug": "reel-dusk-poplars",
+      "title": "Dusk Over the Poplars",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T07:51:01.999Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T07:51:01.999Z",
+      "updatedAt": "2026-10-01T07:51:01.999Z",
+      "publishedAt": "2026-10-01T07:51:01.999Z",
+      "filePath": "content/home/reel-dusk-poplars.md"
     }
   ],
-  "lastUpdated": "2026-09-28T18:08:28.599Z",
+  "lastUpdated": "2026-10-01T08:08:18.618Z",
   "version": 1
 }

@@ -341,33 +341,45 @@ html {
 
 /* ==========================================================================
    MARKDOWN BODY
-   --pts / --pff are per-post customization hooks driven by lib/customization.
+   Per-post hooks, set inline by lib/customization (all optional):
+   --pfs exact body size   --pts scale for headings (and body when --pfs unset)
+   --pff body family       --phf heading family
+   --plh line height       --pls letter spacing    --pfw body weight
    ========================================================================== */
 
 .markdown-body {
   color: var(--ink-3);
-  @apply leading-relaxed;
   font-family: var(--pff, var(--font-sans));
+  line-height: var(--plh, 1.625);
+  letter-spacing: var(--pls, normal);
 }
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
   color: var(--ink-0);
-  font-family: var(--font-display);
+  font-family: var(--phf, var(--font-display));
   @apply font-medium mt-8 mb-4;
   letter-spacing: -0.035em;
+  line-height: 1.2;
 }
 .markdown-body h1 {
-  @apply text-2xl md:text-3xl pb-3;
+  @apply pb-3;
+  font-size: calc(1.5rem * var(--pts, 1));
   border-bottom: 1px solid var(--rule);
 }
-.markdown-body h2 { @apply text-xl md:text-2xl; }
-.markdown-body h3 { @apply text-lg md:text-xl; }
+.markdown-body h2 { font-size: calc(1.25rem * var(--pts, 1)); }
+.markdown-body h3 { font-size: calc(1.125rem * var(--pts, 1)); }
+@media (min-width: 768px) {
+  .markdown-body h1 { font-size: calc(1.875rem * var(--pts, 1)); }
+  .markdown-body h2 { font-size: calc(1.5rem * var(--pts, 1)); }
+  .markdown-body h3 { font-size: calc(1.25rem * var(--pts, 1)); }
+}
 .markdown-body p {
   color: var(--ink-3);
-  @apply font-light leading-relaxed mb-6;
-  font-size: calc(0.9375rem * var(--pts, 1));
+  @apply mb-6;
+  font-weight: var(--pfw, 300);
+  font-size: var(--pfs, calc(0.9375rem * var(--pts, 1)));
 }
 @media (min-width: 768px) {
-  .markdown-body p { font-size: calc(1.0625rem * var(--pts, 1)); }
+  .markdown-body p { font-size: var(--pfs, calc(1.0625rem * var(--pts, 1))); }
 }
 .markdown-body blockquote {
   border-left: 2px solid var(--accent);
@@ -398,11 +410,11 @@ html {
 .markdown-body ol { @apply list-decimal; }
 .markdown-body li {
   color: var(--ink-3);
-  @apply font-light;
-  font-size: calc(0.9375rem * var(--pts, 1));
+  font-weight: var(--pfw, 300);
+  font-size: var(--pfs, calc(0.9375rem * var(--pts, 1)));
 }
 @media (min-width: 768px) {
-  .markdown-body li { font-size: calc(1.0625rem * var(--pts, 1)); }
+  .markdown-body li { font-size: var(--pfs, calc(1.0625rem * var(--pts, 1))); }
 }
 .markdown-body a {
   color: var(--accent);

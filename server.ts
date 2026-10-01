@@ -8,7 +8,7 @@ import { createServer as createViteServer } from 'vite';
 import http from 'http';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { transitionState, getItem, getAllItems, saveItem, createItem, deleteItem, initialize, getStateStats, ContentState } from './src/lib/contentState';
+import { transitionState, getItem, getAllItems, saveItem, createItem, deleteItem, initialize, reconcile, getStateStats, ContentState } from './src/lib/contentState';
 import { PreviewDocument } from './src/components/PreviewDocument';
 import { PublishingService } from './src/services/PublishingService';
 import { DeploymentService } from './src/services/DeploymentService';
@@ -387,6 +387,9 @@ app.get('/api/content', async (req, res) => {
      * window in which a concurrent registry write could make a read fail and
      * turn the whole listing into a 500.
      */
+    // Files added or renamed outside the admin have no registry entry yet.
+    // Register them first, so they are listed with the state they really have.
+    await reconcile();
     const registryIndex = new Map(
       (await getAllItems()).map((item) => [`${item.collection}/${item.slug}`, item])
     );
@@ -429,15 +432,25 @@ app.get('/api/content', async (req, res) => {
         allItems.push({
           collection: col,
           slug,
-          title: data.title || data.projectImage ? data.title || 'Untitled Project' : data.title || 'Untitled',
+          title: data.title || data.label || 'Untitled',
           date: data.date || '',
-          category: data.category || '',
+          category: data.category || data.configType || '',
           featured: !!data.featured,
           coverImage: data.coverImage || data.featuredImage || data.projectImage || data.image || '',
           excerpt: data.excerpt || data.description || '',
           filePath: `content/${col}/${file}`,
           frontMatterError,
-          state: registryItem?.state || 'draft',
+          // A file the registry has never seen is already bundled into the
+          // site, so it is published — not a draft.
+          state: registryItem?.state || 'published',
+          // What the site itself honours, independent of the workflow label.
+          visible: data.visible !== false && data.published !== false,
+          video: data.video || '',
+          videoPoster: data.videoPoster || '',
+          hasVideo: !!data.video,
+          configType: data.configType || '',
+          label: data.label || '',
+          order: typeof data.order === 'number' ? data.order : undefined,
           unsavedChanges: registryItem?.unsavedChanges || false,
           publishedAt: registryItem?.publishedAt
         });

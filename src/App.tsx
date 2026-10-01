@@ -148,14 +148,21 @@ export default function App() {
   return (
     <EntryNavigationProvider value={openEntry}>
       <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 overflow-x-hidden">
-        <GlobalBackground />
+        {!isAdmin && <GlobalBackground />}
 
         {/* Pointer follower. Outside the framed layout so it can cross the frame,
             and skipped on the admin surface, where precision matters more. */}
         {!isAdmin && <CursorWand />}
 
         {/* Outer Border Frame */}
-        <div className="flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800 relative z-10 flex flex-col overflow-hidden">
+        {/* The admin studio is a tool, not a page of the site: it takes the whole viewport. */}
+        <div
+          className={
+            isAdmin
+              ? 'flex-grow relative z-10 flex flex-col'
+              : 'flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800 relative z-10 flex flex-col overflow-hidden'
+          }
+        >
 
           {/* Header: mark left, sections centre, standing invitation right */}
           {!isAdmin && (
@@ -200,7 +207,7 @@ export default function App() {
             <motion.div
               key={viewKey}
               className="relative flex min-h-0 flex-1 flex-col"
-              initial={{ opacity: 0, y: isTouchDevice ? 0 : 26 }}
+              initial={isAdmin ? false : { opacity: 0, y: isTouchDevice ? 0 : 26 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: isTouchDevice ? 0 : -24 }}
               transition={{ duration: isTouchDevice ? 0.2 : 0.72, ease: [0.16, 1, 0.3, 1] }}
@@ -253,10 +260,14 @@ export default function App() {
           {!isAdmin && <FloatingMagicalArrow />}
 
           {/* Camera framing marks */}
-          <div className="pointer-events-none absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-zinc-700"></div>
-          <div className="pointer-events-none absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-zinc-700"></div>
-          <div className="pointer-events-none absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-zinc-700"></div>
-          <div className="pointer-events-none absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-zinc-700"></div>
+          {!isAdmin && (
+            <>
+              <div className="pointer-events-none absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-zinc-700"></div>
+              <div className="pointer-events-none absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-zinc-700"></div>
+              <div className="pointer-events-none absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-zinc-700"></div>
+              <div className="pointer-events-none absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-zinc-700"></div>
+            </>
+          )}
         </div>
       </div>
     </EntryNavigationProvider>

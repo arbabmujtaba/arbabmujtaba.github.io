@@ -1,3 +1,5 @@
+import { getMediaFx } from '../lib/customization';
+import { MediaFxOverlays } from '../components/MediaFx';
 import { useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import Footer from '../components/Footer';
@@ -270,16 +272,23 @@ export default function Home({ setView }: HomeProps) {
                 reels.length > 1 ? 'md:grid-cols-2' : ''
               }`}
             >
-              {reels.map((reel) => (
-                <MotionPlate
-                  key={reel.slug}
-                  src={reel.video!}
-                  poster={reel.videoPoster || reel.image}
-                  title={reel.title}
-                  caption={reel.label || reel.description}
-                  aspect={reels.length > 1 ? 'aspect-[4/3]' : 'aspect-[16/9]'}
-                />
-              ))}
+              {reels.map((reel) => {
+                // A reel carries the same colour grade, grain and vignette
+                // controls as a post, so a clip can be matched to its stills.
+                const fx = getMediaFx(reel.customization);
+                return (
+                  <MotionPlate
+                    key={reel.slug}
+                    src={reel.video!}
+                    poster={reel.videoPoster || reel.image}
+                    title={reel.title}
+                    caption={reel.label || reel.description}
+                    aspect={reels.length > 1 ? 'aspect-[4/3]' : 'aspect-[16/9]'}
+                    mediaFilter={fx.filter}
+                    overlay={<MediaFxOverlays fx={fx} />}
+                  />
+                );
+              })}
             </div>
           </Section>
         )}

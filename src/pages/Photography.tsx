@@ -1,3 +1,4 @@
+import { getCardImageStyle } from '../lib/customization';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   AnimatePresence,
@@ -150,6 +151,7 @@ function PlateRows({
                 index={plateLabel(plateOf(entry))}
                 excerpt={entry.description}
                 aspect={ROW_ASPECT[row.length]}
+                customization={entry.customization}
                 href={detailPath('photography', entry.slug)}
                 onClick={() => onSelect(entry)}
               />
@@ -403,6 +405,7 @@ export default function Photography() {
                       alt={leadPhoto.title}
                       loading="eager"
                       sizes="100vw"
+                      style={getCardImageStyle(leadPhoto.customization)}
                       className={`w-full object-cover transition-transform duration-[1200ms] ease-out ${
                         shouldParallax ? 'h-[112%]' : 'h-full'
                       } ${shouldReduceMotion ? '' : 'group-hover:scale-[1.02]'}`}

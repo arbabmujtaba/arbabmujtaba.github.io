@@ -2,6 +2,28 @@
 // POST CUSTOMIZATION TYPES
 // ============================================================
 
+export type AnimationPreset =
+  | 'none'
+  | 'fade-in'
+  | 'slide-up'
+  | 'parallax'
+  | 'typewriter'
+  | 'cinematic'
+  | 'zoom'
+  | 'blur-in';
+
+export type ColorFilterPreset =
+  | 'none'
+  | 'warm'
+  | 'cool'
+  | 'vintage'
+  | 'noir'
+  | 'faded'
+  | 'cinematic'
+  | 'vivid';
+
+export type ImageAspect = 'auto' | '21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '3/4' | '2/3';
+
 export interface PostCustomization {
   music?: {
     songTitle?: string;
@@ -11,8 +33,10 @@ export interface PostCustomization {
     provider?: 'spotify' | 'soundcloud' | 'youtube' | 'custom';
   };
   animation?: {
-    preset?: 'fade-in' | 'slide-up' | 'parallax' | 'typewriter' | 'cinematic' | 'none';
+    preset?: AnimationPreset;
     speed?: 'slow' | 'normal' | 'fast';
+    /** `load` plays when the page opens; `scroll` reveals each block as it is reached. */
+    trigger?: 'load' | 'scroll';
     hoverEffects?: boolean;
   };
   style?: {
@@ -23,24 +47,69 @@ export interface PostCustomization {
       from?: string;
       to?: string;
       angle?: number;
+      /** 0–100. How strongly the wash sits over the page. Default 20. */
+      intensity?: number;
     };
     accentColor?: string;
+    /** Page background behind the article. */
+    backgroundColor?: string;
+    /** Body text colour. */
+    textColor?: string;
+    /** `bone` flips the article to the site's light paper surface. */
+    surface?: 'ink' | 'bone';
     opacity?: number;
   };
   layout?: {
     contentWidth?: 'narrow' | 'default' | 'wide' | 'full';
-    textAlign?: 'left' | 'center' | 'right';
+    textAlign?: 'left' | 'center' | 'right' | 'justify';
     spacing?: 'compact' | 'default' | 'relaxed' | 'spacious';
+    /** Exact gap between blocks, in px. Overrides the `spacing` preset. */
+    gapPx?: number;
+    /** Where the content column sits inside the article. */
+    blockAlign?: 'left' | 'center' | 'right';
   };
   effects?: {
+    /** Film grain over photographs and clips. */
     grain?: boolean;
+    /** 0–100. Default 40. */
+    grainAmount?: number;
     vignette?: boolean;
+    /** 0–100. Default 50. */
+    vignetteAmount?: number;
     blur?: number;
-    colorFilter?: 'none' | 'warm' | 'cool' | 'vintage' | 'noir';
+    colorFilter?: ColorFilterPreset;
+    /** 50–150, 100 is untouched. */
+    brightness?: number;
+    contrast?: number;
+    saturation?: number;
   };
   typography?: {
+    /** Legacy 4-step scale. `fontSizePx` wins when both are set. */
     fontSize?: 'small' | 'default' | 'large' | 'x-large';
-    fontFamily?: 'serif' | 'sans' | 'mono';
+    /** Exact body text size in px. */
+    fontSizePx?: number;
+    /** Exact title size in px at desktop width. */
+    titleSizePx?: number;
+    /** Key from `lib/fonts.ts` (or the legacy `serif` / `sans` / `mono`). */
+    fontFamily?: string;
+    headingFontFamily?: string;
+    /** Unitless line-height multiplier, e.g. 1.7. */
+    lineHeight?: number;
+    /** Tracking in em, e.g. 0.02. */
+    letterSpacing?: number;
+    fontWeight?: number;
+  };
+  image?: {
+    aspect?: ImageAspect;
+    fit?: 'cover' | 'contain';
+    /** Focal point, 0–100 from the left / top. Default 50 / 50. */
+    focalX?: number;
+    focalY?: number;
+    /** 1–3. Default 1. */
+    zoom?: number;
+    /** Where the plate sits when it is narrower than the column. */
+    align?: 'left' | 'center' | 'right';
+    width?: 'full' | 'large' | 'medium' | 'small';
   };
 }
 

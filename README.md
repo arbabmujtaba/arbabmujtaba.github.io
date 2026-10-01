@@ -64,14 +64,61 @@ than remembered. `src/services/ImageDerivativeService.ts` owns the whole contrac
 
 Two surfaces, both local:
 
-- The React admin at `/admin` (`src/pages/Admin.tsx`) — content states (draft → review → published →
-  archived) tracked in `content-state.json`, live click-to-edit, SSR preview at
+- The React admin at `/admin` — the Editorial Hub (`src/pages/Admin.tsx` is the shell; the pieces are
+  in `src/components/admin/`). It has a dashboard, a filterable content list, an entry editor, a reel
+  publisher, the click-to-edit live editor and the deployment centre. SSR preview at
   `/preview/:collection/:slug`, and an 11-step publishing pipeline that commits and pushes via
   `simple-git`.
 - Decap CMS (`public/admin/`), loaded from a CDN.
 
 Neither works on the deployed site: GitHub Pages cannot run `server.ts` or serve Decap's OAuth
-exchange. Editing happens on the machine that holds the repo; pushing to `main` deploys.
+exchange. Editing happens on the machine that holds the repo; pushing to `main` deploys. `/admin` is
+dev-only and is not part of the built site. Set `STUDIO_TOKEN` to require an `x-studio-token` header
+on mutating API calls (the admin sends `localStorage.studio_token`).
+
+### The entry editor
+
+- **Live preview is the real site.** `LivePreview` loads the actual page renderer (`ContentModal`,
+  the same component visitors get) in a same-origin iframe at `/admin/preview-frame` and streams the
+  unsaved form into it with `postMessage`. Desktop / tablet / phone widths, a "page" and an "in the
+  list" view, and a replay button for entrance animations.
+- **Where & publish** shows the section and URL an entry will land on, which list page picks it up,
+  and what happens when you save or publish.
+- **Style** — every option is stored in front-matter and read by the renderer, so what the preview
+  shows is what ships: 29 font families in six groups, with exact-size sliders for
+  body text and title, line height, letter spacing and weight; entrance animations with speed and
+  trigger; column width, position, text alignment and block spacing; colours, including the page
+  background; and **Effects** — colour grades (vintage, noir, warm, cool, faded, cinematic, vivid),
+  exposure / contrast / saturation / blur, film grain and vignette — applied to photographs and video
+  alike. Six "starting looks" fill the whole panel at once.
+- **Media** — an aspect picker (21:9 … 2:3, original) with a draggable crop window and focal point.
+  The aspect and focal point are stored and honoured everywhere the image is shown (page, cards,
+  home); "Apply crop" can also bake the window into a new WebP.
+- `Ctrl/⌘ + S` saves; unsaved work is autosaved to `localStorage` and offered back after a reload.
+
+### Publishing a reel
+
+*Publish a reel* in the sidebar is a three-step wizard: add a clip (MP4/WebM, up to 40 MB; a poster
+frame is picked automatically or from any point in the clip), choose where it goes, then describe it.
+
+| Destination | What it writes |
+|---|---|
+| Home page reel | a `home` entry with `configType: reel` — shown in "Frames that keep moving" on `/` |
+| Add to an existing entry | `video` and `videoPoster` merged into that entry's front-matter |
+| Start a new post | opens the editor with the clip and poster pre-attached |
+
+A live preview shows the place the clip will appear. *Save only* writes it locally as a draft;
+*Save & publish* runs the publishing pipeline.
+
+### Draft, live and hidden
+
+The registry (`content-state.json`) holds a workflow label — draft → review → published → archived —
+and is **not** what the website reads. Everything in `content/` is bundled into the site, so the
+admin reports an entry's *standing*: published and visible is **Live**; published with
+`visible: false` (or `published: false` for the journal) is **Hidden**; anything not published is a
+**Draft** that is saved locally. Files that exist in `content/` but are missing from the registry are
+reconciled to published on load (`contentState.reconcile`), and the publishing pipeline moves entries
+through the lifecycle to published (`markPublished`) instead of failing on a draft.
 
 ## Design
 

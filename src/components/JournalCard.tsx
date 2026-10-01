@@ -4,6 +4,7 @@ import SafeImage from './SafeImage';
 import { TagChip } from './rushes';
 import { detailPath } from '../lib/collections';
 import { shouldInterceptClick } from '../lib/navigation';
+import { getCardImageStyle } from '../lib/customization';
 import { JournalEntry } from '../types';
 
 /**
@@ -68,6 +69,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
         src={cover}
         alt={entry.title}
         loading={isFeatured ? 'eager' : 'lazy'}
+        style={getCardImageStyle(entry.customization)}
         className="h-full w-full object-cover grayscale-[12%] transition-[transform,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
         fallback={<div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />}
       />

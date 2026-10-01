@@ -1,31 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink, Camera, Maximize2 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from './SafeImage';
 import Lightbox, { type LightboxFrame } from './Lightbox';
+import MediaFx, { MediaFxOverlays } from './MediaFx';
 import MotionPlate from './rushes/MotionPlate';
 import { normalizeImagePath } from '../lib/image';
+import { ensureFontLoaded } from '../lib/fonts';
 import type { PostCustomization } from '../types';
 import {
   getAnimationVariants,
-  getContentAnimationVariants,
+  getRevealPlan,
+  getPostTheme,
   getContainerStyles,
-  getCoverImageStyles,
   getContentWidthClass,
+  getBlockAlignClass,
   getTextAlignClass,
   getSpacingStyle,
-  getAccentColor,
   getGradientStyle,
   getTypographyStyle,
-  getTypographyFontFamily,
-  hasGrainEffect,
-  hasVignetteEffect,
+  getTitleStyle,
+  getUsedFontIds,
+  getMediaFx,
+  getPlateStyle,
+  getImageZoomStyle,
+  getImageFitStyle,
   detectMusicProvider,
   extractSpotifyTrackId,
   extractYouTubeId,
   isValidEmbedUrl,
   isValidAudioUrl,
+  type RevealPlan,
 } from '../lib/customization';
 
 interface ContentModalProps {
@@ -56,6 +62,12 @@ interface ContentModalProps {
    * route, so `/journal/<slug>` and the quick look can never drift apart.
    */
   variant?: 'overlay' | 'page';
+  /**
+   * Play the reveal animation even when the OS asks for reduced motion. Only
+   * the admin preview sets this: the author is checking the animation, so
+   * hiding it would defeat the preview. The public site never does.
+   */
+  forceMotion?: boolean;
 }
 
 function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']> }) {
@@ -174,6 +186,74 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
   );
 }
 
+/**
+ * One block of the article. Plays the post's reveal when the animation preset is
+ * on, and is a plain wrapper — so layout never depends on it — when it is off.
+ */
+function Block({
+  plan,
+  index,
+  className,
+  children,
+}: {
+  plan: RevealPlan;
+  index: number;
+  className?: string;
+  children: ReactNode;
+}) {
+  if (!plan.enabled) return <div className={className}>{children}</div>;
+
+  if (plan.onScroll) {
+    return (
+      <motion.div
+        className={className}
+        variants={plan.item}
+        custom={index}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.12 }}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div className={className} variants={plan.item} custom={index}>
+      {children}
+    </motion.div>
+  );
+}
+
+/** The title typed out one letter at a time. The full text stays in `aria-label`. */
+function TypedTitle({
+  text,
+  step,
+  className,
+  style,
+}: {
+  text: string;
+  step: number;
+  className: string;
+  style: React.CSSProperties;
+}) {
+  return (
+    <h1 className={className} style={style} aria-label={text}>
+      {Array.from(text).map((char, index) => (
+        <motion.span
+          key={index}
+          aria-hidden="true"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 + index * step, duration: 0.01 }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </h1>
+  );
+}
+
 export default function ContentModal({
   isOpen,
   onClose,
@@ -187,10 +267,13 @@ export default function ContentModal({
   customization,
   video,
   videoPoster,
-  variant = 'overlay'
+  variant = 'overlay',
+  forceMotion = false,
 }: ContentModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const isPage = variant === 'page';
+  const systemReducedMotion = useReducedMotion();
+  const reducedMotion = !!systemReducedMotion && !forceMotion;
 
   /**
    * Full-size viewing. Every photograph in an entry — the cover, the gallery,
@@ -218,30 +301,33 @@ export default function ContentModal({
     };
   }, [isOpen, isPage]);
 
+  // Request any web fonts the post asks for. Cheap and idempotent.
+  const fontKey = getUsedFontIds(customization).join('|');
+  useEffect(() => {
+    fontKey.split('|').filter(Boolean).forEach(ensureFontLoaded);
+  }, [fontKey]);
+
   if (!isOpen) return null;
 
   // Customization-derived values
   const animVariants = getAnimationVariants(customization);
-  const contentAnim = getContentAnimationVariants(customization);
+  const reveal = getRevealPlan(customization, reducedMotion);
+  const theme = getPostTheme(customization);
   const containerStyles = getContainerStyles(customization);
-  const coverStyles = getCoverImageStyles(customization);
   const widthClass = getContentWidthClass(customization);
+  const alignClass = getBlockAlignClass(customization);
   const textAlignClass = getTextAlignClass(customization);
   const spacingStyle = getSpacingStyle(customization);
-  const accentColor = getAccentColor(customization);
   const gradientStyle = getGradientStyle(customization);
-  const showGrain = hasGrainEffect(customization);
-  const showVignette = hasVignetteEffect(customization);
   const typographyStyle = getTypographyStyle(customization);
-  const typographyFamily = getTypographyFontFamily(customization);
+  const titleStyle = getTitleStyle(customization);
+  const fx = getMediaFx(customization);
+  const plateStyle = getPlateStyle(customization);
+  const zoomStyle = getImageZoomStyle(customization);
+  const fitStyle = getImageFitStyle(customization);
+  const naturalAspect = customization?.image?.aspect === 'auto';
   const hoverEffects = !!customization?.animation?.hoverEffects;
-
-  // Heading style with accent color
-  const headingStyle: React.CSSProperties = {
-    ...(accentColor ? { color: accentColor } : {}),
-    ...(typographyFamily ? { fontFamily: typographyFamily } : {}),
-  };
-  const linkStyle: React.CSSProperties = accentColor ? { color: accentColor } : {};
+  const plateRadius = plateStyle.borderRadius ? { borderRadius: plateStyle.borderRadius } : undefined;
 
   /**
    * The photographs of this entry, in reading order: cover first, then the
@@ -285,37 +371,10 @@ export default function ContentModal({
     />
   );
 
-
-  /** Customization-driven surface treatments, shared by both variants. */
-  const decorations = (
-    <>
-      {/* Gradient overlay */}
-      {gradientStyle && (
-        <div
-          className="absolute inset-0 pointer-events-none z-[1] opacity-20"
-          style={gradientStyle}
-        />
-      )}
-
-      {/* Grain overlay */}
-      {showGrain && (
-        <div
-          className="absolute inset-0 pointer-events-none z-[2] opacity-[0.04]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          }}
-        />
-      )}
-
-      {/* Vignette overlay */}
-      {showVignette && (
-        <div
-          className="absolute inset-0 pointer-events-none z-[2]"
-          style={{ boxShadow: 'inset 0 0 120px 40px rgba(0,0,0,0.6)' }}
-        />
-      )}
-    </>
-  );
+  /** Background wash behind the content. Grain and vignette live on the media. */
+  const decorations = gradientStyle ? (
+    <div className="pointer-events-none absolute inset-0 z-[1]" style={gradientStyle} aria-hidden="true" />
+  ) : null;
 
   /** Category + date strip. Sticky with a close action only in the drawer. */
   const header = (
@@ -327,10 +386,7 @@ export default function ContentModal({
       }`}
     >
       <div className="flex items-center gap-4">
-        <span
-          className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded"
-          style={accentColor ? { color: accentColor, backgroundColor: `${accentColor}15` } : {}}
-        >
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded">
           {category}
         </span>
         {date && (
@@ -353,203 +409,259 @@ export default function ContentModal({
     </div>
   );
 
-  const canvas = (
-        <motion.div
-          initial={contentAnim.initial}
-          animate={contentAnim.animate}
-          transition={contentAnim.transition}
-          className={`p-6 md:p-12 lg:p-16 flex flex-col relative z-10 mx-auto w-full ${widthClass}`}
-          style={{ ...spacingStyle, ...typographyStyle }}
-        >
-          {/* Music Player Widget */}
-          {customization?.music?.songUrl && (
-            <MusicPlayer music={customization.music} />
-          )}
+  const titleClass =
+    'font-serif text-3xl md:text-5xl lg:text-6xl text-zinc-100 tracking-tight leading-[1.1]';
 
-          {/* Motion plate. Placed above the cover because a clip is the more
-              specific artefact: when an entry has both, the moving one leads. */}
-          {video && (
-            <MotionPlate
-              src={video}
-              poster={videoPoster || coverImage}
-              title={title}
-              aspect="aspect-[16/9]"
-            />
-          )}
+  const canvasClass = `p-6 md:p-12 lg:p-16 flex flex-col relative z-10 w-full ${widthClass} ${alignClass}`;
+  const canvasStyle = { ...spacingStyle, ...typographyStyle };
 
-          {/* Cover image banner */}
-          {normalizeImagePath(coverImage) && (
-            <button
-              type="button"
-              onClick={() => openFrame(coverImage)}
-              aria-label={`${title} — open the full frame`}
-              className="group relative block aspect-[16/9] w-full cursor-zoom-in overflow-hidden border border-zinc-900 bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
-              style={coverStyles}
-            >
-              <SafeImage 
-                src={coverImage} 
-                alt={title} 
-                className={`w-full h-full object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-700 ${hoverEffects ? 'hover:scale-105' : ''}`}
-                referrerPolicy="no-referrer"
-              />
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 border border-zinc-700/60 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
-              >
-                <Maximize2 className="h-3 w-3" />
-                full frame
+  let blockIndex = 0;
+  const nextIndex = () => blockIndex++;
+
+  const canvasChildren = (
+    <>
+      {/* Music Player Widget */}
+      {customization?.music?.songUrl && (
+        <Block plan={reveal} index={nextIndex()}>
+          <MusicPlayer music={customization.music} />
+        </Block>
+      )}
+
+      {/* Motion plate. Placed above the cover because a clip is the more
+          specific artefact: when an entry has both, the moving one leads. */}
+      {video && (
+        <Block plan={reveal} index={nextIndex()}>
+          <MotionPlate
+            src={video}
+            poster={videoPoster || coverImage}
+            title={title}
+            aspect="aspect-[16/9]"
+            mediaFilter={fx.filter}
+            overlay={<MediaFxOverlays fx={fx} />}
+            frameStyle={plateRadius}
+          />
+        </Block>
+      )}
+
+      {/* Cover image banner */}
+      {normalizeImagePath(coverImage) && (
+        <Block plan={reveal} index={nextIndex()} className="flex flex-col">
+          <button
+            type="button"
+            onClick={() => openFrame(coverImage)}
+            aria-label={`${title} — open the full frame`}
+            data-plate="cover"
+            className="group relative block w-full cursor-zoom-in overflow-hidden border border-zinc-900 bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+            style={plateStyle}
+          >
+            <MediaFx fx={fx} className={naturalAspect ? '' : 'h-full w-full'}>
+              <span className={`block overflow-hidden ${naturalAspect ? '' : 'h-full w-full'}`}>
+                <span className={`block ${naturalAspect ? '' : 'h-full w-full'}`} style={zoomStyle}>
+                  <SafeImage
+                    src={coverImage}
+                    alt={title}
+                    className={`w-full ${naturalAspect ? 'h-auto' : 'h-full'} grayscale-[15%] hover:grayscale-0 transition-all duration-700 ${hoverEffects ? 'hover:scale-105' : ''}`}
+                    style={fitStyle}
+                    referrerPolicy="no-referrer"
+                  />
+                </span>
               </span>
-            </button>
-          )}
-
-          {/* Core Title and description */}
-          <div className={`space-y-6 ${textAlignClass}`}>
-            <h1
-              className="font-serif text-3xl md:text-5xl lg:text-6xl text-zinc-100 tracking-tight leading-[1.1]"
-              style={headingStyle}
+            </MediaFx>
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-3 right-3 z-[2] flex items-center gap-1.5 border border-zinc-700/60 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
             >
+              <Maximize2 className="h-3 w-3" />
+              full frame
+            </span>
+          </button>
+        </Block>
+      )}
+
+      {/* Core Title and description */}
+      <Block plan={reveal} index={nextIndex()}>
+        <div className={`space-y-6 ${textAlignClass}`}>
+          {reveal.enabled && reveal.typeTitle ? (
+            <TypedTitle text={title} step={reveal.typeStep} className={titleClass} style={titleStyle} />
+          ) : (
+            <h1 className={titleClass} style={titleStyle}>
               {title}
             </h1>
-            
-            {excerpt && (
-              <p className="font-sans text-base md:text-lg text-zinc-400 font-light leading-relaxed border-l border-zinc-800 pl-6">
-                {excerpt}
-              </p>
+          )}
+
+          {excerpt && (
+            <p className="font-sans text-base md:text-lg text-zinc-400 font-light leading-relaxed border-l border-zinc-800 pl-6">
+              {excerpt}
+            </p>
+          )}
+        </div>
+      </Block>
+
+      {/* Captured With — gear used for this photo */}
+      {metadata && ((metadata.gear && metadata.gear.length > 0) || metadata.captureMode) && (
+        <Block plan={reveal} index={nextIndex()}>
+          <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
+            <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
+              <Camera className="w-3 h-3 text-zinc-600" />
+              Captured With
+            </h4>
+            {metadata.gear && metadata.gear.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {metadata.gear.map((g, idx) => (
+                  <span key={idx} className="font-mono text-xs text-zinc-300 bg-zinc-900 border border-zinc-800/40 px-2.5 py-1 rounded">
+                    {g}
+                  </span>
+                ))}
+              </div>
+            )}
+            {metadata.captureMode && (
+              <p className="font-sans text-xs text-zinc-500">{metadata.captureMode}</p>
             )}
           </div>
+        </Block>
+      )}
 
-          {/* Captured With — gear used for this photo */}
-          {metadata && ((metadata.gear && metadata.gear.length > 0) || metadata.captureMode) && (
-            <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm">
-              <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
-                <Camera className="w-3 h-3 text-zinc-600" />
-                Captured With
-              </h4>
-              {metadata.gear && metadata.gear.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {metadata.gear.map((g, idx) => (
+      {/* Project Specific Links/Tags if available */}
+      {metadata && (metadata.githubLink || metadata.liveLink || (metadata.techStack && metadata.techStack.length > 0)) && (
+        <Block plan={reveal} index={nextIndex()}>
+          <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+            {metadata.techStack && metadata.techStack.length > 0 && (
+              <div>
+                <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
+                  <Tag className="w-3 h-3 text-zinc-600" />
+                  Technologies
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {metadata.techStack.map((tech, idx) => (
                     <span key={idx} className="font-mono text-xs text-zinc-300 bg-zinc-900 border border-zinc-800/40 px-2.5 py-1 rounded">
-                      {g}
+                      {tech}
                     </span>
                   ))}
                 </div>
-              )}
-              {metadata.captureMode && (
-                <p className="font-sans text-xs text-zinc-500">{metadata.captureMode}</p>
-              )}
-            </div>
-          )}
+              </div>
+            )}
 
-          {/* Project Specific Links/Tags if available */}
-          {metadata && (metadata.githubLink || metadata.liveLink || (metadata.techStack && metadata.techStack.length > 0)) && (
-            <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm grid grid-cols-1 md:grid-cols-2 gap-8">
-              {metadata.techStack && metadata.techStack.length > 0 && (
-                <div>
-                  <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
-                    <Tag className="w-3 h-3 text-zinc-600" />
-                    Technologies
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {metadata.techStack.map((tech, idx) => (
-                      <span key={idx} className="font-mono text-xs text-zinc-300 bg-zinc-900 border border-zinc-800/40 px-2.5 py-1 rounded">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
+            {(metadata.githubLink || metadata.liveLink) && (
+              <div>
+                <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
+                  Project Resources
+                </h4>
+                <div className="flex flex-col gap-2">
+                  {metadata.githubLink && (
+                    <a
+                      href={metadata.githubLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group"
+                    >
+                      GitHub Repository
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  )}
+                  {metadata.liveLink && (
+                    <a
+                      href={metadata.liveLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group"
+                    >
+                      Launch Direct Showcase
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
+          </div>
+        </Block>
+      )}
 
-              {(metadata.githubLink || metadata.liveLink) && (
-                <div>
-                  <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
-                    Project Resources
-                  </h4>
-                  <div className="flex flex-col gap-2">
-                    {metadata.githubLink && (
-                      <a 
-                        href={metadata.githubLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group"
-                        style={linkStyle}
-                      >
-                        GitHub Repository
-                        <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    )}
-                    {metadata.liveLink && (
-                      <a 
-                        href={metadata.liveLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group"
-                        style={linkStyle}
-                      >
-                        Launch Direct Showcase
-                        <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Markdown Content Parser */}
-          <div className={`markdown-body pt-4 border-t border-zinc-900 ${textAlignClass}`}>
-            <Markdown
-              components={{
-                img: ({ src, alt, ...rest }) => (
+      {/* Markdown Content Parser */}
+      <Block plan={reveal} index={nextIndex()}>
+        <div className={`markdown-body pt-4 border-t border-zinc-900 ${textAlignClass}`}>
+          <Markdown
+            components={{
+              img: ({ src, alt, ...rest }) => (
+                <MediaFx fx={fx} className="my-4 max-w-full" style={{ display: 'inline-block', ...plateRadius, overflow: 'hidden' }}>
                   <SafeImage
                     src={src}
                     alt={alt || ''}
                     onClick={() => openFrame(typeof src === 'string' ? src : undefined)}
-                    className="max-w-full cursor-zoom-in rounded-sm border border-zinc-900 my-4"
+                    className={`max-w-full cursor-zoom-in rounded-sm border border-zinc-900 ${hoverEffects ? 'transition-transform duration-700 hover:scale-[1.03]' : ''}`}
                     {...rest}
                   />
-                ),
-              }}
-            >
-              {body}
-            </Markdown>
-          </div>
+                </MediaFx>
+              ),
+            }}
+          >
+            {body}
+          </Markdown>
+        </div>
+      </Block>
 
-          {/* Photography Gallery Images if available */}
-          {metadata && metadata.galleryImages && metadata.galleryImages.length > 0 && (
-            <div className="space-y-8 pt-8 border-t border-zinc-900">
-              <h3 className="font-serif text-2xl text-zinc-200" style={headingStyle}>Gallery</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {metadata.galleryImages
-                  .map((img, idx) => ({ img, idx, normalized: normalizeImagePath(img) }))
-                  .filter(({ normalized }) => normalized)
-                  .map(({ img, idx, normalized }) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => openFrame(normalized!)}
-                      aria-label={`Gallery slide ${idx + 1} — open the full frame`}
-                      className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden border border-zinc-900 bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
-                    >
-                      <SafeImage 
-                        src={normalized!} 
-                        alt={`Gallery slide ${idx + 1}`} 
+      {/* Photography Gallery Images if available */}
+      {metadata && metadata.galleryImages && metadata.galleryImages.length > 0 && (
+        <Block plan={reveal} index={nextIndex()}>
+          <div className="space-y-8 pt-8 border-t border-zinc-900">
+            <h3 className="font-serif text-2xl text-zinc-200" style={titleStyle.color ? { color: titleStyle.color, fontFamily: titleStyle.fontFamily } : { fontFamily: titleStyle.fontFamily }}>
+              Gallery
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {metadata.galleryImages
+                .map((img, idx) => ({ img, idx, normalized: normalizeImagePath(img) }))
+                .filter(({ normalized }) => normalized)
+                .map(({ idx, normalized }) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => openFrame(normalized!)}
+                    aria-label={`Gallery slide ${idx + 1} — open the full frame`}
+                    data-plate="gallery"
+                    className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden border border-zinc-900 bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                    style={plateRadius}
+                  >
+                    <MediaFx fx={fx} className="h-full w-full">
+                      <SafeImage
+                        src={normalized!}
+                        alt={`Gallery slide ${idx + 1}`}
                         className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700 hover:scale-105"
                         referrerPolicy="no-referrer"
                       />
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1.5 border border-zinc-700/60 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
-                      >
-                        <Maximize2 className="h-3 w-3" />
-                        full frame
-                      </span>
-                    </button>
-                  ))}
-              </div>
+                    </MediaFx>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute bottom-2 right-2 z-[2] flex items-center gap-1.5 border border-zinc-700/60 bg-black/60 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    >
+                      <Maximize2 className="h-3 w-3" />
+                      full frame
+                    </span>
+                  </button>
+                ))}
             </div>
-          )}
-        </motion.div>
+          </div>
+        </Block>
+      )}
+    </>
   );
+
+  /** `motion.div` only when there is a reveal to run; a plain div otherwise. */
+  const canvas =
+    reveal.enabled && !reveal.onScroll ? (
+      <motion.div
+        key={`${customization?.animation?.preset}-${customization?.animation?.speed}`}
+        variants={reveal.container}
+        initial="hidden"
+        animate="show"
+        className={canvasClass}
+        style={canvasStyle}
+      >
+        {canvasChildren}
+      </motion.div>
+    ) : (
+      <div className={canvasClass} style={canvasStyle}>
+        {canvasChildren}
+      </div>
+    );
 
   // Inline article: no backdrop, no fixed positioning, no scroll lock. The
   // detail route owns the page chrome and the back navigation.
@@ -558,6 +670,7 @@ export default function ContentModal({
       <article
         className="relative w-full overflow-hidden border border-zinc-800 bg-canvas-raised"
         style={containerStyles}
+        data-surface={theme.surface}
       >
         {decorations}
         {header}
@@ -586,6 +699,7 @@ export default function ContentModal({
         exit={animVariants.exit}
         transition={animVariants.transition}
         style={containerStyles}
+        data-surface={theme.surface}
         className="relative w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl h-full bg-canvas-raised border-l border-zinc-900 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar"
       >
         {decorations}
