@@ -31,12 +31,11 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /**
  * NumberedItem — the `01 label` index row.
  *
- * Rows rest dim and come up to full contrast on hover or focus, which lets a
- * long list read as one quiet block until the reader engages with a line. The
+ * Rows rest at readable contrast and brighten (and nudge right) on hover or
+ * focus. They used to rest at the faintest grey, which on a dark canvas read
+ * as disabled rather than quiet. The
  * description sits in a right-hand column on desktop and stacks underneath on
- * phones. Interactive rows render as buttons so they stay keyboard reachable,
- * and the dim state is only ever applied alongside a hover/focus recovery so
- * nothing is permanently low-contrast.
+ * phones. Interactive rows render as buttons so they stay keyboard reachable.
  */
 export default function NumberedItem({
   index,
@@ -70,12 +69,12 @@ export default function NumberedItem({
         {number}
       </span>
 
-      <span className="min-w-0 flex-1 font-display text-2xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 group-focus-visible/item:text-zinc-50 md:text-4xl lg:text-5xl">
+      <span className="min-w-0 flex-1 font-display text-2xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-200 transition-[color,transform] duration-500 group-hover/item:translate-x-1.5 group-hover/item:text-zinc-50 group-focus-visible/item:text-zinc-50 md:text-4xl lg:text-5xl">
         {label}
       </span>
 
       {description && (
-        <span className="mt-2 block max-w-sm text-xs font-light leading-relaxed text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-300 group-focus-visible/item:text-zinc-300 md:mt-0 md:shrink-0 md:text-right md:text-sm">
+        <span className="mt-2 block max-w-sm text-xs font-light leading-relaxed text-zinc-400 transition-colors duration-500 group-hover/item:text-zinc-200 group-focus-visible/item:text-zinc-300 md:mt-0 md:shrink-0 md:text-right md:text-sm">
           {description}
         </span>
       )}

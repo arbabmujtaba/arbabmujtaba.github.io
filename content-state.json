@@ -2223,8 +2223,27 @@
       "updatedAt": "2026-10-01T07:51:01.999Z",
       "publishedAt": "2026-10-01T07:51:01.999Z",
       "filePath": "content/home/reel-dusk-poplars.md"
+    },
+    {
+      "id": "home/reel-sopore-night",
+      "collection": "home",
+      "slug": "reel-sopore-night",
+      "title": "A Night Over Sopore",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T09:28:02.833Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T09:28:02.833Z",
+      "updatedAt": "2026-10-01T09:28:02.833Z",
+      "publishedAt": "2026-10-01T09:28:02.833Z",
+      "filePath": "content/home/reel-sopore-night.md"
     }
   ],
-  "lastUpdated": "2026-10-01T08:08:18.618Z",
+  "lastUpdated": "2026-10-01T09:28:02.861Z",
   "version": 1
 }

@@ -193,6 +193,13 @@ html {
   to { transform: translate3d(-33.3333%, 0, 0); }
 }
 
+/* LastNotes progress segment. Paused with animation-play-state; the note turns
+   on animationend, so the bar and the timing can never disagree. */
+@keyframes last-notes-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 [data-marquee-fade="true"] {
   mask-image: linear-gradient(
     to right,
@@ -251,6 +258,11 @@ html {
   white-space: nowrap;
   -webkit-text-stroke: 1px var(--rule-strong);
   pointer-events: none;
+  /* The mark sits behind the eyebrow and the title. Fading it out towards its
+     lower half keeps it as a watermark instead of letterforms tangling with
+     the REC label and the descenders of the title. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.55) 38%, transparent 78%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.55) 38%, transparent 78%);
 }
 
 @media (max-width: 400px) {

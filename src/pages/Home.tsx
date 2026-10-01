@@ -1,19 +1,21 @@
-import { getMediaFx } from '../lib/customization';
-import { MediaFxOverlays } from '../components/MediaFx';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import Footer from '../components/Footer';
 import SafeImage from '../components/SafeImage';
 import {
   CountUp,
   FrameCard,
-  MotionPlate,
+  LastNotes,
   Marquee,
+  Notebook,
   NumberedItem,
-  QuotePanel,
+  PhotoShuffle,
+  ProjectIndex,
   RecLabel,
+  ReelShowcase,
+  SoftTimeline,
   StackedHeading,
-  TagChip,
+  type NotebookItem,
 } from '../components/rushes';
 import {
   getFavoriteItems,
@@ -25,7 +27,6 @@ import {
   getTimelineMilestones,
 } from '../lib/cms';
 import { useMediaQuery } from '../lib/useMediaQuery';
-import type { PortfolioProject } from '../types';
 
 interface HomeProps {
   setView: (view: string) => void;
@@ -40,16 +41,6 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * the wordmark. Do not swap it for a brighter frame without re-measuring.
  */
 const HERO_IMAGE = '/uploads/photography/1785134270800-642096424.jpeg';
-
-/**
- * techStack arrives either as plain strings or as `{ tech }` objects, depending
- * on whether the entry was written by hand or through the CMS list widget.
- */
-function firstTech(stack: PortfolioProject['techStack']): string | undefined {
-  const first = stack?.[0];
-  if (!first) return undefined;
-  return typeof first === 'string' ? first : first.tech;
-}
 
 function Section({
   children,
@@ -77,7 +68,6 @@ export default function Home({ setView }: HomeProps) {
   const shouldReduceMotion = useReducedMotion();
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const shouldParallax = !shouldReduceMotion && !isTouchDevice;
-  const [activeQuote, setActiveQuote] = useState(0);
 
   const { scrollY } = useScroll({ container: containerRef });
   const heroImageY = useTransform(scrollY, [0, 900], ['0%', '14%']);
@@ -103,14 +93,15 @@ export default function Home({ setView }: HomeProps) {
    */
   const reels = homeConfig.filter((entry) => entry.configType === 'reel' && !!entry.video);
 
-  const quotes = useMemo(
+  const notes = useMemo(
     () =>
       homeConfig
         .filter((entry) => entry.configType === 'quote')
         .map((entry) => ({
           id: entry.slug,
-          quote: entry.title,
-          name: entry.description,
+          text: entry.title,
+          aside: entry.description,
+          author: entry.author || undefined,
         })),
     [homeConfig]
   );
@@ -122,10 +113,28 @@ export default function Home({ setView }: HomeProps) {
   const favorites = useMemo(() => getFavoriteItems(), []);
   const timeline = useMemo(() => getTimelineMilestones(), []);
 
-  const featured = useMemo(() => {
-    const flagged = projects.filter((project) => project.featured);
-    return (flagged.length >= 3 ? flagged : projects).slice(0, 3);
-  }, [projects]);
+  /** Featured work first, then the rest — six lines is an index, not a dump. */
+  const projectIndex = useMemo(
+    () =>
+      [...projects]
+        .sort((a, b) => Number(b.featured) - Number(a.featured))
+        .slice(0, 6),
+    [projects]
+  );
+
+  const notebook = useMemo<NotebookItem[]>(
+    () =>
+      journal.slice(0, 3).map((entry) => ({
+        collection: 'journal',
+        slug: entry.slug,
+        title: entry.title,
+        excerpt: entry.excerpt,
+        date: entry.date,
+        kicker: entry.volume ? `Vol. ${String(entry.volume).padStart(2, '0')}` : 'Journal',
+        meta: entry.readingTime,
+      })),
+    [journal]
+  );
 
   const targetOf = (entry: { navTarget?: string; slug: string }) =>
     entry.navTarget || entry.slug.replace('gateway-', '');
@@ -256,75 +265,88 @@ export default function Home({ setView }: HomeProps) {
           </p>
         </Section>
 
-        {/* ===================== REEL ===================== */}
+        {/* ===================== REELS ===================== */}
         {reels.length > 0 && (
           <Section>
-            <RecLabel>reel</RecLabel>
-            <div className="mt-7 flex flex-col justify-between gap-8 md:flex-row md:items-end">
-              <StackedHeading
-                lines={['frames that', 'keep moving']}
-                body="Short clips from the same archive — the parts a still photograph cannot hold."
-              />
-            </div>
-
-            <div
-              className={`mt-14 grid grid-cols-1 gap-10 md:gap-6 ${
-                reels.length > 1 ? 'md:grid-cols-2' : ''
-              }`}
-            >
-              {reels.map((reel) => {
-                // A reel carries the same colour grade, grain and vignette
-                // controls as a post, so a clip can be matched to its stills.
-                const fx = getMediaFx(reel.customization);
-                return (
-                  <MotionPlate
-                    key={reel.slug}
-                    src={reel.video!}
-                    poster={reel.videoPoster || reel.image}
-                    title={reel.title}
-                    caption={reel.label || reel.description}
-                    aspect={reels.length > 1 ? 'aspect-[4/3]' : 'aspect-[16/9]'}
-                    mediaFilter={fx.filter}
-                    overlay={<MediaFxOverlays fx={fx} />}
-                  />
-                );
-              })}
-            </div>
+            <RecLabel>reels</RecLabel>
+            <StackedHeading
+              lines={['frames that', 'keep moving']}
+              className="mt-7"
+              body="Short clips from the same archive — the parts a still photograph cannot hold."
+            />
+            <ReelShowcase reels={reels} className="mt-14" />
           </Section>
         )}
 
-        {/* ===================== FEATURED WORK ===================== */}
-        {featured.length > 0 && (
+        {/* ===================== PHOTOS ===================== */}
+        {photography.length > 0 && (
           <Section>
-            <RecLabel>work</RecLabel>
-            <div className="mt-7 flex flex-col justify-between gap-8 md:flex-row md:items-end">
-              <StackedHeading
-                lines={['things built', 'and shipped']}
-                body="Engineering projects where the interesting part was never the framework."
-              />
+            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+              <div>
+                <RecLabel>frames</RecLabel>
+                <StackedHeading
+                  lines={['pictures i', 'keep coming back to']}
+                  className="mt-7"
+                  body="Drawn at random from the favourites shelf, and reshuffled while you look. Open one to see it at full size."
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setView('photography')}
+                className="self-start font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-accent md:self-auto"
+              >
+                all frames &rarr;
+              </button>
+            </div>
+            <PhotoShuffle entries={photography} className="mt-14" />
+          </Section>
+        )}
+
+        {/* ===================== PROJECTS ===================== */}
+        {projectIndex.length > 0 && (
+          <Section>
+            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+              <div>
+                <RecLabel>work</RecLabel>
+                <StackedHeading
+                  lines={['things built', 'and shipped']}
+                  className="mt-7"
+                  body="Engineering projects where the interesting part was never the framework."
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => setView('portfolio')}
                 className="self-start font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-accent md:self-auto"
               >
-                all work &rarr;
+                all {projects.length} projects &rarr;
               </button>
             </div>
+            <ProjectIndex projects={projectIndex} className="mt-14" />
+          </Section>
+        )}
 
-            <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-6">
-              {featured.map((project, index) => (
-                <FrameCard
-                  key={project.slug}
-                  title={project.title}
-                  image={project.projectImage}
-                  index={`0${index + 1}`}
-                  tag={firstTech(project.techStack)}
-                  excerpt={project.description}
-                  aspect="aspect-[4/5]"
-                  onClick={() => setView('portfolio')}
+        {/* ===================== NOTEBOOK ===================== */}
+        {notebook.length > 0 && (
+          <Section>
+            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+              <div>
+                <RecLabel>notebook</RecLabel>
+                <StackedHeading
+                  lines={['written down', 'lately']}
+                  className="mt-7"
+                  body="The newest pages from the journal — the human side of learning, building and becoming."
                 />
-              ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setView('journal')}
+                className="self-start font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-accent md:self-auto"
+              >
+                the journal &rarr;
+              </button>
             </div>
+            <Notebook items={notebook} className="mt-14" />
           </Section>
         )}
 
@@ -360,39 +382,25 @@ export default function Home({ setView }: HomeProps) {
               className="mt-7"
               body="Where the curiosity went, one year at a time."
             />
-
-            <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {timeline.map((milestone, index) => (
-                <motion.article
-                  key={milestone.slug}
-                  className="border border-zinc-800 bg-canvas-raised p-6"
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.75, delay: index * 0.08, ease: EASE }}
-                >
-                  <TagChip tone="accent">{milestone.year}</TagChip>
-                  <h3 className="mt-5 font-display text-xl font-medium leading-tight tracking-[-0.03em] text-zinc-100">
-                    {milestone.title}
-                  </h3>
-                  <p className="mt-3 text-xs font-light leading-relaxed text-zinc-400">
-                    {milestone.description}
-                  </p>
-                </motion.article>
-              ))}
-            </div>
+            <SoftTimeline milestones={timeline} scrollContainer={containerRef} className="mt-16 md:mt-24" />
           </Section>
         )}
 
-        {/* ===================== INTERLUDE ===================== */}
-        {quotes.length > 0 && (
-          <Section>
-            <RecLabel>interlude</RecLabel>
-            <QuotePanel
-              entries={quotes}
-              activeIndex={activeQuote}
-              onSelect={setActiveQuote}
-              className="mt-10"
+        {/* ===================== LAST NOTES ===================== */}
+        {notes.length > 0 && (
+          <Section className="overflow-hidden">
+            <LastNotes
+              notes={notes}
+              intro={
+                <>
+                  <RecLabel>last notes</RecLabel>
+                  <StackedHeading
+                    lines={['last notes', 'before you go']}
+                    className="mt-7"
+                    body="A few lines left on the desk. They turn over on their own; hover to hold one."
+                  />
+                </>
+              }
             />
           </Section>
         )}
@@ -406,7 +414,7 @@ export default function Home({ setView }: HomeProps) {
                 {gear.map((item) => (
                   <span
                     key={item.slug}
-                    className="font-display text-2xl font-medium tracking-[-0.03em] text-zinc-600 md:text-4xl"
+                    className="font-display text-2xl font-medium tracking-[-0.03em] text-zinc-500 md:text-4xl"
                   >
                     {item.title}
                   </span>
@@ -435,7 +443,7 @@ export default function Home({ setView }: HomeProps) {
             only, so five deliberately chosen photographs were dead weight in the
             front-matter. The numbering survives as the plate's index line.
           */}
-          <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+          <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
             {gateways.map((gateway, index) => (
               <FrameCard
                 key={gateway.slug}
@@ -444,7 +452,7 @@ export default function Home({ setView }: HomeProps) {
                 index={`${String(index + 1).padStart(2, '0')}/`}
                 tag={gateway.label?.replace(/^\d+\s*\/\/\s*/, '')}
                 excerpt={gateway.description}
-                aspect="aspect-[4/3]"
+                aspect="aspect-[4/5]"
                 href={`/${targetOf(gateway)}`}
                 onClick={() => setView(targetOf(gateway))}
                 className="min-h-[44px]"

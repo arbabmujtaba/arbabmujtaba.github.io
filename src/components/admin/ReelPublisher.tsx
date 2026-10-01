@@ -552,7 +552,7 @@ export function ReelPublisher({
                 <p className="mt-2 text-[0.6875rem] leading-snug text-zinc-500">
                   {reels.length === 0
                     ? 'This will be the first reel — the strip appears on the Home page once it has one.'
-                    : 'One reel is shown wide; two or more sit side by side.'}
+                    : 'The first reel plays as the main plate; the rest join the strip beneath it — pick any to play.'}
                 </p>
               </div>
             </>

@@ -241,7 +241,13 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
                 onOpenEntry={openEntry}
               />
             )}
-            {view === 'deploy' && <DeploymentCenter />}
+            {view === 'deploy' && (
+              <DeploymentCenter
+                items={items}
+                onEditReel={(slug) => openEntry('home', slug)}
+                onPublishReel={() => go('reel')}
+              />
+            )}
             {view === 'live' && (
               <div className="h-full">
                 <LiveEditor content={items} onNavigateToEditor={(item) => openEntry(item.collection as CollectionId, item.slug)} onToast={notify} />

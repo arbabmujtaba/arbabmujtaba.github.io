@@ -110,6 +110,11 @@ frame is picked automatically or from any point in the clip), choose where it go
 A live preview shows the place the clip will appear. *Save only* writes it locally as a draft;
 *Save & publish* runs the publishing pipeline.
 
+On the Home page the live reel with the lowest `order` plays as the main plate; every other live reel
+joins the strip of posters beneath it, and picking one swaps it into the plate (only one `<video>` is
+decoded at a time). The *Deployments* view lists every reel with its poster, order, standing and
+whether it is the main plate or in the strip.
+
 ### Draft, live and hidden
 
 The registry (`content-state.json`) holds a workflow label — draft → review → published → archived —
