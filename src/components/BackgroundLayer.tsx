@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   motion,
   useMotionValue,
@@ -6,15 +6,19 @@ import {
   useScroll,
   useSpring,
   useTransform,
-  useVelocity,
   type MotionValue,
 } from 'motion/react';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
 /** How far each band of stars (or dust) travels per pixel scrolled. */
 const DEPTHS = [0.05, 0.12, 0.24] as const;
+
+/**
+ * Backing-store density for the map canvas. The lines are faint and the layer
+ * is scaled up a little anyway, so 1.5× is indistinguishable from 2× and costs
+ * half the texture memory.
+ */
+const MAX_DPR = 1.5;
 
 /** Park–Miller, so the sky and the terrain are the same on every visit. */
 function seeded(seed: number) {
@@ -27,8 +31,11 @@ function seeded(seed: number) {
 
 // ---------------------------------------------------------------------------
 // Terrain: contour lines around two summits, one for each end of the journey.
-// Drawn in a 1600×1000 box that is cropped to cover the viewport.
+// Laid out in a 1600×1000 box that is cropped to cover the viewport.
 // ---------------------------------------------------------------------------
+
+const VIEW_W = 1600;
+const VIEW_H = 1000;
 
 interface Peak {
   x: number;
@@ -45,7 +52,8 @@ const PEAKS: Peak[] = [
 ];
 
 interface Contour {
-  d: string;
+  path: Path2D;
+  length: number;
   index: boolean;
   level: number;
 }
@@ -84,10 +92,170 @@ function terrain(seed: number): Contour[] {
         for (const h of harmonics) wobble += h.a * Math.sin(h.f * t + h.p + k * 0.21);
         pts.push([peak.x + Math.cos(t) * r * wobble * 1.08, peak.y + Math.sin(t) * r * wobble]);
       }
-      out.push({ d: smoothClosed(pts), index: k % 5 === 0, level: k });
+      // Perimeter of the polygon — close enough to the curve for the draw-in dash.
+      let length = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const [ax, ay] = pts[i];
+        const [bx, by] = pts[(i + 1) % pts.length];
+        length += Math.hypot(bx - ax, by - ay);
+      }
+      out.push({ path: new Path2D(smoothClosed(pts)), length, index: k % 5 === 0, level: k });
     }
   }
   return out;
+}
+
+const DRAW_MS = 2600;
+const DRAW_DELAY = 200;
+const DRAW_STAGGER = 70;
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
+
+/**
+ * Paints the map into the canvas. `t` is milliseconds since the draw-in began;
+ * pass Infinity for the finished map. Returns true once every line is complete.
+ */
+function paintMap(canvas: HTMLCanvasElement, contours: Contour[], t: number): boolean {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return true;
+  const w = canvas.width;
+  const h = canvas.height;
+  const root = document.documentElement;
+  const day = root.dataset.theme === 'day';
+  const styles = getComputedStyle(root);
+  const ink = styles.getPropertyValue('--gilt').trim() || '#d9b46a';
+  const mono = styles.getPropertyValue('--font-mono').trim() || 'monospace';
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+  ctx.clearRect(0, 0, w, h);
+
+  // preserveAspectRatio="xMidYMid slice"
+  const s = Math.max(w / VIEW_W, h / VIEW_H);
+  ctx.setTransform(s, 0, 0, s, (w - VIEW_W * s) / 2, (h - VIEW_H * s) / 2);
+  const dpr = w / Math.max(1, canvas.clientWidth);
+
+  ctx.strokeStyle = ink;
+  ctx.fillStyle = ink;
+  ctx.lineCap = 'round';
+  let done = true;
+  for (const c of contours) {
+    const local = Math.min(1, Math.max(0, (t - DRAW_DELAY - c.level * DRAW_STAGGER) / DRAW_MS));
+    if (local < 1) done = false;
+    if (local <= 0) continue;
+    ctx.globalAlpha = c.index ? (day ? 0.4 : 0.3) : day ? 0.24 : 0.17;
+    // Non-scaling stroke: the width is in CSS pixels, whatever the crop.
+    ctx.lineWidth = ((c.index ? 1.1 : 0.7) * dpr) / s;
+    if (local < 1) ctx.setLineDash([c.length * easeOut(local), c.length]);
+    else ctx.setLineDash([]);
+    ctx.stroke(c.path);
+  }
+  ctx.setLineDash([]);
+
+  ctx.globalAlpha = day ? 0.55 : 0.42;
+  ctx.font = `11px ${mono}`;
+  if ('letterSpacing' in ctx) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = '1.6px';
+  for (const p of PEAKS) {
+    if (!p.label) continue;
+    ctx.beginPath();
+    ctx.moveTo(p.x - 5, p.y + 4);
+    ctx.lineTo(p.x, p.y - 5);
+    ctx.lineTo(p.x + 5, p.y + 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillText(p.label, p.x + 12, p.y + 4);
+  }
+
+  // The map fades out toward the edges — baked in, so no CSS mask has to be
+  // recomposited while the layer moves.
+  ctx.setTransform(1.1 * w, 0, 0, 0.95 * h, 0.5 * w, 0.45 * h);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'destination-in';
+  const fade = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+  fade.addColorStop(0.35, 'rgba(0,0,0,1)');
+  fade.addColorStop(0.92, 'rgba(0,0,0,0)');
+  ctx.fillStyle = fade;
+  ctx.fillRect(-1, -1, 2, 2);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  return done;
+}
+
+/**
+ * The survey map as a bitmap. It is painted once (animated only while the
+ * lines draw themselves in, then repainted on resize or a change of theme), so
+ * every per-frame movement after that is a compositor transform of a texture —
+ * no SVG re-rasterising, no mask, nothing on the main thread.
+ */
+function TerrainCanvas({ live, style }: { live: boolean; style: Record<string, MotionValue<number> | number> }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const contours = useMemo(() => terrain(20190601), []);
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    let frame = 0;
+    let start = 0;
+    let drawn = !live;
+    let resizeTimer = 0;
+
+    const size = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+      const w = Math.round(canvas.clientWidth * dpr);
+      const h = Math.round(canvas.clientHeight * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+    };
+    const still = () => {
+      size();
+      paintMap(canvas, contours, Infinity);
+    };
+    const tick = (now: number) => {
+      if (!start) start = now;
+      drawn = paintMap(canvas, contours, now - start);
+      frame = drawn ? 0 : requestAnimationFrame(tick);
+    };
+
+    size();
+    // The draw-in waits until the page has finished its own first work, so it
+    // never competes with the content for the main thread during load.
+    let idle = 0;
+    const ric = window.requestIdleCallback as ((cb: () => void, o?: { timeout: number }) => number) | undefined;
+    if (drawn) paintMap(canvas, contours, Infinity);
+    else if (ric) idle = ric(() => (frame = requestAnimationFrame(tick)), { timeout: 1200 });
+    else idle = window.setTimeout(() => (frame = requestAnimationFrame(tick)), 300);
+
+    // Labels are set in the mono face; repaint once it has arrived.
+    void document.fonts?.ready.then(() => {
+      if (drawn) still();
+    });
+
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        if (drawn) still();
+        else size();
+      }, 150);
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+    const themeWatch = new MutationObserver(() => {
+      if (drawn) still();
+    });
+    themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => {
+      cancelAnimationFrame(frame);
+      if (ric) window.cancelIdleCallback?.(idle);
+      else window.clearTimeout(idle);
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('resize', onResize);
+      themeWatch.disconnect();
+    };
+  }, [contours, live]);
+
+  return <motion.canvas ref={ref} className="absolute inset-0 h-full w-full will-change-transform" style={style} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -117,49 +285,39 @@ function field(count: number, seed: number, spanX = 100): Mote[] {
   }));
 }
 
-function useViewportHeight() {
-  const [h, setH] = useState(() => (typeof window === 'undefined' ? 900 : window.innerHeight));
-  useEffect(() => {
-    let frame = 0;
-    const onResize = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setH(window.innerHeight));
-    };
-    window.addEventListener('resize', onResize, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('resize', onResize);
-    };
-  }, []);
-  return h;
-}
-
 /**
  * Three bands of points, each drifting at its own rate as the page scrolls and
- * wrapping on one screen height, so the field never runs out. Fast scrolling
- * draws them out into short streaks.
+ * wrapping on one screen height, so the field never runs out.
+ *
+ * The still points are one static SVG per band, rasterised once. The few that
+ * twinkle are separate HTML dots with a CSS opacity animation, which the
+ * compositor runs on its own — animating an SVG child would repaint the whole
+ * band every frame.
  */
 function Drift({
   motes,
   className,
   scrollY,
-  stretch,
   live,
   sizeScale = 1,
 }: {
   motes: Mote[];
   className: string;
   scrollY: MotionValue<number>;
-  stretch: MotionValue<number>[];
   live: boolean;
   sizeScale?: number;
 }) {
-  const h = useViewportHeight();
-  const hRef = useRef(h);
-  hRef.current = h;
-  const y0 = useTransform(scrollY, (y) => -((y * DEPTHS[0]) % hRef.current));
-  const y1 = useTransform(scrollY, (y) => -((y * DEPTHS[1]) % hRef.current));
-  const y2 = useTransform(scrollY, (y) => -((y * DEPTHS[2]) % hRef.current));
+  const height = useRef(typeof window === 'undefined' ? 900 : window.innerHeight);
+  useEffect(() => {
+    const onResize = () => {
+      height.current = window.innerHeight;
+    };
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const y0 = useTransform(scrollY, (y) => -((y * DEPTHS[0]) % height.current));
+  const y1 = useTransform(scrollY, (y) => -((y * DEPTHS[1]) % height.current));
+  const y2 = useTransform(scrollY, (y) => -((y * DEPTHS[2]) % height.current));
   const ys = [y0, y1, y2];
   const layers = useMemo(() => DEPTHS.map((_, layer) => motes.filter((m) => m.layer === layer)), [motes]);
 
@@ -168,27 +326,51 @@ function Drift({
       {layers.map((layer, depth) => (
         <motion.div
           key={depth}
-          className={`${className} absolute inset-0 origin-center will-change-transform`}
-          style={{ scaleY: live ? stretch[depth] : 1 }}
+          className={`${className} absolute inset-x-0 top-0 h-[200%] will-change-transform`}
+          style={{ y: live ? ys[depth] : 0 }}
         >
-          <motion.svg className="absolute inset-x-0 top-0 w-full" style={{ height: '200%', y: live ? ys[depth] : 0 }}>
+          <svg className="absolute inset-0 h-full w-full">
             {[0, 50].map((offset) =>
-              layer.map((m, i) => (
-                <circle
-                  key={`${offset}-${i}`}
-                  cx={`${m.x}%`}
-                  cy={`${offset + m.y / 2}%`}
-                  r={m.r * sizeScale * (0.8 + depth * 0.2)}
-                  fill="var(--gilt)"
-                  style={{
-                    opacity: m.o,
-                    ['--o' as string]: m.o,
-                    animation: m.twinkle && live ? `star-twinkle ${6 + m.delay}s ease-in-out ${m.delay}s infinite` : undefined,
-                  }}
-                />
-              )),
+              layer
+                .filter((m) => !(m.twinkle && live))
+                .map((m, i) => (
+                  <circle
+                    key={`${offset}-${i}`}
+                    cx={`${m.x}%`}
+                    cy={`${offset + m.y / 2}%`}
+                    r={m.r * sizeScale * (0.8 + depth * 0.2)}
+                    fill="var(--gilt)"
+                    opacity={m.o}
+                  />
+                )),
             )}
-          </motion.svg>
+          </svg>
+          {live &&
+            [0, 50].map((offset) =>
+              layer
+                .filter((m) => m.twinkle)
+                .map((m, i) => {
+                  const d = 2 * m.r * sizeScale * (0.8 + depth * 0.2);
+                  return (
+                    <span
+                      key={`t${offset}-${i}`}
+                      className="star-twinkle absolute rounded-full bg-gilt"
+                      style={{
+                        left: `${m.x}%`,
+                        top: `${offset + m.y / 2}%`,
+                        width: d,
+                        height: d,
+                        marginLeft: -d / 2,
+                        marginTop: -d / 2,
+                        opacity: m.o,
+                        ['--o' as string]: m.o,
+                        animationDuration: `${6 + m.delay}s`,
+                        animationDelay: `${m.delay}s`,
+                      }}
+                    />
+                  );
+                }),
+            )}
         </motion.div>
       ))}
     </>
@@ -207,14 +389,16 @@ function Drift({
  * gold — that drift down the page as you scroll. Day keeps the warm window and
  * a little dust floating in it.
  *
- * Everything is scroll- or pointer-driven: no timers, only transform and
- * opacity change per frame. Under reduced motion the map is simply there.
+ * Performance contract: after the draw-in, nothing here repaints. Every
+ * per-frame change is a transform of an already-rasterised layer (the map is a
+ * canvas bitmap, the sky and the pools are static), and nothing runs while the
+ * page is still apart from a handful of compositor-only twinkles. Under reduced
+ * motion the map is simply there.
  */
 export default function BackgroundLayer() {
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const live = !useReducedMotion();
 
-  const contours = useMemo(() => terrain(20190601), []);
   const stars = useMemo(() => field(isTouchDevice ? 36 : 84, 20190601), [isTouchDevice]);
   const dust = useMemo(() => field(isTouchDevice ? 14 : 28, 1906, 60), [isTouchDevice]);
 
@@ -232,21 +416,12 @@ export default function BackgroundLayer() {
   const giltX = useTransform(progress, [0, 1], ['0%', '18%']);
   const sunY = useTransform(progress, [0, 1], ['0%', '18%']);
 
-  const velocity = useSpring(useVelocity(scrollY), { stiffness: 140, damping: 32, mass: 0.6 });
-  const rush = useTransform(velocity, [-2600, 0, 2600], [1, 0, 1]);
-  const stretch = [
-    useTransform(rush, [0, 1], [1, 1.2]),
-    useTransform(rush, [0, 1], [1, 1.45]),
-    useTransform(rush, [0, 1], [1, 1.8]),
-  ];
-  // The index contours brighten a touch while the page is moving.
-  const indexGlow = useTransform(rush, [0, 1], [1, 1.6]);
-
   // --- pointer: the map leans toward the cursor (desktop) -------------------
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const leanX = useSpring(px, { stiffness: 40, damping: 18 });
   const leanY = useSpring(py, { stiffness: 40, damping: 18 });
+  const mapTy = useTransform([mapY, leanY] as MotionValue<number>[], ([a, b]: number[]) => a + b);
 
   useEffect(() => {
     if (!live || isTouchDevice) return;
@@ -257,6 +432,10 @@ export default function BackgroundLayer() {
     window.addEventListener('pointermove', onMove, { passive: true });
     return () => window.removeEventListener('pointermove', onMove);
   }, [live, isTouchDevice, px, py]);
+
+  const mapStyle: Record<string, MotionValue<number> | number> = live
+    ? { x: leanX, y: mapTy, rotate: mapRotate, scale: mapScale }
+    : { scale: 1.06 };
 
   return (
     <div aria-hidden="true" className="film-grain pointer-events-none fixed inset-0 z-0 overflow-hidden bg-canvas">
@@ -290,50 +469,12 @@ export default function BackgroundLayer() {
       />
 
       {/* the map */}
-      <motion.div
-        className="absolute inset-0 will-change-transform"
-        style={{
-          x: live ? leanX : 0,
-          y: live ? leanY : 0,
-          maskImage: 'radial-gradient(ellipse 110% 95% at 50% 45%, black 35%, transparent 92%)',
-        }}
-      >
-        <motion.svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 1600 1000"
-          preserveAspectRatio="xMidYMid slice"
-          style={{ rotate: live ? mapRotate : 0, scale: live ? mapScale : 1.06, y: live ? mapY : 0 }}
-        >
-          <g fill="none" strokeLinecap="round">
-            {contours.map((c, i) => (
-              <motion.path
-                key={i}
-                d={c.d}
-                className={c.index ? 'contour contour--index' : 'contour'}
-                strokeWidth={c.index ? 1.1 : 0.7}
-                vectorEffect="non-scaling-stroke"
-                style={c.index && live ? { opacity: indexGlow } : undefined}
-                initial={live ? { pathLength: 0 } : false}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2.6, delay: 0.2 + c.level * 0.07, ease: EASE }}
-              />
-            ))}
-          </g>
-          {PEAKS.filter((p) => p.label).map((p) => (
-            <g key={p.label} className="contour-mark">
-              <path d={`M${p.x - 5},${p.y + 4} L${p.x},${p.y - 5} L${p.x + 5},${p.y + 4} Z`} />
-              <text x={p.x + 12} y={p.y + 4} fontSize="11" letterSpacing="1.6" fontFamily="var(--font-mono)">
-                {p.label}
-              </text>
-            </g>
-          ))}
-        </motion.svg>
-      </motion.div>
+      <TerrainCanvas live={live} style={mapStyle} />
 
       {/* the night sky, in three depths */}
-      <Drift motes={stars} className="night-only" scrollY={scrollY} stretch={stretch} live={live} />
+      <Drift motes={stars} className="night-only" scrollY={scrollY} live={live} />
       {/* dust in the window light, day */}
-      <Drift motes={dust} className="day-only" scrollY={scrollY} stretch={stretch} live={live} sizeScale={1.3} />
+      <Drift motes={dust} className="day-only" scrollY={scrollY} live={live} sizeScale={1.3} />
 
       <div
         className="absolute inset-0"

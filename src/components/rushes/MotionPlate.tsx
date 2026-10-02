@@ -71,7 +71,8 @@ export default function MotionPlate({
   const gif = isGif(resolvedSrc);
 
   const wantsAutoPlay = autoPlay && !shouldReduceMotion;
-  const [playing, setPlaying] = useState(wantsAutoPlay);
+  // A video reports its own state through onPlay/onPause once the observer starts it.
+  const [playing, setPlaying] = useState(gif && wantsAutoPlay);
   const [muted, setMuted] = useState(true);
   const [failed, setFailed] = useState(false);
 
@@ -197,8 +198,10 @@ export default function MotionPlate({
             muted={muted}
             loop={loop}
             playsInline
-            autoPlay={wantsAutoPlay}
-            preload={wantsAutoPlay ? 'auto' : 'metadata'}
+            // No autoPlay attribute: playback is started by the visibility
+            // observer, so a clip below the fold is neither downloaded in full
+            // nor decoded until it is about to be seen.
+            preload="metadata"
             aria-label={title}
             onError={() => setFailed(true)}
             onPlay={() => setPlaying(true)}

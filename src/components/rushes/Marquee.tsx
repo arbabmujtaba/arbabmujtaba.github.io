@@ -1,5 +1,5 @@
 import { useReducedMotion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 interface MarqueeProps {
   children: ReactNode;
@@ -29,6 +29,17 @@ export default function Marquee({
   className = '',
 }: MarqueeProps) {
   const shouldReduceMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  // Only run while on screen: a running transform animation keeps the browser
+  // producing frames (and Chrome running main-thread frames) even off-screen.
+  const [onScreen, setOnScreen] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || shouldReduceMotion) return;
+    const observer = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { rootMargin: '100px 0px' });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldReduceMotion]);
 
   if (shouldReduceMotion) {
     return (
@@ -42,6 +53,7 @@ export default function Marquee({
 
   return (
     <div
+      ref={ref}
       className={`group relative w-full overflow-hidden ${className}`}
       data-marquee-fade={fade ? 'true' : undefined}
     >
@@ -51,6 +63,7 @@ export default function Marquee({
           animation: `rushes-marquee ${duration}s linear infinite${
             reverse ? ' reverse' : ''
           }`,
+          animationPlayState: onScreen ? undefined : 'paused',
         }}
       >
         <div className="flex shrink-0 items-center gap-10">{children}</div>

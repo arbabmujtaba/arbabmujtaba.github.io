@@ -150,12 +150,13 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                         >
                           {selected ? (
                             <span aria-hidden="true" className="flex h-3 items-end gap-[2px]">
+                              {/* scaleY, not height: a transform runs on the compositor,
+                                  height would re-layout and repaint the strip every frame. */}
                               {[0, 1, 2].map((bar) => (
-                                <motion.span
+                                <span
                                   key={bar}
-                                  className="block w-[2px] bg-current"
-                                  animate={shouldReduceMotion ? { height: 8 } : { height: [4, 12, 6, 10, 4] }}
-                                  transition={{ duration: 1.2, repeat: Infinity, delay: bar * 0.18, ease: 'easeInOut' }}
+                                  className={`block h-3 w-[2px] origin-bottom bg-current ${shouldReduceMotion ? 'scale-y-[0.67]' : 'eq-bar'}`}
+                                  style={shouldReduceMotion ? undefined : { animationDelay: `${bar * 0.18}s` }}
                                 />
                               ))}
                             </span>

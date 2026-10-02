@@ -48,6 +48,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * the darkest large photograph in the archive, so the bone hero type stays
  * legible over it. The hero is an ink plate at any hour (data-surface="ink").
  */
+// Also preloaded by index.html — change both together.
 const HERO_IMAGE = '/uploads/photography/1785134270800-642096424.jpeg';
 
 function Section({
@@ -175,6 +176,7 @@ export default function Home({ setView }: HomeProps) {
               src={HERO_IMAGE}
               alt=""
               loading="eager"
+              fetchPriority="high"
               className="h-[114%] w-full object-cover opacity-70"
               fallback={<div className="hairline-grid h-full w-full bg-canvas-deep" />}
             />

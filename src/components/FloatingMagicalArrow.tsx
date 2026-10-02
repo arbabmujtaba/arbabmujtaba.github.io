@@ -34,25 +34,33 @@ export default function FloatingMagicalArrow() {
   useEffect(() => {
     if (!supportsDesktopControl) return;
     let frame = 0;
+    // The document height is measured only when it can change (resize, the
+    // body growing). Reading scrollHeight on every scroll frame forced a
+    // synchronous layout in the middle of the frame.
+    let max = 0;
     const update = () => {
       frame = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
       setIsScrollable(max > 50);
       setIsAtBottom(window.scrollY >= max - 45);
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+    const measure = () => {
+      max = document.documentElement.scrollHeight - window.innerHeight;
+      schedule();
+    };
+    measure();
     update();
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
+    window.addEventListener('resize', measure);
     // Content arrives lazily (images, routes); watch the document grow instead of polling it.
-    const observer = new ResizeObserver(schedule);
+    const observer = new ResizeObserver(measure);
     observer.observe(document.body);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
+      window.removeEventListener('resize', measure);
       observer.disconnect();
     };
   }, [supportsDesktopControl]);

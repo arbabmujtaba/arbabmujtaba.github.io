@@ -51,7 +51,8 @@ export default function RecLabel({
           <motion.span
             aria-hidden="true"
             className="inline-block h-2 w-2 rounded-full bg-alarm"
-            animate={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
+            initial={{ opacity: 1 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />
         </button>
@@ -60,7 +61,8 @@ export default function RecLabel({
         <motion.span
           aria-hidden="true"
           className="inline-block h-2 w-2 shrink-0 rounded-full bg-alarm"
-          animate={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
+          initial={{ opacity: 1 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}

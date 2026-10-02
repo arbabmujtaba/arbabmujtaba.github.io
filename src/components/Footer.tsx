@@ -69,7 +69,7 @@ const SECTIONS = [
  */
 export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: FooterProps) {
   return (
-    <footer className="relative z-10 mt-32 w-full border-t border-zinc-800 bg-canvas/60 backdrop-blur-sm">
+    <footer className="relative z-10 mt-32 w-full border-t border-zinc-800 bg-canvas/80">
       <div className="px-4 pt-20 md:px-12 md:pt-28 lg:px-16">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <RecLabel>contact</RecLabel>

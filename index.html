@@ -11,10 +11,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap"
-    />
+    <!-- Fonts load without blocking the first paint (display=swap already
+         covers the text); the stylesheet is applied the moment it arrives. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap" /></noscript>
     <script>
       // Day or night before the first paint, so the page never flashes the
       // wrong surface. Mirrors resolveTheme() in src/lib/magic.tsx.
@@ -28,6 +29,22 @@
           document.documentElement.setAttribute('data-theme', 'night');
         }
       })();
+    </script>
+
+    <script>
+      // The home hero is the largest paint, but it is only discovered after the
+      // app and the home chunk have loaded. Start fetching it now — home only,
+      // and the same srcset/sizes SafeImage renders, so it is one request.
+      if (location.pathname === '/') {
+        var hero = document.createElement('link');
+        hero.rel = 'preload';
+        hero.as = 'image';
+        hero.type = 'image/webp';
+        hero.setAttribute('fetchpriority', 'high');
+        hero.setAttribute('imagesrcset', '/uploads/optimized/photography/1785134270800-642096424-480.webp 480w, /uploads/optimized/photography/1785134270800-642096424-768.webp 768w, /uploads/optimized/photography/1785134270800-642096424-1536.webp 1536w');
+        hero.setAttribute('imagesizes', '100vw');
+        document.head.appendChild(hero);
+      }
     </script>
 
     <title>Arbab Mujtaba — Archive</title>
