@@ -32,7 +32,8 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
   const openEntry = useOpenEntry();
 
   return (
-    <ol className={`border-t border-zinc-800 ${className}`}>
+    <div className={`relative ${className}`}>
+    <ol className="border-t border-zinc-800">
       {projects.map((project, index) => {
         const href = `/portfolio/${project.slug}`;
         const stack = stackOf(project);
@@ -90,5 +91,6 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
         );
       })}
     </ol>
+    </div>
   );
 }

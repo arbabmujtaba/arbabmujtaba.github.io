@@ -52,9 +52,64 @@
   --accent: var(--rushes-ember);
   --accent-soft: rgba(226, 97, 47, 0.16);
   --signal: var(--rushes-signal);
+  /* Old gold — the hidden layer's one colour: seals, stars, wand light. */
+  --gilt: #d9b46a;
+  color-scheme: dark;
 
   /* Motion — single source of truth */
   --ease-rushes: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- DAY: the whole site on paper ----
+   Set on <html> by the inline boot script in index.html (before first paint)
+   and by MagicProvider afterwards. Photographs keep dark plates through
+   data-surface="ink", the way prints sit on black mounts in a photo book. */
+[data-theme="day"] {
+  --bg: #f3efe6;
+  --bg-deep: #e9e3d6;
+  --bg-raised: #fbf9f4;
+  --bg-lift: #e7e1d3;
+
+  --ink-0: #14130f;
+  --ink-1: rgba(22, 20, 16, 0.94);
+  --ink-2: rgba(22, 20, 16, 0.84);
+  --ink-3: rgba(22, 20, 16, 0.76);
+  --ink-4: rgba(22, 20, 16, 0.66);
+  --ink-5: rgba(22, 20, 16, 0.6);   /* 4.6:1 on --bg — the bone surface's 0.44 failed AA */
+  --ink-6: rgba(22, 20, 16, 0.55);
+
+  --rule: rgba(22, 20, 16, 0.14);
+  --rule-strong: rgba(22, 20, 16, 0.26);
+  --well: rgba(22, 20, 16, 0.045);
+
+  /* Ember at #e2612f is 3.1:1 on paper; this is the same hue, 4.7:1. */
+  --accent: #b4461a;
+  --accent-soft: rgba(180, 70, 26, 0.14);
+  --gilt: #8a6a2a;
+  color-scheme: light;
+}
+
+/* Back to the dark canvas inside a subtree — hero, reels, lightbox, the
+   darkroom. A no-op at night. */
+[data-surface="ink"] {
+  --bg: var(--rushes-ink-deep);
+  --bg-deep: #050505;
+  --bg-raised: var(--rushes-ink-cool);
+  --bg-lift: var(--rushes-surface);
+  --ink-0: #ffffff;
+  --ink-1: rgba(244, 242, 237, 0.94);
+  --ink-2: rgba(244, 242, 237, 0.82);
+  --ink-3: rgba(244, 242, 237, 0.68);
+  --ink-4: var(--rushes-grey-1);
+  --ink-5: var(--rushes-grey-2);
+  --ink-6: var(--rushes-grey-3);
+  --rule: rgba(255, 255, 255, 0.12);
+  --rule-strong: rgba(255, 255, 255, 0.22);
+  --well: rgba(255, 255, 255, 0.04);
+  --accent: var(--rushes-ember);
+  --accent-soft: rgba(226, 97, 47, 0.16);
+  --gilt: #d9b46a;
+  color-scheme: dark;
 }
 
 [data-surface="bone"] {
@@ -84,8 +139,12 @@
   --font-display: "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Fragment Mono", ui-monospace, SFMono-Regular, monospace;
   /* Legacy alias: 74 existing `font-serif` usages resolve to the display face
-     instead of the old Sora mislabel. No serif exists in this design. */
+     instead of the old Sora mislabel. */
   --font-serif: "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
+  /* The manuscript voice — italics in headings, notes, chapters, the hidden
+     layer. A real serif, and the only one. */
+  --font-book: "EB Garamond", ui-serif, Georgia, Cambria, serif;
+  --color-gilt: var(--gilt);
 
   /* ---- Semantic colours (preferred for new code) ---- */
   --color-canvas: var(--bg);
@@ -138,6 +197,151 @@ body {
 
 html {
   font-size: 15px;
+  background-color: var(--bg);
+}
+
+/* Theme change cross-fades instead of snapping. Scoped to colour properties
+   so it never slows a transform. */
+html.theme-fade, html.theme-fade * {
+  transition: background-color 600ms var(--ease-rushes), color 600ms var(--ease-rushes),
+    border-color 600ms var(--ease-rushes) !important;
+}
+
+/* ==========================================================================
+   THE HIDDEN LAYER
+   ========================================================================== */
+
+/* Wand cursor: a thin wand whose tip is the hotspot. Text keeps its I-beam and
+   links keep a pointer, so selection and navigation read exactly as before. */
+html[data-wand="on"] body {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M4 4 L24 24' stroke='%23140f08' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M4 4 L24 24' stroke='%23d9b46a' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='4' cy='4' r='2.6' fill='%23fff6dc'/%3E%3C/svg%3E") 3 3, auto;
+}
+html[data-wand="on"] :is(p, li, h1, h2, h3, blockquote, figcaption, input, textarea) {
+  cursor: text;
+}
+html[data-wand="on"] :is(a[href], button, [role="button"], summary, label) {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M4 4 L24 24' stroke='%23140f08' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M4 4 L24 24' stroke='%23e2612f' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='4' cy='4' r='3.4' fill='%23fff6dc'/%3E%3C/svg%3E") 3 3, pointer;
+}
+
+/* Enchanted objects only declare themselves while the wand is out. */
+[data-enchanted] {
+  transition: filter 500ms var(--ease-rushes), text-shadow 500ms var(--ease-rushes);
+}
+html[data-wand="on"] [data-enchanted]:hover,
+html[data-wand="on"] [data-enchanted]:focus-visible {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gilt) 70%, transparent));
+}
+
+@keyframes leviosa {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  30% { translate: 0 -14px; rotate: -2deg; }
+  60% { translate: 0 -9px; rotate: 1.5deg; }
+}
+.is-levitating { animation: leviosa 2.4s var(--ease-rushes) 1; }
+
+/* Invisible ink: drawn, but masked to nothing until the wand's light passes.
+   --mx/--my are set per element by the Lumos layer, in element coordinates. */
+.invisible-ink {
+  font-family: var(--font-book);
+  font-style: italic;
+  color: var(--gilt);
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: radial-gradient(circle 150px at var(--mx, -999px) var(--my, -999px), #000 30%, transparent 100%);
+  mask-image: radial-gradient(circle 150px at var(--mx, -999px) var(--my, -999px), #000 30%, transparent 100%);
+  opacity: 0;
+  transition: opacity 500ms var(--ease-rushes);
+}
+html[data-lumos="on"] .invisible-ink { opacity: 1; }
+/* No pointer to carry the light: the whole margin glows instead. */
+html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Manuscript paper — used sparingly: notes, secret rooms, the journal's
+   opening page. A gradient and a turbulence tooth; no image request. */
+.manuscript {
+  --paper: #f1e9d6;
+  --paper-ink: #2a2116;
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 250, 235, 0.9), transparent 60%),
+    radial-gradient(ellipse at 100% 100%, rgba(150, 110, 60, 0.18), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
+  color: var(--paper-ink);
+  /* Paper always reads as paper: ink tokens inside it are dark at any hour. */
+  --ink-0: #1b150d;
+  --ink-1: rgba(42, 33, 22, 0.94);
+  --ink-2: rgba(42, 33, 22, 0.86);
+  --ink-3: rgba(42, 33, 22, 0.78);
+  --ink-4: rgba(42, 33, 22, 0.7);
+  --ink-5: rgba(42, 33, 22, 0.64);
+  --ink-6: rgba(42, 33, 22, 0.56);
+  --rule: rgba(42, 33, 22, 0.16);
+  --rule-strong: rgba(42, 33, 22, 0.28);
+  --accent: #a2401a;
+  --gilt: #85622a;
+}
+
+.font-book { font-family: var(--font-book); }
+
+/* A fleuron rule: hairline, a small diamond, hairline. */
+.fleuron {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--ink-5);
+}
+.fleuron::before, .fleuron::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(to right, transparent, var(--rule-strong), transparent);
+}
+
+/* Drop cap for the journal's reading view. */
+.drop-cap > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-book);
+  font-size: 4.2em;
+  line-height: 0.82;
+  padding: 0.06em 0.12em 0 0;
+  color: var(--accent);
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: var(--o, 0.7); }
+  50% { opacity: 0.15; }
+}
+
+/* Day hides the night sky entirely; night hides the paper sun. */
+[data-theme="day"] .night-only { display: none !important; }
+:root:not([data-theme="day"]) .day-only { display: none !important; }
+
+/* Ledger door buttons. */
+.ledger-door {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  font-family: var(--font-book);
+  font-size: 1.05rem;
+  color: var(--ink-1);
+  text-align: left;
+  transition: border-color 300ms var(--ease-rushes), background-color 300ms var(--ease-rushes);
+}
+.ledger-door:hover, .ledger-door:focus-visible { border-color: var(--gilt); background: rgba(133, 98, 42, 0.08); outline: none; }
+.ledger-door-final { border-color: var(--gilt); color: var(--gilt); }
+
+/* Hover is never the only way in. Phones and pens have no hover, so anything
+   revealed on hover is shown at rest there instead. */
+@media (hover: none) {
+  .reveal-on-hover { opacity: 1 !important; transform: none !important; translate: none !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {

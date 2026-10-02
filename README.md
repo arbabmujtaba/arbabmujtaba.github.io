@@ -20,7 +20,7 @@ has no API.
 | Command | What it does |
 |---|---|
 | `npm run typecheck` | `tsc --noEmit`, strict |
-| `npm test` | content-state transitions, routing, and the WebP derivative contract |
+| `npm test` | content-state transitions, routing, the WebP derivative contract, the hidden layer's gestures / content contract, and the admin's front-matter mapping |
 | `npm run build` | production build, then the route shells, 404.html and sitemap.xml |
 | `npm run verify:dist` | asserts every public route resolves the way GitHub Pages serves it |
 | `npm run optimize:images` | regenerates WebP derivatives (`--force` to rebuild all) |
@@ -38,10 +38,38 @@ Eight collections; four of them are documents with their own URL:
 | `tech` | `/tech/<slug>` | build logs and notes |
 | `photography` | `/photography/<slug>` | frame, gallery, gear, capture mode |
 
-The rest — `gear`, `favorites`, `home`, `timeline` — are fragments composed into pages rather than
-documents, so they have no route of their own. `content/home/` drives the entire home page through
-`configType` entries (`profile`, `gateway`, `quote`, `principle`); `timeline/` feeds the milestone
-list further down the same page.
+The rest — `gear`, `favorites`, `home`, `timeline`, `secrets` — are fragments composed into pages
+rather than documents, so they have no route of their own. `content/home/` drives the home page
+through `configType` entries (`profile`, `gateway`, `quote`, `principle`, `reel`, `thought`);
+`timeline/` holds the eight personal chapters (2019–2026, each with a `place`) that feed the
+chapter timeline, the Sopore → Indore passage and the memory map.
+
+## The hidden layer
+
+About a third of the site is a layer visitors find rather than see. Everything a visitor chooses
+or finds is kept in `localStorage`; nothing leaves the browser.
+
+| Piece | Where | How it is found |
+|---|---|---|
+| Day / night | header, sun/moon menu | night, day, or follow the clock (06–18 local). Set before first paint by the script in `index.html` |
+| The wand | header, wand icon | trail of sparks; draw a circle in the air for Lumos, shake for levitation; Esc or the chip puts it away |
+| Invisible ink | margins of home sections | only readable under Lumos (`kind: ink` secrets) |
+| The Restricted Section | the untitled book at the end of the writing shelf, or type `alohomora` | notes (`kind: note, room: library`) and lines lifted from the journal |
+| The Darkroom | the red tally light in the *frames* section; on `/photography`, "darkroom open" or the lead print while the wand is out | prints develop as you hover; the back carries date and gear |
+| Saptarishi | seven bright stars over the hero, night only | light all seven |
+| The wax seal | footer, every page | seven knocks |
+| The compass | memory map | open Sopore and Indore, or trace the journey |
+| The quill | end of any journal volume | read to the last line |
+| The Room of Small Details | the ledger, once all collectibles are found | facts computed from the archive |
+| Incantations | anywhere outside a text field | `lumos`, `nox`, `alohomora`; a note for whoever opens devtools |
+| Ambient sound | sky menu, off by default | synthesised in the browser (`src/lib/sound.ts`), no audio files |
+
+State lives in `src/lib/magic.tsx` (initial chunk, no content); everything that draws or listens is
+in `src/components/magic/`, mounted on idle and lazy. Copy and on/off switches for every room, egg
+and ink line are markdown in `content/secrets/`, read by `src/lib/secrets.ts` and managed from the
+**Secrets** workspace in `/admin`. Hidden is not private: those files ship in the public bundle like
+the rest of `content/`. Reduced motion turns off the trail, twinkle and door animations but keeps
+every discovery reachable.
 
 Images live in `public/uploads/`. Every image on the site is the owner's own photograph;
 `.kiro/IMAGE_MAP.md` records which frame fills which slot and why, with measured luminance and
@@ -70,6 +98,10 @@ Two surfaces, both local:
   `/preview/:collection/:slug`, and an 11-step publishing pipeline that commits and pushes via
   `simple-git`.
 - Decap CMS (`public/admin/`), loaded from a CDN.
+
+The **Secrets** workspace switches rooms, easter eggs and ink lines on and off (it writes `visible`
+to the file) and opens the editor for new hidden notes. Timeline chapters carry a `place`; home
+blocks of type *Thought* feed the random-thought drawer.
 
 Neither works on the deployed site: GitHub Pages cannot run `server.ts` or serve Decap's OAuth
 exchange. Editing happens on the machine that holds the repo; pushing to `main` deploys. `/admin` is
@@ -127,8 +159,10 @@ through the lifecycle to published (`markPublished`) instead of failing on a dra
 
 ## Design
 
-Tokens in `src/index.css` — two surfaces (dark "ink" canvas, light "bone" for reading), Host Grotesk
-and Fragment Mono, ember accent with acid lime reserved for live/recording signals. Components use
+Tokens in `src/index.css` — night (dark canvas) and day (`[data-theme="day"]`, paper) themes, with
+`data-surface="ink"` keeping photographs on dark plates in daylight; Host Grotesk, Fragment Mono and
+EB Garamond (`font-book`, the manuscript voice used for the second line of every heading, notes and
+the hidden layer); ember accent, old-gold `gilt` for the hidden layer only. Components use
 the token-backed utilities, never colour literals. `src/components/rushes/` holds the shared motifs:
 `RecLabel`, `StackedHeading`, `Marquee`, `NumberedItem`, `FrameCard`, `Accordion`, `ImageTypeMask`.
 Motion respects `prefers-reduced-motion` and degrades on touch. See `.kiro/DESIGN_SYSTEM.md`.
@@ -152,6 +186,13 @@ and Open Graph tags, plus `404.html` as the catch-all and `sitemap.xml`. `npm ru
 the build if any route would 404.
 
 ## Deploying
+
+Scrolling is the window's. Pages used to wrap themselves in an `overflow-y-auto` box that never
+actually scrolled (the shell has no bounded height), so every scroll-linked effect read a scrollTop
+of 0 — the hero parallax, the timeline rail and the floating arrow were dead in dev and production
+alike. Use `useScroll()` / `useScroll({ target })`, never `{ container }`. Arbitrary transition lists
+must name `scale` / `translate` (Tailwind v4 uses the individual transform properties), and a stale
+tab after a deploy reloads itself once on `vite:preloadError` (`src/main.tsx`).
 
 Push to `main`. `.github/workflows/deploy.yml` runs typecheck, tests, build and `verify:dist`, then
 publishes `dist/` to Pages.

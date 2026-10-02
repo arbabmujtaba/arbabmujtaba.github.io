@@ -14,7 +14,7 @@ interface StackedHeadingProps {
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
- * StackedHeading — the two-line lowercase display heading.
+ * StackedHeading — the two-line display heading: grotesk, then book italic.
  *
  * Each line wipes up from a clipped box. The clip animation is skipped under
  * prefers-reduced-motion (the text simply fades), and because the wipe uses
@@ -32,14 +32,16 @@ export default function StackedHeading({
   const Tag = as;
 
   return (
-    <div className={`max-w-3xl ${className}`}>
+    <div data-levitate className={`max-w-3xl ${className}`}>
       <Tag
-        className={`font-display font-medium lowercase leading-[0.94] tracking-[-0.055em] text-zinc-50 ${size}`}
+        className={`font-display font-medium leading-[0.94] tracking-[-0.055em] text-zinc-50 ${size}`}
       >
         {lines.filter(Boolean).map((line, index) => (
           <span key={line} className="block overflow-hidden pb-[0.06em]">
             <motion.span
-              className={`block ${index === 1 ? 'text-zinc-400' : ''}`}
+              /* The second line is the manuscript voice: the book serif, in
+                 italic, a step quieter. One pairing used on every page. */
+              className={`block ${index === 1 ? 'font-book font-normal italic tracking-[-0.025em] text-zinc-400' : ''}`}
               initial={
                 shouldReduceMotion ? { opacity: 0 } : { y: '105%', opacity: 0 }
               }

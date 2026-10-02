@@ -9,7 +9,9 @@ import Navigation from './components/Navigation';
 import CursorWand from './components/CursorWand';
 import FloatingMagicalArrow from './components/FloatingMagicalArrow';
 import GlobalBackground from './components/GlobalBackground';
+import HeaderControls from './components/magic/HeaderControls';
 import { PillButton } from './components/rushes';
+import { MagicProvider } from './lib/magic';
 import { resetAllScrolls } from './lib/scroll';
 import { useMediaQuery } from './lib/useMediaQuery';
 import { detailPath, type DetailCollection } from './lib/collections';
@@ -29,7 +31,9 @@ const Portfolio = lazy(() => import('./pages/Portfolio'));
 const Journal = lazy(() => import('./pages/Journal'));
 const Tech = lazy(() => import('./pages/Tech'));
 const Photography = lazy(() => import('./pages/Photography'));
-const Admin = lazy(() => import('./pages/Admin'));
+// The studio needs server.ts, which only exists on the authoring machine; keep
+// its 200 kB out of the production bundle. (/admin on Pages is Decap's page.)
+const Admin = import.meta.env.DEV ? lazy(() => import('./pages/Admin')) : null;
 const Entry = lazy(() => import('./pages/Entry'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 // The reader (react-markdown, the customization layer, and the inlined content
@@ -37,6 +41,8 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 // card click still opens instantly.
 const loadQuickLook = () => import('./components/QuickLook');
 const QuickLook = lazy(loadQuickLook);
+// The hidden layer: wand effects, spells, rooms, the ledger. Mounted on idle.
+const MagicLayer = lazy(() => import('./components/magic/MagicLayer'));
 
 interface QuickLook {
   collection: DetailCollection;
@@ -145,7 +151,21 @@ export default function App() {
 
   const isAdmin = route.kind === 'list' && route.view === 'admin';
 
+  // Mount the hidden layer once the page is quiet.
+  const [magicReady, setMagicReady] = useState(false);
+  useEffect(() => {
+    if (isAdmin) return;
+    const idle = window.requestIdleCallback;
+    if (typeof idle === 'function') {
+      const handle = idle(() => setMagicReady(true), { timeout: 2500 });
+      return () => window.cancelIdleCallback?.(handle);
+    }
+    const timer = window.setTimeout(() => setMagicReady(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, [isAdmin]);
+
   return (
+    <MagicProvider>
     <EntryNavigationProvider value={openEntry}>
       <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 overflow-x-hidden">
         {!isAdmin && <GlobalBackground />}
@@ -160,7 +180,7 @@ export default function App() {
           className={
             isAdmin
               ? 'flex-grow relative z-10 flex flex-col'
-              : 'flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800 relative z-10 flex flex-col overflow-hidden'
+              : 'flex-grow m-1 sm:m-3 md:m-6 lg:m-8 border-0 sm:border border-zinc-800 relative z-10 flex flex-col overflow-clip'
           }
         >
 
@@ -184,13 +204,17 @@ export default function App() {
               </div>
 
               <motion.div
+                className="flex items-center gap-2 md:gap-3"
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               >
-                <PillButton href="mailto:arbabandjones@gmail.com" className="hidden sm:inline-flex">
-                  get in touch
-                </PillButton>
+                <HeaderControls />
+                {/* A wrapper, because the pill's own `inline-flex` outranks a
+                    `hidden` passed in className — it was showing on phones. */}
+                <span className="hidden sm:block">
+                  <PillButton href="mailto:arbabandjones@gmail.com">get in touch</PillButton>
+                </span>
               </motion.div>
             </header>
           )}
@@ -218,7 +242,7 @@ export default function App() {
                 {route.kind === 'list' && route.view === 'journal' && <Journal />}
                 {route.kind === 'list' && route.view === 'tech' && <Tech />}
                 {route.kind === 'list' && route.view === 'photography' && <Photography />}
-                {route.kind === 'list' && route.view === 'admin' && <Admin setView={setView} />}
+                {route.kind === 'list' && route.view === 'admin' && (Admin ? <Admin setView={setView} /> : <NotFound setView={setView} />)}
                 {route.kind === 'entry' && (
                   <Entry
                     collection={route.collection}
@@ -259,6 +283,12 @@ export default function App() {
 
           {!isAdmin && <FloatingMagicalArrow />}
 
+          {!isAdmin && magicReady && (
+            <Suspense fallback={null}>
+              <MagicLayer />
+            </Suspense>
+          )}
+
           {/* Camera framing marks */}
           {!isAdmin && (
             <>
@@ -271,5 +301,6 @@ export default function App() {
         </div>
       </div>
     </EntryNavigationProvider>
+    </MagicProvider>
   );
 }

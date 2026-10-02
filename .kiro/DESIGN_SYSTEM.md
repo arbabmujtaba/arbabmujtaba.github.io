@@ -8,8 +8,12 @@ older code, this file wins. Verified against the reference screenshots in
 
 - **No literal colours.** No hex, `rgb()`, or `rgba()` in `.tsx`. Use the utilities below. The only
   file allowed to contain colour literals is `src/index.css`.
-- **No new fonts.** Two faces only: Host Grotesk (`font-display`, `font-sans`) and Fragment Mono
-  (`font-mono`). `font-serif` is a legacy alias that resolves to the display face — do not add serifs.
+- **Three faces.** Host Grotesk (`font-display`, `font-sans`), Fragment Mono (`font-mono`), and EB
+  Garamond (`font-book`) — the manuscript voice: the second line of a `StackedHeading`, notes,
+  chapter titles, the hidden layer. `font-serif` is still a legacy alias for the display face.
+- **Two themes.** `[data-theme="day"]` on `<html>` flips every token to paper; `data-surface="ink"`
+  keeps a subtree dark (hero, reels, photo plates, secret rooms). `.manuscript` is paper at any hour.
+  `gilt` is the hidden layer's colour only.
 - **All content is the owner's.** Read from `content/` via `src/lib/cms.ts`. Never invent portfolio
   entries, testimonials, prices, or team members, and never copy the reference site's wording.
 - **Reduced motion and touch.** Every animation checks `useReducedMotion()`. Scroll-linked and
@@ -89,7 +93,7 @@ Section skeleton:
 Rules observed in the reference:
 
 - Eyebrow, then a gap, then the two-line heading; line 1 is `zinc-50`, line 2 is `zinc-400`.
-- Headings are **lowercase**. The only uppercase display type is the hero and footer wordmarks.
+- Headings are sentence case: line 1 grotesk, line 2 book italic (`StackedHeading` does this).
 - Display tracking is tight: `tracking-[-0.05em]` at large sizes.
 - Numbered lists are separated by `border-b border-zinc-800` with generous vertical padding
   (`py-8 md:py-12`), the label on the left and the description right-aligned on desktop.

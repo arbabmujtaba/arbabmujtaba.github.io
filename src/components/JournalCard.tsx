@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Disc3 } from 'lucide-react';
 import SafeImage from './SafeImage';
@@ -56,6 +57,8 @@ function formatDate(date: string): string {
 export default function JournalCard({ entry, variant, onOpen, index = 0 }: JournalCardProps) {
   const shouldReduceMotion = useReducedMotion();
   const isFeatured = variant === 'featured';
+  /** The cover swings open for a moment before the volume is read. */
+  const [opening, setOpening] = useState(false);
 
   const cover = entry.featuredImage || entry.coverImage || DEFAULT_JOURNAL_COVER;
   const date = formatDate(entry.date);
@@ -63,24 +66,35 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
   const hasMusic = !!(music && (music.songTitle || music.songArtist));
   const tags = (entry.tags || []).filter(Boolean).slice(0, isFeatured ? 3 : 2);
 
+  /* The plate is bound like a book: a spine down the left edge with a gilt
+     line, the fore-edge corners softened, and the cover lifts on its spine on
+     hover and swings open on click. */
   const plate = (
-    <div className="image-frame aspect-[4/3] w-full sm:aspect-[16/10]">
+    <motion.div
+      className="image-frame relative aspect-[4/3] w-full rounded-r-[4px] sm:aspect-[16/10]"
+      style={{ transformOrigin: 'left center', transformPerspective: 1400 }}
+      animate={shouldReduceMotion ? undefined : { rotateY: opening ? -32 : 0 }}
+      whileHover={shouldReduceMotion ? undefined : { rotateY: -5 }}
+      transition={{ duration: opening ? 0.42 : 0.6, ease: EASE }}
+    >
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-3 bg-gradient-to-r from-black/55 via-black/20 to-transparent" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-3 left-[7px] z-[2] w-px bg-gilt/60" />
       <SafeImage
         src={cover}
         alt={entry.title}
         loading={isFeatured ? 'eager' : 'lazy'}
         style={getCardImageStyle(entry.customization)}
-        className="h-full w-full object-cover grayscale-[12%] transition-[transform,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
+        className="h-full w-full object-cover grayscale-[12%] transition-[transform,scale,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
         fallback={<div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />}
       />
-    </div>
+    </motion.div>
   );
 
   /* Volume number as the numbered prefix. Display size keeps the accent well
      clear of the small-text contrast floor on the paper surface. */
   const prefix = (
     <span
-      className={`shrink-0 font-display font-medium leading-none tracking-[-0.045em] text-accent ${
+      className={`shrink-0 font-book italic leading-none tracking-[-0.02em] text-accent ${
         isFeatured ? 'text-3xl md:text-5xl' : 'text-3xl'
       }`}
     >
@@ -134,7 +148,15 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
         onClick={(event) => {
           if (!shouldInterceptClick(event)) return;
           event.preventDefault();
-          onOpen(entry);
+          if (shouldReduceMotion) {
+            onOpen(entry);
+            return;
+          }
+          setOpening(true);
+          window.setTimeout(() => {
+            onOpen(entry);
+            setOpening(false);
+          }, 380);
         }}
         aria-label={`Read ${entry.title}`}
         className="group block w-full cursor-pointer text-left"
@@ -151,7 +173,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
                 </span>
               </div>
 
-              <h2 className="mt-5 font-display text-3xl font-medium leading-[0.96] tracking-[-0.05em] text-zinc-50 md:text-4xl lg:text-5xl">
+              <h2 className="mt-5 font-book text-4xl italic leading-[0.98] tracking-[-0.015em] text-zinc-50 md:text-5xl lg:text-6xl">
                 {entry.title}
               </h2>
 
@@ -216,7 +238,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
               {prefix}
 
               <div className="min-w-0 flex-1">
-                <h3 className="font-display text-xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-50 md:text-2xl">
+                <h3 className="font-book text-2xl italic leading-[1.05] tracking-[-0.01em] text-zinc-50 md:text-3xl">
                   {entry.title}
                 </h3>
 

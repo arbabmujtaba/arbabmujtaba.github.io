@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import ContentModal from '../ContentModal';
 import JournalCard from '../JournalCard';
 import FrameCard from '../rushes/FrameCard';
@@ -9,8 +10,17 @@ import { RecLabel } from '../rushes';
 import { getCardImageStyle, getMediaFx } from '../../lib/customization';
 import { MediaFxOverlays } from '../MediaFx';
 import { COLLECTION_LABEL, isDetailCollection } from '../../lib/collections';
-import { destinationFor, STYLED_COLLECTIONS, type PreviewPayload } from './model';
-import type { JournalEntry } from '../../types';
+import {
+  INK_SECTION_LABELS,
+  SECRET_KIND_LABELS,
+  SECRET_ROOM_LABELS,
+  SECRET_TRIGGER_LABELS,
+  categoryLabelFor,
+  destinationFor,
+  STYLED_COLLECTIONS,
+  type PreviewPayload,
+} from './model';
+import type { InkSection, JournalEntry, SecretRoomId, SecretTrigger } from '../../types';
 
 /** Where the admin loads this from, and what it sends it. Shared with LivePreview. */
 export const PREVIEW_FRAME_PATH = '/admin/preview-frame';
@@ -175,9 +185,13 @@ function CardPreview({ payload }: { payload: PreviewPayload }) {
         </div>
       </div>
     );
+  } else if (payload.collection === 'secrets') {
+    card = <SecretCard payload={payload} />;
+  } else if (payload.collection === 'timeline') {
+    card = <TimelineCard payload={payload} />;
   } else if (payload.collection === 'home' && payload.category === 'reel') {
     card = <ReelCard payload={payload} />;
-  } else if (['portfolio', 'tech', 'photography', 'gallery'].includes(payload.collection)) {
+  } else if (['portfolio', 'tech', 'photography'].includes(payload.collection)) {
     card = (
       <div>
         <SectionLabel>{dest?.label} card — as it appears on {dest?.listPath}</SectionLabel>
@@ -259,13 +273,129 @@ function ReelCard({ payload }: { payload: PreviewPayload }) {
   );
 }
 
+/**
+ * A secret, as the hidden layer will show it.
+ *
+ * Deliberately not the real magic components: `src/components/magic/` does not
+ * exist yet, so this draws the shape each kind has — a manuscript leaf for a
+ * room or a note, the revealed copy for an easter egg, and the two-line
+ * marginalia for invisible ink — from the studio's own primitives.
+ */
+function SecretCard({ payload }: { payload: PreviewPayload }) {
+  const kind = payload.kind ?? 'note';
+  const where =
+    kind === 'room' || kind === 'note'
+      ? SECRET_ROOM_LABELS[(payload.room || 'library') as SecretRoomId]
+      : kind === 'egg'
+        ? SECRET_TRIGGER_LABELS[(payload.trigger || 'seal') as SecretTrigger]
+        : INK_SECTION_LABELS[(payload.section || 'hero') as InkSection];
+
+  if (kind === 'ink') {
+    return (
+      <div>
+        <SectionLabel>
+          {SECRET_KIND_LABELS.ink} · {where}
+        </SectionLabel>
+        <div className="relative max-w-xl border border-dashed border-zinc-800 bg-well px-7 py-10">
+          <span className="absolute left-7 top-3 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+            under the light
+          </span>
+          <p
+            className="font-display text-xl leading-snug tracking-[-0.02em]"
+            style={{ color: 'color-mix(in oklab, var(--accent) 60%, #f4f2ed)' }}
+          >
+            {payload.title}
+          </p>
+          {payload.excerpt && <p className="mt-2 font-mono text-[11px] text-zinc-500">{payload.excerpt}</p>}
+        </div>
+        <p className="mt-4 max-w-xl text-[0.75rem] leading-relaxed text-zinc-500">
+          Invisible until a visitor casts light over this part of the page.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <SectionLabel>
+        {SECRET_KIND_LABELS[kind]} · {where}
+      </SectionLabel>
+      <article
+        className="max-w-2xl border border-zinc-800 px-8 py-9 shadow-2xl"
+        style={{ background: 'color-mix(in oklab, var(--bone, #f4f2ed) 94%, #d8cfbd)', color: '#2a2722' }}
+      >
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: '#8a7f6d' }}>
+          {kind === 'egg' ? 'what it reveals' : kind === 'room' ? 'the door' : 'found on the shelf'}
+        </p>
+        <h3 className="mt-3 font-display text-3xl font-medium leading-tight tracking-[-0.035em]">{payload.title}</h3>
+        {payload.excerpt && (
+          <p className="mt-3 font-display text-base italic leading-relaxed" style={{ color: '#5c5346' }}>
+            {payload.excerpt}
+          </p>
+        )}
+        {payload.coverImage && (
+          <div className="my-6 overflow-hidden border" style={{ borderColor: '#cfc4ae' }}>
+            <SafeImage src={payload.coverImage} alt={payload.title} className="block w-full" />
+          </div>
+        )}
+        {payload.body.trim() ? (
+          <div className="mt-6 space-y-4 text-[0.9375rem] leading-[1.75]">
+            <ReactMarkdown>{payload.body}</ReactMarkdown>
+          </div>
+        ) : (
+          <p className="mt-6 font-mono text-[11px]" style={{ color: '#a0947f' }}>
+            no body yet — this is where the manuscript goes
+          </p>
+        )}
+      </article>
+      {payload.visible === false && (
+        <p className="mt-4 max-w-2xl text-[0.75rem] leading-relaxed text-amber-300">
+          Switched off: {kind === 'room' ? 'this room’s door does not work' : kind === 'egg' ? 'this easter egg is disabled' : 'this note is not in its room'}.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** A timeline chapter, with its year and place. */
+function TimelineCard({ payload }: { payload: PreviewPayload }) {
+  return (
+    <div>
+      <SectionLabel>Timeline chapter — on the Home page</SectionLabel>
+      <div className="max-w-2xl border-l-2 border-[var(--accent)] pl-6">
+        <p className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+          <span className="text-[var(--accent)]">{payload.year || '––––'}</span>
+          {payload.place && (
+            <>
+              <span aria-hidden>·</span>
+              <span>{payload.place}</span>
+            </>
+          )}
+          <span aria-hidden>·</span>
+          <span>position {payload.order ?? 0}</span>
+        </p>
+        <h3 className="mt-3 font-display text-2xl font-medium leading-tight tracking-[-0.035em] text-zinc-100">
+          {payload.title}
+        </h3>
+        {payload.excerpt && <p className="mt-3 text-sm font-light leading-relaxed text-zinc-400">{payload.excerpt}</p>}
+        {payload.body.trim() && (
+          <div className="mt-4 text-sm font-light leading-relaxed text-zinc-500">
+            <ReactMarkdown>{payload.body}</ReactMarkdown>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function TextBlockCard({ payload }: { payload: PreviewPayload }) {
   const dest = destinationFor(payload.collection);
+  const categoryName = categoryLabelFor(payload.collection, payload.category);
   return (
     <div>
       <SectionLabel>
         {dest?.label}
-        {payload.category && payload.category !== dest?.fixedCategory ? ` · ${payload.category}` : ''}
+        {categoryName && payload.category !== dest?.fixedCategory ? ` · ${categoryName}` : ''}
       </SectionLabel>
       <div className="max-w-2xl border border-zinc-800 bg-canvas-raised p-8">
         {payload.coverImage && (

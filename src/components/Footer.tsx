@@ -1,5 +1,6 @@
 import { Github, Instagram, Linkedin, Mail, Twitter } from 'lucide-react';
 import { ImageTypeMask, RecLabel } from './rushes';
+import WaxSeal from './magic/WaxSeal';
 
 /* ------------------------------------------------------------------ */
 /*  SOCIAL LINKS CONFIG                                                */
@@ -73,10 +74,10 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <RecLabel>contact</RecLabel>
 
-          <h2 className="mt-7 font-display text-4xl font-medium lowercase leading-[0.95] tracking-[-0.05em] text-zinc-50 md:text-6xl">
-            the way to
+          <h2 className="mt-7 font-display text-4xl font-medium leading-[0.95] tracking-[-0.05em] text-zinc-50 md:text-6xl">
+            The way to
             <br />
-            <span className="text-zinc-400">reach me</span>
+            <span className="font-book font-normal italic tracking-[-0.02em] text-zinc-400">reach me</span>
           </h2>
 
           <p className="mt-7 max-w-md text-sm font-light leading-relaxed text-zinc-400">
@@ -100,24 +101,29 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
         </div>
       </div>
 
-      <ImageTypeMask
-        text="ARBAB."
-        image={wordmarkImage}
-        className="mt-20 md:mt-28"
-      />
+      <div data-surface="ink">
+        <ImageTypeMask
+          text="ARBAB."
+          image={wordmarkImage}
+          className="mt-20 md:mt-28"
+        />
+      </div>
 
       <div className="px-4 pb-10 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 gap-12 border-t border-zinc-800 pt-12 md:grid-cols-12">
           <div className="md:col-span-6">
-            <p className="max-w-sm font-display text-2xl font-medium lowercase leading-[1.1] tracking-[-0.04em] text-zinc-100 md:text-3xl">
-              an archive still
+            <p className="max-w-sm font-book text-3xl italic leading-[1.05] tracking-[-0.01em] text-zinc-100 md:text-4xl">
+              An archive still
               <br />
               being written.
             </p>
+            <div className="mt-8">
+              <WaxSeal />
+            </div>
 
             <div className="mt-10 space-y-1.5 font-mono text-[10px] lowercase tracking-[0.08em] text-zinc-400">
               <p>© {new Date().getFullYear()} arbab mujtaba. all rights reserved.</p>
-              <p>computer engineering, iet davv — srinagar &amp; indore.</p>
+              <p>computer engineering, iet davv — sopore &amp; indore.</p>
               {/* Release mark. Bump alongside the version in package.json and the git tag. */}
               <p className="flex items-center gap-2 pt-1 text-zinc-500">
                 <span

@@ -11,7 +11,17 @@
  */
 
 import { pruneCustomization } from '../../lib/customization';
-import type { PostCustomization } from '../../types';
+import {
+  INK_SECTIONS,
+  SECRET_KINDS,
+  SECRET_ROOMS,
+  SECRET_TRIGGERS,
+  type InkSection,
+  type PostCustomization,
+  type SecretKind,
+  type SecretRoomId,
+  type SecretTrigger,
+} from '../../types';
 
 // ---------------------------------------------------------------------------
 // Website structure
@@ -26,7 +36,7 @@ export type CollectionId =
   | 'favorites'
   | 'timeline'
   | 'home'
-  | 'gallery';
+  | 'secrets';
 
 export interface Destination {
   collection: CollectionId;
@@ -118,7 +128,10 @@ export const WEBSITE_STRUCTURE: Section[] = [
         collection: 'portfolio',
         label: 'Case study',
         blurb: 'Project case studies on the Portfolio page.',
-        categories: ['Web Development', 'Systems', 'Embedded & DSP', 'Audio Engineering', 'Design', 'Other'],
+        // The Portfolio page groups by tech stack, not by category: nothing on
+        // the site reads a `category` for a project, so the admin no longer
+        // offers one (it used to write a field that was never read).
+        categories: [],
         listPath: '/portfolio',
         hasPage: true,
       },
@@ -132,18 +145,34 @@ export const WEBSITE_STRUCTURE: Section[] = [
       {
         collection: 'home',
         label: 'Home block',
-        blurb: 'Gateways, quotes, principles, the profile and reels on the landing page.',
-        categories: ['gateway', 'quote', 'principle', 'profile', 'section', 'reel'],
+        blurb: 'Archive doors, notes, principles, the profile and reels on the landing page.',
+        categories: ['gateway', 'quote', 'principle', 'profile', 'section', 'reel', 'thought'],
         categoryLabel: 'Block type',
         listPath: '/',
         hasPage: false,
       },
       {
         collection: 'timeline',
-        label: 'Timeline milestone',
-        blurb: 'A milestone on the Home page timeline.',
-        categories: ['Milestone'],
-        fixedCategory: 'Milestone',
+        label: 'Timeline chapter',
+        blurb: 'A chapter on the Home page timeline — a year, a place and a few lines.',
+        categories: [],
+        listPath: '/',
+        hasPage: false,
+      },
+    ],
+  },
+  {
+    id: 'secrets',
+    label: 'Hidden layer',
+    isConfig: true,
+    destinations: [
+      {
+        collection: 'secrets',
+        label: 'Secret',
+        blurb:
+          'Secret rooms, hidden notes, easter-egg copy and invisible-ink marginalia. Hidden is not private: everything published here ships inside the public site bundle and can be read in the browser’s network panel.',
+        categories: SECRET_KINDS,
+        categoryLabel: 'Kind',
         listPath: '/',
         hasPage: false,
       },
@@ -174,8 +203,123 @@ export const MOTION_COLLECTIONS: CollectionId[] = ['journal', 'tech', 'photograp
 /** Collections shown with the full page renderer, and therefore with the style studio. */
 export const STYLED_COLLECTIONS: CollectionId[] = ['journal', 'tech', 'photography', 'portfolio'];
 
+/**
+ * Collections that are fragments of a page rather than documents — they have an
+ * `order` and a `visible` switch instead of a date and a URL of their own.
+ * Derived from the structure so a new one is never missed.
+ */
+export const isSnippetCollection = (collection: string): boolean =>
+  destinationFor(collection)?.hasPage === false;
+
+/**
+ * Home blocks are stored by their raw `configType`. These are what an author
+ * should read instead (the raw value is still what gets written).
+ */
+export const HOME_BLOCK_LABELS: Record<string, string> = {
+  gateway: 'Archive door',
+  quote: 'Note (last notes)',
+  principle: 'Principle',
+  profile: 'Profile',
+  reel: 'Reel',
+  thought: 'Thought',
+  section: 'Section',
+};
+
+/** Plain-words description of where a home block appears. */
+export const HOME_BLOCK_WHERE: Record<string, string> = {
+  gateway: 'the archive doors that lead to the other pages',
+  quote: 'the “last notes” band',
+  principle: 'the principles list',
+  profile: 'the profile section',
+  reel: 'the “frames that keep moving” strip',
+  thought: 'the random-thought drawer',
+  section: 'a section of the landing page',
+};
+
+/** What each secret kind is, in one line. */
+export const SECRET_KIND_LABELS: Record<SecretKind, string> = {
+  room: 'Secret room',
+  note: 'Hidden note',
+  egg: 'Easter egg',
+  ink: 'Invisible ink',
+};
+
+export const SECRET_KIND_HELP: Record<SecretKind, string> = {
+  room: 'Configures one secret room — its name, its one-line intro, and whether its door works at all.',
+  note: 'A hidden manuscript shown inside one of the rooms. The body is the note; the description signs it.',
+  egg: 'The copy one easter egg reveals. Switching it off disables that easter egg entirely.',
+  ink: 'Marginalia on the home page, readable only under the wand’s light. The title is the handwritten line.',
+};
+
+export const SECRET_ROOM_LABELS: Record<SecretRoomId, string> = {
+  library: 'The Restricted Section (library)',
+  darkroom: 'The Darkroom',
+  details: 'The Room of Small Details',
+};
+
+/** How a visitor sets each easter egg off. Shown next to the trigger picker. */
+export const SECRET_TRIGGER_LABELS: Record<SecretTrigger, string> = {
+  seal: 'Wax seal — seven clicks',
+  constellation: 'Constellation — seven stars',
+  fullstop: 'The full stop after the name',
+  lumos: 'Lumos — casting light',
+  alohomora: 'Alohomora — the hidden shelf',
+  console: 'Developer console',
+};
+
+export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
+  seal: 'Clicking the wax seal in the footer seven times.',
+  constellation: 'Connecting the seven bright stars in the hero sky, in night mode.',
+  fullstop: 'Clicking the full stop after the name with the wand.',
+  lumos: 'Casting light with the wand, or typing “lumos”.',
+  alohomora: 'Typing “alohomora”, which opens the hidden shelf.',
+  console: 'A message printed to the browser’s devtools console.',
+};
+
+export const INK_SECTION_LABELS: Record<InkSection, string> = {
+  hero: 'Hero — the opening screen',
+  frames: 'Frames — the photography strip',
+  work: 'Work — the project index',
+  writing: 'Writing — the journal pull',
+  timeline: 'Timeline — the chapters',
+  notes: 'Notes — the last-notes band',
+  archive: 'Archive — the doors at the foot of the page',
+};
+
+/** What the `visible` switch does, in the author's words, per collection and kind. */
+export function visibilityLabel(collection: CollectionId, kind?: string): { label: string; hint: string } {
+  if (collection === 'secrets') {
+    switch (kind) {
+      case 'room':
+        return { label: 'Room open', hint: 'Off disables this room’s door — visitors cannot reach it at all.' };
+      case 'egg':
+        return { label: 'Easter egg switched on', hint: 'Off switches this easter egg off entirely, trigger and all.' };
+      case 'ink':
+        return { label: 'Ink shows under the light', hint: 'Off removes this marginalia from the page.' };
+      default:
+        return { label: 'Note on the shelf', hint: 'Off keeps the note out of its room.' };
+    }
+  }
+  return { label: 'Show on site', hint: 'Off hides it without deleting it.' };
+}
+
+/** Suggestions for a timeline chapter's place. Any text is accepted. */
+export const PLACE_SUGGESTIONS = ['Sopore', 'Indore'];
+
 export const prettyCategory = (value: string): string =>
   value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
+
+/**
+ * How a category should read in the UI. Home blocks and secrets store machine
+ * values (`gateway`, `ink`); everywhere they are shown to a person they get a
+ * human label, while the raw value is still what is written to disk.
+ */
+export function categoryLabelFor(collection: string, value: string): string {
+  if (!value) return '';
+  if (collection === 'home') return HOME_BLOCK_LABELS[value] ?? prettyCategory(value);
+  if (collection === 'secrets') return SECRET_KIND_LABELS[value as SecretKind] ?? prettyCategory(value);
+  return prettyCategory(value);
+}
 
 export function slugify(text: string): string {
   return text
@@ -214,6 +358,11 @@ export interface ListItem {
   label?: string;
   order?: number;
   featured?: boolean;
+  /** Secrets only: the kind is also mirrored into `category`. */
+  kind?: string;
+  room?: string;
+  trigger?: string;
+  section?: string;
   unsavedChanges?: boolean;
   publishedAt?: string;
 }
@@ -270,6 +419,8 @@ export interface FormState {
   order: number;
   visible: boolean;
   year: string;
+  /** Timeline: where the chapter happened. Free text; Sopore / Indore are offered. */
+  place: string;
   icon: string;
   link: string;
   group: string;
@@ -279,6 +430,10 @@ export interface FormState {
   text: string;
   variant: string;
   specs: string[];
+  // secrets — `category` carries the kind, these carry the rest
+  room: SecretRoomId | '';
+  trigger: SecretTrigger | '';
+  section: InkSection | '';
   customization: PostCustomization;
 }
 
@@ -314,6 +469,7 @@ export function emptyForm(collection: CollectionId, category?: string): FormStat
     order: 0,
     visible: true,
     year: '',
+    place: '',
     icon: '',
     link: '',
     group: '',
@@ -323,6 +479,9 @@ export function emptyForm(collection: CollectionId, category?: string): FormStat
     text: '',
     variant: 'quote',
     specs: [],
+    room: collection === 'secrets' ? 'library' : '',
+    trigger: collection === 'secrets' ? 'seal' : '',
+    section: collection === 'secrets' ? 'hero' : '',
     customization: {},
   };
 }
@@ -351,6 +510,11 @@ function stringList(value: unknown, split?: RegExp): string[] {
 
 const str = (value: unknown): string => (typeof value === 'string' ? value : value == null ? '' : String(value));
 
+/** Narrow a front-matter value to one of a closed list, or '' when it is not one. */
+function oneOf<T extends string>(value: unknown, allowed: readonly T[]): T | '' {
+  return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : '';
+}
+
 export function formFromDoc(
   collection: CollectionId,
   slug: string,
@@ -358,6 +522,11 @@ export function formFromDoc(
   body: string
 ): FormState {
   const form = emptyForm(collection);
+  // A secret's kind lives in `kind`; everything else uses `category` / `configType`.
+  const category =
+    collection === 'secrets'
+      ? oneOf<SecretKind>(data.kind, SECRET_KINDS) || 'note'
+      : str(data.category || data.configType) || form.category;
   return {
     ...form,
     isNew: false,
@@ -365,7 +534,7 @@ export function formFromDoc(
     slug,
     slugTouched: true,
     title: str(data.title || data.label),
-    category: str(data.category || data.configType) || form.category,
+    category,
     date: str(data.date instanceof Date ? data.date.toISOString().split('T')[0] : data.date),
     cover: str(data.featuredImage || data.coverImage || data.projectImage || data.image),
     video: str(data.video),
@@ -386,6 +555,7 @@ export function formFromDoc(
     order: typeof data.order === 'number' ? data.order : 0,
     visible: data.visible !== false,
     year: str(data.year),
+    place: str(data.place),
     icon: str(data.icon),
     link: str(data.link),
     group: str(data.group),
@@ -395,19 +565,32 @@ export function formFromDoc(
     text: str(data.text),
     variant: str(data.variant) || 'quote',
     specs: stringList(data.specs),
+    room: oneOf<SecretRoomId>(data.room, SECRET_ROOMS) || (category === 'room' || category === 'note' ? 'library' : ''),
+    trigger: oneOf<SecretTrigger>(data.trigger, SECRET_TRIGGERS) || (category === 'egg' ? 'seal' : ''),
+    section: oneOf<InkSection>(data.section, INK_SECTIONS) || (category === 'ink' ? 'hero' : ''),
     customization: (data.customization as PostCustomization) || {},
   };
 }
 
-/** The one place a form becomes front-matter. */
+/**
+ * The one place a form becomes front-matter.
+ *
+ * Only the keys the public reader (`lib/cms.ts`, `lib/secrets.ts`) actually
+ * looks at are written. This used to add `category`, `date` and `excerpt` to
+ * every collection, which put three dead keys into every gear, favourite,
+ * timeline and home file each time one was saved — and made it look as though
+ * the admin's category picker meant something for a portfolio project.
+ */
 export function serializeForm(form: FormState): { data: Record<string, any>; body: string } {
   const c = form.collection;
-  const data: Record<string, any> = {
-    title: form.title.trim(),
-    category: form.category,
-    date: form.date || today(),
-    excerpt: form.excerpt || '',
-  };
+  const data: Record<string, any> = { title: form.title.trim() };
+
+  // `category` is only read for these; see cms.ts.
+  if (['journal', 'tech', 'photography', 'gear', 'favorites'].includes(c)) data.category = form.category;
+  // A date is only shown for the four document collections.
+  if (STYLED_COLLECTIONS.includes(c)) data.date = form.date || today();
+  // `excerpt` is the card line for written entries; everything else uses `description`.
+  if (['journal', 'tech'].includes(c)) data.excerpt = form.excerpt || '';
 
   switch (c) {
     case 'portfolio':
@@ -435,6 +618,7 @@ export function serializeForm(form: FormState): { data: Record<string, any>; bod
     case 'timeline':
       data.year = form.year;
       data.description = form.excerpt;
+      if (form.place.trim()) data.place = form.place.trim();
       data.order = form.order;
       data.visible = form.visible;
       break;
@@ -450,21 +634,31 @@ export function serializeForm(form: FormState): { data: Record<string, any>; bod
       data.configType = form.category;
       data.label = form.label;
       data.description = form.excerpt;
-      data.image = form.cover;
-      data.author = form.author;
-      data.text = form.text;
-      data.variant = form.variant;
-      data.navTarget = form.navTarget;
+      if (form.cover.trim()) data.image = form.cover.trim();
+      if (form.author.trim()) data.author = form.author.trim();
+      if (form.text.trim()) data.text = form.text.trim();
+      if (form.category === 'quote' && form.variant.trim()) data.variant = form.variant.trim();
+      // The site builds the link as `/${navTarget}`, so a leading slash would
+      // produce a protocol-relative URL (`//journal`) and leave the site.
+      if (form.navTarget.trim()) data.navTarget = form.navTarget.trim().replace(/^\/+/, '');
       data.order = form.order;
       data.visible = form.visible;
       break;
-    case 'gallery':
-      data.image = form.cover;
-      data.description = form.excerpt;
-      data.featured = form.featured;
+    case 'secrets': {
+      // The kind is its own key — never `category`.
+      const kind = (form.category || 'note') as SecretKind;
+      data.kind = kind;
+      // Only the field that kind uses, so a note never carries a stale trigger.
+      if (kind === 'room' || kind === 'note') data.room = form.room || 'library';
+      if (kind === 'egg') data.trigger = form.trigger || 'seal';
+      if (kind === 'ink') data.section = form.section || 'hero';
+      data.description = form.excerpt || '';
+      if (form.date.trim()) data.date = form.date.trim();
+      if (form.cover.trim()) data.image = form.cover.trim();
       data.order = form.order;
       data.visible = form.visible;
       break;
+    }
     case 'journal': {
       data.featuredImage = form.cover;
       if (form.readingTime.trim()) data.readingTime = form.readingTime.trim();
@@ -521,6 +715,16 @@ export interface PreviewPayload {
   tags?: string[];
   label?: string;
   techStack?: string[];
+  /** Secrets: which kind of secret, and the one field that kind uses. */
+  kind?: SecretKind;
+  room?: SecretRoomId | '';
+  trigger?: SecretTrigger | '';
+  section?: InkSection | '';
+  /** Timeline: the year and the place. */
+  year?: string;
+  place?: string;
+  order?: number;
+  visible?: boolean;
   metadata: {
     githubLink?: string;
     liveLink?: string;
@@ -557,6 +761,14 @@ export function previewPayloadFromForm(form: FormState, view: PreviewView, repla
     tags: form.tags,
     label: form.label || undefined,
     techStack: form.techStack,
+    kind: form.collection === 'secrets' ? ((form.category || 'note') as SecretKind) : undefined,
+    room: form.room,
+    trigger: form.trigger,
+    section: form.section,
+    year: form.year || undefined,
+    place: form.place || undefined,
+    order: form.order,
+    visible: form.visible,
     metadata: {
       githubLink: form.githubLink || undefined,
       liveLink: form.liveLink || undefined,

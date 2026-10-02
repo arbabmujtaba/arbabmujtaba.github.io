@@ -214,10 +214,58 @@ export interface TimelineMilestone {
   slug: string;
   year: string;
   description: string;
+  /** Where the chapter happened — `Sopore`, `Indore`, … Drives the memory map. */
+  place?: string;
   order: number;
   visible: boolean;
   body: string;
   customization?: PostCustomization;
+}
+
+// ============================================================
+// THE HIDDEN LAYER — content/secrets/*.md
+// ============================================================
+
+/**
+ * What a secret is.
+ *  - `room`  configures one secret room (its title, intro line, and whether its door works at all)
+ *  - `note`  a hidden manuscript shown inside a room
+ *  - `egg`   the message an easter egg reveals; `visible: false` switches the egg off
+ *  - `ink`   invisible-ink marginalia, readable only under the wand's Lumos light
+ */
+export type SecretKind = 'room' | 'note' | 'egg' | 'ink';
+
+/** The three secret rooms. */
+export type SecretRoomId = 'library' | 'darkroom' | 'details';
+
+/** The easter eggs implemented in code. A secret of kind `egg` supplies the copy for one. */
+export type SecretTrigger = 'seal' | 'constellation' | 'fullstop' | 'lumos' | 'alohomora' | 'console';
+
+/** Sections of the home page that can carry invisible-ink marginalia. */
+export type InkSection = 'hero' | 'frames' | 'work' | 'writing' | 'timeline' | 'notes' | 'archive';
+
+export const SECRET_KINDS: SecretKind[] = ['note', 'egg', 'ink', 'room'];
+export const SECRET_ROOMS: SecretRoomId[] = ['library', 'darkroom', 'details'];
+export const SECRET_TRIGGERS: SecretTrigger[] = ['seal', 'constellation', 'fullstop', 'lumos', 'alohomora', 'console'];
+export const INK_SECTIONS: InkSection[] = ['hero', 'frames', 'work', 'writing', 'timeline', 'notes', 'archive'];
+
+export interface SecretEntry {
+  title: string;
+  slug: string;
+  kind: SecretKind;
+  /** kind `room` / `note`: which room. */
+  room?: SecretRoomId;
+  /** kind `egg`: which easter egg this copy belongs to. */
+  trigger?: SecretTrigger;
+  /** kind `ink`: which home section the marginalia sits in. */
+  section?: InkSection;
+  /** One line: a room's intro, a note's signature, an egg's subtitle. */
+  description: string;
+  date?: string;
+  image?: string;
+  order: number;
+  visible: boolean;
+  body: string;
 }
 
 export interface FavoriteItem {
@@ -247,7 +295,7 @@ export interface HomeConfigEntry {
    * `reel` is a short clip on the home page — the one block that moves on its
    * own. Everything else is a still composition.
    */
-  configType: "gateway" | "quote" | "principle" | "profile" | "section" | "reel";
+  configType: "gateway" | "quote" | "principle" | "profile" | "section" | "reel" | "thought";
   /** For interlude blocks (configType "quote"): which visual template to render. */
   variant?: "quote" | "statement" | "marquee" | "stat";
   label?: string;

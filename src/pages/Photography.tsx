@@ -17,6 +17,8 @@ import { detailPath } from '../lib/collections';
 import { useOpenEntry } from '../lib/entryNavigation';
 import { shouldInterceptClick } from '../lib/navigation';
 import { useMediaQuery } from '../lib/useMediaQuery';
+import { useMagic } from '../lib/magic';
+import { isRoomEnabled } from '../lib/secrets';
 import type { GearItem, PhotographyEntry } from '../types';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -173,8 +175,13 @@ export default function Photography() {
   const shouldReduceMotion = useReducedMotion();
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const shouldParallax = !shouldReduceMotion && !isTouchDevice;
+  const { wand, openRoom } = useMagic();
+  const darkroom = useMemo(() => isRoomEnabled('darkroom'), []);
+  /** With the wand out, the lead photograph is a passage, not a print. */
+  const leadIsPassage = wand && darkroom;
 
-  const { scrollY } = useScroll({ container: containerRef });
+  // The window scrolls, not the inner box (see FloatingMagicalArrow).
+  const { scrollY } = useScroll();
   const leadImageY = useTransform(scrollY, [0, 800], ['0%', '8%']);
 
   // Load from CMS
@@ -373,7 +380,18 @@ export default function Photography() {
             <span aria-hidden="true" className="text-zinc-700">
               /
             </span>
-            <span>darkroom open</span>
+            {darkroom ? (
+              <button
+                type="button"
+                onClick={() => openRoom('darkroom')}
+                data-enchanted="darkroom"
+                className="uppercase tracking-[0.2em] text-zinc-500 underline-offset-4 transition-colors hover:text-alarm hover:underline focus-visible:text-alarm focus-visible:outline-none"
+              >
+                darkroom open
+              </button>
+            ) : (
+              <span>darkroom closed</span>
+            )}
           </motion.p>
         </div>
 
@@ -391,8 +409,11 @@ export default function Photography() {
                 onClick={(event) => {
                   if (!shouldInterceptClick(event)) return;
                   event.preventDefault();
-                  handleOpen(leadPhoto);
+                  if (leadIsPassage) openRoom('darkroom');
+                  else handleOpen(leadPhoto);
                 }}
+                data-enchanted={leadIsPassage ? 'passage' : undefined}
+                aria-label={leadIsPassage ? `${leadPhoto.title} — a passage behind the print` : undefined}
                 className="group block w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 <div className="image-frame w-full overflow-hidden aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]">
@@ -417,6 +438,19 @@ export default function Photography() {
                       }
                     />
                   </motion.div>
+
+                  {/* Under the wand, a seam of red light shows round the print's
+                      edge — the way into the darkroom. */}
+                  {leadIsPassage && (
+                    <motion.span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 z-[5]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 1.2 }}
+                      style={{ boxShadow: 'inset 0 0 0 1px rgba(194, 46, 31, 0.7), inset 0 0 90px rgba(194, 46, 31, 0.35)' }}
+                    />
+                  )}
 
                   {/* Legibility band only — the frame itself stays unmuted. */}
                   <div

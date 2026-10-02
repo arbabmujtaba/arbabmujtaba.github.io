@@ -252,8 +252,9 @@ export function getTimelineMilestones(): TimelineMilestone[] {
     return {
       title: data.title || "Untitled",
       slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
-      year: data.year || "",
+      year: data.year ? String(data.year) : "",
       description: data.description || "",
+      place: data.place ? String(data.place) : undefined,
       order: typeof data.order === 'number' ? data.order : 0,
       visible: data.visible !== false,
       body: content || "",

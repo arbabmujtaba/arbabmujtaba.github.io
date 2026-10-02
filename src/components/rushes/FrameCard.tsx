@@ -24,6 +24,8 @@ interface FrameCardProps {
   className?: string;
   /** The entry's customization — the card honours its focal point. */
   customization?: PostCustomization;
+  /** Short labels that rise over the plate on hover (always shown on touch). */
+  overlay?: string[];
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -49,6 +51,7 @@ export default function FrameCard({
   priority = false,
   className = '',
   customization,
+  overlay,
 }: FrameCardProps) {
   const shouldReduceMotion = useReducedMotion();
   const interactive = typeof onClick === 'function';
@@ -61,11 +64,23 @@ export default function FrameCard({
           alt={title}
           loading={priority ? 'eager' : 'lazy'}
           style={getCardImageStyle(customization)}
-          className="h-full w-full object-cover opacity-90 transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
+          className="h-full w-full object-cover opacity-90 transition-[opacity,transform,scale] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
           fallback={
             <div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />
           }
         />
+        {overlay && overlay.length > 0 && (
+          <span
+            aria-hidden="true"
+            className="reveal-on-hover pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-3 flex-wrap gap-1.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12 opacity-0 transition-[opacity,translate] duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+          >
+            {overlay.map((label) => (
+              <span key={label} className="rounded-full border border-white/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/90">
+                {label}
+              </span>
+            ))}
+          </span>
+        )}
       </div>
 
       <div className="mt-4 flex items-start justify-between gap-4">

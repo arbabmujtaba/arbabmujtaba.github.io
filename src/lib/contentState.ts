@@ -102,7 +102,11 @@ export class ContentNotFoundError extends Error {
 
 const REGISTRY_FILENAME = 'content-state.json';
 const CONTENT_DIR = path.join(process.cwd(), 'content');
-const SUPPORTED_COLLECTIONS = ['journal', 'tech', 'photography', 'portfolio', 'gear', 'timeline', 'favorites', 'home', 'gallery'];
+/**
+ * Must match COLLECTIONS in server.ts. `secrets` is the hidden layer; `gallery`
+ * was removed because nothing on the site ever read it.
+ */
+const SUPPORTED_COLLECTIONS = ['journal', 'tech', 'photography', 'portfolio', 'gear', 'timeline', 'favorites', 'home', 'secrets'];
 
 /**
  * Valid state transitions map
@@ -273,10 +277,16 @@ export async function scanContentDir(): Promise<ContentItem[]> {
       const stamp =
         parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : now;
 
+      // The front-matter slug wins, exactly as lib/cms.ts resolves it, and the
+      // id must agree with it — it used to be built from the file name, so a
+      // file whose front-matter declared a different slug got an id and a slug
+      // that disagreed.
+      const resolvedSlug = data.slug || slug;
+
       items.push({
-        id: generateId(collection, slug),
+        id: generateId(collection, resolvedSlug),
         collection,
-        slug: data.slug || slug,
+        slug: resolvedSlug,
         title: data.title || data.label || 'Untitled',
         state: 'published', // Existing files are live, so they are published
         versions: [{ version: 1, state: 'published', timestamp: stamp }],

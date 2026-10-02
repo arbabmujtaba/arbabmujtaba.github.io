@@ -52,6 +52,10 @@ interface ContentModalProps {
     captureMode?: string;
   };
   customization?: PostCustomization;
+  /** The journal's reading treatment: a drop cap on the first paragraph. */
+  dropCap?: boolean;
+  /** Rendered after the body and gallery — the journal's end-of-volume mark. */
+  afterBody?: ReactNode;
   /** Short clip or GIF rendered above the cover, with its own controls. */
   video?: string;
   videoPoster?: string;
@@ -269,6 +273,8 @@ export default function ContentModal({
   videoPoster,
   variant = 'overlay',
   forceMotion = false,
+  dropCap = false,
+  afterBody,
 }: ContentModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const isPage = variant === 'page';
@@ -521,64 +527,67 @@ export default function ContentModal({
         </Block>
       )}
 
-      {/* Project Specific Links/Tags if available */}
+      {/* Project spec sheet — stack, links and status, set like the colophon
+          of a printed case study. Only fields the entry actually has. */}
       {metadata && (metadata.githubLink || metadata.liveLink || (metadata.techStack && metadata.techStack.length > 0)) && (
         <Block plan={reveal} index={nextIndex()}>
-          <div className="p-6 border border-zinc-900 bg-zinc-950/40 rounded-sm grid grid-cols-1 md:grid-cols-2 gap-8">
+          <dl className="grid grid-cols-1 border-y border-zinc-800 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             {metadata.techStack && metadata.techStack.length > 0 && (
-              <div>
-                <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3 flex items-center gap-1.5">
-                  <Tag className="w-3 h-3 text-zinc-600" />
-                  Technologies
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {metadata.techStack.map((tech, idx) => (
-                    <span key={idx} className="font-mono text-xs text-zinc-300 bg-zinc-900 border border-zinc-800/40 px-2.5 py-1 rounded">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
+              <div className="py-6 sm:pr-8">
+                <dt className="mb-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                  <Tag className="h-3 w-3" aria-hidden="true" />
+                  built with
+                </dt>
+                <dd>
+                  <ol className="flex flex-wrap gap-x-5 gap-y-3">
+                    {metadata.techStack.map((tech, idx) => (
+                      <li key={tech} className="flex items-baseline gap-2">
+                        <span className="font-mono text-[10px] text-accent">{String(idx + 1).padStart(2, '0')}</span>
+                        <span className="font-display text-lg font-medium tracking-[-0.02em] text-zinc-100">{tech}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </dd>
               </div>
             )}
 
-            {(metadata.githubLink || metadata.liveLink) && (
-              <div>
-                <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
-                  Project Resources
-                </h4>
-                <div className="flex flex-col gap-2">
-                  {metadata.githubLink && (
-                    <a
-                      href={metadata.githubLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group"
-                    >
-                      GitHub Repository
-                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
-                  )}
-                  {metadata.liveLink && (
-                    <a
-                      href={metadata.liveLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-sans text-xs text-zinc-400 hover:text-orange-500 flex items-center gap-1.5 transition-colors group"
-                    >
-                      Launch Direct Showcase
-                      <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            <div className="border-t border-zinc-800 py-6 sm:border-l sm:border-t-0 sm:pl-8">
+              <dt className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">where it lives</dt>
+              <dd className="flex flex-col gap-1">
+                {metadata.githubLink && (
+                  <a
+                    href={metadata.githubLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group inline-flex min-h-[40px] items-center justify-between gap-3 border-b border-zinc-800 font-display text-base text-zinc-100 transition-colors hover:border-accent hover:text-accent"
+                  >
+                    Source on GitHub
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                )}
+                {metadata.liveLink && (
+                  <a
+                    href={metadata.liveLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group inline-flex min-h-[40px] items-center justify-between gap-3 border-b border-zinc-800 font-display text-base text-zinc-100 transition-colors hover:border-accent hover:text-accent"
+                  >
+                    Open the live build
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                )}
+                {!metadata.githubLink && !metadata.liveLink && (
+                  <span className="font-book text-lg italic text-zinc-400">Not published online — the write-up below is the record.</span>
+                )}
+              </dd>
+            </div>
+          </dl>
         </Block>
       )}
 
       {/* Markdown Content Parser */}
       <Block plan={reveal} index={nextIndex()}>
-        <div className={`markdown-body pt-4 border-t border-zinc-900 ${textAlignClass}`}>
+        <div className={`markdown-body pt-4 border-t border-zinc-900 ${dropCap ? 'drop-cap' : ''} ${textAlignClass}`}>
           <Markdown
             components={{
               img: ({ src, alt, ...rest }) => (
@@ -641,6 +650,8 @@ export default function ContentModal({
           </div>
         </Block>
       )}
+
+      {afterBody}
     </>
   );
 

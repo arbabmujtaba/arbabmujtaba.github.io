@@ -15,6 +15,7 @@ import {
 import { getLiveEditBridgeScript } from '../lib/liveEditBridge';
 import { mapElementToContent, type ClickedElementPayload, type MappedElement, type ContentItem } from '../lib/elementMapper';
 import type { ToastType } from './Toast';
+import { ConfirmDialog } from './admin/ui';
 
 // Types
 interface CMSItem {
@@ -48,13 +49,63 @@ const PAGE_OPTIONS = [
   { value: '/portfolio', label: 'Portfolio' },
 ];
 
+/**
+ * WHICH FRONT-MATTER KEY A FIELD IS
+ *
+ * The inspector names a field in the abstract ("coverImage", "excerpt"), but
+ * every collection stores it under a different key — see `lib/cms.ts`. The save
+ * used to write `coverImage` and `excerpt` for all of them, so editing a
+ * portfolio project's image (`projectImage`) or a photo story's description
+ * (`description`) wrote a key nothing reads: the toast said "Updated", the file
+ * changed, and the site did not. A journal cover was worse — `featuredImage`
+ * wins over `coverImage` in the reader, so the edit was silently shadowed.
+ */
+const COVER_KEY: Record<string, string> = {
+  journal: 'featuredImage',
+  portfolio: 'projectImage',
+  photography: 'coverImage',
+  tech: 'coverImage',
+  gear: 'image',
+  favorites: 'image',
+  home: 'image',
+  secrets: 'image',
+};
+
+const EXCERPT_KEY: Record<string, string> = {
+  journal: 'excerpt',
+  tech: 'excerpt',
+  photography: 'description',
+  portfolio: 'description',
+  gear: 'description',
+  favorites: 'description',
+  timeline: 'description',
+  home: 'description',
+  secrets: 'description',
+};
+
+/** The key a mapped field writes to for one collection. */
+export function frontMatterKeyFor(collection: string, field: string): string | null {
+  switch (field) {
+    case 'title':
+      return 'title';
+    case 'coverImage':
+      return COVER_KEY[collection] ?? 'coverImage';
+    case 'excerpt':
+      return EXCERPT_KEY[collection] ?? 'excerpt';
+    default:
+      return null;
+  }
+}
+
 interface LiveEditorProps {
   content: CMSItem[];
   onNavigateToEditor: (item: CMSItem) => void;
   onToast: (type: ToastType, msg: string) => void;
+  /** Hand a started publishing job to the shell's progress dialog. */
+  onPublish?: (jobId: string) => void;
 }
 
-export default function LiveEditor({ content, onNavigateToEditor, onToast }: LiveEditorProps) {
+export default function LiveEditor({ content, onNavigateToEditor, onToast, onPublish }: LiveEditorProps) {
   // State
   const [currentPage, setCurrentPage] = useState('/');
   const [viewportMode, setViewportMode] = useState<ViewportMode>('desktop');
@@ -69,6 +120,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
 
   // Server connectivity state
   const [serverAvailable, setServerAvailable] = useState(true);
@@ -238,14 +290,19 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
       if (!res.ok) throw new Error('Failed to fetch content');
       const doc = await res.json();
 
-      // Update the specific field
+      // Update the specific field, under the key this collection really uses.
       const updatedData = { ...doc.data };
-      if (mappedElement.field === 'title') {
-        updatedData.title = editValue;
-      } else if (mappedElement.field === 'excerpt') {
-        updatedData.excerpt = editValue;
-      } else if (mappedElement.field === 'coverImage') {
-        updatedData.coverImage = editValue;
+      if (mappedElement.field === 'body') {
+        // The body is not front matter; it is replaced below.
+      } else {
+        const key = frontMatterKeyFor(mappedElement.collection, mappedElement.field);
+        if (!key) throw new Error(`Nothing to write for field "${mappedElement.field}".`);
+        updatedData[key] = editValue;
+        // `coverImage` is the journal's legacy alias for `featuredImage`; keep
+        // the two together so the reader cannot show the stale one.
+        if (mappedElement.collection === 'journal' && key === 'featuredImage' && 'coverImage' in updatedData) {
+          updatedData.coverImage = editValue;
+        }
       }
 
       const body = mappedElement.field === 'body' ? editValue : doc.body;
@@ -283,6 +340,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
 
   // Publish
   const handlePublish = async () => {
+    setConfirmPublish(false);
     if (!mappedElement) {
       onToast('error', 'Select a content item before publishing.');
       return;
@@ -317,7 +375,11 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
         throw new Error(errBody?.error || `Publish failed (HTTP ${publishRes.status})`);
       }
       const data = await publishRes.json();
-      onToast('success', data.message || 'Publishing started successfully!');
+      // Hand the job to the shell so the publishing dialog shows the eleven
+      // steps. This used to report `data.message`, which /api/publish never
+      // returns, so a push ran with no progress and no way to see it fail.
+      if (data.jobId && onPublish) onPublish(data.jobId);
+      else onToast('success', 'Publishing started.');
     } catch (err) {
       console.error('Publish error:', err);
       onToast('error', err instanceof Error ? err.message : 'Failed to publish.');
@@ -653,7 +715,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
                             Full Editor
                           </button>
                           <button
-                            onClick={handlePublish}
+                            onClick={() => setConfirmPublish(true)}
                             disabled={isPublishing || !serverAvailable}
                             className="flex-1 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all rounded-sm font-sans text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -714,6 +776,23 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast }: Liv
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Publishing pushes to GitHub and redeploys the public site, so it asks
+          first — everywhere else in the studio does. */}
+      <ConfirmDialog
+        open={confirmPublish}
+        title="Publish to the live site?"
+        message={
+          <>
+            This commits <span className="font-mono text-zinc-200">{mappedElement?.collection}/{mappedElement?.slug}</span> as it
+            stands on disk and pushes it, so GitHub Pages redeploys. Unsaved edits in the panel are not included — save
+            them first.
+          </>
+        }
+        confirmLabel="Publish"
+        onConfirm={handlePublish}
+        onCancel={() => setConfirmPublish(false)}
+      />
     </div>
   );
 }

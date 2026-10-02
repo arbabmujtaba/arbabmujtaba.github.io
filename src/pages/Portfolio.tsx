@@ -175,7 +175,8 @@ export default function Portfolio() {
                   title={project.title}
                   image={image}
                   index={String(index + 1).padStart(2, '0')}
-                  tag={techList(project.techStack)[0]}
+                  tag={project.featured ? 'featured' : techList(project.techStack)[0]}
+                  overlay={techList(project.techStack)}
                   excerpt={project.description}
                   aspect="aspect-[4/3] sm:aspect-[16/10]"
                   priority={index === 0}

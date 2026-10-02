@@ -74,21 +74,18 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
         {/* sheets underneath */}
         <span
           aria-hidden="true"
-          data-surface="bone"
-          className="absolute inset-0 translate-x-3 translate-y-4 rotate-[3.2deg] rounded-[3px] bg-canvas-deep opacity-50 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)]"
+          className="manuscript absolute inset-0 translate-x-3 translate-y-4 rotate-[3.2deg] rounded-[2px] opacity-45 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)]"
         />
         <span
           aria-hidden="true"
-          data-surface="bone"
-          className="absolute inset-0 -translate-x-2 translate-y-2 -rotate-[1.8deg] rounded-[3px] bg-canvas-deep opacity-75 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)]"
+          className="manuscript absolute inset-0 -translate-x-2 translate-y-2 -rotate-[1.8deg] rounded-[2px] opacity-70 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)]"
         />
 
         <AnimatePresence mode="popLayout" initial={false} custom={direction}>
           <motion.figure
             key={note.id}
             custom={direction}
-            data-surface="bone"
-            className="film-grain relative min-h-[22rem] overflow-hidden rounded-[3px] bg-canvas px-7 pb-10 pt-14 text-zinc-100 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.85)] md:min-h-[26rem] md:px-12 md:pb-12 md:pt-16"
+            className="manuscript relative min-h-[22rem] overflow-hidden rounded-[2px] px-7 pb-10 pt-14 text-zinc-100 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.85)] md:min-h-[26rem] md:px-12 md:pb-12 md:pt-16"
             initial={
               shouldReduceMotion
                 ? { opacity: 0 }
@@ -127,12 +124,12 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
             />
 
             <div className="relative flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-              <span>note {String(active + 1).padStart(2, '0')}</span>
+              <span>leaf {String(active + 1).padStart(2, '0')}</span>
               <span>of {String(count).padStart(2, '0')}</span>
             </div>
 
             <blockquote className="relative mt-8">
-              <p className="font-display text-[1.75rem] font-medium leading-[1.12] tracking-[-0.04em] text-zinc-50 md:text-[2.6rem]">
+              <p className="font-book text-[2rem] italic leading-[1.12] tracking-[-0.015em] text-zinc-50 md:text-[2.9rem]">
                 {words.map((word, i) => (
                   <motion.span
                     key={`${note.id}-${i}`}
@@ -155,7 +152,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                   transition={{ duration: 0.7, delay: 0.35 + words.length * 0.065, ease: EASE }}
                 >
                   {note.aside && (
-                    <span className="text-sm font-light leading-relaxed text-zinc-300 md:text-base">{note.aside}</span>
+                    <span className="font-book text-lg leading-relaxed text-zinc-300 md:text-xl">{note.aside}</span>
                   )}
                   <svg
                     aria-hidden="true"

@@ -5,7 +5,7 @@ navTarget: tech
 configType: gateway
 label: "03 // Engineer"
 description: "A living lab of experiments, notes, architecture sketches, and problems worth opening twice."
-image: "/uploads/photography/1782620995136-322083290.jpg"
+image: "/uploads/photography/1782621000816-524714599.jpg"
 order: 3
 visible: true
 ---

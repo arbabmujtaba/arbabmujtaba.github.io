@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
 import { useMediaQuery } from '../lib/useMediaQuery';
+import { useMagic } from '../lib/magic';
 
 /** Spring for the dot that stays close to the pointer. */
 const TIP = { stiffness: 620, damping: 34, mass: 0.35 };
@@ -39,7 +40,9 @@ export default function CursorWand() {
   const haloX = useSpring(x, HALO);
   const haloY = useSpring(y, HALO);
 
-  const disabled = shouldReduceMotion || isTouchDevice;
+  // The real wand draws its own trail; the follower steps aside while it is out.
+  const { wand } = useMagic();
+  const disabled = shouldReduceMotion || isTouchDevice || wand;
 
   useEffect(() => {
     if (disabled) return;

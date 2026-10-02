@@ -25,9 +25,15 @@ export { default as ReelShowcase } from './ReelShowcase';
 export { default as PhotoShuffle } from './PhotoShuffle';
 export { default as ProjectIndex } from './ProjectIndex';
 export { default as Notebook } from './Notebook';
-export { default as SoftTimeline } from './SoftTimeline';
+
 export { default as LastNotes } from './LastNotes';
 export type { NotebookItem } from './Notebook';
 export type { Note } from './LastNotes';
 export type { AccordionEntry } from './Accordion';
 export type { QuoteEntry } from './QuotePanel';
+export { default as ChapterTimeline } from './ChapterTimeline';
+export { default as MemoryMap } from './MemoryMap';
+export { default as LivingJournal } from './LivingJournal';
+export { default as ThoughtDrawer } from './ThoughtDrawer';
+export { default as Bookshelf } from './Bookshelf';
+export { default as ArchiveDoor } from './ArchiveDoor';

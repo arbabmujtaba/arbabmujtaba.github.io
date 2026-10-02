@@ -137,7 +137,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                       <SafeImage
                         src={reel.videoPoster || reel.image}
                         alt=""
-                        className={`h-full w-full object-cover transition-[transform,opacity,filter] duration-700 ease-out group-hover:scale-[1.04] ${
+                        className={`h-full w-full object-cover transition-[transform,scale,opacity,filter] duration-700 ease-out group-hover:scale-[1.04] ${
                           selected ? 'opacity-100' : 'opacity-60 grayscale-[40%] group-hover:opacity-100 group-hover:grayscale-0'
                         }`}
                         fallback={<span className="hairline-grid block h-full w-full bg-well" />}

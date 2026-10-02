@@ -173,3 +173,19 @@ is legally required, but provenance is recorded here.
 
 Replace any of these with an owner frame by dropping the photograph into `public/uploads/` through
 `/admin` and repointing `projectImage`; nothing else needs to change.
+
+## Addendum 2026-10-02 — gateway plates re-assigned
+
+The "Ways into the archive" doors were showing frames that did not match their section: a desk with
+jewellery for Portfolio, a bonfire for Journal, headphones for Tech, a sunset for Photography.
+Each now shows a frame whose subject *is* the section (all existing owner photographs, all with
+derivatives):
+
+| Door | File | Why |
+|---|---|---|
+| Portfolio | `/uploads/home/1781841191101-361910064.jpeg` | laptop with code open beside handwritten notes — the work itself |
+| Journal | `/uploads/photography/1790615960036-605841172.webp` | the owner alone on a hillside, looking up — reflection |
+| Tech | `/uploads/photography/1782621000816-524714599.jpg` | lit keyboard, desk at night — the lab |
+| Photography | `/uploads/photography/1789991526702-360529747.webp` | hands on a bus rail through amber glass — a witnessed frame |
+
+The doors render inside `data-surface="ink"`, so the plates stay on dark mounts in day mode.

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import ContentModal from './ContentModal';
+import EndOfVolume from './magic/EndOfVolume';
 import type { DetailCollection } from '../lib/collections';
 import { getDetailEntry } from '../lib/entries';
 
@@ -39,6 +40,8 @@ export default function QuickLook({ collection, slug, onClose }: QuickLookProps)
       video={entry.video}
       videoPoster={entry.videoPoster}
       customization={entry.customization}
+      dropCap={collection === 'journal'}
+      afterBody={collection === 'journal' ? <EndOfVolume /> : undefined}
     />
   );
 }

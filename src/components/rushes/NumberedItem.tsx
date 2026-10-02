@@ -69,7 +69,7 @@ export default function NumberedItem({
         {number}
       </span>
 
-      <span className="min-w-0 flex-1 font-display text-2xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-200 transition-[color,transform] duration-500 group-hover/item:translate-x-1.5 group-hover/item:text-zinc-50 group-focus-visible/item:text-zinc-50 md:text-4xl lg:text-5xl">
+      <span className="min-w-0 flex-1 font-display text-2xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-200 transition-[color,transform,translate] duration-500 group-hover/item:translate-x-1.5 group-hover/item:text-zinc-50 group-focus-visible/item:text-zinc-50 md:text-4xl lg:text-5xl">
         {label}
       </span>
 

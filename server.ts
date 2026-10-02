@@ -32,6 +32,10 @@ const HOST = '127.0.0.1';
  * CANONICAL COLLECTION LIST
  * Single source of truth for every route that maps user input onto a directory.
  * Anything not in this list is rejected before it reaches the filesystem.
+ *
+ * `gallery` used to be here: an empty directory that `lib/cms.ts` never read,
+ * with no destination in the admin's WEBSITE_STRUCTURE, so anything filed there
+ * was invisible on the site and had a blank "Where & publish" tab. Removed.
  */
 const COLLECTIONS = [
   'journal',
@@ -42,7 +46,7 @@ const COLLECTIONS = [
   'timeline',
   'favorites',
   'home',
-  'gallery'
+  'secrets'
 ] as const;
 
 // Uploads may additionally land in a shared bucket for un-scoped media.
@@ -82,6 +86,42 @@ function resolveInside(baseDir: string, ...segments: string[]): string | null {
   const target = path.resolve(base, ...segments);
   if (target !== base && !target.startsWith(base + path.sep)) return null;
   return target;
+}
+
+/**
+ * THE SLUG A DOCUMENT ANSWERS TO
+ *
+ * A markdown file's front-matter `slug` is what the public site uses for its
+ * URL (`cms.ts`: `data.slug || <filename>`), and it is allowed to differ from
+ * the file name — four files in this repository do differ. Every single-document
+ * route here, though, built its path straight from the slug, so those four
+ * entries 404'd: the admin listed them with their front-matter slug and then
+ * could not open, save, delete or preview any of them ("This entry could not be
+ * opened").
+ *
+ * This resolves a slug the way a reader would: the file of that name if it
+ * exists, otherwise the file in that collection whose front-matter claims the
+ * slug. Returns null when neither exists.
+ */
+async function resolveDocPath(collection: string, slug: string): Promise<string | null> {
+  const colDir = resolveInside(CONTENT_DIR, collection);
+  if (!colDir) return null;
+
+  const direct = resolveInside(colDir, `${slug}.md`);
+  if (direct && (await fs.pathExists(direct))) return direct;
+
+  if (!(await fs.pathExists(colDir))) return null;
+  for (const file of await fs.readdir(colDir)) {
+    if (!file.endsWith('.md')) continue;
+    const candidate = path.join(colDir, file);
+    try {
+      const { data } = matter(await fs.readFile(candidate, 'utf-8')) as { data: Record<string, any> };
+      if (data.slug === slug) return candidate;
+    } catch {
+      // A file that will not parse cannot claim a slug.
+    }
+  }
+  return null;
 }
 
 /**
@@ -345,6 +385,58 @@ app.post(
 );
 
 /**
+ * GET /api/uploads
+ * The media library: what is already in `public/uploads`, per folder.
+ *
+ * The admin promised a media library ("uploaded images stay in the media
+ * library") but had no way to read one — every cover had to be re-uploaded or
+ * its path typed by hand, even when the file was already in the repository.
+ *
+ * Optional `?collection=` narrows it to one folder. Derivatives under
+ * `uploads/optimized/` are left out: they are generated files, never a choice.
+ */
+app.get('/api/uploads', async (req, res) => {
+  try {
+    const only = req.query.collection;
+    if (only !== undefined && !isValidUploadCollection(only)) {
+      return res.status(400).json({ error: INVALID_COLLECTION_MESSAGE });
+    }
+    const folders = only ? [String(only)] : [...UPLOAD_COLLECTIONS];
+
+    const MEDIA_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, ...ALLOWED_MOTION_EXTENSIONS]);
+    const out: { collection: string; files: { url: string; name: string; bytes: number; modified: string; kind: 'image' | 'video' }[] }[] = [];
+
+    for (const folder of folders) {
+      const dir = resolveInside(UPLOADS_DIR, folder);
+      if (!dir || !(await fs.pathExists(dir))) continue;
+
+      const files: { url: string; name: string; bytes: number; modified: string; kind: 'image' | 'video' }[] = [];
+      for (const name of await fs.readdir(dir)) {
+        const ext = path.extname(name).toLowerCase();
+        if (!MEDIA_EXTENSIONS.has(ext)) continue;
+        const full = path.join(dir, name);
+        const stat = await fs.stat(full).catch(() => null);
+        if (!stat || !stat.isFile()) continue;
+        files.push({
+          url: `/uploads/${folder}/${name}`,
+          name,
+          bytes: stat.size,
+          modified: stat.mtime.toISOString(),
+          kind: ['.mp4', '.webm', '.gif'].includes(ext) ? 'video' : 'image',
+        });
+      }
+      // Newest first: the file you just uploaded is the one you want.
+      files.sort((a, b) => b.modified.localeCompare(a.modified));
+      if (files.length) out.push({ collection: folder, files });
+    }
+
+    res.json({ folders: out, total: out.reduce((sum, folder) => sum + folder.files.length, 0) });
+  } catch (error: any) {
+    fail(res, error, 'GET /api/uploads');
+  }
+});
+
+/**
  * GET /api/uploads/optimization
  * Background WebP queue state, so the admin can show conversion as it happens
  * rather than leaving it invisible.
@@ -432,9 +524,16 @@ app.get('/api/content', async (req, res) => {
         allItems.push({
           collection: col,
           slug,
+          /**
+           * The file this entry lives in. `slug` is the address the site uses
+           * (front-matter wins), and the two are allowed to differ.
+           */
+          fileSlug: file.replace('.md', ''),
           title: data.title || data.label || 'Untitled',
           date: data.date || '',
-          category: data.category || data.configType || '',
+          // A secret's kind is its category as far as the admin is concerned,
+          // so the existing category filters and labels work unchanged.
+          category: col === 'secrets' ? data.kind || 'note' : data.category || data.configType || '',
           featured: !!data.featured,
           coverImage: data.coverImage || data.featuredImage || data.projectImage || data.image || '',
           excerpt: data.excerpt || data.description || '',
@@ -451,6 +550,11 @@ app.get('/api/content', async (req, res) => {
           configType: data.configType || '',
           label: data.label || '',
           order: typeof data.order === 'number' ? data.order : undefined,
+          // The hidden layer: which room / trigger / home section this belongs to.
+          kind: col === 'secrets' ? data.kind || 'note' : undefined,
+          room: col === 'secrets' ? data.room || undefined : undefined,
+          trigger: col === 'secrets' ? data.trigger || undefined : undefined,
+          section: col === 'secrets' ? data.section || undefined : undefined,
           unsavedChanges: registryItem?.unsavedChanges || false,
           publishedAt: registryItem?.publishedAt
         });
@@ -516,12 +620,9 @@ app.get('/api/content/:collection', validateContentParams, async (req, res) => {
 app.get('/api/content/:collection/:slug', validateContentParams, async (req, res) => {
   try {
     const { collection, slug } = req.params;
-    const filePath = resolveInside(CONTENT_DIR, collection, `${slug}.md`);
-    if (!filePath) {
-      return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
-    }
+    const filePath = await resolveDocPath(collection, slug);
 
-    if (!(await fs.pathExists(filePath))) {
+    if (!filePath) {
       return res.status(404).json({ error: `File not found at content/${collection}/${slug}.md` });
     }
 
@@ -531,11 +632,13 @@ app.get('/api/content/:collection/:slug', validateContentParams, async (req, res
     res.json({
       collection,
       slug,
+      /** The file this slug resolved to, which may not be `<slug>.md`. */
+      fileSlug: path.basename(filePath, '.md'),
       data,
       body: content
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    fail(res, error, `GET /api/content/${req.params.collection}/${req.params.slug}`);
   }
 });
 
@@ -641,13 +744,8 @@ app.get('/preview/:collection/:slug', async (req, res) => {
       return res.status(400).send(errorPage('400', 'Invalid slug.'));
     }
 
-    const filePath = resolveInside(CONTENT_DIR, collection, `${slug}.md`);
+    const filePath = await resolveDocPath(collection, slug);
     if (!filePath) {
-      res.set('Content-Type', 'text/html');
-      return res.status(400).send(errorPage('400', 'Invalid content path.'));
-    }
-
-    if (!(await fs.pathExists(filePath))) {
       return res.status(404).send(errorPage('404', 'Content not found.'));
     }
 
@@ -898,19 +996,21 @@ app.put('/api/content', async (req, res) => {
     }
 
     const colDir = resolveInside(CONTENT_DIR, collection);
-    const sourcePath = colDir && resolveInside(colDir, `${slug}.md`);
-    if (!colDir || !sourcePath) {
-      return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
+    const sourcePath = await resolveDocPath(collection, slug);
+    if (!colDir) {
+      return res.status(400).json({ error: INVALID_COLLECTION_MESSAGE });
     }
 
-    if (!(await fs.pathExists(sourcePath))) {
+    if (!sourcePath) {
       return res.status(404).json({ error: `Original file does not exist at content/${collection}/${slug}.md` });
     }
 
+    // The file this slug lives in, which is not necessarily `<slug>.md`.
+    const sourceFileSlug = path.basename(sourcePath, '.md');
     let finalSlug = slug;
     let targetPath = sourcePath;
 
-    if (newSlug && slugify(newSlug) !== slug) {
+    if (newSlug && slugify(newSlug) !== sourceFileSlug) {
       finalSlug = slugify(newSlug);
       if (!isValidSlug(finalSlug)) {
         return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
@@ -939,15 +1039,18 @@ app.put('/api/content', async (req, res) => {
     const existingItem = await getItem(collection, slug);
     if (existingItem) {
       existingItem.slug = finalSlug;
+      // The id is `collection/slug`; leaving it on the old slug made the
+      // registry disagree with itself after a rename.
+      existingItem.id = `${collection}/${finalSlug}`;
       existingItem.title = data.title || existingItem.title;
-      existingItem.filePath = `content/${collection}/${finalSlug}.md`;
+      existingItem.filePath = `content/${collection}/${path.basename(targetPath)}`;
       existingItem.updatedAt = new Date().toISOString();
       await saveItem(existingItem);
     }
 
     res.json({ success: true, slug: finalSlug, filePath: targetPath });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    fail(res, error, 'PUT /api/content');
   }
 });
 
@@ -970,19 +1073,16 @@ app.delete('/api/content', async (req, res) => {
       return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
     }
 
-    const filePath = resolveInside(CONTENT_DIR, collection, `${slug}.md`);
+    const filePath = await resolveDocPath(collection, slug);
     if (!filePath) {
-      return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
-    }
-    if (!(await fs.pathExists(filePath))) {
       return res.status(404).json({ error: `File not found at content/${collection}/${slug}.md` });
     }
 
     await fs.remove(filePath);
-    await deleteItem(collection, slug);
+    await deleteItem(collection, slug).catch(() => undefined);
     res.json({ success: true, message: `Successfully deleted content ${slug}` });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    fail(res, error, 'DELETE /api/content');
   }
 });
 
@@ -990,18 +1090,15 @@ app.delete('/api/content', async (req, res) => {
 app.delete('/api/content/:collection/:slug', validateContentParams, async (req, res) => {
   try {
     const { collection, slug } = req.params;
-    const filePath = resolveInside(CONTENT_DIR, collection, `${slug}.md`);
+    const filePath = await resolveDocPath(collection, slug);
     if (!filePath) {
-      return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
-    }
-    if (!(await fs.pathExists(filePath))) {
       return res.status(404).json({ error: `File not found` });
     }
     await fs.remove(filePath);
-    await deleteItem(collection, slug);
+    await deleteItem(collection, slug).catch(() => undefined);
     res.json({ success: true, message: 'Deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    fail(res, error, `DELETE /api/content/${req.params.collection}/${req.params.slug}`);
   }
 });
 

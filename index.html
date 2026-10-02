@@ -13,8 +13,22 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap"
     />
+    <script>
+      // Day or night before the first paint, so the page never flashes the
+      // wrong surface. Mirrors resolveTheme() in src/lib/magic.tsx.
+      (function () {
+        try {
+          var pref = localStorage.getItem('archive.theme') || 'night';
+          var h = new Date().getHours();
+          var theme = pref === 'day' || pref === 'night' ? pref : h >= 6 && h < 18 ? 'day' : 'night';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'night');
+        }
+      })();
+    </script>
 
     <title>Arbab Mujtaba — Archive</title>
 

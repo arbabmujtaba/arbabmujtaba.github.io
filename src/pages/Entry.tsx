@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import AppLink from '../components/AppLink';
 import ContentModal from '../components/ContentModal';
 import Footer from '../components/Footer';
+import EndOfVolume from '../components/magic/EndOfVolume';
 import NotFound from './NotFound';
 import { RecLabel } from '../components/rushes';
 import { COLLECTION_LABEL, type DetailCollection } from '../lib/collections';
@@ -95,6 +96,8 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
             video={entry.video}
             videoPoster={entry.videoPoster}
             customization={entry.customization}
+            dropCap={collection === 'journal'}
+            afterBody={collection === 'journal' ? <EndOfVolume /> : undefined}
           />
         </article>
 

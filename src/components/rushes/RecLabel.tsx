@@ -10,6 +10,9 @@ interface RecLabelProps {
   /** Hide the recording dot. */
   quiet?: boolean;
   className?: string;
+  /** Makes the tally light a (discreet) button — used by the darkroom door. */
+  onDot?: () => void;
+  dotLabel?: string;
 }
 
 /**
@@ -26,6 +29,8 @@ export default function RecLabel({
   bright = false,
   quiet = false,
   className = '',
+  onDot,
+  dotLabel = 'A red light',
 }: RecLabelProps) {
   const shouldReduceMotion = useReducedMotion();
 
@@ -35,7 +40,23 @@ export default function RecLabel({
         bright ? 'text-zinc-100' : 'text-zinc-400'
       } ${lowercase ? '' : 'uppercase'} ${className}`}
     >
-      {!quiet && (
+      {!quiet && onDot && (
+        <button
+          type="button"
+          onClick={onDot}
+          aria-label={dotLabel}
+          data-enchanted="safelight"
+          className="-m-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-alarm"
+        >
+          <motion.span
+            aria-hidden="true"
+            className="inline-block h-2 w-2 rounded-full bg-alarm"
+            animate={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </button>
+      )}
+      {!quiet && !onDot && (
         <motion.span
           aria-hidden="true"
           className="inline-block h-2 w-2 shrink-0 rounded-full bg-alarm"

@@ -18,29 +18,47 @@ import {
 } from 'lucide-react';
 import { getGearItems } from '../../lib/cms';
 import { useMediaQuery } from '../../lib/useMediaQuery';
-import type { PostCustomization } from '../../types';
+import {
+  INK_SECTIONS,
+  SECRET_ROOMS,
+  SECRET_TRIGGERS,
+  type InkSection,
+  type PostCustomization,
+  type SecretKind,
+  type SecretRoomId,
+  type SecretTrigger,
+} from '../../types';
 import { createDoc, deleteDoc, getDoc, setState, startPublish, updateDoc, uploadFile } from './api';
 import { DestinationPanel } from './DestinationPanel';
 import { ImageCropper } from './ImageCropper';
 import { LivePreview } from './LivePreview';
 import { ClipField, MediaField, type Notify } from './MediaField';
 import {
+  INK_SECTION_LABELS,
   MOTION_COLLECTIONS,
+  PLACE_SUGGESTIONS,
+  SECRET_KIND_HELP,
+  SECRET_ROOM_LABELS,
+  SECRET_TRIGGER_HELP,
+  SECRET_TRIGGER_LABELS,
   STYLED_COLLECTIONS,
+  categoryLabelFor,
   destinationFor,
   emptyForm,
   fingerprint,
   formFromDoc,
+  isSnippetCollection,
   publicPath,
   serializeForm,
   slugify,
+  visibilityLabel,
   type CollectionId,
   type FormState,
   type ListItem,
   type WorkflowState,
 } from './model';
 import { StyleStudio } from './StyleStudio';
-import { ConfirmDialog, Field, Group, SavedTick, Segmented, StandingBadge, TagInput, Toggle } from './ui';
+import { ConfirmDialog, Field, Group, SavedTick, StandingBadge, TagInput, Toggle } from './ui';
 
 export type EditorMode =
   | { kind: 'edit'; collection: CollectionId; slug: string }
@@ -587,23 +605,69 @@ export function EntryEditor({
   const dest = destinationFor(form.collection);
   const styled = STYLED_COLLECTIONS.includes(form.collection);
   const reel = form.collection === 'home' && form.category === 'reel';
+  const secret = form.collection === 'secrets';
+  const secretKind = (form.category || 'note') as SecretKind;
+  // A secret has no cover, no clip and no style studio — only an optional image.
   const motion = MOTION_COLLECTIONS.includes(form.collection);
-  const isConfig = ['gear', 'favorites', 'timeline', 'home', 'gallery'].includes(form.collection);
+  const isConfig = isSnippetCollection(form.collection);
   const customization = form.customization;
   const setCustomization = (next: PostCustomization) => patch({ customization: next });
 
   const tabs: { id: TabId; label: string }[] = [
     { id: 'content', label: 'Content' },
-    { id: 'media', label: 'Media' },
+    { id: 'media', label: secret ? 'Image' : 'Media' },
     ...(styled || reel ? [{ id: 'style' as TabId, label: reel ? 'Effects' : 'Style' }] : []),
     { id: 'publish', label: 'Where & publish' },
     ...(wide ? [] : [{ id: 'preview' as TabId, label: 'Preview' }]),
   ];
   const activeTab = tabs.some((entry) => entry.id === tab) ? tab : 'content';
 
-  const excerptLabel =
-    form.collection === 'portfolio' ? 'Short description' : ['journal', 'tech'].includes(form.collection) ? 'Excerpt' : 'Description';
+  const titleLabel = secret
+    ? secretKind === 'ink'
+      ? 'The handwritten line'
+      : secretKind === 'room'
+        ? 'Room name'
+        : secretKind === 'egg'
+          ? 'What it reveals (heading)'
+          : 'Note title'
+    : form.collection === 'home'
+      ? form.category === 'quote' || form.category === 'thought'
+        ? 'The line itself'
+        : 'Title (internal name)'
+      : 'Title';
+
+  const excerptLabel = secret
+    ? secretKind === 'ink'
+      ? 'Second line (small)'
+      : secretKind === 'room'
+        ? 'One-line intro'
+        : secretKind === 'egg'
+          ? 'Subtitle'
+          : 'Signature line'
+    : form.collection === 'portfolio'
+      ? 'Short description'
+      : ['journal', 'tech'].includes(form.collection)
+        ? 'Excerpt'
+        : form.collection === 'home' && (form.category === 'quote' || form.category === 'thought')
+          ? 'Source / aside'
+          : 'Description';
+
+  const bodyLabel = secret
+    ? secretKind === 'ink'
+      ? 'Body (not used for ink)'
+      : secretKind === 'room'
+        ? 'Intro paragraph'
+        : secretKind === 'egg'
+          ? 'The copy it reveals'
+          : 'The note'
+    : form.collection === 'photography'
+      ? 'Story'
+      : isConfig
+        ? 'Details (optional)'
+        : 'Body';
+
   const coverLabel = form.collection === 'portfolio' ? 'Project image' : form.collection === 'photography' ? 'Cover photograph' : 'Cover image';
+  const visibility = visibilityLabel(form.collection, form.category);
 
   const address = publicPath(form.collection, form.slug || '…');
 
@@ -620,7 +684,9 @@ export function EntryEditor({
         </button>
         <div className="min-w-0 flex-1">
           <p className="st-eyebrow">
-            {dest?.label ?? form.collection} · {form.isNew ? 'new' : 'editing'}
+            {dest?.label ?? form.collection}
+            {(secret || form.collection === 'home') && form.category ? ` · ${categoryLabelFor(form.collection, form.category)}` : ''} ·{' '}
+            {form.isNew ? 'new' : 'editing'}
           </p>
           <h1 className="st-title truncate text-lg">{form.title || form.label || 'Untitled'}</h1>
         </div>
@@ -692,7 +758,7 @@ export function EntryEditor({
             <div className="st-scroll min-h-0 flex-1 overflow-y-auto px-5 py-5">
               {activeTab === 'content' && (
                 <div className="space-y-6">
-                  <Field label={form.collection === 'home' ? 'Title (internal name)' : 'Title'} htmlFor="entry-title">
+                  <Field label={titleLabel} htmlFor="entry-title">
                     <input
                       id="entry-title"
                       className="st-input !h-12 !text-lg"
@@ -722,8 +788,8 @@ export function EntryEditor({
                         )}
                       </div>
                     </Field>
-                    {styled && (
-                      <Field label="Date">
+                    {(styled || secret) && (
+                      <Field label="Date" hint={secret ? 'Optional.' : undefined}>
                         <input type="date" className="st-input" value={form.date} onChange={(event) => patch({ date: event.target.value })} />
                       </Field>
                     )}
@@ -735,27 +801,35 @@ export function EntryEditor({
 
                   <CollectionFields form={form} patch={patch} gearSuggestions={gearSuggestions} />
 
-                  <Field label={form.collection === 'photography' ? 'Story' : isConfig ? 'Details (optional)' : 'Body'}>
-                    <MarkdownBox
-                      value={form.body}
-                      onChange={(body) => patch({ body })}
-                      collection={form.collection}
-                      notify={notify}
-                      rows={isConfig ? 6 : 18}
-                    />
-                  </Field>
+                  {!(secret && secretKind === 'ink') && (
+                    <Field label={bodyLabel}>
+                      <MarkdownBox
+                        value={form.body}
+                        onChange={(body) => patch({ body })}
+                        collection={form.collection}
+                        notify={notify}
+                        rows={isConfig ? 6 : 18}
+                      />
+                    </Field>
+                  )}
                 </div>
               )}
 
               {activeTab === 'media' && (
                 <div className="space-y-6">
                   <MediaField
-                    label={coverLabel}
+                    label={secret ? 'Image (optional)' : coverLabel}
                     value={form.cover}
                     onChange={(cover) => patch({ cover })}
                     collection={form.collection}
                     notify={notify}
-                    hint={reel ? 'Optional — the poster below is used when this is empty.' : undefined}
+                    hint={
+                      reel
+                        ? 'Optional — the poster below is used when this is empty.'
+                        : secret
+                          ? 'Shown with the note or the room, if the hidden layer has a place for it.'
+                          : undefined
+                    }
                   />
 
                   {styled && form.cover && !/\.(mp4|webm)(\?|$)/i.test(form.cover) && (
@@ -820,13 +894,20 @@ export function EntryEditor({
                       <Toggle checked={form.published} onChange={(published) => patch({ published })} label="Show on site" hint="Off keeps the entry out of the Journal even after it is published." />
                     )}
                     {isConfig && (
-                      <Toggle checked={form.visible} onChange={(visible) => patch({ visible })} label="Show on site" hint="Off hides it without deleting it." />
+                      <Toggle checked={form.visible} onChange={(visible) => patch({ visible })} label={visibility.label} hint={visibility.hint} />
                     )}
                     {form.collection === 'portfolio' && (
                       <Toggle checked={form.featured} onChange={(featured) => patch({ featured })} label="Featured" hint="Pinned to the top of the Portfolio." />
                     )}
                     {!isConfig && form.collection !== 'journal' && form.collection !== 'portfolio' && (
                       <p className="text-[0.75rem] text-zinc-500">This entry shows on the site as soon as it is published.</p>
+                    )}
+                    {secret && (
+                      <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[0.75rem] leading-relaxed text-amber-200">
+                        Hidden is not private. Whatever you publish here is bundled into the public site exactly like
+                        the rest of <span className="font-mono">content/</span> — a visitor can read it in the browser’s
+                        network panel without finding the door. Switching it off is the only way to keep it off the site.
+                      </p>
                     )}
                   </Group>
 
@@ -977,11 +1058,40 @@ function CollectionFields({
       );
     case 'timeline':
       return (
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Year">
-            <input className="st-input" value={form.year} placeholder="2024" onChange={(event) => patch({ year: event.target.value })} />
-          </Field>
-          <NumberField label="Order" value={form.order} onChange={(order) => patch({ order })} />
+        <div className="space-y-5">
+          <div className="grid grid-cols-3 gap-4">
+            <Field label="Year">
+              <input className="st-input" value={form.year} placeholder="2024" onChange={(event) => patch({ year: event.target.value })} />
+            </Field>
+            <Field label="Place" hint="Where the chapter happened. Any text works.">
+              <input
+                className="st-input"
+                list="timeline-places"
+                value={form.place}
+                placeholder="Sopore"
+                onChange={(event) => patch({ place: event.target.value })}
+              />
+              <datalist id="timeline-places">
+                {PLACE_SUGGESTIONS.map((place) => (
+                  <option key={place} value={place} />
+                ))}
+              </datalist>
+            </Field>
+            <NumberField label="Order" value={form.order} onChange={(order) => patch({ order })} />
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="st-eyebrow mr-1">quick add</span>
+            {PLACE_SUGGESTIONS.filter((place) => place !== form.place).map((place) => (
+              <button
+                key={place}
+                type="button"
+                className="st-chip cursor-pointer !bg-transparent transition-colors hover:!border-[var(--accent)] hover:!text-[var(--accent)]"
+                onClick={() => patch({ place })}
+              >
+                {place}
+              </button>
+            ))}
+          </div>
         </div>
       );
     case 'favorites':
@@ -1001,46 +1111,132 @@ function CollectionFields({
           <NumberField label="Order" value={form.order} onChange={(order) => patch({ order })} />
         </div>
       );
+    case 'secrets':
+      return <SecretFields form={form} patch={patch} />;
     case 'home':
       return (
         <div className="space-y-5">
-          <Field label={form.category === 'reel' ? 'Caption' : 'Label'} hint={form.category === 'reel' ? 'Shown under the reel on the Home page.' : undefined}>
+          <Field
+            label={form.category === 'reel' ? 'Caption' : 'Label'}
+            hint={
+              form.category === 'reel'
+                ? 'Shown under the reel on the Home page.'
+                : form.category === 'gateway'
+                  ? 'The small line above the door, e.g. “02 // Thinker”.'
+                  : undefined
+            }
+          >
             <input className="st-input" value={form.label} onChange={(event) => patch({ label: event.target.value })} />
           </Field>
           {form.category === 'quote' && (
-            <>
-              <Field label="Quote text">
-                <textarea className="st-textarea" rows={3} value={form.text} onChange={(event) => patch({ text: event.target.value })} />
-              </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Author">
-                  <input className="st-input" value={form.author} onChange={(event) => patch({ author: event.target.value })} />
-                </Field>
-                <Field label="Style">
-                  <Segmented
-                    block
-                    value={form.variant}
-                    onChange={(variant) => patch({ variant })}
-                    options={[
-                      { id: 'quote', label: 'Quote' },
-                      { id: 'note', label: 'Note' },
-                    ]}
-                  />
-                </Field>
-              </div>
-            </>
+            <Field label="Attribution" hint="Optional. Left blank, the note stands on its own.">
+              <input
+                className="st-input"
+                value={form.author}
+                placeholder="— from The Missed Train"
+                onChange={(event) => patch({ author: event.target.value })}
+              />
+            </Field>
+          )}
+          {form.category === 'thought' && (
+            <p className="st-hint !mt-0">
+              The title above is the thought itself and the description is an optional source — one is drawn at
+              random for the thought drawer.
+            </p>
           )}
           {form.category === 'gateway' && (
-            <Field label="Links to" hint="A path on the site, e.g. /journal.">
-              <input className="st-input st-mono" value={form.navTarget} onChange={(event) => patch({ navTarget: event.target.value })} />
+            <Field label="Opens which page" hint="The page this door leads to.">
+              <select
+                className="st-select"
+                value={form.navTarget.replace(/^\/+/, '')}
+                onChange={(event) => patch({ navTarget: event.target.value })}
+              >
+                {!NAV_TARGETS.includes(form.navTarget.replace(/^\/+/, '')) && (
+                  <option value={form.navTarget.replace(/^\/+/, '')}>{form.navTarget || '—'}</option>
+                )}
+                {NAV_TARGETS.map((target) => (
+                  <option key={target} value={target}>
+                    /{target}
+                  </option>
+                ))}
+              </select>
             </Field>
           )}
           <NumberField label="Order" value={form.order} onChange={(order) => patch({ order })} hint="Lower numbers come first." />
         </div>
       );
-    case 'gallery':
-      return <NumberField label="Order" value={form.order} onChange={(order) => patch({ order })} />;
     default:
       return null;
   }
+}
+
+/** The pages a home gateway can open. The site builds the link as `/${navTarget}`. */
+const NAV_TARGETS = ['journal', 'photography', 'tech', 'portfolio'];
+
+/**
+ * The hidden layer's fields.
+ *
+ * A secret carries exactly one of room / trigger / section, decided by its
+ * kind, so the other two are never shown — and `serializeForm` never writes
+ * them, so a note cannot end up with a stale trigger nobody can explain.
+ */
+function SecretFields({ form, patch }: { form: FormState; patch: (next: Partial<FormState>) => void }) {
+  const kind = (form.category || 'note') as SecretKind;
+  return (
+    <div className="space-y-5">
+      <div className="st-well px-3 py-2.5">
+        <p className="text-[0.75rem] leading-relaxed text-zinc-400">{SECRET_KIND_HELP[kind]}</p>
+      </div>
+
+      {(kind === 'room' || kind === 'note') && (
+        <Field label="Which room" hint={kind === 'room' ? 'The room this entry configures.' : 'The room this note is filed in.'}>
+          <select
+            className="st-select"
+            value={form.room || 'library'}
+            onChange={(event) => patch({ room: event.target.value as SecretRoomId })}
+          >
+            {SECRET_ROOMS.map((room) => (
+              <option key={room} value={room}>
+                {SECRET_ROOM_LABELS[room]}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
+
+      {kind === 'egg' && (
+        <Field label="Which easter egg" hint={SECRET_TRIGGER_HELP[(form.trigger || 'seal') as SecretTrigger]}>
+          <select
+            className="st-select"
+            value={form.trigger || 'seal'}
+            onChange={(event) => patch({ trigger: event.target.value as SecretTrigger })}
+          >
+            {SECRET_TRIGGERS.map((trigger) => (
+              <option key={trigger} value={trigger}>
+                {SECRET_TRIGGER_LABELS[trigger]}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
+
+      {kind === 'ink' && (
+        <Field label="Which section of the home page" hint="The marginalia sits beside this section, readable only under the wand’s light.">
+          <select
+            className="st-select"
+            value={form.section || 'hero'}
+            onChange={(event) => patch({ section: event.target.value as InkSection })}
+          >
+            {INK_SECTIONS.map((section) => (
+              <option key={section} value={section}>
+                {INK_SECTION_LABELS[section]}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
+
+      <NumberField label="Order" value={form.order} onChange={(order) => patch({ order })} hint="Lower numbers come first." />
+    </div>
+  );
 }

@@ -1218,82 +1218,6 @@
       "filePath": "content/timeline/2019-the-beginning.md"
     },
     {
-      "id": "timeline/2021-first-significant-build",
-      "collection": "timeline",
-      "slug": "2021-first-significant-build",
-      "title": "First Significant Build",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-10-01T07:51:01.999Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-10-01T07:51:01.999Z",
-      "updatedAt": "2026-10-01T07:51:01.999Z",
-      "publishedAt": "2026-10-01T07:51:01.999Z",
-      "filePath": "content/timeline/2021-first-significant-build.md"
-    },
-    {
-      "id": "timeline/2022-network-systems",
-      "collection": "timeline",
-      "slug": "2022-network-systems",
-      "title": "Network Systems",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-10-01T07:51:01.999Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-10-01T07:51:01.999Z",
-      "updatedAt": "2026-10-01T07:51:01.999Z",
-      "publishedAt": "2026-10-01T07:51:01.999Z",
-      "filePath": "content/timeline/2022-network-systems.md"
-    },
-    {
-      "id": "timeline/2023-dsp-spatial-audio",
-      "collection": "timeline",
-      "slug": "2023-dsp-spatial-audio",
-      "title": "DSP & Spatial Audio",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-10-01T07:51:01.999Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-10-01T07:51:01.999Z",
-      "updatedAt": "2026-10-01T07:51:01.999Z",
-      "publishedAt": "2026-10-01T07:51:01.999Z",
-      "filePath": "content/timeline/2023-dsp-spatial-audio.md"
-    },
-    {
-      "id": "timeline/2024-scale-architecture",
-      "collection": "timeline",
-      "slug": "2024-scale-architecture",
-      "title": "Scale & Architecture",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-10-01T07:51:01.999Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-10-01T07:51:01.999Z",
-      "updatedAt": "2026-10-01T07:51:01.999Z",
-      "publishedAt": "2026-10-01T07:51:01.999Z",
-      "filePath": "content/timeline/2024-scale-architecture.md"
-    },
-    {
       "id": "favorites/ai-til",
       "collection": "favorites",
       "slug": "ai-til",
@@ -2242,8 +2166,483 @@
       "updatedAt": "2026-10-01T09:28:02.833Z",
       "publishedAt": "2026-10-01T09:28:02.833Z",
       "filePath": "content/home/reel-sopore-night.md"
+    },
+    {
+      "id": "timeline/2020-the-quiet-years",
+      "collection": "timeline",
+      "slug": "2020-the-quiet-years",
+      "title": "The Quiet Years",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2020-the-quiet-years.md"
+    },
+    {
+      "id": "timeline/2021-growing-up",
+      "collection": "timeline",
+      "slug": "2021-growing-up",
+      "title": "Growing Up",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2021-growing-up.md"
+    },
+    {
+      "id": "timeline/2022-the-pursuit",
+      "collection": "timeline",
+      "slug": "2022-the-pursuit",
+      "title": "The Pursuit",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2022-the-pursuit.md"
+    },
+    {
+      "id": "timeline/2023-a-new-chapter",
+      "collection": "timeline",
+      "slug": "2023-a-new-chapter",
+      "title": "A New Chapter",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2023-a-new-chapter.md"
+    },
+    {
+      "id": "timeline/2024-finding-my-voice",
+      "collection": "timeline",
+      "slug": "2024-finding-my-voice",
+      "title": "Finding My Voice",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2024-finding-my-voice.md"
+    },
+    {
+      "id": "timeline/2025-between-code-and-creativity",
+      "collection": "timeline",
+      "slug": "2025-between-code-and-creativity",
+      "title": "Between Code and Creativity",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2025-between-code-and-creativity.md"
+    },
+    {
+      "id": "timeline/2026-becoming-still",
+      "collection": "timeline",
+      "slug": "2026-becoming-still",
+      "title": "Becoming, Still",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T19:42:52.847Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T19:42:52.847Z",
+      "updatedAt": "2026-10-01T19:42:52.847Z",
+      "publishedAt": "2026-10-01T19:42:52.847Z",
+      "filePath": "content/timeline/2026-becoming-still.md"
+    },
+    {
+      "id": "secrets/darkroom-under-the-safelight",
+      "collection": "secrets",
+      "slug": "darkroom-under-the-safelight",
+      "title": "Under the safelight",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/darkroom-under-the-safelight.md"
+    },
+    {
+      "id": "secrets/egg-alohomora",
+      "collection": "secrets",
+      "slug": "egg-alohomora",
+      "title": "Alohomora",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/egg-alohomora.md"
+    },
+    {
+      "id": "secrets/egg-console",
+      "collection": "secrets",
+      "slug": "egg-console",
+      "title": "For whoever opens the console",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/egg-console.md"
+    },
+    {
+      "id": "secrets/egg-constellation",
+      "collection": "secrets",
+      "slug": "egg-constellation",
+      "title": "Saptarishi",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/egg-constellation.md"
+    },
+    {
+      "id": "secrets/egg-fullstop",
+      "collection": "secrets",
+      "slug": "egg-fullstop",
+      "title": "Not a full stop",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/egg-fullstop.md"
+    },
+    {
+      "id": "secrets/egg-lumos",
+      "collection": "secrets",
+      "slug": "egg-lumos",
+      "title": "Lumos",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/egg-lumos.md"
+    },
+    {
+      "id": "secrets/egg-seal",
+      "collection": "secrets",
+      "slug": "egg-seal",
+      "title": "Sealed",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-02T03:57:44.931Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/egg-seal.md"
+    },
+    {
+      "id": "secrets/ink-archive",
+      "collection": "secrets",
+      "slug": "ink-archive",
+      "title": "not every door here is on this list",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-archive.md"
+    },
+    {
+      "id": "secrets/ink-frames",
+      "collection": "secrets",
+      "slug": "ink-frames",
+      "title": "22.6639 N, 75.8827 E is Indore",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-frames.md"
+    },
+    {
+      "id": "secrets/ink-hero",
+      "collection": "secrets",
+      "slug": "ink-hero",
+      "title": "this started in Sopore",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-hero.md"
+    },
+    {
+      "id": "secrets/ink-notes",
+      "collection": "secrets",
+      "slug": "ink-notes",
+      "title": "turn the page",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-notes.md"
+    },
+    {
+      "id": "secrets/ink-timeline",
+      "collection": "secrets",
+      "slug": "ink-timeline",
+      "title": "about 1,300 km, as the crow flies",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-timeline.md"
+    },
+    {
+      "id": "secrets/ink-work",
+      "collection": "secrets",
+      "slug": "ink-work",
+      "title": "every one of these began as a question",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-work.md"
+    },
+    {
+      "id": "secrets/ink-writing",
+      "collection": "secrets",
+      "slug": "ink-writing",
+      "title": "Memory is selective. It forgets conversations, but preserves contrasts.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/ink-writing.md"
+    },
+    {
+      "id": "secrets/library-a-note-on-the-shelf",
+      "collection": "secrets",
+      "slug": "library-a-note-on-the-shelf",
+      "title": "A note left on the shelf",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/library-a-note-on-the-shelf.md"
+    },
+    {
+      "id": "secrets/room-darkroom",
+      "collection": "secrets",
+      "slug": "room-darkroom",
+      "title": "The Darkroom",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/room-darkroom.md"
+    },
+    {
+      "id": "secrets/room-details",
+      "collection": "secrets",
+      "slug": "room-details",
+      "title": "The Room of Small Details",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/room-details.md"
+    },
+    {
+      "id": "secrets/room-library",
+      "collection": "secrets",
+      "slug": "room-library",
+      "title": "The Restricted Section",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-01T21:02:59.639Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-01T21:02:59.639Z",
+      "updatedAt": "2026-10-01T21:02:59.639Z",
+      "publishedAt": "2026-10-01T21:02:59.639Z",
+      "filePath": "content/secrets/room-library.md"
     }
   ],
-  "lastUpdated": "2026-10-01T09:28:02.861Z",
+  "lastUpdated": "2026-10-02T03:57:44.931Z",
   "version": 1
 }

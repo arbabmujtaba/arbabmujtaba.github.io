@@ -8,6 +8,7 @@ import {
   MousePointerClick,
   PenSquare,
   Rocket,
+  Wand2,
 } from 'lucide-react';
 import DeploymentCenter from '../components/DeploymentCenter';
 import LiveEditor from '../components/LiveEditor';
@@ -19,14 +20,16 @@ import { Dashboard } from '../components/admin/Dashboard';
 import { EntryEditor, type EditorMode } from '../components/admin/EntryEditor';
 import type { CollectionId, ListItem } from '../components/admin/model';
 import { ReelPublisher } from '../components/admin/ReelPublisher';
+import { SecretsPanel } from '../components/admin/SecretsPanel';
 import '../components/admin/studio.css';
 
-type View = 'dashboard' | 'content' | 'editor' | 'reel' | 'deploy' | 'live';
+type View = 'dashboard' | 'content' | 'editor' | 'reel' | 'secrets' | 'deploy' | 'live';
 
 const NAV: { id: Exclude<View, 'editor'>; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'content', label: 'Content', icon: Library },
   { id: 'reel', label: 'Publish a reel', icon: Film },
+  { id: 'secrets', label: 'Secrets', icon: Wand2 },
   { id: 'live', label: 'Live editor', icon: MousePointerClick },
   { id: 'deploy', label: 'Deployments', icon: Rocket },
 ];
@@ -241,6 +244,16 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
                 onOpenEntry={openEntry}
               />
             )}
+            {view === 'secrets' && (
+              <SecretsPanel
+                items={items}
+                loading={loading}
+                notify={notify}
+                onChanged={() => void refresh()}
+                onEdit={(slug) => openEntry('secrets', slug)}
+                onOpenEditor={openEditor}
+              />
+            )}
             {view === 'deploy' && (
               <DeploymentCenter
                 items={items}
@@ -250,7 +263,12 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
             )}
             {view === 'live' && (
               <div className="h-full">
-                <LiveEditor content={items} onNavigateToEditor={(item) => openEntry(item.collection as CollectionId, item.slug)} onToast={notify} />
+                <LiveEditor
+                  content={items}
+                  onNavigateToEditor={(item) => openEntry(item.collection as CollectionId, item.slug)}
+                  onToast={notify}
+                  onPublish={startPublishing}
+                />
               </div>
             )}
           </div>
