@@ -105,10 +105,14 @@ export default function LivingJournal({ journal, photography, tech, className = 
         line: t.excerpt,
       })),
     ];
-    return all
+    const sorted = all
       .filter((item) => !Number.isNaN(new Date(item.date).getTime()))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, limit);
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (sorted.length === 0) return [];
+    // The lead is the newest thing from any collection; the pile beside it is journal only.
+    const [first] = sorted;
+    const pile = sorted.filter((item) => item !== first && item.collection === 'journal').slice(0, limit - 1);
+    return [first, ...pile];
   }, [journal, photography, tech, limit]);
 
   if (items.length === 0) return null;

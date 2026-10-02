@@ -390,6 +390,14 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
   .hairline-grid { background-size: 56px 56px; }
 }
 
+/* Background survey map: gilt at night, sepia ink on paper by day. */
+.contour { stroke: color-mix(in oklab, var(--gilt) 17%, transparent); }
+.contour--index { stroke: color-mix(in oklab, var(--gilt) 30%, transparent); }
+.contour-mark { fill: color-mix(in oklab, var(--gilt) 42%, transparent); }
+[data-theme="day"] .contour { stroke: color-mix(in oklab, var(--gilt) 24%, transparent); }
+[data-theme="day"] .contour--index { stroke: color-mix(in oklab, var(--gilt) 40%, transparent); }
+[data-theme="day"] .contour-mark { fill: color-mix(in oklab, var(--gilt) 55%, transparent); }
+
 /* Marquee track. Three copies of the children are rendered, so translating by
    one third returns to an identical frame — no seam at any viewport width. */
 @keyframes rushes-marquee {
