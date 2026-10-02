@@ -27,7 +27,7 @@ function Passage({ from, to }: { from: string; to: string }) {
   const km = a && b ? Math.round(distanceKm(a, b) / 100) * 100 : null;
 
   return (
-    <div ref={ref} className="relative my-16 overflow-hidden rounded-[3px] border border-zinc-800 bg-canvas-raised/60 px-6 py-12 md:my-24 md:px-14 md:py-16">
+    <div ref={ref} className="relative my-16 overflow-hidden px-6 py-12 md:my-24 md:px-40 md:py-16">
       <InkNote section="timeline" className="absolute right-6 top-5 text-right md:right-12" />
       <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500">the passage</p>
       <div className="mt-8 grid items-center gap-8 md:grid-cols-[1fr_minmax(0,2fr)_1fr]">
