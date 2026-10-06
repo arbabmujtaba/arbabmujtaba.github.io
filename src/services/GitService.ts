@@ -7,15 +7,84 @@
  * - Files staged explicitly by name (no `git add -A` / `git add .`)
  * - Default branch detected dynamically via `git symbolic-ref`
  * - No destructive commands (`reset --hard`, `push --force`, `branch -D`, `clean -f`) on protected branches
- * - Non-interactive execution via `GIT_EDITOR=true`
+ * - Non-interactive: GIT_TERMINAL_PROMPT=0 and a no-output timeout, so a sign-in
+ *   prompt fails fast with a readable message instead of hanging the pipeline
  * - Auto-generated commit messages in format: "Published: {Title}"
  */
 
 import { simpleGit, SimpleGit, StatusResult, DefaultLogFields, LogResult } from 'simple-git';
 import path from 'path';
-import { execSync } from 'child_process';
 
 const PROTECTED_BRANCHES = ['main', 'master'];
+
+/**
+ * How long a git process may sit without printing anything before it is killed.
+ *
+ * This is what used to hang publishing forever: the remote is HTTPS, and when
+ * the dev server is started from a terminal with no credential helper, `git
+ * push` asks "Username for 'https://github.com':" on that terminal and waits.
+ * Nobody is looking at it — the author is in the browser watching a spinner.
+ */
+export const GIT_BLOCK_TIMEOUT_MS = Number(process.env.GIT_TIMEOUT_MS) || 60_000;
+
+/**
+ * The environment every git child process runs with.
+ *
+ * GIT_TERMINAL_PROMPT=0 turns a would-be terminal prompt into an immediate,
+ * readable failure. It does NOT disable credential helpers or GIT_ASKPASS (VS
+ * Code's terminal sets one), so any sign-in that already works keeps working.
+ */
+function gitEnv(): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env)) if (typeof value === 'string') env[key] = value;
+  // Nothing here opens an editor or a pager (commits always carry -m), and
+  // simple-git refuses to spawn while either is named in the environment.
+  for (const key of ['EDITOR', 'VISUAL', 'GIT_EDITOR', 'GIT_SEQUENCE_EDITOR', 'PAGER', 'GIT_PAGER']) delete env[key];
+  env.GIT_TERMINAL_PROMPT = '0';
+  env.GCM_INTERACTIVE = 'never';
+  return env;
+}
+
+export type PushFailure = 'PUSH_AUTH' | 'PUSH_REJECTED' | 'PUSH_NETWORK_ERROR' | 'PUSH_TIMEOUT' | 'PUSH_FAILED';
+
+/** Sort a git push error into something the author can act on. Exported for tests. */
+export function classifyPushError(message: string): PushFailure {
+  const text = message || '';
+  if (/block timeout|timed? ?out after|timeout reached/i.test(text)) return 'PUSH_TIMEOUT';
+  if (
+    /could not read (username|password)|could not read from remote repository|terminal prompts disabled|authentication failed|invalid username or password|permission denied \(publickey\)|returned error: 40[13]|access denied|support for password authentication was removed/i.test(
+      text
+    )
+  ) {
+    return 'PUSH_AUTH';
+  }
+  if (/\[rejected\]|rejected|non-fast-forward|fetch first|updates were rejected/i.test(text)) return 'PUSH_REJECTED';
+  if (/could not resolve host|failed to connect|connection (timed out|refused|reset)|network is unreachable|unable to access/i.test(text)) {
+    return 'PUSH_NETWORK_ERROR';
+  }
+  return 'PUSH_FAILED';
+}
+
+/** The Pages site, repository and Actions page for an origin URL (https or ssh form). */
+export function githubUrls(repoUrl: string | undefined): { site: string | null; repo: string | null; actions: string | null } {
+  const match = (repoUrl || '').match(/github\.com[:/]([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
+  if (!match) return { site: null, repo: null, actions: null };
+  const [, owner, repo] = match;
+  const site = repo.toLowerCase() === `${owner.toLowerCase()}.github.io` ? `https://${owner}.github.io/` : `https://${owner}.github.io/${repo}/`;
+  return { site, repo: `https://github.com/${owner}/${repo}`, actions: `https://github.com/${owner}/${repo}/actions` };
+}
+
+/** One plain sentence (and a command, where there is one) for each failure. */
+export const PUSH_HINTS: Record<PushFailure, string> = {
+  PUSH_AUTH:
+    'Git could not sign in to GitHub from the dev server. Run `gh auth login` and then `gh auth setup-git` once in a terminal (or start `npm run dev` from VS Code’s terminal), then press Retry push. The commit is already saved locally.',
+  PUSH_REJECTED:
+    'GitHub has commits this machine does not. Run `git pull --no-rebase` in the project folder, then press Retry push.',
+  PUSH_NETWORK_ERROR: 'GitHub could not be reached. Check the connection, then press Retry push.',
+  PUSH_TIMEOUT:
+    'git push waited a minute without a reply — almost always a sign-in prompt that nobody could see. Set up credentials with `gh auth login` + `gh auth setup-git`, then press Retry push.',
+  PUSH_FAILED: 'The push did not go through. The commit is saved locally; press Retry push, or run `git push` in a terminal to see the full message.',
+};
 
 /**
  * Custom error class for Git operation failures.
@@ -51,7 +120,24 @@ export class GitService {
     this.basePath = basePath;
     this.git = simpleGit(basePath, {
       config: ['core.quotepath=false', 'core.precomposeunicode=false'],
-    });
+      // Kill a git process that goes quiet (a hidden credential prompt) instead of waiting forever.
+      timeout: { block: GIT_BLOCK_TIMEOUT_MS },
+      // simple-git refuses to spawn when the environment names an askpass helper,
+      // ssh command or config override, because those can be abused when the env
+      // comes from untrusted input. Here it is this process's own environment —
+      // exactly what git would inherit without `.env()` — and every argument is
+      // ours. Keeping them is what lets a working sign-in (VS Code's askpass, a
+      // credential helper, an ssh agent) keep working.
+      unsafe: {
+        allowUnsafeAskPass: true,
+        allowUnsafeSshCommand: true,
+        allowUnsafeCredentialHelper: true,
+        allowUnsafeConfigEnvCount: true,
+        allowUnsafeConfigPaths: true,
+        allowUnsafeGitProxy: true,
+        allowUnsafeTemplateDir: true,
+      },
+    }).env(gitEnv());
   }
 
   // ==========================================================
@@ -192,16 +278,15 @@ export class GitService {
   // ==========================================================
 
   /**
-   * Create a commit with an auto-generated message.
-   * Always sets GIT_EDITOR=true to prevent interactive prompts.
+   * Create a commit. When `paths` is given only those paths are committed
+   * (`git commit -- <paths>`), so anything else the author happened to have
+   * staged by hand stays out of an automated "Published:" commit.
    */
-  async commit(message: string): Promise<GitOperationResult> {
+  async commit(message: string, paths?: string[]): Promise<GitOperationResult> {
     const currentBranch = await this.getCurrentBranch();
 
     try {
-      // Set GIT_EDITOR to prevent interactive prompts
-      process.env.GIT_EDITOR = 'true';
-      const result = await this.git.commit(message);
+      const result = paths && paths.length > 0 ? await this.git.commit(message, paths) : await this.git.commit(message);
 
       if (result.commit) {
         return {
@@ -217,15 +302,30 @@ export class GitService {
 
       return {
         success: true,
-        message: 'No changes to commit',
+        message: 'Nothing new to commit',
         details: { branch: currentBranch },
       };
     } catch (err: any) {
+      // Committing a path whose content already matches HEAD is not a failure:
+      // republishing an unchanged entry should still push whatever is waiting.
+      if (/nothing (added )?to commit|no changes added to commit|nothing to commit/i.test(err?.message || '')) {
+        return { success: true, message: 'Nothing new to commit', details: { branch: currentBranch } };
+      }
       throw new GitError(
         `Commit failed on ${currentBranch}: ${err.message}`,
         'COMMIT_FAILED',
         err
       );
+    }
+  }
+
+  /** Commits on this branch that origin does not have yet (0 when there is no upstream). */
+  async aheadCount(): Promise<number> {
+    try {
+      const status = await this.git.status();
+      return status.ahead || 0;
+    } catch {
+      return 0;
     }
   }
 
@@ -263,26 +363,19 @@ export class GitService {
         },
       };
     } catch (err: any) {
-      // Check for common push errors
-      if (err.message?.includes('rejected')) {
-        throw new GitError(
-          `Push rejected on ${currentBranch}. Remote has diverging changes.`,
-          'PUSH_REJECTED',
-          err
-        );
-      }
-      if (err.message?.includes('could not resolve host')) {
-        throw new GitError(
-          'Network error: Cannot reach remote repository.',
-          'PUSH_NETWORK_ERROR',
-          err
-        );
-      }
-      throw new GitError(
-        `Push failed on ${currentBranch}: ${err.message}`,
-        'PUSH_FAILED',
-        err
-      );
+      const code = classifyPushError(err?.message || '');
+      const firstLine = String(err?.message || 'unknown error')
+        .split('\n')
+        .map((line) => line.trim())
+        .find((line) => line && !/^hint:/i.test(line)) || 'unknown error';
+      const summary: Record<PushFailure, string> = {
+        PUSH_AUTH: 'GitHub did not accept a sign-in from the dev server',
+        PUSH_REJECTED: `Push rejected on ${currentBranch} — the remote has commits this machine does not`,
+        PUSH_NETWORK_ERROR: 'Network error: cannot reach the remote repository',
+        PUSH_TIMEOUT: 'git push stopped responding (usually a hidden sign-in prompt)',
+        PUSH_FAILED: `Push failed on ${currentBranch}: ${firstLine}`,
+      };
+      throw new GitError(summary[code], code, err);
     }
   }
 

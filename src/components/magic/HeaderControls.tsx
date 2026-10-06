@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import Glyph from './Glyph';
-import { useMagic, type ThemePref } from '../../lib/magic';
+import { readFlag, useMagic, WAND_EVENT, WAND_TOUCHED, type ThemePref } from '../../lib/magic';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -18,12 +18,29 @@ const THEME_OPTIONS: { id: ThemePref; label: string; note: string; glyph: string
  * pointer effects, and the same button puts it away. The sky button opens a
  * small menu: night, day or follow the clock, and the ambient sound switch,
  * which is off until someone turns it on.
+ *
+ * Until the wand has been picked up once it wears a small gilt dot — the one
+ * sign, on a phone, that the header holds more than navigation. When the
+ * first-visit invitation is shown (MagicLayer) the wand rings twice.
  */
 export default function HeaderControls() {
   const { wand, setWand, theme, themePref, setThemePref, sound, setSound } = useMagic();
+  const reduced = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [untouched, setUntouched] = useState(() => !readFlag(WAND_TOUCHED));
+  const [beckon, setBeckon] = useState(0);
+
+  useEffect(() => {
+    const onWand = (event: Event) => {
+      const what = (event as CustomEvent<'beckon' | 'touched'>).detail;
+      if (what === 'touched') setUntouched(false);
+      else setBeckon((n) => n + 1);
+    };
+    window.addEventListener(WAND_EVENT, onWand);
+    return () => window.removeEventListener(WAND_EVENT, onWand);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -54,12 +71,29 @@ export default function HeaderControls() {
       <button
         type="button"
         aria-pressed={wand}
-        aria-label={wand ? 'Put the wand away' : 'Pick up the wand'}
+        aria-label={wand ? 'Put the wand away' : untouched ? 'Pick up the wand — this archive has a hidden layer' : 'Pick up the wand'}
         title={wand ? 'Put the wand away' : 'Pick up the wand'}
         onClick={() => setWand(!wand)}
         className={`${iconButton} ${wand ? 'border-gilt/60 text-gilt' : 'border-transparent hover:border-zinc-800'}`}
       >
         <Glyph name="wand" size={18} />
+        {untouched && !wand && (
+          <span aria-hidden="true" className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-gilt shadow-[0_0_8px_var(--gilt)]" />
+        )}
+        {/* two rings, once, when the invitation points here — never a loop */}
+        {beckon > 0 && !wand && !reduced && (
+          <span key={beckon} aria-hidden="true" className="pointer-events-none absolute inset-0">
+            {[0, 1].map((ring) => (
+              <motion.span
+                key={ring}
+                className="absolute inset-0 rounded-full border border-gilt"
+                initial={{ opacity: 0.8, scale: 0.8 }}
+                animate={{ opacity: 0, scale: 1.9 }}
+                transition={{ duration: 1.4, delay: ring * 0.7, ease: EASE }}
+              />
+            ))}
+          </span>
+        )}
         {wand && (
           <motion.span
             aria-hidden="true"

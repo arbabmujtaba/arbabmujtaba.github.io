@@ -5,12 +5,25 @@
  * before they are written to the filesystem or committed.
  */
 
+/**
+ * Every collection the publishing pipeline may commit. It used to list only the
+ * four document collections, so publishing a home reel, a timeline chapter, a
+ * secret, a gear item or a favourite always failed at "Validate Metadata".
+ */
 const ALLOWED_COLLECTIONS = [
   'journal',
   'tech',
   'photography',
   'portfolio',
+  'gear',
+  'timeline',
+  'favorites',
+  'home',
+  'secrets',
 ];
+
+/** Collections whose entries are dated documents; the rest are undated fragments. */
+const DATED_COLLECTIONS = new Set(['journal', 'tech', 'photography']);
 
 const RESERVED_SLUGS = [
   'admin',
@@ -48,7 +61,11 @@ export class ValidationService {
       errors.push(`Invalid collection. Must be one of: ${ALLOWED_COLLECTIONS.join(', ')}`);
     }
 
-    if (!data.date || !this.isValidISODate(data.date)) {
+    // Portfolio projects, reels, chapters and secrets carry no date; requiring one
+    // made them impossible to publish. A date that IS present must still parse.
+    if (DATED_COLLECTIONS.has(collection) && !data.date) {
+      errors.push('Date is required (YYYY-MM-DD)');
+    } else if (data.date && !this.isValidISODate(data.date)) {
       errors.push('Date must be a valid date string (YYYY-MM-DD)');
     }
 
@@ -149,16 +166,18 @@ export class ValidationService {
     if (!path.startsWith('/uploads/') && !path.startsWith('/assets/')) {
       return false;
     }
-    const ext = path.split('.').pop()?.toLowerCase();
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext || '');
+    const ext = path.split(/[?#]/)[0].split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'svg', 'mp4', 'webm', 'mov'].includes(ext || '');
   }
 
   /**
    * Check if a string is a valid date (YYYY-MM-DD).
    */
-  private isValidISODate(dateStr: string): boolean {
+  private isValidISODate(dateStr: unknown): boolean {
+    // gray-matter turns an unquoted `date: 2026-10-06` into a Date.
+    if (dateStr instanceof Date) return !isNaN(dateStr.getTime());
     if (!dateStr || typeof dateStr !== 'string') return false;
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    const regex = /^\d{4}-\d{2}-\d{2}/;
     if (!regex.test(dateStr)) return false;
     const date = new Date(dateStr);
     return !isNaN(date.getTime());

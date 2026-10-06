@@ -27,6 +27,8 @@ interface LivingJournalProps {
   tech: TechEntry[];
   className?: string;
   limit?: number;
+  /** Set under the pile, in the desk's second column — the home page puts the shelf here. */
+  children?: React.ReactNode;
 }
 
 function when(date: string) {
@@ -71,7 +73,7 @@ function usePreviousVisit(): number | null {
  * entry published from /admin lands here by itself. Entries newer than the
  * reader's last visit come in with a little ink still wet on them.
  */
-export default function LivingJournal({ journal, photography, tech, className = '', limit = 6 }: LivingJournalProps) {
+export default function LivingJournal({ journal, photography, tech, className = '', limit = 6, children }: LivingJournalProps) {
   const reduced = useReducedMotion();
   const openEntry = useOpenEntry();
   const previous = usePreviousVisit();
@@ -187,8 +189,9 @@ export default function LivingJournal({ journal, photography, tech, className = 
           )}
         </motion.div>
 
-        {/* the rest of the pile */}
-        <ol className="border-t border-zinc-800">
+        {/* the rest of the pile, and whatever stands behind it */}
+        <div className="min-w-0">
+          <ol className="border-t border-zinc-800">
           {rest.map((item, i) => (
             <motion.li key={`${item.collection}/${item.slug}`} {...ink(item, i + 1)} viewport={{ once: true, amount: 0.5 }} className="border-b border-zinc-800">
               {link(
@@ -208,7 +211,9 @@ export default function LivingJournal({ journal, photography, tech, className = 
               )}
             </motion.li>
           ))}
-        </ol>
+          </ol>
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -115,6 +115,58 @@ export async function startPublish(args: {
   return json(res, 'Publishing failed to start');
 }
 
+/** The shape the progress dialog reads; mirrors PublishingJob on the server. */
+export interface PublishStep {
+  step: string;
+  status: 'pending' | 'running' | 'success' | 'error' | 'skipped';
+  message: string;
+  timestamp: string;
+  startedAt?: string;
+  details?: Record<string, any>;
+}
+
+export interface PublishJob {
+  id: string;
+  collection: string;
+  slug: string;
+  title: string;
+  status: 'pending' | 'running' | 'success' | 'error' | 'cancelled';
+  steps: PublishStep[];
+  createdAt: string;
+  updatedAt: string;
+  error?: string;
+  hint?: string;
+  errorCode?: string;
+  canRetryPush?: boolean;
+  commitHash?: string;
+  deployedUrl?: string;
+  actionsUrl?: string;
+}
+
+/** null when the server no longer knows the job (it restarted). */
+export async function getPublishJob(jobId: string): Promise<PublishJob | null> {
+  const res = await fetch(`/api/publish/${encodeURIComponent(jobId)}`);
+  if (res.status === 404) return null;
+  return json<PublishJob>(res, 'Could not read the publishing job');
+}
+
+export async function listPublishJobs(): Promise<PublishJob[]> {
+  try {
+    const res = await fetch('/api/publish');
+    return res.ok ? ((await res.json()) as PublishJob[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function retryPush(jobId: string): Promise<{ jobId: string }> {
+  const res = await fetch(`/api/publish/${encodeURIComponent(jobId)}/retry-push`, {
+    method: 'POST',
+    headers: jsonHeaders(),
+  });
+  return json(res, 'Could not retry the push');
+}
+
 export interface UploadResult {
   url: string;
   converted?: { from: string; to: string };

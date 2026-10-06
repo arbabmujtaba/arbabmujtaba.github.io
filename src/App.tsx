@@ -150,6 +150,13 @@ export default function App() {
   }, []);
 
   const isAdmin = route.kind === 'list' && route.view === 'admin';
+  /**
+   * On the home page the header floats over the hero photograph instead of
+   * sitting on its own strip above it, so the photograph runs to the top of the
+   * frame. It is over an ink plate there, so it takes the ink surface (light
+   * type) even in daylight.
+   */
+  const overHero = route.kind === 'list' && route.view === 'home';
 
   // Mount the hidden layer once the page is quiet.
   const [magicReady, setMagicReady] = useState(false);
@@ -186,7 +193,10 @@ export default function App() {
 
           {/* Header: mark left, sections centre, standing invitation right */}
           {!isAdmin && (
-            <header className="relative z-20 flex w-full items-center justify-between gap-6 px-4 pt-5 md:px-12 md:pt-8 lg:px-16">
+            <header
+              data-surface={overHero ? 'ink' : undefined}
+              className={`${overHero ? 'absolute inset-x-0 top-0' : 'relative'} z-30 flex w-full items-center justify-between gap-6 px-4 pt-5 md:px-12 md:pt-8 lg:px-16`}
+            >
               <motion.button
                 type="button"
                 initial={{ opacity: 0, y: -12 }}

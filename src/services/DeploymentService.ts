@@ -5,7 +5,7 @@
  * and provides data for the Deployment Center dashboard.
  */
 
-import { GitService } from './GitService';
+import { GitService, githubUrls } from './GitService';
 import { PublishingService, PublishingJob } from './PublishingService';
 
 export interface DeploymentStatus {
@@ -162,19 +162,6 @@ export class DeploymentService {
   // ==========================================================
 
   private deriveWebsiteUrl(repoUrl: string | undefined): string | null {
-    if (!repoUrl) return null;
-    // Convert git@github.com:owner/repo.git → https://owner.github.io/repo
-    // or https://github.com/owner/repo → https://owner.github.io/repo
-    const match = repoUrl.match(/github\.com[:/]([^/]+)\/([^/]+?)(?:\.git)?$/);
-    if (match) {
-      const [, owner, repo] = match;
-      // User/org site: owner.github.io repo → https://owner.github.io/
-      // Project site: other repo → https://owner.github.io/repo/
-      if (repo === `${owner}.github.io`) {
-        return `https://${owner}.github.io/`;
-      }
-      return `https://${owner}.github.io/${repo}`;
-    }
-    return null;
+    return githubUrls(repoUrl).site;
   }
 }

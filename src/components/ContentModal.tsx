@@ -7,6 +7,7 @@ import Lightbox, { type LightboxFrame } from './Lightbox';
 import MediaFx, { MediaFxOverlays } from './MediaFx';
 import MotionPlate from './rushes/MotionPlate';
 import { normalizeImagePath } from '../lib/image';
+import { lockScroll } from '../lib/scrollLock';
 import { ensureFontLoaded } from '../lib/fonts';
 import type { PostCustomization } from '../types';
 import {
@@ -294,17 +295,12 @@ export default function ContentModal({
     // stay scrollable, since the article *is* the page.
     if (isPage) return;
 
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => {
-        modalRef.current?.scrollTo({ top: 0, behavior: 'instant' });
-      });
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (!isOpen) return;
+    const release = lockScroll();
+    requestAnimationFrame(() => {
+      modalRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    });
+    return release;
   }, [isOpen, isPage]);
 
   // Request any web fonts the post asks for. Cheap and idempotent.

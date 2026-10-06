@@ -2677,8 +2677,27 @@
       "createdAt": "2026-10-06T17:26:47.623Z",
       "updatedAt": "2026-10-06T17:26:47.623Z",
       "filePath": "content/photography/meditate.md"
+    },
+    {
+      "id": "secrets/egg-invitation",
+      "collection": "secrets",
+      "slug": "egg-invitation",
+      "title": "This is not only a website.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-06T20:05:33.927Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-06T20:05:33.927Z",
+      "updatedAt": "2026-10-06T20:05:33.927Z",
+      "publishedAt": "2026-10-06T20:05:33.927Z",
+      "filePath": "content/secrets/egg-invitation.md"
     }
   ],
-  "lastUpdated": "2026-10-06T17:26:47.623Z",
+  "lastUpdated": "2026-10-06T20:05:33.940Z",
   "version": 1
 }

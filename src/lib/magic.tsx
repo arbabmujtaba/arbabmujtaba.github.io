@@ -25,7 +25,7 @@ export type Theme = 'day' | 'night';
 /** The seven things a visitor can find. Order is the order of the ledger. */
 export const COLLECTIBLES = [
   { id: 'lantern', name: 'The lantern', hint: 'Light the margins.', where: 'Cast Lumos with the wand' },
-  { id: 'key', name: 'The key', hint: 'One book on the writing shelf is not like the others.', where: 'Opened the Restricted Section' },
+  { id: 'key', name: 'The key', hint: 'One book on the shelf behind the desk is not like the others.', where: 'Opened the Restricted Section' },
   { id: 'lens', name: 'The lens', hint: 'Every frame section has a red light. One of them is a safelight.', where: 'Developed a print in the darkroom' },
   { id: 'star', name: 'The seventh star', hint: 'After dark, the sky above the name is not empty.', where: 'Connected the Saptarishi' },
   { id: 'seal', name: 'The wax seal', hint: 'Knock at the very end of the page. Keep knocking.', where: 'Broke the seal' },
@@ -35,12 +35,29 @@ export const COLLECTIBLES = [
 
 export type CollectibleId = (typeof COLLECTIBLES)[number]['id'];
 
+/**
+ * The rooms are a lazy chunk. Fetching it only when a door is pulled put a
+ * network round-trip between the pull and the room, so MagicLayer warms it on
+ * idle and anything that leads to a door (the odd book, the tally light) can
+ * warm it on hover or touch. One promise, so it is only ever fetched once.
+ */
+let roomsChunk: Promise<typeof import('../components/magic/Rooms')> | null = null;
+export function prefetchRooms() {
+  roomsChunk ??= import('../components/magic/Rooms').catch((error) => {
+    roomsChunk = null;
+    throw error;
+  });
+  return roomsChunk;
+}
+
 export interface Whisper {
   id: number;
   title: string;
   body?: string;
   /** Glyph id from components/magic/Glyph. */
   glyph?: string;
+  /** One button in the whisper — e.g. "pick up the wand" for whoever cannot find it. */
+  action?: { label: string; run: () => void };
 }
 
 interface MagicContextValue {
@@ -61,7 +78,7 @@ interface MagicContextValue {
   ledgerOpen: boolean;
   setLedgerOpen: (open: boolean) => void;
   whisper: Whisper | null;
-  whisperOf: (title: string, body?: string, glyph?: string) => void;
+  whisperOf: (title: string, body?: string, glyph?: string, action?: Whisper['action']) => void;
   dismissWhisper: () => void;
   forgetEverything: () => void;
 }
@@ -73,6 +90,20 @@ const KEYS = {
   sound: 'archive.sound',
   found: 'archive.found.v1',
 };
+
+/** Set the first time the wand is picked up; until then the header wand wears a gilt dot. */
+export const WAND_TOUCHED = 'archive.wand.v1';
+/** Set once the first-visit invitation has been shown. */
+export const INVITED = 'archive.invited.v1';
+/** `beckon` asks the header wand to draw attention to itself once; `touched` clears its dot. */
+export const WAND_EVENT = 'archive:wand';
+
+export function readFlag(key: string) {
+  return read(key) === '1';
+}
+export function writeFlag(key: string) {
+  write(key, '1');
+}
 
 function read(key: string): string | null {
   try {
@@ -194,13 +225,17 @@ export function MagicProvider({ children }: { children: ReactNode }) {
   const setWand = useCallback((on: boolean) => {
     setWandState(on);
     if (!on) setLumosState(false);
+    if (on && read(WAND_TOUCHED) !== '1') {
+      write(WAND_TOUCHED, '1');
+      window.dispatchEvent(new CustomEvent(WAND_EVENT, { detail: 'touched' }));
+    }
   }, []);
 
   const setLumos = useCallback((on: boolean) => setLumosState(on), []);
 
-  const whisperOf = useCallback((title: string, body?: string, glyph?: string) => {
+  const whisperOf = useCallback((title: string, body?: string, glyph?: string, action?: Whisper['action']) => {
     whisperId.current += 1;
-    setWhisper({ id: whisperId.current, title, body, glyph });
+    setWhisper({ id: whisperId.current, title, body, glyph, action });
   }, []);
 
   const dismissWhisper = useCallback(() => setWhisper(null), []);

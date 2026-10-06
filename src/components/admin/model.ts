@@ -265,6 +265,7 @@ export const SECRET_TRIGGER_LABELS: Record<SecretTrigger, string> = {
   lumos: 'Lumos — casting light',
   alohomora: 'Alohomora — the hidden shelf',
   console: 'Developer console',
+  invitation: 'The invitation — first visit',
 };
 
 export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
@@ -274,13 +275,15 @@ export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
   lumos: 'Casting light with the wand, or typing “lumos”.',
   alohomora: 'Typing “alohomora”, which opens the hidden shelf.',
   console: 'A message printed to the browser’s devtools console.',
+  invitation:
+    'Shown once, to a first-time visitor who has scrolled past the opening screen and found nothing yet — the only hint that works on a phone, where nobody opens the console or types a spell.',
 };
 
 export const INK_SECTION_LABELS: Record<InkSection, string> = {
   hero: 'Hero — the opening screen',
   frames: 'Frames — the photography strip',
   work: 'Work — the project index',
-  writing: 'Writing — the journal pull',
+  writing: 'Writing — the desk and the shelf',
   timeline: 'Timeline — the chapters',
   notes: 'Notes — the last-notes band',
   archive: 'Archive — the doors at the foot of the page',

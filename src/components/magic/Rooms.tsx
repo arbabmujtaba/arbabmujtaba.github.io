@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import Glyph from './Glyph';
 import SafeImage from '../SafeImage';
 import { useMagic, COLLECTIBLES } from '../../lib/magic';
+import { lockScroll } from '../../lib/scrollLock';
 import { getRoomConfig, getRoomNotes, isRoomEnabled } from '../../lib/secrets';
 import { getArchiveThoughts } from '../../lib/thoughts';
 import {
@@ -59,12 +60,20 @@ function useFocusTrap(ref: React.RefObject<HTMLElement | null>, active: boolean)
   }, [ref, active]);
 }
 
+/**
+ * When the room's own content starts to arrive, in seconds after the door is
+ * pulled. Everything inside a room is staged off this one number so the rooms
+ * open at the same pace — it used to be 0.5s in one, 0.9s in another.
+ */
+const ENTER = 0.35;
+
 function NoteCard({ note, index }: { note: SecretEntry; index: number }) {
+  const reduced = useReducedMotion();
   return (
     <motion.article
-      initial={{ opacity: 0, y: 18, rotate: index % 2 ? 0.8 : -0.8 }}
-      animate={{ opacity: 1, y: 0, rotate: index % 2 ? 0.4 : -0.4 }}
-      transition={{ duration: 0.8, delay: 0.5 + index * 0.12, ease: EASE }}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18, rotate: index % 2 ? 0.8 : -0.8 }}
+      animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, rotate: index % 2 ? 0.4 : -0.4 }}
+      transition={{ duration: 0.8, delay: ENTER + 0.1 + index * 0.1, ease: EASE }}
       className="manuscript rounded-[2px] px-6 py-7 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.85)] md:px-8"
     >
       <h3 className="font-book text-2xl italic leading-tight text-zinc-50">{note.title}</h3>
@@ -76,15 +85,62 @@ function NoteCard({ note, index }: { note: SecretEntry; index: number }) {
   );
 }
 
-function RoomShell({
-  room,
-  tone,
-  children,
-}: {
-  room: SecretRoomId;
-  tone: 'library' | 'darkroom' | 'details';
-  children: ReactNode;
-}) {
+type Tone = 'library' | 'darkroom' | 'details';
+
+/** The light that comes through once the way in is open — tokens only. */
+const BACKDROP: Record<Tone, string> = {
+  library:
+    'radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--gilt) 22%, transparent), color-mix(in srgb, var(--gilt) 3%, var(--bg-deep)) 62%)',
+  darkroom:
+    'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--rushes-alarm) 55%, transparent), color-mix(in srgb, var(--rushes-alarm) 7%, var(--bg-deep)) 60%)',
+  details:
+    'radial-gradient(ellipse at 50% 120%, color-mix(in srgb, var(--gilt) 20%, transparent), color-mix(in srgb, var(--bg-raised) 40%, var(--bg-deep)) 60%)',
+};
+
+/** What each way in is made of: the shelf's two leaves, the darkroom's blackout curtain, the last room's doors. */
+function leaf(tone: Tone, side: number) {
+  if (tone === 'library')
+    return 'repeating-linear-gradient(90deg, color-mix(in srgb, var(--gilt) 6%, transparent) 0 2px, transparent 2px 46px)';
+  if (tone === 'darkroom')
+    return 'repeating-linear-gradient(90deg, color-mix(in srgb, var(--rushes-alarm) 12%, transparent) 0 14px, transparent 14px 34px)';
+  // a gilt rule a hand's width from where the two doors meet
+  const toward = side === 0 ? '90deg' : '270deg';
+  return `linear-gradient(${toward}, transparent calc(100% - 3rem), color-mix(in srgb, var(--gilt) 18%, transparent) calc(100% - 3rem) calc(100% - 3rem + 1px), transparent calc(100% - 3rem + 1px))`;
+}
+
+/**
+ * The way in. Two leaves that part — doors swing (transform only, so the
+ * compositor does the work), the darkroom's curtain draws aside. Not rendered
+ * at all under reduced motion.
+ */
+function Threshold({ tone }: { tone: Tone }) {
+  const curtain = tone === 'darkroom';
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[3] flex [perspective:1600px]">
+      {[0, 1].map((side) => (
+        <motion.div
+          key={side}
+          className="h-full w-1/2 border-zinc-700 bg-canvas-deep will-change-transform"
+          style={{
+            transformOrigin: side === 0 ? 'left center' : 'right center',
+            borderRightWidth: side === 0 ? 1 : 0,
+            borderLeftWidth: side === 1 ? 1 : 0,
+            backgroundImage: leaf(tone, side),
+          }}
+          initial={curtain ? { x: '0%' } : { rotateY: 0, opacity: 1 }}
+          animate={
+            curtain
+              ? { x: side === 0 ? '-101%' : '101%' }
+              : { rotateY: side === 0 ? -96 : 96, opacity: 0 }
+          }
+          transition={{ duration: curtain ? 0.9 : 1.1, delay: 0.05, ease: [0.65, 0, 0.35, 1] }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function RoomShell({ room, tone, children }: { room: SecretRoomId; tone: Tone; children: ReactNode }) {
   const { closeRoom } = useMagic();
   const reduced = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
@@ -96,58 +152,47 @@ function RoomShell({
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => event.key === 'Escape' && closeRoom();
     window.addEventListener('keydown', onKey);
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = overflow;
-    };
+    return () => window.removeEventListener('keydown', onKey);
   }, [closeRoom]);
 
-  const backdrop =
-    tone === 'darkroom'
-      ? 'radial-gradient(ellipse at 50% 0%, rgba(150, 20, 12, 0.55), rgba(20, 2, 2, 0.98) 60%)'
-      : tone === 'library'
-        ? 'radial-gradient(ellipse at 50% -10%, rgba(217, 180, 106, 0.22), rgba(10, 8, 5, 0.98) 62%)'
-        : 'radial-gradient(ellipse at 50% 120%, rgba(217, 180, 106, 0.2), rgba(6, 6, 10, 0.98) 60%)';
+  // The page behind is covered completely, so stop it working while a room is
+  // open: freeze its scroll (without the scrollbar reflow), pause the reel and
+  // the marquees (index.css, [data-room-open]). Resumed on the way out.
+  useEffect(() => {
+    const release = lockScroll();
+    const root = document.documentElement;
+    root.dataset.roomOpen = room;
+    const playing = Array.from(document.querySelectorAll('video')).filter(
+      (video) => !video.paused && !ref.current?.contains(video)
+    );
+    playing.forEach((video) => video.pause());
+    return () => {
+      release();
+      if (root.dataset.roomOpen === room) delete root.dataset.roomOpen;
+      playing.forEach((video) => void video.play().catch(() => undefined));
+    };
+  }, [room]);
 
   return (
     <motion.div
       data-surface="ink"
       className="fixed inset-0 z-[190] overflow-hidden"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.45 } }}
+      animate={{ opacity: 1, transition: { duration: 0.25 } }}
+      exit={{ opacity: 0, transition: { duration: 0.4 } }}
     >
-      {/* the doors — two leaves that swing away as the room opens */}
-      {!reduced && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[3] flex [perspective:1600px]">
-          {[0, 1].map((side) => (
-            <motion.div
-              key={side}
-              className="h-full w-1/2 border-zinc-700 bg-[#0d0b08]"
-              style={{
-                transformOrigin: side === 0 ? 'left center' : 'right center',
-                borderRightWidth: side === 0 ? 1 : 0,
-                borderLeftWidth: side === 1 ? 1 : 0,
-                backgroundImage:
-                  'repeating-linear-gradient(90deg, rgba(217,180,106,0.05) 0 2px, transparent 2px 46px)',
-              }}
-              initial={{ rotateY: 0 }}
-              animate={{ rotateY: side === 0 ? -98 : 98, opacity: 0 }}
-              transition={{ duration: 1.5, delay: 0.15, ease: [0.65, 0, 0.35, 1] }}
-            />
-          ))}
-        </div>
-      )}
+      {!reduced && <Threshold tone={tone} />}
+      {/* The room's floor: opaque from the first frame, so the page behind
+          never shows through the light while it is still coming up. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] bg-canvas-deep" />
       {/* the light that comes through */}
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: backdrop }}
+        style={{ background: BACKDROP[tone] }}
         initial={{ opacity: reduced ? 1 : 0.4 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.6, ease: EASE }}
+        transition={{ duration: 1.2, ease: EASE }}
       />
 
       <div
@@ -156,23 +201,27 @@ function RoomShell({
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="custom-scrollbar relative z-[2] h-full overflow-y-auto focus:outline-none"
+        className="custom-scrollbar relative z-[2] h-full overflow-y-auto overscroll-contain focus:outline-none"
       >
-        <div className="mx-auto max-w-5xl px-5 pb-24 pt-8 md:px-10 md:pt-12">
+        {/* The way out stays in reach however far down the room is read —
+            on a phone there is no Escape key. */}
+        <div className="sticky top-0 z-10 px-4 pt-4 md:px-8 md:pt-6">
           <button
             type="button"
             onClick={closeRoom}
-            className="group inline-flex min-h-[44px] items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:text-gilt"
+            className="group inline-flex min-h-[44px] items-center gap-2 rounded-full border border-zinc-800 bg-canvas-deep/80 px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:border-gilt/60 hover:text-gilt"
           >
             <ArrowLeft size={14} className="transition-transform duration-300 group-hover:-translate-x-1" />
             return to the archive
           </button>
+        </div>
 
+        <div className="mx-auto max-w-5xl px-5 pb-24 md:px-10">
           <motion.header
-            className="mt-12 text-center md:mt-16"
-            initial={{ opacity: 0, y: 16 }}
+            className="mt-10 text-center md:mt-14"
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: reduced ? 0 : 0.7, ease: EASE }}
+            transition={{ duration: 0.9, delay: reduced ? 0 : ENTER, ease: EASE }}
           >
             <Glyph name={tone === 'library' ? 'key' : tone === 'darkroom' ? 'lens' : 'door'} size={26} className="mx-auto text-gilt" />
             <h2 className="mt-5 font-book text-5xl italic leading-none tracking-[-0.01em] text-zinc-50 md:text-7xl">{title}</h2>
@@ -194,6 +243,7 @@ function RoomShell({
 
 function RestrictedSection() {
   const { collect } = useMagic();
+  const reduced = useReducedMotion();
   const notes = getRoomNotes('library');
   const torn = useMemo(() => {
     const journal = getArchiveThoughts().filter((t) => t.href);
@@ -223,9 +273,9 @@ function RestrictedSection() {
             {torn.map((line, i) => (
               <motion.li
                 key={line.id}
-                initial={{ opacity: 0, y: 14 }}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.9 + i * 0.07, ease: EASE }}
+                transition={{ duration: 0.7, delay: ENTER + 0.3 + i * 0.06, ease: EASE }}
               >
                 <button
                   type="button"
@@ -249,6 +299,7 @@ function RestrictedSection() {
 // ---------------------------------------------------------------------------
 
 function Print({ entry, index, onDeveloped }: { entry: ReturnType<typeof getPhotographyEntries>[number]; index: number; onDeveloped: () => void }) {
+  const reduced = useReducedMotion();
   const [developed, setDeveloped] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const src = ownerArchiveImage(entry.coverImage);
@@ -263,15 +314,19 @@ function Print({ entry, index, onDeveloped }: { entry: ReturnType<typeof getPhot
 
   return (
     <motion.li
-      initial={{ opacity: 0, y: 20 }}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.8 + (index % 6) * 0.08, ease: EASE }}
+      transition={{ duration: 0.8, delay: ENTER + 0.15 + (index % 6) * 0.06, ease: EASE }}
       className="[perspective:1200px]"
     >
       <button
         type="button"
-        onPointerEnter={develop}
-        onFocus={develop}
+        // A tap is pointerenter + focus + click. Developing on the first two and
+        // then flipping on the click turned the print face-down the moment it
+        // was touched, so only a mouse develops on enter and only the keyboard
+        // develops on focus; a tap develops on its click.
+        onPointerEnter={(event) => event.pointerType === 'mouse' && develop()}
+        onFocus={(event) => event.currentTarget.matches(':focus-visible') && develop()}
         onClick={() => (developed ? setFlipped((f) => !f) : develop())}
         aria-label={`${entry.title}. ${developed ? 'Turn the print over' : 'Develop the print'}`}
         className="relative block aspect-[4/5] w-full text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gilt"
@@ -279,10 +334,10 @@ function Print({ entry, index, onDeveloped }: { entry: ReturnType<typeof getPhot
         <motion.span
           className="absolute inset-0 block [transform-style:preserve-3d]"
           animate={{ rotateY: flipped ? 180 : 0 }}
-          transition={{ duration: 0.8, ease: EASE }}
+          transition={{ duration: reduced ? 0 : 0.8, ease: EASE }}
         >
           {/* front: the print, developing out of white */}
-          <span className="absolute inset-0 block overflow-hidden bg-[#f2ece0] p-2 shadow-[0_24px_50px_-24px_rgba(0,0,0,0.9)] [backface-visibility:hidden]">
+          <span className="absolute inset-0 block overflow-hidden bg-bone p-2 shadow-[0_24px_50px_-24px_rgba(0,0,0,0.9)] [backface-visibility:hidden]">
             <SafeImage
               src={src}
               alt={entry.title}
@@ -329,7 +384,7 @@ function Darkroom() {
           ))}
         </div>
       )}
-      <p className="text-center font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff8a70]">
+      <p className="text-center font-mono text-[10px] uppercase tracking-[0.24em] text-safelight">
         {count === 0 ? 'hover or tap a print to develop it' : `${count} of ${prints.length} developed · tap a print to read its back`}
       </p>
       <ul className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
@@ -345,6 +400,7 @@ function Darkroom() {
 
 function RoomOfDetails() {
   const { found } = useMagic();
+  const reduced = useReducedMotion();
   const notes = getRoomNotes('details');
 
   const facts = useMemo(() => {
@@ -405,9 +461,9 @@ function RoomOfDetails() {
         {facts.map((fact, i) => (
           <motion.div
             key={fact.label}
-            initial={{ opacity: 0, y: 10 }}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.9 + i * 0.08, ease: EASE }}
+            transition={{ duration: 0.7, delay: ENTER + 0.25 + i * 0.07, ease: EASE }}
             className="grid gap-2 py-6 md:grid-cols-[14rem_1fr] md:gap-8"
           >
             <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gilt">{fact.label}</dt>

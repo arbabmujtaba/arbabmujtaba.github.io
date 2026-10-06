@@ -16,6 +16,7 @@ import { getLiveEditBridgeScript } from '../lib/liveEditBridge';
 import { mapElementToContent, type ClickedElementPayload, type MappedElement, type ContentItem } from '../lib/elementMapper';
 import type { ToastType } from './Toast';
 import { ConfirmDialog } from './admin/ui';
+import { startPublish } from './admin/api';
 
 // Types
 interface CMSItem {
@@ -358,23 +359,15 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
       }
       const doc = await res.json();
 
-      const publishRes = await fetch('/api/publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          collection: mappedElement.collection,
-          slug: mappedElement.slug,
-          title: doc.data?.title || mappedElement.slug,
-          body: doc.body || '',
-          frontmatter: doc.data || {},
-        }),
+      // Through the shared client so the studio token (when STUDIO_TOKEN is set)
+      // rides along — the hand-rolled fetch here never sent it.
+      const data = await startPublish({
+        collection: mappedElement.collection,
+        slug: mappedElement.slug,
+        title: doc.data?.title || mappedElement.slug,
+        body: doc.body || '',
+        frontmatter: doc.data || {},
       });
-
-      if (!publishRes.ok) {
-        const errBody = await publishRes.json().catch(() => null);
-        throw new Error(errBody?.error || `Publish failed (HTTP ${publishRes.status})`);
-      }
-      const data = await publishRes.json();
       // Hand the job to the shell so the publishing dialog shows the eleven
       // steps. This used to report `data.message`, which /api/publish never
       // returns, so a push ran with no progress and no way to see it fail.

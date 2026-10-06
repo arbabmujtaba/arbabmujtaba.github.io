@@ -239,14 +239,14 @@ export type SecretKind = 'room' | 'note' | 'egg' | 'ink';
 export type SecretRoomId = 'library' | 'darkroom' | 'details';
 
 /** The easter eggs implemented in code. A secret of kind `egg` supplies the copy for one. */
-export type SecretTrigger = 'seal' | 'constellation' | 'fullstop' | 'lumos' | 'alohomora' | 'console';
+export type SecretTrigger = 'seal' | 'constellation' | 'fullstop' | 'lumos' | 'alohomora' | 'console' | 'invitation';
 
 /** Sections of the home page that can carry invisible-ink marginalia. */
 export type InkSection = 'hero' | 'frames' | 'work' | 'writing' | 'timeline' | 'notes' | 'archive';
 
 export const SECRET_KINDS: SecretKind[] = ['note', 'egg', 'ink', 'room'];
 export const SECRET_ROOMS: SecretRoomId[] = ['library', 'darkroom', 'details'];
-export const SECRET_TRIGGERS: SecretTrigger[] = ['seal', 'constellation', 'fullstop', 'lumos', 'alohomora', 'console'];
+export const SECRET_TRIGGERS: SecretTrigger[] = ['seal', 'constellation', 'fullstop', 'lumos', 'alohomora', 'console', 'invitation'];
 export const INK_SECTIONS: InkSection[] = ['hero', 'frames', 'work', 'writing', 'timeline', 'notes', 'archive'];
 
 export interface SecretEntry {

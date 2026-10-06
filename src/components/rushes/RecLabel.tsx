@@ -1,4 +1,55 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+
+/** Characters the label cycles through while it resolves — all in the mono face, so nothing changes width. */
+const NOISE = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#/+:';
+const DECODE_MS = 650;
+
+/**
+ * The label resolves out of noise the first time it comes into view, the way
+ * a slate is read off a monitor. One pass, then plain text; the real words are
+ * on the page from the first paint (and for screen readers throughout), and
+ * reduced motion skips it.
+ */
+function useDecode(text: string | null, enabled: boolean) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [shown, setShown] = useState(text);
+  useEffect(() => {
+    setShown(text);
+    const node = ref.current;
+    if (!enabled || !text || !node || typeof IntersectionObserver === 'undefined') return;
+    let frame = 0;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        let start = 0;
+        const run = (now: number) => {
+          if (!start) start = now;
+          const progress = (now - start) / DECODE_MS;
+          if (progress >= 1) {
+            setShown(text);
+            return;
+          }
+          const settled = Math.floor(progress * text.length);
+          const tick = Math.floor(now / 45);
+          setShown(
+            Array.from(text, (c, i) => (i < settled || c === ' ' ? c : NOISE[(i * 7 + tick) % NOISE.length])).join('')
+          );
+          frame = requestAnimationFrame(run);
+        };
+        frame = requestAnimationFrame(run);
+      },
+      { threshold: 0.9 }
+    );
+    observer.observe(node);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [text, enabled]);
+  return [ref, shown] as const;
+}
 
 interface RecLabelProps {
   /** Section name, rendered after the REC prefix. */
@@ -33,6 +84,8 @@ export default function RecLabel({
   dotLabel = 'A red light',
 }: RecLabelProps) {
   const shouldReduceMotion = useReducedMotion();
+  const text = `${lowercase ? 'rec:' : 'REC:'} ${typeof children === 'string' ? children : ''}`;
+  const [labelRef, shown] = useDecode(typeof children === 'string' ? text : null, !shouldReduceMotion);
 
   return (
     <div
@@ -46,7 +99,7 @@ export default function RecLabel({
           onClick={onDot}
           aria-label={dotLabel}
           data-enchanted="safelight"
-          className="-m-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-alarm"
+          className="-m-[18px] flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-alarm"
         >
           <motion.span
             aria-hidden="true"
@@ -62,13 +115,20 @@ export default function RecLabel({
           aria-hidden="true"
           className="inline-block h-2 w-2 shrink-0 rounded-full bg-alarm"
           initial={{ opacity: 1 }}
-            whileInView={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: [1, 0.3, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
-      <span>
-        {lowercase ? 'rec:' : 'REC:'} {children}
-      </span>
+      {typeof children === 'string' ? (
+        <span ref={labelRef}>
+          <span className="sr-only">{text}</span>
+          <span aria-hidden="true">{shown}</span>
+        </span>
+      ) : (
+        <span>
+          {lowercase ? 'rec:' : 'REC:'} {children}
+        </span>
+      )}
     </div>
   );
 }

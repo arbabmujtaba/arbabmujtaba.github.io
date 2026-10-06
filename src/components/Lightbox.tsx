@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
 import { navigate, shouldInterceptClick } from '../lib/navigation';
 import { normalizeImagePath } from '../lib/image';
+import { lockScroll } from '../lib/scrollLock';
 
 export interface LightboxFrame {
   /** The original file — full resolution, deliberately not a derivative. */
@@ -104,12 +105,11 @@ export default function Lightbox({ frames, openIndex, onClose, onNavigate }: Lig
     if (!isOpen) return;
 
     restoreFocusRef.current = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const release = lockScroll();
     closeButtonRef.current?.focus();
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      release();
       const restore = restoreFocusRef.current;
       if (restore instanceof HTMLElement) restore.focus();
     };

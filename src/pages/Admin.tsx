@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 import DeploymentCenter from '../components/DeploymentCenter';
 import LiveEditor from '../components/LiveEditor';
-import PublishingModal from '../components/PublishingModal';
+import PublishingModal, { ACTIVE_JOB_KEY } from '../components/PublishingModal';
 import { ToastContainer, type ToastItem, type ToastType } from '../components/Toast';
-import { listContent } from '../components/admin/api';
+import { getPublishJob, listContent } from '../components/admin/api';
 import { ContentList, DEFAULT_FILTER, type ListFilter } from '../components/admin/ContentList';
 import { Dashboard } from '../components/admin/Dashboard';
 import { EntryEditor, type EditorMode } from '../components/admin/EntryEditor';
@@ -85,6 +85,28 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // Pick a publish back up after a reload (Vite reloads the page when content changes mid-publish).
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = window.sessionStorage.getItem(ACTIVE_JOB_KEY);
+    } catch {
+      stored = null;
+    }
+    if (!stored) return;
+    void getPublishJob(stored)
+      .then((job) => {
+        if (!mounted.current) return;
+        if (job && job.status !== 'success') {
+          setJobId(job.id);
+          setPublishOpen(true);
+        } else {
+          window.sessionStorage.removeItem(ACTIVE_JOB_KEY);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     const previous = document.title;

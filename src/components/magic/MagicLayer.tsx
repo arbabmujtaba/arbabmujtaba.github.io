@@ -1,12 +1,26 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X } from 'lucide-react';
 import Glyph from './Glyph';
-import { castSpell, COLLECTIBLES, cue, SPELL_EVENT, useMagic, type CollectibleId } from '../../lib/magic';
+import {
+  castSpell,
+  COLLECTIBLES,
+  cue,
+  INVITED,
+  prefetchRooms,
+  readFlag,
+  SPELL_EVENT,
+  useMagic,
+  WAND_EVENT,
+  WAND_TOUCHED,
+  writeFlag,
+  type CollectibleId,
+} from '../../lib/magic';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 import { getEgg, isEggEnabled, isRoomEnabled } from '../../lib/secrets';
 import { isCircle, isShake, type Point } from '../../lib/gestures';
 
-const Rooms = lazy(() => import('./Rooms'));
+const Rooms = lazy(prefetchRooms);
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -127,9 +141,18 @@ function WandEffects() {
       if (!frame) g.clearRect(0, 0, canvas.width, canvas.height);
     };
 
+    let plate: HTMLElement | null = null;
     const onMove = (event: PointerEvent) => {
       if (event.pointerType === 'touch') return;
       pointer = { x: event.clientX, y: event.clientY };
+      // The photograph under the wand catches the light (index.css).
+      const over = (event.target as Element | null)?.closest?.<HTMLElement>('.image-frame') ?? null;
+      if (over !== plate) plate = over;
+      if (plate) {
+        const rect = plate.getBoundingClientRect();
+        plate.style.setProperty('--wx', `${event.clientX - rect.left}px`);
+        plate.style.setProperty('--wy', `${event.clientY - rect.top}px`);
+      }
       const now = performance.now();
       const point = { x: event.clientX, y: event.clientY, t: now };
       if (last && Math.hypot(point.x - last.x, point.y - last.y) < 7) return;
@@ -177,6 +200,32 @@ function WandEffects() {
   const lumosRef = useRef(lumos);
   lumosRef.current = lumos;
 
+  // A phone has no hovering pointer to shake, so shaking the phone itself
+  // levitates. Only where motion events need no permission prompt (Android):
+  // iOS asks for one, and a dialog is not a spell.
+  useEffect(() => {
+    if (!wand || reduced || typeof DeviceMotionEvent === 'undefined') return;
+    if (typeof (DeviceMotionEvent as unknown as { requestPermission?: unknown }).requestPermission === 'function') return;
+    const peaks: number[] = [];
+    let cooldown = 0;
+    const onMotion = (event: DeviceMotionEvent) => {
+      const a = event.acceleration;
+      if (!a || a.x === null || a.y === null || a.z === null) return;
+      const now = performance.now();
+      if (now < cooldown || Math.hypot(a.x, a.y, a.z) < 16) return;
+      if (peaks.length && now - peaks[peaks.length - 1] < 90) return; // one peak per swing
+      peaks.push(now);
+      while (peaks.length && now - peaks[0] > 900) peaks.shift();
+      if (peaks.length >= 3) {
+        peaks.length = 0;
+        cooldown = now + 1500;
+        castSpell('leviosa', { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+      }
+    };
+    window.addEventListener('devicemotion', onMotion);
+    return () => window.removeEventListener('devicemotion', onMotion);
+  }, [wand, reduced]);
+
   // Escape puts the wand away (unless something else is open and wants it).
   useEffect(() => {
     if (!wand) return;
@@ -213,10 +262,13 @@ function WandEffects() {
       if (!frame) frame = requestAnimationFrame(paint);
     };
     paint();
+    // A finger has no hover: the light goes where the page is touched.
+    window.addEventListener('pointerdown', onMove, { passive: true });
     window.addEventListener('pointermove', onMove, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       cancelAnimationFrame(frame);
+      window.removeEventListener('pointerdown', onMove);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('scroll', onScroll);
     };
@@ -265,7 +317,7 @@ function Spellbook() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="fixed bottom-[5.5rem] left-1/2 z-[160] flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full border border-gilt/40 bg-canvas-raised/95 px-2 py-1.5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] backdrop-blur md:bottom-8"
+          className="fixed bottom-[5.5rem] right-3 z-[160] flex max-w-[calc(100vw-6.5rem)] items-center gap-1 rounded-full border border-gilt/40 bg-canvas-raised/95 px-2 py-1.5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] backdrop-blur md:bottom-8 md:left-1/2 md:right-auto md:max-w-[calc(100vw-1.5rem)] md:-translate-x-1/2"
         >
           <span className="hidden pl-3 pr-2 font-book text-sm italic text-zinc-300 lg:inline">
             draw a circle in the air for light · shake for levitation
@@ -399,7 +451,7 @@ function WhisperToast() {
   const { whisper, dismissWhisper } = useMagic();
   useEffect(() => {
     if (!whisper) return;
-    const timer = window.setTimeout(dismissWhisper, 6500);
+    const timer = window.setTimeout(dismissWhisper, whisper.action ? 12000 : 6500);
     return () => window.clearTimeout(timer);
   }, [whisper, dismissWhisper]);
 
@@ -419,6 +471,21 @@ function WhisperToast() {
             <div className="min-w-0">
               <p className="font-book text-lg italic leading-tight text-zinc-50">{whisper.title}</p>
               {whisper.body && <p className="mt-1 font-book text-[0.95rem] leading-snug text-zinc-300">{whisper.body}</p>}
+              {whisper.action && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Dismiss first: the action may raise a whisper of its own.
+                    const action = whisper.action;
+                    dismissWhisper();
+                    action?.run();
+                  }}
+                  className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-gilt/60 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-gilt transition-colors hover:bg-gilt/10"
+                >
+                  <Glyph name="wand" size={14} />
+                  {whisper.action.label}
+                </button>
+              )}
             </div>
             <button
               type="button"
@@ -435,7 +502,7 @@ function WhisperToast() {
   );
 }
 
-function Ledger() {
+function Ledger({ invited }: { invited: boolean }) {
   const { found, ledgerOpen, setLedgerOpen, openRoom, forgetEverything } = useMagic();
   const available = useMemo(availableCollectibles, []);
   const foundHere = available.filter((item) => found.includes(item.id));
@@ -462,7 +529,9 @@ function Ledger() {
     return () => window.removeEventListener('keydown', onKey);
   }, [ledgerOpen, setLedgerOpen]);
 
-  if (foundHere.length === 0 && !ledgerOpen) return null;
+  // Hidden until there is a reason for it: something found, or the visitor
+  // having been told there is something to find.
+  if (foundHere.length === 0 && !ledgerOpen && !invited) return null;
 
   return (
     <>
@@ -602,6 +671,25 @@ function Ambience() {
 function RoomHost() {
   const { room } = useMagic();
   const [loaded, setLoaded] = useState(false);
+  // Warm the rooms on idle, so the first door opens onto a room rather than a
+  // network wait. Mounting <Rooms/> with nothing open renders nothing.
+  useEffect(() => {
+    let cancelled = false;
+    const warm = () => {
+      prefetchRooms().then(
+        () => !cancelled && setLoaded(true),
+        () => undefined
+      );
+    };
+    // Safari has no requestIdleCallback.
+    const idle = 'requestIdleCallback' in window;
+    const handle = idle ? window.requestIdleCallback(warm, { timeout: 4000 }) : window.setTimeout(warm, 2500);
+    return () => {
+      cancelled = true;
+      if (idle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, []);
   useEffect(() => {
     if (room) setLoaded(true);
   }, [room]);
@@ -614,17 +702,82 @@ function RoomHost() {
 }
 
 /**
+ * The only hint on a phone. Nobody opens devtools or types a spell there, and
+ * the wand is a small icon at the top of a page that has scrolled away — so a
+ * first-time visitor who has found nothing gets told, once, that there is
+ * something to find, with a button that picks the wand up for them. Copy and
+ * the on/off switch are `trigger: invitation` in content/secrets.
+ */
+function Invitation({ invited, onInvited }: { invited: boolean; onInvited: () => void }) {
+  const { found, wand, whisperOf, setWand } = useMagic();
+  const coarse = useMediaQuery('(pointer: coarse)');
+
+  useEffect(() => {
+    if (invited || wand || found.length > 0 || readFlag(WAND_TOUCHED) || !isEggEnabled('invitation')) return;
+    let done = false;
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('scroll', onScroll);
+    };
+    const show = () => {
+      if (done) return;
+      // Not over a drawer, a lightbox or a room — wait for the next scroll.
+      if (document.querySelector('[aria-modal="true"]')) return;
+      done = true;
+      cleanup();
+      writeFlag(INVITED);
+      onInvited();
+      const egg = getEgg('invitation');
+      window.dispatchEvent(new CustomEvent(WAND_EVENT, { detail: 'beckon' }));
+      whisperOf(
+        egg?.title || 'This is not only a website.',
+        egg?.body?.trim() || 'Part of this archive is hidden. The wand at the top of the page is the way in.',
+        'wand',
+        { label: egg?.description || 'Pick up the wand', run: () => setWand(true) }
+      );
+    };
+    // Once they are reading (past the opening screen), or after a while.
+    const onScroll = () => window.scrollY > window.innerHeight * 0.6 && show();
+    const timer = window.setTimeout(show, 15000);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return cleanup;
+  }, [invited, wand, found.length, whisperOf, setWand, onInvited]);
+
+  // The first time the wand is picked up on a touch screen, say what a finger
+  // can do with it — the desktop chip's "draw a circle in the air" means
+  // nothing there.
+  useEffect(() => {
+    if (!coarse) return;
+    const onWand = (event: Event) => {
+      if ((event as CustomEvent).detail !== 'touched') return;
+      whisperOf(
+        'The wand is out',
+        'Tap anywhere for sparks. Lumos lights the ink in the margins; the stars, the seal and the odd book on the shelf all answer a touch.',
+        'wand'
+      );
+    };
+    window.addEventListener(WAND_EVENT, onWand);
+    return () => window.removeEventListener(WAND_EVENT, onWand);
+  }, [coarse, whisperOf]);
+
+  return null;
+}
+
+/**
  * MagicLayer — everything the hidden layer draws or listens for. Lazy, and
  * mounted on idle by App, so the first paint never waits on it.
  */
 export default function MagicLayer() {
+  const [invited, setInvited] = useState(() => readFlag(INVITED));
+  const markInvited = useCallback(() => setInvited(true), []);
   return (
     <>
       <WandEffects />
       <Spellbook />
       <SpellHandler />
       <WhisperToast />
-      <Ledger />
+      <Invitation invited={invited} onInvited={markInvited} />
+      <Ledger invited={invited} />
       <Ambience />
       <RoomHost />
     </>

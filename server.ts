@@ -789,8 +789,12 @@ const deploymentService = new DeploymentService(publishingService);
 
 /**
  * POST /api/publish
- * Triggers the full 11-step publishing pipeline.
- * Returns a job ID immediately; pipeline runs asynchronously.
+ * Starts the 11-step publishing pipeline and answers at once with the job id.
+ *
+ * It used to await the whole pipeline — push included — before replying, so the
+ * progress dialog could not even open until publishing was over, and a push
+ * waiting on a hidden credential prompt left the editor hanging with nothing to
+ * show for it.
  */
 app.post('/api/publish', async (req, res) => {
   try {
@@ -807,23 +811,48 @@ app.post('/api/publish', async (req, res) => {
       return res.status(400).json({ error: INVALID_SLUG_MESSAGE });
     }
 
-    const job = await publishingService.publish({
+    // Publish into the file this entry already lives in (its name can differ from the slug).
+    const existingPath = await resolveDocPath(collection, slug);
+
+    const job = publishingService.start({
       collection,
       slug,
       title,
       body: body || '',
       frontmatter: frontmatter || {},
+      filePath: existingPath ?? undefined,
       images,
     });
 
-    res.json({
+    res.status(202).json({
       success: true,
       jobId: job.id,
       status: job.status,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    fail(res, error, 'POST /api/publish');
   }
+});
+
+/**
+ * GET /api/publish
+ * Recent publishing jobs, newest first — lets the admin pick a running job back
+ * up after a reload.
+ */
+app.get('/api/publish', (_req, res) => {
+  res.json(publishingService.getRecentJobs(20));
+});
+
+/**
+ * POST /api/publish/:jobId/retry-push
+ * The commit already exists locally; push it again (after fixing sign-in, say).
+ */
+app.post('/api/publish/:jobId/retry-push', (req, res) => {
+  const job = publishingService.retryPush(req.params.jobId);
+  if (!job) {
+    return res.status(409).json({ error: 'This publish cannot be retried — it is still running, already succeeded, or never reached the commit.' });
+  }
+  res.status(202).json({ success: true, jobId: job.id, status: job.status });
 });
 
 /**
@@ -844,28 +873,31 @@ app.get('/api/publish/:jobId', (req, res) => {
  */
 app.get('/api/publish/:jobId/progress', (req, res) => {
   const { jobId } = req.params;
+  const job = publishingService.getJob(jobId);
 
   res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
-  const sendUpdate = (job: any) => {
-    res.write(`data: ${JSON.stringify(job)}\n\n`);
-  };
-
-  // Subscribe to job updates
-  const unsubscribe = publishingService.subscribe(jobId, sendUpdate);
-
-  // Send initial state
-  const job = publishingService.getJob(jobId);
-  if (job) {
-    sendUpdate(job);
-  } else {
-    res.write(`data: ${JSON.stringify({ error: 'Job not found' })}\n\n`);
+  if (!job) {
+    // The client treats this as final (the server restarted, or the id is stale).
+    res.write(`data: ${JSON.stringify({ error: 'Job not found', notFound: true })}\n\n`);
     res.end();
     return;
   }
+
+  const sendUpdate = (current: any) => {
+    res.write(`data: ${JSON.stringify(current)}\n\n`);
+  };
+
+  // Tell EventSource to reconnect quickly if the stream drops, then send the
+  // current state once (subscribe() no longer echoes it, which used to send
+  // every first frame twice).
+  res.write('retry: 1500\n\n');
+  sendUpdate(job);
+  const unsubscribe = publishingService.subscribe(jobId, sendUpdate);
 
   // Keep connection alive with heartbeat
   const heartbeat = setInterval(() => {

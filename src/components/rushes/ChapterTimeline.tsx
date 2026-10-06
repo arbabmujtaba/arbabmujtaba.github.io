@@ -144,7 +144,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
       </nav>
 
       <ol ref={railRef} className="relative">
-        <div aria-hidden="true" className="absolute bottom-0 left-[11px] top-0 w-px bg-zinc-800 md:left-[7.5rem]">
+        <div aria-hidden="true" className="absolute bottom-0 left-[11px] top-0 w-px bg-zinc-800 md:left-[9.5rem]">
           <motion.div
             className="absolute inset-0 origin-top bg-gradient-to-b from-accent via-accent to-[var(--accent-soft)]"
             style={{ scaleY: reduced ? 1 : drawn }}
@@ -161,7 +161,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
               <motion.article
                 id={`chapter-${chapter.slug}`}
                 data-slug={chapter.slug}
-                className="relative grid grid-cols-1 gap-3 pb-16 pl-10 md:grid-cols-[7.5rem_1fr] md:gap-14 md:pb-24 md:pl-0"
+                className="relative grid grid-cols-1 gap-3 pb-16 pl-10 md:grid-cols-[9.5rem_1fr] md:gap-14 md:pb-24 md:pl-0"
                 initial={reduced ? { opacity: 0 } : { opacity: 0, y: 26 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
@@ -170,13 +170,13 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                 {/* marker */}
                 <span
                   aria-hidden="true"
-                  className="absolute left-[5px] top-3 h-[13px] w-[13px] rounded-full border border-accent bg-canvas md:left-[calc(7.5rem-6px)]"
+                  className="absolute left-[5px] top-3 h-[13px] w-[13px] rounded-full border border-accent bg-canvas md:left-[calc(9.5rem-6px)]"
                 >
                   <span className="absolute inset-[3px] rounded-full bg-accent" />
                 </span>
 
-                <div className="md:pr-8 md:text-right">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+                <div className="md:pr-7 md:text-right">
+                  <p className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
                     chapter {ROMAN[index] ?? index + 1}
                   </p>
                   <p className="mt-1 font-display text-4xl font-medium leading-none tracking-[-0.06em] text-zinc-600 md:text-5xl">

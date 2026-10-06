@@ -34,14 +34,21 @@
     <script>
       // The home hero is the largest paint, but it is only discovered after the
       // app and the home chunk have loaded. Start fetching it now — home only,
-      // and the same srcset/sizes SafeImage renders, so it is one request.
+      // and the same sources HeroPlate in src/pages/Home.tsx renders (a wide
+      // band on landscape screens, the portrait frame on portrait ones), so it
+      // is one request either way.
       if (location.pathname === '/') {
+        var wide = matchMedia('(orientation: landscape)').matches;
+        var base = '/uploads/optimized/';
+        var set = wide
+          ? [1280, 1920, 2560].map(function (w) { return base + 'home/hero-dusk-wide-' + w + '.webp ' + w + 'w'; })
+          : [480, 768, 1536].map(function (w) { return base + 'photography/1785134270800-642096424-' + w + '.webp ' + w + 'w'; });
         var hero = document.createElement('link');
         hero.rel = 'preload';
         hero.as = 'image';
         hero.type = 'image/webp';
         hero.setAttribute('fetchpriority', 'high');
-        hero.setAttribute('imagesrcset', '/uploads/optimized/photography/1785134270800-642096424-480.webp 480w, /uploads/optimized/photography/1785134270800-642096424-768.webp 768w, /uploads/optimized/photography/1785134270800-642096424-1536.webp 1536w');
+        hero.setAttribute('imagesrcset', set.join(', '));
         hero.setAttribute('imagesizes', '100vw');
         document.head.appendChild(hero);
       }

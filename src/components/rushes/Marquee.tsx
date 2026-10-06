@@ -58,6 +58,7 @@ export default function Marquee({
       data-marquee-fade={fade ? 'true' : undefined}
     >
       <div
+        data-marquee-track
         className="flex w-max gap-10 will-change-transform group-hover:[animation-play-state:paused]"
         style={{
           animation: `rushes-marquee ${duration}s linear infinite${

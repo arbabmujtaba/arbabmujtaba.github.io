@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import Footer from '../components/Footer';
-import SafeImage from '../components/SafeImage';
 import Constellation from '../components/magic/Constellation';
 import FullStop from '../components/magic/FullStop';
 import InkNote from '../components/magic/InkNote';
@@ -14,14 +13,12 @@ import {
   LivingJournal,
   Marquee,
   MemoryMap,
-  Notebook,
   PhotoShuffle,
   ProjectIndex,
   RecLabel,
   ReelShowcase,
   StackedHeading,
   ThoughtDrawer,
-  type NotebookItem,
 } from '../components/rushes';
 import {
   getFavoriteItems,
@@ -34,6 +31,7 @@ import {
   getTimelineMilestones,
 } from '../lib/cms';
 import { useMagic } from '../lib/magic';
+import { getLocalWebpSources } from '../lib/image';
 import { isRoomEnabled } from '../lib/secrets';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -47,9 +45,43 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * Hero backdrop. Assigned in `.kiro/IMAGE_MAP.md`: at mean luminance 50 it is
  * the darkest large photograph in the archive, so the bone hero type stays
  * legible over it. The hero is an ink plate at any hour (data-surface="ink").
+ *
+ * The frame is a portrait. Landscape screens get a 3:2 band baked out of it at
+ * full resolution (`npm run hero:image`) — clouds, the low sun beside the name,
+ * the tree line — instead of the middle of the 1536 px portrait derivative,
+ * which was soft on large screens and hid the sun behind the wordmark. Portrait
+ * screens keep the portrait frame.
  */
 // Also preloaded by index.html — change both together.
 const HERO_IMAGE = '/uploads/photography/1785134270800-642096424.jpeg';
+const HERO_WIDE_SRCSET = [1280, 1920, 2560]
+  .map((width) => `/uploads/optimized/home/hero-dusk-wide-${width}.webp ${width}w`)
+  .join(', ');
+const HERO_TALL_SRCSET = getLocalWebpSources(HERO_IMAGE)?.srcSet;
+
+function HeroPlate() {
+  // A missing derivative makes the whole <picture> fail; fall back to the original.
+  const [failed, setFailed] = useState(false);
+  const img = (
+    <img
+      src={HERO_IMAGE}
+      alt=""
+      loading="eager"
+      decoding="async"
+      fetchPriority="high"
+      onError={() => setFailed(true)}
+      className="hero-plate h-[114%] w-full object-cover object-[50%_42%]"
+    />
+  );
+  if (failed) return img;
+  return (
+    <picture>
+      <source media="(orientation: landscape)" type="image/webp" srcSet={HERO_WIDE_SRCSET} sizes="100vw" />
+      {HERO_TALL_SRCSET && <source type="image/webp" srcSet={HERO_TALL_SRCSET} sizes="100vw" />}
+      {img}
+    </picture>
+  );
+}
 
 function Section({
   children,
@@ -135,20 +167,6 @@ export default function Home({ setView }: HomeProps) {
     [projects]
   );
 
-  const notebook = useMemo<NotebookItem[]>(
-    () =>
-      journal.slice(0, 3).map((entry) => ({
-        collection: 'journal',
-        slug: entry.slug,
-        title: entry.title,
-        excerpt: entry.excerpt,
-        date: entry.date,
-        kicker: entry.volume ? `Vol. ${String(entry.volume).padStart(2, '0')}` : 'Journal',
-        meta: entry.readingTime,
-      })),
-    [journal]
-  );
-
   const targetOf = (entry: { navTarget?: string; slug: string }) =>
     entry.navTarget || entry.slug.replace('gateway-', '');
 
@@ -165,27 +183,27 @@ export default function Home({ setView }: HomeProps) {
         {/* ===================== HERO ===================== */}
         <section
           data-surface="ink"
-          className="relative flex min-h-[86vh] flex-col justify-end overflow-hidden px-4 pb-14 pt-24 text-zinc-100 md:min-h-[94vh] md:px-12 md:pb-20 lg:px-16"
+          className="relative flex min-h-[88vh] flex-col justify-end overflow-hidden px-4 pb-14 pt-28 text-zinc-100 md:min-h-[100vh] md:px-12 md:pb-20 md:pt-32 lg:min-h-[calc(100vh-4rem)] lg:px-16"
         >
           <motion.div
             aria-hidden="true"
             className="absolute inset-0 -z-10 overflow-hidden bg-canvas-deep"
             style={shouldParallax ? { y: heroImageY } : undefined}
           >
-            <SafeImage
-              src={HERO_IMAGE}
-              alt=""
-              loading="eager"
-              fetchPriority="high"
-              className="h-[114%] w-full object-cover opacity-70"
-              fallback={<div className="hairline-grid h-full w-full bg-canvas-deep" />}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/45 to-canvas/70" />
+            <HeroPlate />
+            {/* Light where the sky is, dark where the type sits: a scrim along
+                the bottom for the name and the copy, a thin one along the top
+                for the header, and the photograph left at full strength between. */}
+            <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/40 via-35% to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-canvas/70 to-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_0%_100%,var(--bg)_0%,transparent_60%)] opacity-70" />
           </motion.div>
 
+          {/* once, after a while: something crossing the sky */}
+          <span aria-hidden="true" className="night-only shooting-star left-[6%] top-[9%] md:left-[22%] md:top-[8%]" />
           {/* the sky above the name, after dark */}
-          <Constellation className="absolute right-[5%] top-[13%] h-[26vw] max-h-[15rem] w-[44vw] max-w-[30rem] md:right-[8%] md:top-[16%]" />
-          <InkNote section="hero" className="absolute left-4 top-28 md:left-12 lg:left-16" />
+          <Constellation className="absolute left-[8%] top-[13%] h-[26vw] max-h-[15rem] w-[44vw] max-w-[30rem] md:left-[27%] md:top-[15%]" />
+          <InkNote section="hero" className="absolute right-4 top-24 md:left-12 md:right-auto md:top-28 lg:left-16" />
 
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -283,15 +301,26 @@ export default function Home({ setView }: HomeProps) {
           </p>
         </Section>
 
-        {/* ===================== THE DESK (living journal) ===================== */}
+        {/* ===================== THE DESK (living journal + the shelf) =====================
+            Was two sections: "On the desk, lately" and "Ink, still drying", which
+            listed the same three journal volumes twice. One desk now — the newest
+            things on it, every volume on the shelf behind, and the odd book. */}
         <Section>
-          <RecLabel>lately</RecLabel>
-          <StackedHeading
-            lines={['On the desk,', 'lately']}
-            className="mt-7"
-            body="Whatever was added last, from every corner of the archive — a volume, a frame, a log. Anything new since your last visit is marked."
-          />
-          <LivingJournal journal={journal} photography={photography} tech={tech} className="mt-14" />
+          <InkNote section="writing" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
+          <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+            <div>
+              <RecLabel>lately</RecLabel>
+              <StackedHeading
+                lines={['On the desk,', 'lately']}
+                className="mt-7"
+                body="Whatever was added last, from every corner of the archive — a volume, a frame, a log — with every volume of the journal on the shelf behind it. Anything new since your last visit is marked."
+              />
+            </div>
+            {journal.length > 0 && <SeeAll onClick={() => setView('journal')}>the journal</SeeAll>}
+          </div>
+          <LivingJournal journal={journal} photography={photography} tech={tech} className="mt-14">
+            {journal.length > 0 && <Bookshelf volumes={journal} className="mt-14" />}
+          </LivingJournal>
         </Section>
 
         {/* ===================== REELS ===================== */}
@@ -346,26 +375,6 @@ export default function Home({ setView }: HomeProps) {
               <SeeAll onClick={() => setView('portfolio')}>all {projects.length} projects</SeeAll>
             </div>
             <ProjectIndex projects={projectIndex} className="mt-14" />
-          </Section>
-        )}
-
-        {/* ===================== WRITING ===================== */}
-        {notebook.length > 0 && (
-          <Section>
-            <InkNote section="writing" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
-            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
-              <div>
-                <RecLabel>writing</RecLabel>
-                <StackedHeading
-                  lines={['Ink, still', 'drying']}
-                  className="mt-7"
-                  body="Words written down lately — thoughts kept before they could disappear: growing up, missed trains, and the quiet hours in between."
-                />
-              </div>
-              <SeeAll onClick={() => setView('journal')}>the journal</SeeAll>
-            </div>
-            <Notebook items={notebook} className="mt-14" />
-            <Bookshelf volumes={journal} className="mt-16 max-w-xl" />
           </Section>
         )}
 

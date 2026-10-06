@@ -25,6 +25,7 @@
   --rushes-signal: #e4fe00;     /* acid lime — REC / live signal only */
   --rushes-alarm: #c22e1f;      /* destructive */
   --rushes-moss: #7fa654;       /* success / published */
+  --starlight: #fff6dc;         /* stars in the hero sky — the night's only white */
   --rushes-grey-1: #9a9a9e;
   --rushes-grey-2: #7d7d83;
   --rushes-grey-3: #696969;
@@ -145,6 +146,7 @@
      layer. A real serif, and the only one. */
   --font-book: "EB Garamond", ui-serif, Georgia, Cambria, serif;
   --color-gilt: var(--gilt);
+  --color-starlight: var(--starlight);
 
   /* ---- Semantic colours (preferred for new code) ---- */
   --color-canvas: var(--bg);
@@ -158,6 +160,8 @@
   --color-accent: var(--accent);
   --color-signal: var(--signal);
   --color-alarm: var(--rushes-alarm);
+  /* The darkroom's lamp: alarm red let up to be readable on a near-black red. */
+  --color-safelight: color-mix(in srgb, var(--rushes-alarm) 45%, var(--rushes-bone));
   --color-moss: var(--rushes-moss);
   --color-bone: var(--rushes-bone);
 
@@ -314,6 +318,74 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
   0%, 100% { opacity: var(--o, 0.7); }
   50% { opacity: 0.15; }
 }
+
+/* The hero photograph develops once on arrival, like a print in the tray:
+   up from a dim, slightly-near plate to full strength. One shot, no loop. */
+@keyframes hero-develop {
+  from { opacity: 0.25; transform: scale(1.045); }
+  to { opacity: 1; transform: scale(1); }
+}
+.hero-plate {
+  transform-origin: 50% 60%;
+  animation: hero-develop 1.8s var(--ease-rushes) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-plate { animation: none; }
+}
+
+/* One shooting star crosses the hero sky, once, a while after arrival.
+   No loop and no script: a delayed one-shot animation, night only. */
+.shooting-star {
+  position: absolute;
+  height: 1px;
+  width: 7rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--starlight) 85%, transparent));
+  filter: drop-shadow(0 0 4px var(--starlight));
+  opacity: 0;
+  transform: rotate(16deg) translateX(0);
+  transform-origin: 0 50%;
+  animation: shooting-star 1.6s var(--ease-rushes) 9s 1 both;
+}
+.shooting-star::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -1.5px;
+  height: 4px;
+  width: 4px;
+  border-radius: 50%;
+  background: var(--starlight);
+}
+@keyframes shooting-star {
+  0% { opacity: 0; transform: rotate(16deg) translateX(0); }
+  10% { opacity: 1; }
+  55% { opacity: 0.9; }
+  100% { opacity: 0; transform: rotate(16deg) translateX(min(40vw, 30rem)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shooting-star { display: none; }
+}
+
+/* With the wand out, a photograph catches its light where the wand passes
+   (MagicLayer sets --wx/--wy on the plate under the pointer). Mouse only. */
+html[data-wand="on"][data-pointer="fine"] .image-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle 200px at var(--wx, 50%) var(--wy, 50%), color-mix(in srgb, var(--gilt) 55%, transparent), transparent 70%),
+    linear-gradient(115deg, transparent 40%, color-mix(in srgb, var(--starlight) 14%, transparent) 50%, transparent 60%);
+  mix-blend-mode: overlay;
+  transition: opacity 400ms var(--ease-rushes);
+}
+html[data-wand="on"][data-pointer="fine"] .image-frame:hover::before { opacity: 1; }
+
+/* While a hidden room covers the page, the page behind stops moving. */
+html[data-room-open] [data-marquee-track] { animation-play-state: paused !important; }
 
 /* Day hides the night sky entirely; night hides the paper sun. */
 [data-theme="day"] .night-only { display: none !important; }
