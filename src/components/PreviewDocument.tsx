@@ -29,7 +29,7 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
   const galleryImages = Array.isArray(frontmatter.galleryImages) ? frontmatter.galleryImages : [];
 
   return (
-    <div className="min-h-screen bg-[#0d0d0c] text-zinc-100">
+    <div className="min-h-screen bg-canvas text-zinc-100">
       <div className="p-6 md:p-12 lg:p-16 space-y-12 max-w-4xl mx-auto">
         {/* Cover image banner */}
         {normalizeImagePath(coverImage) && (

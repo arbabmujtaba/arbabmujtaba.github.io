@@ -367,25 +367,21 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
   .shooting-star { display: none; }
 }
 
-/* With the wand out, a photograph catches its light where the wand passes
-   (MagicLayer sets --wx/--wy on the plate under the pointer). Mouse only. */
-html[data-wand="on"][data-pointer="fine"] .image-frame::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  background:
-    radial-gradient(circle 200px at var(--wx, 50%) var(--wy, 50%), color-mix(in srgb, var(--gilt) 55%, transparent), transparent 70%),
-    linear-gradient(115deg, transparent 40%, color-mix(in srgb, var(--starlight) 14%, transparent) 50%, transparent 60%);
-  mix-blend-mode: overlay;
-  transition: opacity 400ms var(--ease-rushes);
-}
-html[data-wand="on"][data-pointer="fine"] .image-frame:hover::before { opacity: 1; }
 
 /* While a hidden room covers the page, the page behind stops moving. */
 html[data-room-open] [data-marquee-track] { animation-play-state: paused !important; }
+
+/* Revelio: whatever is enchanted on screen shows itself for a moment. */
+@keyframes revelio {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gilt) 0%, transparent); }
+  18% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--gilt) 70%, transparent), 0 0 28px 6px color-mix(in srgb, var(--gilt) 45%, transparent); }
+  70% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--gilt) 50%, transparent), 0 0 18px 2px color-mix(in srgb, var(--gilt) 25%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gilt) 0%, transparent); }
+}
+.is-revealed { animation: revelio 2.8s var(--ease-rushes) 1; }
+@media (prefers-reduced-motion: reduce) {
+  .is-revealed { animation: none; outline: 1px solid var(--gilt); outline-offset: 3px; }
+}
 
 /* Day hides the night sky entirely; night hides the paper sun. */
 [data-theme="day"] .night-only { display: none !important; }

@@ -208,7 +208,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
         </div>
       </aside>
 
-      <main className="min-h-0 min-w-0 flex-1 bg-[var(--bg)]">
+      <main className="min-h-0 min-w-0 flex-1">
         {loadError && (
           <div className="flex items-center gap-3 border-b border-red-500/30 bg-red-500/10 px-6 py-2.5 text-[0.8125rem] text-red-200">
             <span className="flex-1">{loadError}. Is the dev server running?</span>

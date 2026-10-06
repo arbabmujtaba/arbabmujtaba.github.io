@@ -12,7 +12,11 @@
   --studio-sidebar: 15.5rem;
   --studio-radius: 6px;
   min-height: 100vh;
-  background: var(--bg);
+  /* a little ember light in the far corner, so the workspace is not a flat slab */
+  background:
+    radial-gradient(70rem 36rem at 100% -12%, var(--accent-soft), transparent 62%),
+    radial-gradient(50rem 30rem at -10% 110%, color-mix(in srgb, var(--gilt) 6%, transparent), transparent 60%),
+    var(--bg);
   color: var(--ink-2);
   font-family: var(--font-sans);
   letter-spacing: -0.005em;
@@ -96,6 +100,7 @@
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
+  box-shadow: 0 10px 24px -12px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 .st-btn-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--accent) 88%, white); border-color: color-mix(in oklab, var(--accent) 88%, white); color: #fff; }
 
@@ -108,10 +113,14 @@
 /* ---- Surfaces ----------------------------------------------------------- */
 
 .st-card {
-  background: var(--bg-raised);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ink-0) 2.5%, var(--bg-raised)), var(--bg-raised) 40%);
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink-0) 5%, transparent), 0 18px 40px -28px rgba(0, 0, 0, 0.55);
+  transition: border-color 200ms var(--ease-rushes);
 }
+.st-card:hover { border-color: color-mix(in srgb, var(--rule-strong) 70%, var(--rule)); }
+[data-theme="day"] .st-card { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 14px 30px -26px rgba(0, 0, 0, 0.28); }
 .st-card-pad { padding: 1.25rem; }
 .st-well { background: var(--bg-deep); border: 1px solid var(--rule); border-radius: var(--studio-radius); }
 
@@ -285,15 +294,16 @@
   text-align: left;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: background 160ms, color 160ms, border-color 160ms;
+  transition: background 160ms, color 160ms, border-color 160ms, transform 200ms var(--ease-rushes);
 }
-.st-nav:hover { color: var(--ink-0); background: var(--well); }
+.st-nav:hover { color: var(--ink-0); background: var(--well); transform: translateX(2px); }
 .st-nav[aria-current="page"] {
   color: var(--ink-0);
-  background: var(--bg-lift);
+  background: linear-gradient(90deg, var(--accent-soft), color-mix(in srgb, var(--bg-lift) 60%, transparent) 75%);
   border-color: var(--rule);
   box-shadow: inset 2px 0 0 var(--accent);
 }
+.st-nav[aria-current="page"] svg { color: var(--accent); }
 
 .st-tab {
   position: relative;
@@ -327,7 +337,7 @@
   border-bottom: 1px solid var(--rule);
   transition: background 140ms;
 }
-.st-row:hover { background: var(--well); }
+.st-row:hover { background: var(--well); box-shadow: inset 2px 0 0 var(--accent); }
 .st-row:last-child { border-bottom: 0; }
 
 .st-thumb {
@@ -428,6 +438,7 @@
   .st-publish[data-state="running"] .st-publish-orb,
   .st-pulse,
   .st-rise { animation: none; }
+  .st-nav:hover { transform: none; }
 }
 
 }

@@ -7,6 +7,7 @@ import {
   COLLECTIBLES,
   cue,
   INVITED,
+  PALETTE_EVENT,
   prefetchRooms,
   readFlag,
   SPELL_EVENT,
@@ -17,10 +18,13 @@ import {
   type CollectibleId,
 } from '../../lib/magic';
 import { useMediaQuery } from '../../lib/useMediaQuery';
+import { getArchiveThoughts } from '../../lib/thoughts';
+import { navigate } from '../../lib/navigation';
 import { getEgg, isEggEnabled, isRoomEnabled } from '../../lib/secrets';
 import { isCircle, isShake, type Point } from '../../lib/gestures';
 
 const Rooms = lazy(prefetchRooms);
+const Palette = lazy(() => import('./Palette'));
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -141,18 +145,9 @@ function WandEffects() {
       if (!frame) g.clearRect(0, 0, canvas.width, canvas.height);
     };
 
-    let plate: HTMLElement | null = null;
     const onMove = (event: PointerEvent) => {
       if (event.pointerType === 'touch') return;
       pointer = { x: event.clientX, y: event.clientY };
-      // The photograph under the wand catches the light (index.css).
-      const over = (event.target as Element | null)?.closest?.<HTMLElement>('.image-frame') ?? null;
-      if (over !== plate) plate = over;
-      if (plate) {
-        const rect = plate.getBoundingClientRect();
-        plate.style.setProperty('--wx', `${event.clientX - rect.left}px`);
-        plate.style.setProperty('--wy', `${event.clientY - rect.top}px`);
-      }
       const now = performance.now();
       const point = { x: event.clientX, y: event.clientY, t: now };
       if (last && Math.hypot(point.x - last.x, point.y - last.y) < 7) return;
@@ -307,6 +302,8 @@ function WandEffects() {
 /** The chip that appears while the wand is out: what it can do, and buttons for it. */
 function Spellbook() {
   const { wand, setWand, lumos } = useMagic();
+  const spell =
+    'min-h-[44px] shrink-0 rounded-full px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-gilt transition-colors hover:bg-well md:px-3.5 md:tracking-[0.18em]';
   return (
     <AnimatePresence>
       {wand && (
@@ -317,31 +314,35 @@ function Spellbook() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="fixed bottom-[5.5rem] right-3 z-[160] flex max-w-[calc(100vw-6.5rem)] items-center gap-1 rounded-full border border-gilt/40 bg-canvas-raised/95 px-2 py-1.5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] backdrop-blur md:bottom-8 md:left-1/2 md:right-auto md:max-w-[calc(100vw-1.5rem)] md:-translate-x-1/2"
+          className="fixed bottom-[5.5rem] right-3 z-[160] flex max-w-[calc(100vw-6.5rem)] items-center gap-1 rounded-full border border-gilt/40 bg-canvas-raised/95 py-0.5 pl-1.5 pr-1 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] backdrop-blur md:bottom-8 md:left-1/2 md:right-auto md:max-w-[calc(100vw-1.5rem)] md:-translate-x-1/2 md:px-2 md:py-1.5"
         >
-          <span className="hidden pl-3 pr-2 font-book text-sm italic text-zinc-300 lg:inline">
-            draw a circle in the air for light · shake for levitation
+          <span className="hidden shrink-0 pl-3 pr-2 font-book text-sm italic text-zinc-300 xl:inline">
+            draw a circle in the air for light · shake for levitation · ⌘K for the index
           </span>
-          <button
-            type="button"
-            aria-pressed={lumos}
-            onClick={() => castSpell(lumos ? 'nox' : 'lumos')}
-            className="min-h-[40px] rounded-full px-3.5 font-mono text-[10px] uppercase tracking-[0.18em] text-gilt transition-colors hover:bg-well"
-          >
-            {lumos ? 'nox' : 'lumos'}
-          </button>
-          <button
-            type="button"
-            onClick={() => castSpell('leviosa', { x: window.innerWidth / 2, y: window.innerHeight / 2 })}
-            className="min-h-[40px] rounded-full px-3.5 font-mono text-[10px] uppercase tracking-[0.18em] text-gilt transition-colors hover:bg-well"
-          >
-            leviosa
-          </button>
+          {/* On a narrow phone the spells scroll sideways; the way out stays put. */}
+          <div className="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <button type="button" aria-pressed={lumos} onClick={() => castSpell(lumos ? 'nox' : 'lumos')} className={spell}>
+              {lumos ? 'nox' : 'lumos'}
+            </button>
+            <button type="button" onClick={() => castSpell('revelio')} className={spell}>
+              revelio
+            </button>
+            <button type="button" onClick={() => castSpell('accio')} className={spell}>
+              accio
+            </button>
+            <button
+              type="button"
+              onClick={() => castSpell('leviosa', { x: window.innerWidth / 2, y: window.innerHeight / 2 })}
+              className={spell}
+            >
+              leviosa
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => setWand(false)}
             aria-label="Put the wand away"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-well hover:text-zinc-50"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-well hover:text-zinc-50"
           >
             <X size={15} />
           </button>
@@ -355,8 +356,11 @@ function Spellbook() {
 // Spells, typed or cast
 // ---------------------------------------------------------------------------
 
+/** How long Revelio keeps the hidden things lit. */
+const REVEAL_MS = 2800;
+
 function SpellHandler() {
-  const { setLumos, setThemePref, openRoom, whisperOf, collect, setWand } = useMagic();
+  const { setLumos, setThemePref, openRoom, closeRoom, setLedgerOpen, whisperOf, collect, setWand } = useMagic();
 
   useEffect(() => {
     const onSpell = (event: Event) => {
@@ -375,6 +379,48 @@ function SpellHandler() {
         const egg = getEgg('alohomora');
         whisperOf(egg?.title || 'Alohomora', egg?.description || 'Somewhere, a door unlocked.', 'key');
         window.setTimeout(() => openRoom('library'), 700);
+      } else if (spell === 'revelio') {
+        // Everything enchanted that is on screen right now shows itself for a
+        // moment — counted by kind, so seven stars are one thing, not seven.
+        const kinds = new Set<string>();
+        document.querySelectorAll<HTMLElement>('[data-enchanted]').forEach((node) => {
+          const rect = node.getBoundingClientRect();
+          if (rect.width === 0 || rect.bottom < 0 || rect.top > window.innerHeight) return;
+          kinds.add(node.dataset.enchanted || 'thing');
+          node.classList.remove('is-revealed');
+          void node.offsetWidth;
+          node.classList.add('is-revealed');
+          window.setTimeout(() => node.classList.remove('is-revealed'), REVEAL_MS);
+        });
+        cue('spark');
+        const n = kinds.size;
+        whisperOf(
+          'Revelio',
+          n === 0
+            ? 'Nothing on this screen is hiding. Try somewhere else on the page.'
+            : n === 1
+              ? 'One thing in view is not what it seems.'
+              : `${n} things in view are not what they seem.`,
+          'star'
+        );
+      } else if (spell === 'accio') {
+        // A line flies out of the journal.
+        const lines = getArchiveThoughts();
+        if (lines.length === 0) return;
+        const line = lines[Math.floor(Math.random() * lines.length)];
+        cue('spark');
+        whisperOf(
+          `“${line.text}”`,
+          line.source,
+          'quill',
+          line.href ? { label: 'read where it came from', glyph: 'quill', run: () => navigate(line.href!) } : undefined
+        );
+      } else if (spell === 'mischief') {
+        setLumos(false);
+        setWand(false);
+        closeRoom();
+        setLedgerOpen(false);
+        whisperOf('Mischief managed.', 'The wand is put away and the page is plain again — until next time.', 'seal');
       } else if (spell === 'leviosa') {
         const cx = x ?? window.innerWidth / 2;
         const cy = y ?? window.innerHeight / 2;
@@ -399,7 +445,7 @@ function SpellHandler() {
     };
     window.addEventListener(SPELL_EVENT, onSpell);
     return () => window.removeEventListener(SPELL_EVENT, onSpell);
-  }, [setLumos, openRoom, whisperOf, collect]);
+  }, [setLumos, openRoom, closeRoom, setLedgerOpen, setWand, whisperOf, collect]);
 
   // Incantations typed anywhere outside a text field.
   useEffect(() => {
@@ -408,8 +454,18 @@ function SpellHandler() {
       const target = event.target as HTMLElement | null;
       if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (event.metaKey || event.ctrlKey || event.altKey || event.key.length !== 1) return;
-      buffer = (buffer + event.key.toLowerCase()).slice(-12);
-      if (buffer.endsWith('lumos')) {
+      buffer = (buffer + event.key.toLowerCase()).slice(-24);
+      if (buffer.endsWith('mischief managed')) {
+        buffer = '';
+        castSpell('mischief');
+      } else if (buffer.endsWith('revelio')) {
+        buffer = '';
+        setWand(true);
+        castSpell('revelio');
+      } else if (buffer.endsWith('accio')) {
+        buffer = '';
+        castSpell('accio');
+      } else if (buffer.endsWith('lumos')) {
         buffer = '';
         setWand(true);
         castSpell('lumos');
@@ -482,7 +538,7 @@ function WhisperToast() {
                   }}
                   className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-gilt/60 px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-gilt transition-colors hover:bg-gilt/10"
                 >
-                  <Glyph name="wand" size={14} />
+                  <Glyph name={whisper.action.glyph ?? 'wand'} size={14} />
                   {whisper.action.label}
                 </button>
               )}
@@ -612,6 +668,17 @@ function Ledger({ invited }: { invited: boolean }) {
               </ul>
 
               <div className="mt-6 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLedgerOpen(false);
+                    window.dispatchEvent(new Event(PALETTE_EVENT));
+                  }}
+                  className="ledger-door"
+                >
+                  <Glyph name="compass" size={15} /> Search the archive
+                  <span className="ml-auto hidden font-mono text-[10px] tracking-[0.12em] opacity-60 md:inline">⌘K</span>
+                </button>
                 {found.includes('key') && isRoomEnabled('library') && (
                   <button type="button" onClick={() => openRoom('library')} className="ledger-door">
                     <Glyph name="key" size={15} /> Return to the Restricted Section
@@ -701,6 +768,43 @@ function RoomHost() {
   );
 }
 
+/** ⌘K / Ctrl+K, or "/" outside a text field, or the ledger: the index. */
+function PaletteHost() {
+  const { dismissWhisper } = useMagic();
+  const [open, setOpen] = useState(false);
+  // A whisper sits above everything; it should not sit above the index.
+  useEffect(() => {
+    if (open) dismissWhisper();
+  }, [open, dismissWhisper]);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const typing = !!target?.closest('input, textarea, select, [contenteditable="true"]');
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setOpen((o) => !o);
+      } else if (event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        if (document.querySelector('[aria-modal="true"]')) return;
+        event.preventDefault();
+        setOpen(true);
+      }
+    };
+    const onOpen = () => setOpen(true);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener(PALETTE_EVENT, onOpen);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener(PALETTE_EVENT, onOpen);
+    };
+  }, []);
+  const close = useCallback(() => setOpen(false), []);
+  return (
+    <Suspense fallback={null}>
+      <AnimatePresence>{open && <Palette key="palette" onClose={close} />}</AnimatePresence>
+    </Suspense>
+  );
+}
+
 /**
  * The only hint on a phone. Nobody opens devtools or types a spell there, and
  * the wand is a small icon at the top of a page that has scrolled away — so a
@@ -778,6 +882,7 @@ export default function MagicLayer() {
       <WhisperToast />
       <Invitation invited={invited} onInvited={markInvited} />
       <Ledger invited={invited} />
+      <PaletteHost />
       <Ambience />
       <RoomHost />
     </>

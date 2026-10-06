@@ -100,7 +100,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
     switch (s) {
       case 'success': return 'text-green-400';
       case 'failed': return 'text-red-400';
-      case 'building': return 'text-orange-400';
+      case 'building': return 'text-accent';
       default: return 'text-zinc-400';
     }
   };
@@ -109,7 +109,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
     switch (s) {
       case 'success': return 'bg-green-500/10 border-green-500/20';
       case 'failed': return 'bg-red-500/10 border-red-500/20';
-      case 'building': return 'bg-[var(--accent-soft)] border-orange-500/20';
+      case 'building': return 'bg-[var(--accent-soft)] border-accent/20';
       default: return 'bg-zinc-500/10 border-zinc-500/20';
     }
   };
@@ -118,7 +118,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
     switch (s) {
       case 'success': return <CheckCircle2 className="w-5 h-5 text-green-400" />;
       case 'failed': return <XCircle className="w-5 h-5 text-red-400" />;
-      case 'building': return <Loader2 className="w-5 h-5 text-orange-400 animate-spin" />;
+      case 'building': return <Loader2 className="w-5 h-5 text-accent animate-spin" />;
       default: return <Clock className="w-5 h-5 text-zinc-400" />;
     }
   };
@@ -311,7 +311,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {job.status === 'running' ? (
-                        <Loader2 className="w-4 h-4 text-orange-400 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-accent animate-spin" />
                       ) : job.status === 'success' ? (
                         <CheckCircle2 className="w-4 h-4 text-green-400" />
                       ) : (
@@ -344,7 +344,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                             <div key={step.step} className="flex items-center gap-3">
                               {step.status === 'success' && <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />}
                               {step.status === 'error' && <XCircle className="w-3 h-3 text-red-400 shrink-0" />}
-                              {step.status === 'running' && <Loader2 className="w-3 h-3 text-orange-400 animate-spin shrink-0" />}
+                              {step.status === 'running' && <Loader2 className="w-3 h-3 text-accent animate-spin shrink-0" />}
                               {step.status === 'pending' && <div className="w-3 h-3 rounded-full border border-zinc-700 shrink-0" />}
                               <span className="font-mono text-[10px] text-zinc-400 uppercase">{step.step}</span>
                               <span className="font-sans text-[10px] text-zinc-500 flex-1">{step.message}</span>

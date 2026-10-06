@@ -54,7 +54,7 @@ function ToastNotification({ toast, onRemove }: { toast: ToastItem; onRemove: (i
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 30, scale: 0.95 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className={`flex items-start gap-3 p-4 min-w-[280px] max-w-sm bg-[#0d0d0c] border ${BORDERS[toast.type]} rounded-sm shadow-xl`}
+      className={`flex items-start gap-3 p-4 min-w-[280px] max-w-sm bg-canvas-raised border ${BORDERS[toast.type]} rounded-sm shadow-xl`}
     >
       {ICONS[toast.type]}
       <span className="font-sans text-xs text-zinc-300 flex-1">{toast.message}</span>

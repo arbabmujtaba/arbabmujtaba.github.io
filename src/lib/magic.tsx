@@ -57,7 +57,7 @@ export interface Whisper {
   /** Glyph id from components/magic/Glyph. */
   glyph?: string;
   /** One button in the whisper — e.g. "pick up the wand" for whoever cannot find it. */
-  action?: { label: string; run: () => void };
+  action?: { label: string; run: () => void; glyph?: string };
 }
 
 interface MagicContextValue {
@@ -97,6 +97,8 @@ export const WAND_TOUCHED = 'archive.wand.v1';
 export const INVITED = 'archive.invited.v1';
 /** `beckon` asks the header wand to draw attention to itself once; `touched` clears its dot. */
 export const WAND_EVENT = 'archive:wand';
+/** Opens the index (the ⌘K palette) from anywhere — the ledger uses it on a phone. */
+export const PALETTE_EVENT = 'archive:palette';
 
 export function readFlag(key: string) {
   return read(key) === '1';
@@ -324,7 +326,7 @@ export function useMagic(): MagicContextValue {
 
 /** Element-level event bus for spells that affect many objects at once. */
 export const SPELL_EVENT = 'archive:spell';
-export type Spell = 'leviosa' | 'lumos' | 'nox' | 'alohomora';
+export type Spell = 'leviosa' | 'lumos' | 'nox' | 'alohomora' | 'revelio' | 'accio' | 'mischief';
 export function castSpell(spell: Spell, detail?: { x: number; y: number }) {
   window.dispatchEvent(new CustomEvent(SPELL_EVENT, { detail: { spell, ...detail } }));
 }

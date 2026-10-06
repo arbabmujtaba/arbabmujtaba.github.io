@@ -54,14 +54,16 @@ or finds is kept in `localStorage`; nothing leaves the browser.
 | Day / night | header, sun/moon menu | night, day, or follow the clock (06–18 local). Set before first paint by the script in `index.html` |
 | The wand | header, wand icon | trail of sparks; draw a circle in the air for Lumos, shake for levitation; Esc or the chip puts it away |
 | Invisible ink | margins of home sections | only readable under Lumos (`kind: ink` secrets) |
-| The Restricted Section | the untitled book at the end of the writing shelf, or type `alohomora` | notes (`kind: note, room: library`) and lines lifted from the journal |
+| The Restricted Section | the untitled book at the end of the shelf under "On the desk, lately", or type `alohomora` | notes (`kind: note, room: library`) and lines lifted from the journal |
 | The Darkroom | the red tally light in the *frames* section; on `/photography`, "darkroom open" or the lead print while the wand is out | prints develop as you hover; the back carries date and gear |
-| Saptarishi | seven bright stars over the hero, night only | light all seven |
+| Saptarishi | seven bright stars over the hero, night only | trace the figure star to star (tap or drag) — decoys and wrong turns reset it |
 | The wax seal | footer, every page | seven knocks |
 | The compass | memory map | open Sopore and Indore, or trace the journey |
 | The quill | end of any journal volume | read to the last line |
 | The Room of Small Details | the ledger, once all collectibles are found | facts computed from the archive |
-| Incantations | anywhere outside a text field | `lumos`, `nox`, `alohomora`; a note for whoever opens devtools |
+| Incantations | anywhere outside a text field, or the wand's chip | `lumos`, `nox`, `alohomora`, `revelio` (shows what is enchanted on screen), `accio` (summons a journal line), `mischief managed`; a note for whoever opens devtools |
+| The index | ⌘K / Ctrl+K or `/`; "Search the archive" in the ledger | every page, every entry, the spells and the light, in one input (`components/magic/Palette.tsx`) |
+| The invitation | once, to a first-time visitor who has found nothing | a whisper with a "Pick up the wand" button (`trigger: invitation`) — the hint that works on a phone; the wand wears a gilt dot until first used |
 | Ambient sound | sky menu, off by default | synthesised in the browser (`src/lib/sound.ts`), no audio files |
 
 State lives in `src/lib/magic.tsx` (initial chunk, no content); everything that draws or listens is
@@ -69,7 +71,8 @@ in `src/components/magic/`, mounted on idle and lazy. Copy and on/off switches f
 and ink line are markdown in `content/secrets/`, read by `src/lib/secrets.ts` and managed from the
 **Secrets** workspace in `/admin`. Hidden is not private: those files ship in the public bundle like
 the rest of `content/`. Reduced motion turns off the trail, twinkle and door animations but keeps
-every discovery reachable.
+every discovery reachable. On a phone, Lumos follows a touch, shaking (Android) levitates, and every
+spell has a button on the wand's chip.
 
 Images live in `public/uploads/`. Every image on the site is the owner's own photograph;
 `.kiro/IMAGE_MAP.md` records which frame fills which slot and why, with measured luminance and

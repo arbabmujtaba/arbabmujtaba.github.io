@@ -118,7 +118,7 @@ const MenuItem = ({
     type="button"
     onClick={onClick}
     className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs transition hover:bg-[var(--well)] ${
-      danger ? 'text-[#f0816f]' : 'text-zinc-300'
+      danger ? 'text-safelight' : 'text-zinc-300'
     }`}
   >
     {icon}
