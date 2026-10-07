@@ -21,7 +21,8 @@ const THEME_OPTIONS: { id: ThemePref; label: string; note: string; glyph: string
  *
  * Until the wand has been picked up once it wears a small gilt dot — the one
  * sign, on a phone, that the header holds more than navigation. When the
- * first-visit invitation is shown (MagicLayer) the wand rings twice.
+ * first-visit spark (Wisp) is left uncaught it flies here and the wand rings
+ * twice.
  */
 export default function HeaderControls() {
   const { wand, setWand, theme, themePref, setThemePref, sound, setSound } = useMagic();
@@ -70,6 +71,7 @@ export default function HeaderControls() {
     <div className="relative flex items-center gap-1.5">
       <button
         type="button"
+        data-wand-button
         aria-pressed={wand}
         aria-label={wand ? 'Put the wand away' : untouched ? 'Pick up the wand — this archive has a hidden layer' : 'Pick up the wand'}
         title={wand ? 'Put the wand away' : 'Pick up the wand'}
@@ -80,7 +82,7 @@ export default function HeaderControls() {
         {untouched && !wand && (
           <span aria-hidden="true" className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-gilt shadow-[0_0_8px_var(--gilt)]" />
         )}
-        {/* two rings, once, when the invitation points here — never a loop */}
+        {/* two rings, once, when the uncaught spark flies here — never a loop */}
         {beckon > 0 && !wand && !reduced && (
           <span key={beckon} aria-hidden="true" className="pointer-events-none absolute inset-0">
             {[0, 1].map((ring) => (

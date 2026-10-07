@@ -264,7 +264,10 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
 }
 
 /* Manuscript paper — used sparingly: notes, secret rooms, the journal's
-   opening page. A gradient and a turbulence tooth; no image request. */
+   opening page. A gradient and a tooth of grain. The grain is a 12 KB raster
+   tile of the feTurbulence it replaced: an SVG filter background is
+   re-rasterised every time the paper repaints, which made turning a note
+   drop frames on phones. */
 .manuscript {
   --paper: #f1e9d6;
   --paper-ink: #2a2116;
@@ -272,7 +275,7 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
   background-image:
     radial-gradient(ellipse at 20% 0%, rgba(255, 250, 235, 0.9), transparent 60%),
     radial-gradient(ellipse at 100% 100%, rgba(150, 110, 60, 0.18), transparent 55%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
+    url("./assets/paper-grain.webp");
   color: var(--paper-ink);
   /* Paper always reads as paper: ink tokens inside it are dark at any hour. */
   --ink-0: #1b150d;
@@ -383,6 +386,61 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
   .is-revealed { animation: none; outline: 1px solid var(--gilt); outline-offset: 3px; }
 }
 
+/* The wisp: a spark that drifts across a first visit (components/magic/Wisp.tsx). */
+.wisp-mote {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff8e6 0%, var(--gilt) 70%);
+  box-shadow:
+    0 0 10px 2px color-mix(in srgb, var(--gilt) 80%, transparent),
+    0 0 34px 10px color-mix(in srgb, var(--gilt) 28%, transparent);
+  animation: wisp-breathe 2.6s ease-in-out infinite;
+  transition: box-shadow 400ms var(--ease-rushes);
+}
+.wisp-glint {
+  position: absolute;
+  inset: 9px;
+  color: color-mix(in srgb, var(--gilt) 75%, transparent);
+  animation: wisp-turn 11s linear infinite;
+}
+.wisp:hover .wisp-mote,
+.wisp:focus-visible .wisp-mote {
+  box-shadow:
+    0 0 14px 4px var(--gilt),
+    0 0 48px 16px color-mix(in srgb, var(--gilt) 40%, transparent);
+}
+.wisp-trail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--d);
+  height: var(--d);
+  margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  border-radius: 50%;
+  background: var(--gilt);
+  box-shadow: 0 0 6px var(--gilt);
+}
+/* On paper a glow reads as a smudge: a firmer, warmer spark instead. */
+[data-theme="day"] .wisp-mote {
+  background: radial-gradient(circle, #f6e2a8 0%, var(--gilt) 75%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gilt) 45%, transparent),
+    0 0 16px 4px color-mix(in srgb, var(--gilt) 30%, transparent);
+}
+[data-theme="day"] .wisp-trail { box-shadow: none; }
+@keyframes wisp-breathe {
+  0%, 100% { scale: 1; opacity: 0.85; }
+  50% { scale: 1.3; opacity: 1; }
+}
+@keyframes wisp-turn {
+  to { rotate: 360deg; }
+}
+
 /* Day hides the night sky entirely; night hides the paper sun. */
 [data-theme="day"] .night-only { display: none !important; }
 :root:not([data-theme="day"]) .day-only { display: none !important; }
@@ -487,6 +545,54 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
 @keyframes last-notes-progress {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
+}
+
+/* The top sheet of LastNotes. While a note writes itself in, the sheet's
+   own layer repaints; with the grain tile in that layer every repaint
+   re-rasterised the tile across the whole sheet (~8x the raster cost of the
+   rest of the turn, measured). The grain moves to a child layer that is
+   rasterised once; the sheet keeps only its gradients. */
+.leaf-sheet {
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 250, 235, 0.9), transparent 60%),
+    radial-gradient(ellipse at 100% 100%, rgba(150, 110, 60, 0.18), transparent 55%);
+}
+.leaf-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("./assets/paper-grain.webp");
+  will-change: transform;
+}
+
+/* LastNotes words, written in one at a time. Opacity and transform only, so
+   the compositor runs it; a blur here re-rasterised the whole sheet per frame. */
+.leaf-word {
+  animation: leaf-word-in 700ms var(--ease-rushes) both;
+}
+@keyframes leaf-word-in {
+  from { opacity: 0; transform: translateY(0.35em); }
+  to { opacity: 1; transform: none; }
+}
+.leaf-caption {
+  animation: leaf-caption-in 700ms var(--ease-rushes) both;
+}
+@keyframes leaf-caption-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+/* The hand-drawn underline; the path carries pathLength="1". */
+.leaf-stroke {
+  stroke-dasharray: 1;
+  animation: leaf-stroke-in 1.1s var(--ease-rushes) both;
+}
+@keyframes leaf-stroke-in {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+/* The global reduced-motion rule shortens durations but not delays. */
+@media (prefers-reduced-motion: reduce) {
+  .leaf-word, .leaf-caption, .leaf-stroke { animation: none; }
 }
 
 [data-marquee-fade="true"] {

@@ -1,9 +1,9 @@
 ---
-title: "This is not only a website."
+title: "A stray spark"
 kind: egg
 trigger: invitation
-description: "Pick up the wand"
+description: "catch it to pick up the wand"
 order: 7
 visible: true
 ---
-About a third of this archive is hidden — a shelf behind the shelf, a darkroom, seven stars after dark. The wand at the top of the page is the way in.
+No words on screen: a spark drifts across the page for a visitor who hasn't found anything yet, and slows when a pointer comes near. Catching it picks up the wand and makes whatever is enchanted in view glow. The title and description above are only what a screen reader announces.

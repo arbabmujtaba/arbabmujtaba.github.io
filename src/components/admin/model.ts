@@ -265,7 +265,7 @@ export const SECRET_TRIGGER_LABELS: Record<SecretTrigger, string> = {
   lumos: 'Lumos — casting light',
   alohomora: 'Alohomora — the hidden shelf',
   console: 'Developer console',
-  invitation: 'The invitation — first visit',
+  invitation: 'The invitation — a stray spark',
 };
 
 export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
@@ -276,7 +276,7 @@ export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
   alohomora: 'Typing “alohomora”, which opens the hidden shelf.',
   console: 'A message printed to the browser’s devtools console.',
   invitation:
-    'Shown once, to a first-time visitor who has scrolled past the opening screen and found nothing yet — the only hint that works on a phone, where nobody opens the console or types a spell.',
+    'A spark that drifts across the page for a visitor who has scrolled past the opening screen and found nothing yet. Catching it picks up the wand and lights what is enchanted in view; left alone it flies to the wand and returns on a later visit (three at most). Title and description are its screen-reader name — nothing is written on screen.',
 };
 
 export const INK_SECTION_LABELS: Record<InkSection, string> = {

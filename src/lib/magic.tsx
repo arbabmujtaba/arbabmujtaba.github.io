@@ -93,8 +93,11 @@ const KEYS = {
 
 /** Set the first time the wand is picked up; until then the header wand wears a gilt dot. */
 export const WAND_TOUCHED = 'archive.wand.v1';
-/** Set once the first-visit invitation has been shown. */
+/** Set once the first-visit spark (the invitation) has been caught. */
 export const INVITED = 'archive.invited.v1';
+/** Visits the spark has drifted through; it stops coming after WISP_VISITS. */
+export const WISP_SEEN = 'archive.wisp.v1';
+export const WISP_VISITS = 3;
 /** `beckon` asks the header wand to draw attention to itself once; `touched` clears its dot. */
 export const WAND_EVENT = 'archive:wand';
 /** Opens the index (the ⌘K palette) from anywhere — the ledger uses it on a phone. */
@@ -105,6 +108,12 @@ export function readFlag(key: string) {
 }
 export function writeFlag(key: string) {
   write(key, '1');
+}
+export function readCount(key: string) {
+  return Number(read(key)) || 0;
+}
+export function bumpCount(key: string) {
+  write(key, String(readCount(key) + 1));
 }
 
 function read(key: string): string | null {

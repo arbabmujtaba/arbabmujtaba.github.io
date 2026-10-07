@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react';
-import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useInView, useReducedMotion, type PanInfo, type Variants } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 
 export interface Note {
   id: string;
@@ -21,6 +22,9 @@ interface LastNotesProps {
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+/** A swipe turns the leaf past this distance, or on a flick faster than this. */
+const SWIPE_PX = 56;
+const SWIPE_VELOCITY = 380;
 
 /**
  * LastNotes — the closing notes, as a small stack of paper.
@@ -36,14 +40,22 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * `animation-play-state` and the next note is turned exactly when the bar
  * fills. Under prefers-reduced-motion nothing advances on its own and the
  * words appear at once; the arrows still turn the notes.
+ *
+ * On a touch screen the top sheet can be swiped: left for the next leaf, right
+ * for the one before, and it leaves the stack the way it was thrown. Drag is
+ * horizontal only (motion sets `touch-action: pan-y`), so scrolling past the
+ * stack still scrolls. A mouse doesn't drag it — that would fight selecting
+ * the text.
  */
 export default function LastNotes({ notes, className = '', duration = 9000, intro }: LastNotesProps) {
   const shouldReduceMotion = useReducedMotion();
+  const touch = useMediaQuery('(pointer: coarse)');
   const rootRef = useRef<HTMLDivElement>(null);
   const inView = useInView(rootRef, { amount: 0.35 });
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState(1);
   const [held, setHeld] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const count = notes.length;
   const go = useCallback(
@@ -54,11 +66,37 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
     [count]
   );
 
+  const onSwipe = (_: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+    setDragging(false);
+    const { offset, velocity } = info;
+    if (offset.x < -SWIPE_PX || velocity.x < -SWIPE_VELOCITY) go(1);
+    else if (offset.x > SWIPE_PX || velocity.x > SWIPE_VELOCITY) go(-1);
+  };
+
   if (count === 0) return null;
   const note = notes[active];
   const words = note.text.split(/\s+/).filter(Boolean);
-  const paused = held || !inView;
+  const paused = held || dragging || !inView;
   const autoplay = !shouldReduceMotion && count > 1;
+  const swipeable = touch && count > 1;
+
+  // The top sheet: lifted in, then thrown off the way it is going. `leave`
+  // takes the direction from AnimatePresence's `custom`, because the exiting
+  // sheet's own props are from the render before the turn.
+  const sheet: Variants = {
+    enter: shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 0, y: 18, scale: 0.97, rotate: -1.2 },
+    rest: { opacity: 1, x: 0, y: 0, scale: 1, rotate: -0.4 },
+    leave: (dir: number) =>
+      shouldReduceMotion
+        ? { opacity: 0, transition: { duration: 0.3 } }
+        : {
+            opacity: 0,
+            x: dir > 0 ? -200 : 200,
+            y: -50,
+            rotate: dir > 0 ? -9 : 9,
+            transition: { duration: 0.6, ease: [0.55, 0, 0.75, 0.2] },
+          },
+  };
 
   return (
     <div
@@ -85,31 +123,27 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
           <motion.figure
             key={note.id}
             custom={direction}
-            className="manuscript relative min-h-[22rem] overflow-hidden rounded-[2px] px-7 pb-10 pt-14 text-zinc-100 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.85)] md:min-h-[26rem] md:px-12 md:pb-12 md:pt-16"
-            initial={
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: 18, scale: 0.97, rotate: -1.2 }
-            }
-            animate={{ opacity: 1, y: 0, scale: 1, rotate: -0.4 }}
-            exit={
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    x: direction > 0 ? -140 : 140,
-                    y: -50,
-                    rotate: direction > 0 ? -9 : 9,
-                    transition: { duration: 0.7, ease: [0.55, 0, 0.75, 0.2] },
-                  }
-            }
+            variants={sheet}
+            initial="enter"
+            animate="rest"
+            exit="leave"
+            className="manuscript leaf-sheet relative min-h-[22rem] overflow-hidden rounded-[2px] px-7 pb-10 pt-14 text-zinc-100 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.85)] will-change-transform md:min-h-[26rem] md:px-12 md:pb-12 md:pt-16"
             transition={{ duration: 0.8, ease: EASE }}
             style={{ zIndex: 2 }}
+            drag={swipeable ? 'x' : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.75}
+            dragMomentum={false}
+            onDragStart={() => setDragging(true)}
+            onDragEnd={onSwipe}
+            whileDrag={shouldReduceMotion ? undefined : { scale: 1.015, rotate: 0 }}
           >
-            {/* tape */}
+            {/* grain on its own layer, rasterised once — see .leaf-sheet */}
+            <span aria-hidden="true" className="leaf-grain" />
+            {/* tape — no backdrop blur: on a moving sheet it re-samples what's behind every frame */}
             <span
               aria-hidden="true"
-              className="absolute left-1/2 top-[-6px] h-7 w-28 -translate-x-1/2 rotate-[-2deg] bg-[rgba(226,97,47,0.22)] backdrop-blur-[1px]"
+              className="absolute left-1/2 top-[-6px] h-7 w-28 -translate-x-1/2 rotate-[-2deg] bg-[rgba(226,97,47,0.22)]"
               style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.06)' }}
             />
             {/* faint ruling */}
@@ -130,27 +164,22 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
 
             <blockquote className="relative mt-8">
               <p className="font-book text-[2rem] italic leading-[1.12] tracking-[-0.015em] text-zinc-50 md:text-[2.9rem]">
+                {/* A CSS animation per word (opacity + transform only), so the
+                    compositor runs it — no blur, no per-frame JS. */}
                 {words.map((word, i) => (
-                  <motion.span
+                  <span
                     key={`${note.id}-${i}`}
-                    className="inline-block whitespace-pre"
-                    initial={shouldReduceMotion ? false : { opacity: 0, y: '0.35em', filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.7, delay: 0.25 + i * 0.065, ease: EASE }}
+                    className="leaf-word inline-block whitespace-pre"
+                    style={{ animationDelay: `${250 + i * 65}ms` }}
                   >
                     {word}
                     {i < words.length - 1 ? ' ' : ''}
-                  </motion.span>
+                  </span>
                 ))}
               </p>
 
               {(note.aside || note.author) && (
-                <motion.figcaption
-                  className="mt-10"
-                  initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.35 + words.length * 0.065, ease: EASE }}
-                >
+                <figcaption className="leaf-caption mt-10" style={{ animationDelay: `${350 + words.length * 65}ms` }}>
                   {note.aside && (
                     <span className="font-book text-lg leading-relaxed text-zinc-300 md:text-xl">{note.aside}</span>
                   )}
@@ -160,14 +189,14 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                     className="mt-3 block h-3 w-44 text-accent"
                     fill="none"
                   >
-                    <motion.path
+                    <path
                       d="M2 9 C 40 3, 70 12, 110 7 S 180 3, 218 8"
+                      pathLength={1}
+                      className="leaf-stroke"
+                      style={{ animationDelay: `${550 + words.length * 65}ms` }}
                       stroke="currentColor"
                       strokeWidth="1.6"
                       strokeLinecap="round"
-                      initial={{ pathLength: shouldReduceMotion ? 1 : 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 1.1, delay: 0.55 + words.length * 0.065, ease: EASE }}
                     />
                   </svg>
                   {note.author && (
@@ -175,7 +204,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                       — {note.author}
                     </cite>
                   )}
-                </motion.figcaption>
+                </figcaption>
               )}
             </blockquote>
           </motion.figure>
@@ -237,7 +266,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                 </button>
               ))}
               <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-                {paused && autoplay ? 'held' : autoplay ? 'turning' : ''}
+                {swipeable ? 'swipe the leaf' : paused && autoplay ? 'held' : autoplay ? 'turning' : ''}
               </span>
             </div>
           </>

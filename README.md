@@ -63,7 +63,7 @@ or finds is kept in `localStorage`; nothing leaves the browser.
 | The Room of Small Details | the ledger, once all collectibles are found | facts computed from the archive |
 | Incantations | anywhere outside a text field, or the wand's chip | `lumos`, `nox`, `alohomora`, `revelio` (shows what is enchanted on screen), `accio` (summons a journal line), `mischief managed`; a note for whoever opens devtools |
 | The index | ⌘K / Ctrl+K or `/`; "Search the archive" in the ledger | every page, every entry, the spells and the light, in one input (`components/magic/Palette.tsx`) |
-| The invitation | once, to a first-time visitor who has found nothing | a whisper with a "Pick up the wand" button (`trigger: invitation`) — the hint that works on a phone; the wand wears a gilt dot until first used |
+| The invitation | a first-time visitor who has found nothing | a spark drifts across the page and slows when the pointer nears; catching it picks up the wand and lights what is enchanted in view. Left alone it flies to the wand, and returns on a later visit (three at most) (`trigger: invitation`, `components/magic/Wisp.tsx`); the wand wears a gilt dot until first used |
 | Ambient sound | sky menu, off by default | synthesised in the browser (`src/lib/sound.ts`), no audio files |
 
 State lives in `src/lib/magic.tsx` (initial chunk, no content); everything that draws or listens is

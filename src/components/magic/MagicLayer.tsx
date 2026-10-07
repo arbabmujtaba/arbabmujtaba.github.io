@@ -3,20 +3,25 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { X } from 'lucide-react';
 import Glyph from './Glyph';
 import {
+  bumpCount,
   castSpell,
   COLLECTIBLES,
   cue,
   INVITED,
   PALETTE_EVENT,
   prefetchRooms,
+  readCount,
   readFlag,
   SPELL_EVENT,
   useMagic,
   WAND_EVENT,
   WAND_TOUCHED,
+  WISP_SEEN,
+  WISP_VISITS,
   writeFlag,
   type CollectibleId,
 } from '../../lib/magic';
+import Wisp from './Wisp';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { getArchiveThoughts } from '../../lib/thoughts';
 import { navigate } from '../../lib/navigation';
@@ -359,6 +364,24 @@ function Spellbook() {
 /** How long Revelio keeps the hidden things lit. */
 const REVEAL_MS = 2800;
 
+/**
+ * Everything enchanted that is on screen right now shows itself for a moment.
+ * Returns how many kinds lit up — seven stars are one thing, not seven.
+ */
+function revealEnchanted(): number {
+  const kinds = new Set<string>();
+  document.querySelectorAll<HTMLElement>('[data-enchanted]').forEach((node) => {
+    const rect = node.getBoundingClientRect();
+    if (rect.width === 0 || rect.bottom < 0 || rect.top > window.innerHeight) return;
+    kinds.add(node.dataset.enchanted || 'thing');
+    node.classList.remove('is-revealed');
+    void node.offsetWidth;
+    node.classList.add('is-revealed');
+    window.setTimeout(() => node.classList.remove('is-revealed'), REVEAL_MS);
+  });
+  return kinds.size;
+}
+
 function SpellHandler() {
   const { setLumos, setThemePref, openRoom, closeRoom, setLedgerOpen, whisperOf, collect, setWand } = useMagic();
 
@@ -380,20 +403,8 @@ function SpellHandler() {
         whisperOf(egg?.title || 'Alohomora', egg?.description || 'Somewhere, a door unlocked.', 'key');
         window.setTimeout(() => openRoom('library'), 700);
       } else if (spell === 'revelio') {
-        // Everything enchanted that is on screen right now shows itself for a
-        // moment — counted by kind, so seven stars are one thing, not seven.
-        const kinds = new Set<string>();
-        document.querySelectorAll<HTMLElement>('[data-enchanted]').forEach((node) => {
-          const rect = node.getBoundingClientRect();
-          if (rect.width === 0 || rect.bottom < 0 || rect.top > window.innerHeight) return;
-          kinds.add(node.dataset.enchanted || 'thing');
-          node.classList.remove('is-revealed');
-          void node.offsetWidth;
-          node.classList.add('is-revealed');
-          window.setTimeout(() => node.classList.remove('is-revealed'), REVEAL_MS);
-        });
         cue('spark');
-        const n = kinds.size;
+        const n = revealEnchanted();
         whisperOf(
           'Revelio',
           n === 0
@@ -806,18 +817,24 @@ function PaletteHost() {
 }
 
 /**
- * The only hint on a phone. Nobody opens devtools or types a spell there, and
- * the wand is a small icon at the top of a page that has scrolled away — so a
- * first-time visitor who has found nothing gets told, once, that there is
- * something to find, with a button that picks the wand up for them. Copy and
- * the on/off switch are `trigger: invitation` in content/secrets.
+ * The only hint on a phone, and it says nothing. Nobody opens devtools or types
+ * a spell there, and the wand is a small icon at the top of a page that has
+ * scrolled away — so a visitor who has found nothing gets a spark drifting
+ * across the page (Wisp). Catching it picks up the wand and makes whatever is
+ * enchanted on screen glow: the introduction is the magic itself, not a note
+ * about it. Left alone it flies off, and comes back on a later visit — three
+ * visits at most. The on/off switch and its accessible name are
+ * `trigger: invitation` in content/secrets.
  */
 function Invitation({ invited, onInvited }: { invited: boolean; onInvited: () => void }) {
   const { found, wand, whisperOf, setWand } = useMagic();
   const coarse = useMediaQuery('(pointer: coarse)');
+  const [phase, setPhase] = useState<'waiting' | 'drifting' | 'caught' | 'done'>('waiting');
 
   useEffect(() => {
+    if (phase !== 'waiting') return;
     if (invited || wand || found.length > 0 || readFlag(WAND_TOUCHED) || !isEggEnabled('invitation')) return;
+    if (readCount(WISP_SEEN) >= WISP_VISITS) return;
     let done = false;
     const cleanup = () => {
       window.clearTimeout(timer);
@@ -829,23 +846,31 @@ function Invitation({ invited, onInvited }: { invited: boolean; onInvited: () =>
       if (document.querySelector('[aria-modal="true"]')) return;
       done = true;
       cleanup();
-      writeFlag(INVITED);
-      onInvited();
-      const egg = getEgg('invitation');
-      window.dispatchEvent(new CustomEvent(WAND_EVENT, { detail: 'beckon' }));
-      whisperOf(
-        egg?.title || 'This is not only a website.',
-        egg?.body?.trim() || 'Part of this archive is hidden. The wand at the top of the page is the way in.',
-        'wand',
-        { label: egg?.description || 'Pick up the wand', run: () => setWand(true) }
-      );
+      bumpCount(WISP_SEEN);
+      setPhase('drifting');
     };
     // Once they are reading (past the opening screen), or after a while.
     const onScroll = () => window.scrollY > window.innerHeight * 0.6 && show();
-    const timer = window.setTimeout(show, 15000);
+    const timer = window.setTimeout(show, 12000);
     window.addEventListener('scroll', onScroll, { passive: true });
     return cleanup;
-  }, [invited, wand, found.length, whisperOf, setWand, onInvited]);
+  }, [phase, invited, wand, found.length]);
+
+  // Found their own way in while it drifted: it has nothing left to show.
+  useEffect(() => {
+    if (phase === 'drifting' && (wand || found.length > 0)) setPhase('done');
+  }, [phase, wand, found.length]);
+
+  const caught = useCallback(() => {
+    setPhase('caught');
+    writeFlag(INVITED);
+    onInvited();
+    cue('chime');
+    setWand(true);
+    // Once the burst has cleared, whatever is enchanted in view answers.
+    window.setTimeout(revealEnchanted, 450);
+  }, [onInvited, setWand]);
+  const gone = useCallback(() => setPhase('done'), []);
 
   // The first time the wand is picked up on a touch screen, say what a finger
   // can do with it — the desktop chip's "draw a circle in the air" means
@@ -864,7 +889,13 @@ function Invitation({ invited, onInvited }: { invited: boolean; onInvited: () =>
     return () => window.removeEventListener(WAND_EVENT, onWand);
   }, [coarse, whisperOf]);
 
-  return null;
+  const egg = getEgg('invitation');
+  const label = [egg?.title || 'A stray spark', egg?.description || 'catch it to pick up the wand'].join('. ');
+  return (
+    <AnimatePresence>
+      {(phase === 'drifting' || phase === 'caught') && <Wisp key="wisp" label={label} onCatch={caught} onGone={gone} />}
+    </AnimatePresence>
+  );
 }
 
 /**

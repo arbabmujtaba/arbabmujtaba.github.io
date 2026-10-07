@@ -411,7 +411,7 @@ export default function Home({ setView }: HomeProps) {
                   <StackedHeading
                     lines={['Loose leaves,', 'left on the desk']}
                     className="mt-7"
-                    body="A few lines I keep close. They turn over on their own; hover to hold one."
+                    body="A few lines I keep close. They turn over on their own — hold one to keep it, or swipe it away."
                   />
                 </>
               }
