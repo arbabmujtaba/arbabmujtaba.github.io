@@ -2130,25 +2130,6 @@
       "filePath": "content/home/quote-technology.md"
     },
     {
-      "id": "home/reel-dusk-poplars",
-      "collection": "home",
-      "slug": "reel-dusk-poplars",
-      "title": "Dusk Over the Poplars",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-10-01T07:51:01.999Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-10-01T07:51:01.999Z",
-      "updatedAt": "2026-10-01T07:51:01.999Z",
-      "publishedAt": "2026-10-01T07:51:01.999Z",
-      "filePath": "content/home/reel-dusk-poplars.md"
-    },
-    {
       "id": "home/reel-sopore-night",
       "collection": "home",
       "slug": "reel-sopore-night",
@@ -2728,8 +2709,40 @@
       "filePath": "content/home/reel-still.md",
       "lastReviewedAt": "2026-10-13T20:49:30.783Z",
       "publishedAt": "2026-10-13T20:49:30.785Z"
+    },
+    {
+      "id": "home/reel-dal-lake",
+      "collection": "home",
+      "slug": "reel-dal-lake",
+      "title": "Dal Lake",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-10-13T20:54:02.056Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T20:54:02.207Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T20:54:02.209Z",
+          "commitHash": "30cbe4cf918fdbcc8dfbdc60c1041d2db198637b",
+          "notes": "Published via pipeline job pub-1791924842191-9uhk4x"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-13T20:54:02.065Z",
+      "updatedAt": "2026-10-13T20:54:02.209Z",
+      "filePath": "content/home/reel-dal-lake.md",
+      "lastReviewedAt": "2026-10-13T20:54:02.207Z",
+      "publishedAt": "2026-10-13T20:54:02.209Z"
     }
   ],
-  "lastUpdated": "2026-10-13T20:49:30.790Z",
+  "lastUpdated": "2026-10-13T20:54:02.213Z",
   "version": 1
 }
