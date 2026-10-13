@@ -2660,18 +2660,32 @@
       "collection": "photography",
       "slug": "meditate",
       "title": "Meditate",
-      "state": "draft",
+      "state": "published",
       "versions": [
         {
           "version": 1,
           "state": "draft",
           "timestamp": "2026-10-06T17:26:47.615Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T21:35:19.394Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T21:35:19.401Z",
+          "commitHash": "b6b0c7571e30448de482dcbab9f753f943ec363f",
+          "notes": "Published via pipeline job pub-1791927319346-305ja1"
         }
       ],
       "unsavedChanges": false,
       "createdAt": "2026-10-06T17:26:47.623Z",
-      "updatedAt": "2026-10-06T17:26:47.623Z",
-      "filePath": "content/photography/meditate.md"
+      "updatedAt": "2026-10-13T21:35:19.401Z",
+      "filePath": "content/photography/meditate.md",
+      "lastReviewedAt": "2026-10-13T21:35:19.394Z",
+      "publishedAt": "2026-10-13T21:35:19.401Z"
     },
     {
       "id": "secrets/egg-invitation",
@@ -2808,6 +2822,6 @@
       "filePath": "content/home/hero.md"
     }
   ],
-  "lastUpdated": "2026-10-13T21:34:59.903Z",
+  "lastUpdated": "2026-10-13T21:35:19.405Z",
   "version": 1
 }
