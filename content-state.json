@@ -2628,18 +2628,32 @@
       "collection": "photography",
       "slug": "aeronautical-engineering",
       "title": "Aeronautical Engineering?",
-      "state": "draft",
+      "state": "published",
       "versions": [
         {
           "version": 1,
           "state": "draft",
           "timestamp": "2026-10-06T17:13:19.144Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T21:34:59.815Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T21:34:59.895Z",
+          "commitHash": "bffe66dfc051879ff5e873be780966b7e3370953",
+          "notes": "Published via pipeline job pub-1791927299745-4uhnca"
         }
       ],
       "unsavedChanges": false,
       "createdAt": "2026-10-06T17:13:19.147Z",
-      "updatedAt": "2026-10-06T17:15:58.934Z",
-      "filePath": "content/photography/aeronautical-engineering.md"
+      "updatedAt": "2026-10-13T21:34:59.895Z",
+      "filePath": "content/photography/aeronautical-engineering.md",
+      "lastReviewedAt": "2026-10-13T21:34:59.815Z",
+      "publishedAt": "2026-10-13T21:34:59.895Z"
     },
     {
       "id": "photography/meditate",
@@ -2794,6 +2808,6 @@
       "filePath": "content/home/hero.md"
     }
   ],
-  "lastUpdated": "2026-10-13T21:18:14.535Z",
+  "lastUpdated": "2026-10-13T21:34:59.903Z",
   "version": 1
 }
