@@ -2696,8 +2696,40 @@
       "updatedAt": "2026-10-06T20:05:33.927Z",
       "publishedAt": "2026-10-06T20:05:33.927Z",
       "filePath": "content/secrets/egg-invitation.md"
+    },
+    {
+      "id": "home/reel-still",
+      "collection": "home",
+      "slug": "reel-still",
+      "title": "Still!",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-10-13T20:49:30.589Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T20:49:30.783Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T20:49:30.785Z",
+          "commitHash": "f8cc645299ab22616ca87b5c3fc361053812bb19",
+          "notes": "Published via pipeline job pub-1791924570773-a8t1ez"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-13T20:49:30.592Z",
+      "updatedAt": "2026-10-13T20:49:30.785Z",
+      "filePath": "content/home/reel-still.md",
+      "lastReviewedAt": "2026-10-13T20:49:30.783Z",
+      "publishedAt": "2026-10-13T20:49:30.785Z"
     }
   ],
-  "lastUpdated": "2026-10-06T20:05:33.940Z",
+  "lastUpdated": "2026-10-13T20:49:30.790Z",
   "version": 1
 }
