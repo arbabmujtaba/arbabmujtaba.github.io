@@ -32,6 +32,7 @@ import { createDoc, deleteDoc, getDoc, setState, startPublish, updateDoc, upload
 import { DestinationPanel } from './DestinationPanel';
 import { ImageCropper } from './ImageCropper';
 import { LivePreview } from './LivePreview';
+import { PlacementPanel } from './Placement';
 import { ClipField, MediaField, type Notify } from './MediaField';
 import {
   INK_SECTION_LABELS,
@@ -349,6 +350,7 @@ export function EntryEditor({
   onExit,
   onChanged,
   onPublish,
+  items = [],
 }: {
   mode: EditorMode;
   /** The listing row for this entry, when it exists — carries the workflow state. */
@@ -358,6 +360,8 @@ export function EntryEditor({
   /** Something on disk changed; refresh the listing. */
   onChanged: () => void;
   onPublish: (jobId: string) => void;
+  /** Every entry in the archive — for "Where it lands" beside the preview. */
+  items?: ListItem[];
 }) {
   const wide = useMediaQuery('(min-width: 1280px)');
   const [form, setForm] = useState<FormState | null>(null);
@@ -676,7 +680,7 @@ export function EntryEditor({
   const address = publicPath(form.collection, form.slug || '…');
 
   const livePreview = (
-    <LivePreview form={form} replay={replay} onReplay={() => setReplay((n) => n + 1)} canPage={!!dest?.hasPage} />
+    <LivePreview form={form} replay={replay} onReplay={() => setReplay((n) => n + 1)} canPage={!!dest?.hasPage} items={items} />
   );
 
   return (
@@ -800,6 +804,12 @@ export function EntryEditor({
                   </div>
 
                   {styled && <PriorityField form={form} patch={patch} />}
+                  {/* With the preview on its own tab, show where it lands right under the priority. */}
+                  {styled && !wide && (
+                    <div className="st-well overflow-hidden">
+                      <PlacementPanel form={form} items={items} />
+                    </div>
+                  )}
 
                   <Field label={excerptLabel} hint={['journal', 'tech'].includes(form.collection) ? 'Shown on cards and in search results.' : undefined}>
                     <textarea className="st-textarea" rows={3} value={form.excerpt} onChange={(event) => patch({ excerpt: event.target.value })} />

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ExternalLink, Laptop, Loader2, Monitor, RotateCw, Smartphone, Tablet } from 'lucide-react';
-import { previewPayloadFromForm, publicPath, type FormState, type PreviewView } from './model';
+import { previewPayloadFromForm, publicPath, type FormState, type ListItem, type PreviewView } from './model';
+import { PlacementPanel } from './Placement';
 import { PREVIEW_FRAME_PATH, PREVIEW_MESSAGE, PREVIEW_READY } from './PreviewHost';
 
 const DEVICES = [
@@ -24,6 +25,7 @@ export function LivePreview({
   onReplay,
   canPage,
   defaultDevice = 'desktop',
+  items,
 }: {
   form: FormState;
   replay: number;
@@ -32,6 +34,8 @@ export function LivePreview({
   canPage: boolean;
   /** A narrow host (the reel wizard) reads better at phone width than at a 33% desktop. */
   defaultDevice?: DeviceId;
+  /** The rest of the archive; when given, "Where it lands" is shown above the frame. */
+  items?: ListItem[];
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -121,6 +125,8 @@ export function LivePreview({
           )}
         </div>
       </div>
+
+      {items && <PlacementPanel form={form} items={items} />}
 
       <div ref={stage} className="relative min-h-0 flex-1 overflow-hidden bg-[var(--bg-deep)]">
         <div

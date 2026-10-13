@@ -5,6 +5,8 @@
  * and allows clicking any element to identify and edit the underlying content.
  */
 
+import { PlacementSummary } from './admin/Placement';
+import type { ListItem } from './admin/model';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -641,6 +643,14 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                           </span>
                         </div>
                       </div>
+
+                      {/* Its priority, and where that puts it on the site */}
+                      {(() => {
+                        const listed = (content as unknown as ListItem[]).find(
+                          (c) => c.collection === mappedElement.collection && c.slug === mappedElement.slug
+                        );
+                        return listed ? <PlacementSummary item={listed} items={content as unknown as ListItem[]} /> : null;
+                      })()}
 
                       {/* Edit Field */}
                       <div className="space-y-2">

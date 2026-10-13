@@ -6,6 +6,7 @@ import FullStop from '../components/magic/FullStop';
 import InkNote from '../components/magic/InkNote';
 import {
   ArchiveDoor,
+  ArchiveIndex,
   Bookshelf,
   ChapterTimeline,
   CountUp,
@@ -440,7 +441,21 @@ export default function Home({ setView }: HomeProps) {
             className="mt-7"
             body={profile?.body || 'Part portfolio, part journal, part visual memory bank.'}
           />
-          <div className="mt-14 grid grid-cols-1 gap-12 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
+          {/* Phones: a compact index of the doors. Wider screens: the arched doors. */}
+          <ArchiveIndex
+            className="mt-10 md:hidden"
+            doors={gateways.map((gateway, index) => ({
+              key: gateway.slug,
+              title: gateway.title,
+              image: gateway.image,
+              index: `${String(index + 1).padStart(2, '0')}/`,
+              role: gateway.label?.replace(/^\d+\s*\/\/\s*/, ''),
+              description: gateway.description,
+              href: `/${targetOf(gateway)}`,
+              onOpen: () => setView(targetOf(gateway)),
+            }))}
+          />
+          <div className="mt-14 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-4">
             {gateways.map((gateway, index) => (
               <ArchiveDoor
                 key={gateway.slug}

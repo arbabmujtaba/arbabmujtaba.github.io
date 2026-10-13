@@ -91,6 +91,7 @@ export const GUIDE: GuideSection[] = [
     features: [
       { title: 'Content tab', body: TAB_TIPS.content },
       { title: 'Priority', body: '0 · Featured puts the entry first on the Home page and at the top of its own page. 1, 2… come right after, in order. None = by date, after everything with a priority. Two at the same number: the newer one first.' },
+      { title: 'Where it lands', body: 'Above the live preview (or under Priority on smaller screens): the priority the entry holds, its rank in the section, and every slot that gives it — Home desk, Home frames, lead plate, “#3 in Travel stories” — updated as you edit. The Live editor shows the same when you click an entry on the page.' },
       { title: 'Address (slug)', body: 'The end of the URL, filled from the title. Change it before publishing — a changed address breaks old links.' },
       { title: 'Media tab', body: 'Upload a cover (any photo, even HEIC — it becomes WebP automatically). Pick a shape and drag the window and focal point; "Apply crop" bakes a new cropped file.' },
       { title: 'Gallery & clip', body: 'Photography entries take extra frames (hover to reorder or remove). Any entry can carry a short muted clip with a poster frame.' },
@@ -200,6 +201,7 @@ export const TIPS: Record<TipTopic, string[]> = {
     'Priority 0 · Featured = first on the Home page and at the top of its section.',
     'The address (slug) is the URL. Changing it after publishing breaks old links.',
     'The excerpt is the line on cards and in search — one good sentence is enough.',
+    '“Where it lands” above the preview shows exactly which slot this entry gets before you publish.',
     'Ctrl / ⌘ + S saves from anywhere in the editor.',
   ],
   'editor.media': [

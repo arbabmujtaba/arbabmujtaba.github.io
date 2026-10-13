@@ -37,3 +37,4 @@ export { default as LivingJournal } from './LivingJournal';
 export { default as ThoughtDrawer } from './ThoughtDrawer';
 export { default as Bookshelf } from './Bookshelf';
 export { default as ArchiveDoor } from './ArchiveDoor';
+export { default as ArchiveIndex } from './ArchiveIndex';

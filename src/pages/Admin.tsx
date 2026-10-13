@@ -258,6 +258,7 @@ function Studio({ setView }: { setView: (view: string) => void }) {
               onExit={() => go('content')}
               onChanged={() => void refresh()}
               onPublish={startPublishing}
+              items={items}
             />
           </div>
         ) : (
