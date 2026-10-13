@@ -140,6 +140,8 @@ export interface JournalEntry {
   /** When false the entry is hidden from the site. Defaults to true. */
   published?: boolean;
   body: string;
+  /** Editorial priority: 0 = featured (home + top of its page), 1, 2… next; unset = by date. See lib/priority.ts. */
+  priority?: number;
   customization?: PostCustomization;
 }
 
@@ -154,6 +156,8 @@ export interface TechEntry {
   videoPoster?: string;
   excerpt: string;
   body: string;
+  /** Editorial priority: 0 = featured (home + top of its page), 1, 2… next; unset = by date. See lib/priority.ts. */
+  priority?: number;
   customization?: PostCustomization;
 }
 
@@ -173,6 +177,8 @@ export interface PhotographyEntry {
   /** Short clip (.mp4/.webm) or .gif — a frame that moves. */
   video?: string;
   videoPoster?: string;
+  /** Editorial priority: 0 = featured (home + top of its page), 1, 2… next; unset = by date. See lib/priority.ts. */
+  priority?: number;
   customization?: PostCustomization;
 }
 
@@ -189,6 +195,8 @@ export interface PortfolioProject {
   videoPoster?: string;
   featured: boolean;
   body: string;
+  /** Editorial priority: 0 = featured (home + top of its page), 1, 2… next; unset = by date. See lib/priority.ts. */
+  priority?: number;
   customization?: PostCustomization;
 }
 

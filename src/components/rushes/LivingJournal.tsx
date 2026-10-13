@@ -6,6 +6,7 @@ import { shouldInterceptClick } from '../../lib/navigation';
 import { useOpenEntry } from '../../lib/entryNavigation';
 import { ownerArchiveImage } from '../../lib/image';
 import type { DetailCollection } from '../../lib/collections';
+import { comparePriority } from '../../lib/priority';
 import type { JournalEntry, PhotographyEntry, TechEntry } from '../../types';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -19,6 +20,7 @@ interface DeskItem {
   kind: string;
   line?: string;
   image?: string;
+  priority?: number;
 }
 
 interface LivingJournalProps {
@@ -69,8 +71,9 @@ function usePreviousVisit(): number | null {
 
 /**
  * LivingJournal — the desk. Whatever was added to the archive most recently,
- * from every collection that keeps dates, newest first. Nothing to curate: an
- * entry published from /admin lands here by itself. Entries newer than the
+ * from every collection that keeps dates, newest first — unless the author
+ * gave an entry a priority in /admin: priority 0 takes the lead, 1, 2… follow.
+ * Without one, an entry published from /admin lands here by itself. Entries newer than the
  * reader's last visit come in with a little ink still wet on them.
  */
 export default function LivingJournal({ journal, photography, tech, className = '', limit = 6, children }: LivingJournalProps) {
@@ -88,6 +91,7 @@ export default function LivingJournal({ journal, photography, tech, className = 
         kind: j.volume ? `journal · vol. ${String(j.volume).padStart(2, '0')}` : 'journal',
         line: j.excerpt,
         image: ownerArchiveImage(j.featuredImage),
+        priority: j.priority,
       })),
       ...photography.map((p) => ({
         collection: 'photography' as const,
@@ -97,6 +101,7 @@ export default function LivingJournal({ journal, photography, tech, className = 
         kind: `frame · ${p.category.toLowerCase()}`,
         line: p.description,
         image: ownerArchiveImage(p.coverImage),
+        priority: p.priority,
       })),
       ...tech.map((t) => ({
         collection: 'tech' as const,
@@ -105,13 +110,16 @@ export default function LivingJournal({ journal, photography, tech, className = 
         date: t.date,
         kind: `log · ${t.category.toLowerCase()}`,
         line: t.excerpt,
+        priority: t.priority,
       })),
     ];
+    // The author's priority first (0 = featured, then 1, 2…), newest first within each.
     const sorted = all
       .filter((item) => !Number.isNaN(new Date(item.date).getTime()))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort((a, b) => comparePriority(a, b) || new Date(b.date).getTime() - new Date(a.date).getTime());
     if (sorted.length === 0) return [];
-    // The lead is the newest thing from any collection; the pile beside it is journal only.
+    // The lead is the featured entry — or, with none, the newest — from any
+    // collection; the pile beside it is journal only.
     const [first] = sorted;
     const pile = sorted.filter((item) => item !== first && item.collection === 'journal').slice(0, limit - 1);
     return [first, ...pile];

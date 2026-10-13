@@ -25,7 +25,7 @@ export default function Tech() {
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
   const flatten = shouldReduceMotion || isTouchDevice;
 
-  // Load from CMS — already sorted newest first.
+  // Load from CMS — priority first (0 = featured), then newest first.
   const logs = useMemo(() => getTechEntries(), []);
 
   /** Entries grouped by their category, categories in newest-entry order. */
@@ -59,7 +59,11 @@ export default function Tech() {
     }, {} as Record<string, FavoriteItem[]>);
   }, [techILikeItems]);
 
-  const latestStamp = logs.length > 0 ? formatStamp(logs[0].date) : '';
+  // Logs are priority-first, so the newest is not necessarily logs[0].
+  const latestStamp =
+    logs.length > 0
+      ? formatStamp(logs.reduce((a, b) => (new Date(b.date).getTime() > new Date(a.date).getTime() ? b : a)).date)
+      : '';
 
   return (
     <motion.div

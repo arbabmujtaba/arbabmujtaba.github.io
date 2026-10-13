@@ -18,6 +18,7 @@ import { useOpenEntry } from '../lib/entryNavigation';
 import { shouldInterceptClick } from '../lib/navigation';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { useMagic } from '../lib/magic';
+import { isFeatured } from '../lib/priority';
 import { isRoomEnabled } from '../lib/secrets';
 import type { GearItem, PhotographyEntry } from '../types';
 
@@ -219,14 +220,19 @@ export default function Photography() {
     );
   }, [allPhotos]);
 
-  // The lead plate is the first favorite, or the first frame on file when no
-  // favorites are flagged — either way it is never repeated further down.
-  const leadFromFavorites = favorites.length > 0;
-  const leadPhoto = leadFromFavorites ? favorites[0] : stories[0];
-  const restFavorites = leadFromFavorites ? favorites.slice(1) : [];
+  // The lead plate is the frame given priority 0 (featured) in /admin, else
+  // the first favorite, else the first frame on file — either way it is never
+  // repeated further down. Lists arrive priority-first from the CMS.
+  const featured = allPhotos.find(isFeatured);
+  const leadFromFavorites = !featured && favorites.length > 0;
+  const leadPhoto = featured ?? (leadFromFavorites ? favorites[0] : stories[0]);
+  const restFavorites = useMemo(
+    () => favorites.filter((p) => p !== leadPhoto),
+    [favorites, leadPhoto]
+  );
   const archiveStories = useMemo(
-    () => (leadFromFavorites ? stories : stories.slice(1)),
-    [stories, leadFromFavorites]
+    () => stories.filter((p) => p !== leadPhoto),
+    [stories, leadPhoto]
   );
 
   const storyCategories = useMemo(() => {

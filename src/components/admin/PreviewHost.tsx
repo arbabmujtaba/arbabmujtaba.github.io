@@ -8,6 +8,7 @@ import MotionPlate from '../rushes/MotionPlate';
 import SafeImage from '../SafeImage';
 import { RecLabel } from '../rushes';
 import { getCardImageStyle, getMediaFx } from '../../lib/customization';
+import { resolveHero } from '../../lib/hero';
 import { MediaFxOverlays } from '../MediaFx';
 import { COLLECTION_LABEL, isDetailCollection } from '../../lib/collections';
 import {
@@ -145,6 +146,30 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** The top of the Home page, roughly: the photograph, the scrim and the name over it. */
+function HeroCard({ payload }: { payload: PreviewPayload }) {
+  const hero = resolveHero([
+    { configType: 'hero', image: payload.coverImage, visible: true, customization: payload.customization },
+  ]);
+  return (
+    <div>
+      <SectionLabel>Hero — the photograph behind your name at the top of the Home page</SectionLabel>
+      <div data-surface="ink" className="relative flex aspect-[16/10] flex-col justify-end overflow-hidden rounded-[3px] bg-canvas-deep p-6 text-zinc-100 md:p-10">
+        <img src={hero.src} alt="" style={{ objectPosition: hero.objectPosition }} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/40 via-35% to-transparent" />
+        <p className="relative font-display text-[13vw] font-bold uppercase leading-[0.82] tracking-[-0.055em] text-bone md:text-[8vw]">Arbab.</p>
+        <p className="relative mt-4 font-book text-xl italic text-zinc-50">An archive still being written.</p>
+      </div>
+      {!payload.coverImage && (
+        <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">no photo chosen — the default frame is shown</p>
+      )}
+      {payload.visible === false && (
+        <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">switched off — the site uses the default frame</p>
+      )}
+    </div>
+  );
+}
+
 function CardPreview({ payload }: { payload: PreviewPayload }) {
   const dest = destinationFor(payload.collection);
   const cover = payload.coverImage;
@@ -191,6 +216,8 @@ function CardPreview({ payload }: { payload: PreviewPayload }) {
     card = <TimelineCard payload={payload} />;
   } else if (payload.collection === 'home' && payload.category === 'reel') {
     card = <ReelCard payload={payload} />;
+  } else if (payload.collection === 'home' && payload.category === 'hero') {
+    card = <HeroCard payload={payload} />;
   } else if (['portfolio', 'tech', 'photography'].includes(payload.collection)) {
     card = (
       <div>

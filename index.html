@@ -35,20 +35,18 @@
       // The home hero is the largest paint, but it is only discovered after the
       // app and the home chunk have loaded. Start fetching it now — home only,
       // and the same sources HeroPlate in src/pages/Home.tsx renders (a wide
-      // band on landscape screens, the portrait frame on portrait ones), so it
-      // is one request either way.
-      if (location.pathname === '/') {
-        var wide = matchMedia('(orientation: landscape)').matches;
-        var base = '/uploads/optimized/';
-        var set = wide
-          ? [1280, 1920, 2560].map(function (w) { return base + 'home/hero-dusk-wide-' + w + '.webp ' + w + 'w'; })
-          : [480, 768, 1536].map(function (w) { return base + 'photography/1785134270800-642096424-' + w + '.webp ' + w + 'w'; });
+      // set on landscape screens, a tall one otherwise), so it is one request
+      // either way. __HERO_PRELOAD__ is written by the hero-preload plugin in
+      // vite.config.ts from the Hero photo chosen in /admin (src/lib/hero.ts).
+      var heroSets = __HERO_PRELOAD__;
+      var set = matchMedia('(orientation: landscape)').matches ? heroSets.wide : heroSets.tall;
+      if (location.pathname === '/' && set) {
         var hero = document.createElement('link');
         hero.rel = 'preload';
         hero.as = 'image';
         hero.type = 'image/webp';
         hero.setAttribute('fetchpriority', 'high');
-        hero.setAttribute('imagesrcset', set.join(', '));
+        hero.setAttribute('imagesrcset', set);
         hero.setAttribute('imagesizes', '100vw');
         document.head.appendChild(hero);
       }

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
+  BookOpen,
   ExternalLink,
+  Lightbulb,
   Film,
   LayoutDashboard,
   Library,
@@ -21,6 +23,8 @@ import { EntryEditor, type EditorMode } from '../components/admin/EntryEditor';
 import type { CollectionId, ListItem } from '../components/admin/model';
 import { ReelPublisher } from '../components/admin/ReelPublisher';
 import { SecretsPanel } from '../components/admin/SecretsPanel';
+import { TipBar, TipsLayer, TipsProvider, useTips } from '../components/admin/Guide';
+import { NAV_TIPS } from '../components/admin/guideContent';
 import '../components/admin/studio.css';
 
 type View = 'dashboard' | 'content' | 'editor' | 'reel' | 'secrets' | 'deploy' | 'live';
@@ -42,7 +46,16 @@ let toastCounter = 0;
  * A thin shell: it owns the listing, the toasts and the publish dialog, and decides which
  * workspace is on screen. Everything an author does lives in components/admin/*.
  */
-export default function Admin({ setView }: { setView: (view: string) => void }) {
+export default function Admin(props: { setView: (view: string) => void }) {
+  return (
+    <TipsProvider>
+      <Studio {...props} />
+    </TipsProvider>
+  );
+}
+
+function Studio({ setView }: { setView: (view: string) => void }) {
+  const { tips, setTips, openGuide } = useTips();
   const [view, setWorkspace] = useState<View>('dashboard');
   const [items, setItems] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +175,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
   );
 
   return (
-    <div className="studio flex h-screen flex-col overflow-hidden lg:flex-row">
+    <div className="studio flex h-screen flex-col overflow-hidden lg:flex-row" data-tips={tips ? 'on' : 'off'}>
       <aside className="flex flex-none flex-col border-b border-zinc-800 bg-[var(--bg-deep)] lg:w-[var(--studio-sidebar)] lg:border-b-0 lg:border-r">
         <div className="flex items-center gap-3 px-5 py-4 lg:py-6">
           <span className="st-title text-xl font-semibold uppercase tracking-[-0.04em]">
@@ -176,6 +189,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
             type="button"
             className="st-btn st-btn-primary mb-3 hidden w-full justify-center lg:inline-flex"
             onClick={() => openNew()}
+            data-tip="Start a new journal volume, photo, project, log, home block or secret — you choose where it goes on the Where & publish tab." 
           >
             <PenSquare size={14} /> New entry
           </button>
@@ -186,6 +200,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
               className="st-nav !w-auto flex-none lg:!w-full lg:flex-initial"
               aria-current={active === id || (active === 'editor' && id === 'content') ? 'page' : undefined}
               onClick={() => (id === 'content' ? openContent() : go(id))}
+              data-tip={NAV_TIPS[id]}
             >
               <Icon size={15} />
               <span className="whitespace-nowrap">{label}</span>
@@ -199,7 +214,22 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
         </nav>
 
         <div className="hidden space-y-1 border-t border-zinc-800 p-3 lg:block">
-          <a className="st-nav" href="/" target="_blank" rel="noreferrer">
+          <button type="button" className="st-nav" onClick={openGuide} data-tip="Every feature of the hub, searchable. Shortcut: press ? anywhere.">
+            <BookOpen size={15} /> Guide
+            <kbd className="ml-auto font-mono text-[10px] text-zinc-500">?</kbd>
+          </button>
+          <button
+            type="button"
+            className="st-nav"
+            role="switch"
+            aria-checked={tips}
+            onClick={() => setTips(!tips)}
+            data-tip="Hover cards on buttons and the tip bar under each workspace."
+          >
+            <Lightbulb size={15} /> Tips
+            <span className={`ml-auto font-mono text-[10px] uppercase ${tips ? 'text-[var(--accent)]' : 'text-zinc-500'}`}>{tips ? 'on' : 'off'}</span>
+          </button>
+          <a className="st-nav" href="/" target="_blank" rel="noreferrer" data-tip="The site as it is on this machine, in a new tab — including saved but unpublished changes.">
             <ExternalLink size={15} /> Open the site
           </a>
           <button type="button" className="st-nav" onClick={() => setView('home')}>
@@ -208,7 +238,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
         </div>
       </aside>
 
-      <main className="min-h-0 min-w-0 flex-1">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         {loadError && (
           <div className="flex items-center gap-3 border-b border-red-500/30 bg-red-500/10 px-6 py-2.5 text-[0.8125rem] text-red-200">
             <span className="flex-1">{loadError}. Is the dev server running?</span>
@@ -219,7 +249,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
         )}
 
         {view === 'editor' && editor ? (
-          <div className="h-full">
+          <div className="min-h-0 flex-1">
             <EntryEditor
               key={editor.nonce}
               mode={editor}
@@ -231,7 +261,7 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
             />
           </div>
         ) : (
-          <div className="st-scroll h-full overflow-y-auto">
+          <div className="st-scroll min-h-0 flex-1 overflow-y-auto">
             {view === 'dashboard' && (
               <Dashboard
                 items={items}
@@ -295,8 +325,10 @@ export default function Admin({ setView }: { setView: (view: string) => void }) 
             )}
           </div>
         )}
+        {view !== 'editor' && <TipBar topic={view} />}
       </main>
 
+      <TipsLayer onGo={(next) => (next === 'content' ? openContent() : go(next))} />
       <PublishingModal isOpen={publishOpen} onClose={onPublishClose} jobId={jobId} />
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>

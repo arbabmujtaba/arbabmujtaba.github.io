@@ -11,6 +11,7 @@ import {
 } from '../types';
 
 import { parseMarkdown } from './frontmatter';
+import { FEATURED_PRIORITY, parsePriority, sortByPriority } from './priority';
 
 // Dynamically import all *.md content files at build time
 const journalGlob = (import.meta as any).glob('/content/journal/**/*.md', { query: '?raw', eager: true });
@@ -91,6 +92,7 @@ export function getJournalEntries(): JournalEntry[] {
       volume: parseVolume(data.volume),
       tags: normalizeTags(data.tags),
       published: data.published !== false,
+      priority: parsePriority(data.priority),
       body,
       customization: data.customization as PostCustomization | undefined
     } as JournalEntry;
@@ -108,11 +110,12 @@ export function getJournalEntries(): JournalEntry[] {
     if (e.volume === undefined) e.volume = total - i;
   });
 
-  return visible;
+  // Then the author's priority: 0 is featured, 1, 2… follow; the rest stay newest-first.
+  return sortByPriority(visible);
 }
 
 export function getTechEntries(): TechEntry[] {
-  return Object.entries(techGlob).map(([filePath, module]: [string, any]) => {
+  const entries = Object.entries(techGlob).map(([filePath, module]: [string, any]) => {
     const rawContent = module.default;
     const { data, content } = parseMarkdown(rawContent);
     return {
@@ -124,14 +127,16 @@ export function getTechEntries(): TechEntry[] {
       video: data.video || undefined,
       videoPoster: data.videoPoster || undefined,
       excerpt: data.excerpt || "",
+      priority: parsePriority(data.priority),
       body: content || "",
       customization: data.customization as PostCustomization | undefined
-    };
+    } as TechEntry;
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return sortByPriority(entries);
 }
 
 export function getPhotographyEntries(): PhotographyEntry[] {
-  return Object.entries(photographyGlob).map(([filePath, module]: [string, any]) => {
+  const entries = Object.entries(photographyGlob).map(([filePath, module]: [string, any]) => {
     const rawContent = module.default;
     const { data, content } = parseMarkdown(rawContent);
     
@@ -176,13 +181,15 @@ export function getPhotographyEntries(): PhotographyEntry[] {
       captureMode: data.captureMode || "",
       video: data.video || undefined,
       videoPoster: data.videoPoster || undefined,
+      priority: parsePriority(data.priority),
       customization: data.customization as PostCustomization | undefined
-    };
+    } as PhotographyEntry;
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return sortByPriority(entries);
 }
 
 export function getPortfolioProjects(): PortfolioProject[] {
-  return Object.entries(portfolioGlob).map(([filePath, module]: [string, any]) => {
+  const projects = Object.entries(portfolioGlob).map(([filePath, module]: [string, any]) => {
     const rawContent = module.default;
     const { data, content } = parseMarkdown(rawContent);
     
@@ -197,6 +204,7 @@ export function getPortfolioProjects(): PortfolioProject[] {
       }).filter(Boolean);
     }
 
+    const priority = parsePriority(data.priority);
     return {
       title: data.title || "Untitled Project",
       slug: data.slug || filePath.split('/').pop()?.replace('.md', '') || "",
@@ -207,11 +215,15 @@ export function getPortfolioProjects(): PortfolioProject[] {
       projectImage: data.projectImage || "",
       video: data.video || undefined,
       videoPoster: data.videoPoster || undefined,
-      featured: !!data.featured,
+      // Priority 0 is the same promise as the old Featured switch.
+      featured: !!data.featured || priority === FEATURED_PRIORITY,
+      priority,
       body: content || "",
       customization: data.customization as PostCustomization | undefined
-    };
+    } as PortfolioProject;
   });
+  // Featured (switch or priority 0) before the rest, then the author's priority on top of that.
+  return sortByPriority([...projects].sort((a, b) => Number(b.featured) - Number(a.featured)));
 }
 
 export function getGearItems(): GearItem[] {

@@ -11,6 +11,7 @@
  */
 
 import { pruneCustomization } from '../../lib/customization';
+import { parsePriority } from '../../lib/priority';
 import {
   INK_SECTIONS,
   SECRET_KINDS,
@@ -145,8 +146,8 @@ export const WEBSITE_STRUCTURE: Section[] = [
       {
         collection: 'home',
         label: 'Home block',
-        blurb: 'Archive doors, notes, principles, the profile and reels on the landing page.',
-        categories: ['gateway', 'quote', 'principle', 'profile', 'section', 'reel', 'thought'],
+        blurb: 'The hero photo behind your name, archive doors, notes, principles, the profile and reels on the landing page.',
+        categories: ['hero', 'gateway', 'quote', 'principle', 'profile', 'section', 'reel', 'thought'],
         categoryLabel: 'Block type',
         listPath: '/',
         hasPage: false,
@@ -216,6 +217,7 @@ export const isSnippetCollection = (collection: string): boolean =>
  * should read instead (the raw value is still what gets written).
  */
 export const HOME_BLOCK_LABELS: Record<string, string> = {
+  hero: 'Hero photo (behind your name)',
   gateway: 'Archive door',
   quote: 'Note (last notes)',
   principle: 'Principle',
@@ -227,6 +229,7 @@ export const HOME_BLOCK_LABELS: Record<string, string> = {
 
 /** Plain-words description of where a home block appears. */
 export const HOME_BLOCK_WHERE: Record<string, string> = {
+  hero: 'the photograph behind your name at the top of the home page',
   gateway: 'the archive doors that lead to the other pages',
   quote: 'the “last notes” band',
   principle: 'the principles list',
@@ -361,6 +364,8 @@ export interface ListItem {
   label?: string;
   order?: number;
   featured?: boolean;
+  /** Document collections: 0 = featured, 1, 2… next; absent = by date. */
+  priority?: number;
   /** Secrets only: the kind is also mirrored into `category`. */
   kind?: string;
   room?: string;
@@ -410,6 +415,11 @@ export interface FormState {
   githubLink: string;
   liveLink: string;
   featured: boolean;
+  /**
+   * Journal, tech, photography, portfolio. '' = no priority (natural order);
+   * otherwise a whole number as text — 0 is featured. See lib/priority.ts.
+   */
+  priority: string;
   // photography
   gear: string[];
   captureMode: string;
@@ -463,6 +473,7 @@ export function emptyForm(collection: CollectionId, category?: string): FormStat
     githubLink: '',
     liveLink: '',
     featured: false,
+    priority: '',
     gear: [],
     captureMode: '',
     volume: '',
@@ -549,6 +560,7 @@ export function formFromDoc(
     githubLink: str(data.githubLink),
     liveLink: str(data.liveLink),
     featured: !!data.featured,
+    priority: parsePriority(data.priority)?.toString() ?? '',
     gear: stringList(data.gear),
     captureMode: str(data.captureMode),
     volume: data.volume != null ? String(data.volume) : '',
@@ -594,6 +606,11 @@ export function serializeForm(form: FormState): { data: Record<string, any>; bod
   if (STYLED_COLLECTIONS.includes(c)) data.date = form.date || today();
   // `excerpt` is the card line for written entries; everything else uses `description`.
   if (['journal', 'tech'].includes(c)) data.excerpt = form.excerpt || '';
+  // Priority is only read for the document collections, and only written when set.
+  if (STYLED_COLLECTIONS.includes(c)) {
+    const priority = parsePriority(form.priority);
+    if (priority !== undefined) data.priority = priority;
+  }
 
   switch (c) {
     case 'portfolio':

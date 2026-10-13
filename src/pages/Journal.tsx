@@ -21,12 +21,13 @@ export default function Journal() {
     [openEntry]
   );
 
-  // Entries arrive already filtered (published only), sorted newest-first,
-  // and with volume / reading time resolved by the CMS layer.
+  // Entries arrive already filtered (published only), sorted by the author's
+  // priority (0 = featured, then 1, 2…) and newest-first after that, with
+  // volume / reading time resolved by the CMS layer.
   const entries = useMemo(() => getJournalEntries(), []);
 
-  // The newest published entry is always the featured hero; everything older
-  // automatically falls back into the archive grid — no manual flagging.
+  // The priority-0 entry is the featured hero — or, with none set, the newest.
+  // Everything else falls into the archive grid in the same order.
   const featuredEntry = entries[0] || null;
   const archiveEntries = useMemo(() => entries.slice(1), [entries]);
 
@@ -77,7 +78,7 @@ export default function Journal() {
                     {entries.length === 1 ? 'volume' : 'volumes'}
                   </span>
                   <span aria-hidden="true" className="h-px w-5 bg-zinc-700" />
-                  <span>newest first</span>
+                  <span>{entries.some((e) => e.priority !== undefined) ? 'pinned first, then newest' : 'newest first'}</span>
                 </motion.p>
               )}
             </header>

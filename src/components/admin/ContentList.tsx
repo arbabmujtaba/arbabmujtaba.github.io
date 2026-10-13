@@ -90,6 +90,8 @@ function RowMenu({ children }: { children: (close: () => void) => React.ReactNod
         className="st-btn st-btn-sm st-btn-icon st-btn-ghost"
         aria-label="More actions"
         aria-expanded={open}
+        data-tip="Open on the site, publish just this entry, change its workflow label, archive or delete."
+
         onClick={() => setOpen((v) => !v)}
       >
         <MoreHorizontal size={14} />
@@ -260,7 +262,10 @@ export function ContentList({
       </header>
 
       <div className="mb-4 flex flex-wrap items-center gap-x-5 border-b border-zinc-800" role="tablist" aria-label="Website section">
-        {[{ id: 'all', label: 'Everything' }, ...WEBSITE_STRUCTURE.map((s) => ({ id: s.id, label: s.label }))].map((tab) => (
+        {[
+          { id: 'all', label: 'Everything', tip: 'Every entry from every part of the site.' },
+          ...WEBSITE_STRUCTURE.map((s) => ({ id: s.id, label: s.label, tip: s.destinations.map((d) => d.blurb).join(' ') })),
+        ].map((tab) => (
           <button
             key={tab.id}
             type="button"
@@ -268,6 +273,7 @@ export function ContentList({
             className="st-tab"
             aria-selected={filter.section === tab.id}
             onClick={() => onFilter({ ...filter, section: tab.id })}
+            data-tip={tab.tip}
           >
             {tab.label}
             <span className="ml-1.5 font-mono text-[10px] text-zinc-600">{sectionCounts[tab.id] ?? 0}</span>
@@ -281,7 +287,7 @@ export function ContentList({
             <button
               key={option.id}
               type="button"
-              title={option.hint}
+              data-tip={option.hint}
               aria-pressed={filter.state === option.id}
               onClick={() => onFilter({ ...filter, state: option.id })}
             >
@@ -298,6 +304,7 @@ export function ContentList({
             onChange={(e) => onFilter({ ...filter, query: e.target.value })}
             placeholder="Search title, slug, category…"
             aria-label="Search entries"
+            data-tip="Type any part of a title, address (slug) or category."
           />
         </div>
       </div>
@@ -352,6 +359,18 @@ export function ContentList({
                         <span className="truncate">{prettyCategory(item.category)}</span>
                       </>
                     )}
+                    {item.priority !== undefined && (
+                      <span
+                        className={item.priority === 0 ? 'text-[var(--accent)]' : 'text-zinc-400'}
+                        data-tip={
+                          item.priority === 0
+                            ? 'Priority 0 — featured: first on the Home page and at the top of its section.'
+                            : `Priority ${item.priority} — shown after the featured entries${item.priority > 1 ? ` and priorities 1–${item.priority - 1}` : ''}.`
+                        }
+                      >
+                        {item.priority === 0 ? '★ featured' : `P${item.priority}`}
+                      </span>
+                    )}
                     {item.hasVideo && (
                       <span className="inline-flex items-center gap-1 text-zinc-400" title="Has a motion clip">
                         <Film size={10} /> clip
@@ -370,7 +389,7 @@ export function ContentList({
                 <span className="hidden items-center gap-1.5 sm:flex">
                   <StandingBadge item={item} />
                   {item.unsavedChanges && standing === 'live' && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" title="Edited since it was last published" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" data-tip="Edited since it was last published — the live site still shows the older version." />
                   )}
                 </span>
 

@@ -434,9 +434,49 @@
 .st-publish-step[data-status="error"] { background: rgba(194, 46, 31, 0.12); }
 .st-publish-step[data-status="error"] .st-publish-label { color: #ffb4a8; }
 
+/* ---- Help: hover cards and the tip bar (components/admin/Guide.tsx) ------ */
+
+.st-hovertip {
+  position: fixed;
+  z-index: 90;
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 1rem));
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--studio-radius);
+  background: var(--bg-raised);
+  color: var(--ink-1);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  box-shadow: 0 16px 36px -16px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  animation: st-tip-in 160ms var(--ease-rushes) both;
+}
+.st-hovertip[data-above] { transform: translateY(-100%); animation-name: st-tip-in-above; }
+@keyframes st-tip-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+@keyframes st-tip-in-above { from { opacity: 0; transform: translateY(calc(-100% + 3px)); } to { opacity: 1; transform: translateY(-100%); } }
+
+/* Something with a hover card says so, quietly — only while tips are on. */
+.studio[data-tips="on"] [data-tip] { cursor: help; }
+.studio[data-tips="on"] button[data-tip],
+.studio[data-tips="on"] a[data-tip],
+.studio[data-tips="on"] [role="tab"][data-tip] { cursor: pointer; }
+
+.st-tipbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.75rem 0.25rem 1rem;
+  border-top: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--gilt) 5%, var(--bg-deep));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .st-publish[data-state="running"] .st-publish-orb,
   .st-pulse,
+  .st-hovertip,
   .st-rise { animation: none; }
   .st-nav:hover { transform: none; }
 }

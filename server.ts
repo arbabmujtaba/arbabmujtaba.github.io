@@ -535,6 +535,8 @@ app.get('/api/content', async (req, res) => {
           // so the existing category filters and labels work unchanged.
           category: col === 'secrets' ? data.kind || 'note' : data.category || data.configType || '',
           featured: !!data.featured,
+          // Editorial priority (0 = featured); only whole numbers count, as on the site.
+          priority: Number.isInteger(data.priority) && data.priority >= 0 ? data.priority : undefined,
           coverImage: data.coverImage || data.featuredImage || data.projectImage || data.image || '',
           excerpt: data.excerpt || data.description || '',
           filePath: `content/${col}/${file}`,

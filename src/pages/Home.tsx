@@ -31,7 +31,7 @@ import {
   getTimelineMilestones,
 } from '../lib/cms';
 import { useMagic } from '../lib/magic';
-import { getLocalWebpSources } from '../lib/image';
+import { resolveHero, type HeroImage } from '../lib/hero';
 import { isRoomEnabled } from '../lib/secrets';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -42,42 +42,32 @@ interface HomeProps {
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
- * Hero backdrop. Assigned in `.kiro/IMAGE_MAP.md`: at mean luminance 50 it is
- * the darkest large photograph in the archive, so the bone hero type stays
- * legible over it. The hero is an ink plate at any hour (data-surface="ink").
- *
- * The frame is a portrait. Landscape screens get a 3:2 band baked out of it at
- * full resolution (`npm run hero:image`) — clouds, the low sun beside the name,
- * the tree line — instead of the middle of the 1536 px portrait derivative,
- * which was soft on large screens and hid the sun behind the wordmark. Portrait
- * screens keep the portrait frame.
+ * Hero backdrop — the photograph behind the name. Chosen in /admin as a Home
+ * block of type "Hero photo"; `src/lib/hero.ts` resolves it (and falls back to
+ * the default frame from `.kiro/IMAGE_MAP.md`). The hero is an ink plate at
+ * any hour (data-surface="ink"), so pick a darker frame for the bone type.
+ * index.html preloads the same sources through the plugin in vite.config.ts.
  */
-// Also preloaded by index.html — change both together.
-const HERO_IMAGE = '/uploads/photography/1785134270800-642096424.jpeg';
-const HERO_WIDE_SRCSET = [1280, 1920, 2560]
-  .map((width) => `/uploads/optimized/home/hero-dusk-wide-${width}.webp ${width}w`)
-  .join(', ');
-const HERO_TALL_SRCSET = getLocalWebpSources(HERO_IMAGE)?.srcSet;
-
-function HeroPlate() {
+function HeroPlate({ hero }: { hero: HeroImage }) {
   // A missing derivative makes the whole <picture> fail; fall back to the original.
   const [failed, setFailed] = useState(false);
   const img = (
     <img
-      src={HERO_IMAGE}
+      src={hero.src}
       alt=""
       loading="eager"
       decoding="async"
       fetchPriority="high"
       onError={() => setFailed(true)}
-      className="hero-plate h-[114%] w-full object-cover object-[50%_42%]"
+      style={{ objectPosition: hero.objectPosition }}
+      className="hero-plate h-[114%] w-full object-cover"
     />
   );
   if (failed) return img;
   return (
     <picture>
-      <source media="(orientation: landscape)" type="image/webp" srcSet={HERO_WIDE_SRCSET} sizes="100vw" />
-      {HERO_TALL_SRCSET && <source type="image/webp" srcSet={HERO_TALL_SRCSET} sizes="100vw" />}
+      {hero.wideSrcSet && <source media="(orientation: landscape)" type="image/webp" srcSet={hero.wideSrcSet} sizes="100vw" />}
+      {hero.tallSrcSet && <source type="image/webp" srcSet={hero.tallSrcSet} sizes="100vw" />}
       {img}
     </picture>
   );
@@ -135,6 +125,8 @@ export default function Home({ setView }: HomeProps) {
     []
   );
 
+  // Every hero block, visible or not — resolveHero skips the hidden ones.
+  const hero = useMemo(() => resolveHero(getHomeConfig()), []);
   const gateways = homeConfig.filter((entry) => entry.configType === 'gateway');
   const profile = homeConfig.find((entry) => entry.configType === 'profile');
   const reels = homeConfig.filter((entry) => entry.configType === 'reel' && !!entry.video);
@@ -161,11 +153,11 @@ export default function Home({ setView }: HomeProps) {
   const timeline = useMemo(() => getTimelineMilestones().filter((m) => m.visible), []);
   const darkroom = useMemo(() => isRoomEnabled('darkroom'), []);
 
-  /** Featured work first, then the rest — six lines is an index, not a dump. */
-  const projectIndex = useMemo(
-    () => [...projects].sort((a, b) => Number(b.featured) - Number(a.featured)).slice(0, 6),
-    [projects]
-  );
+  /**
+   * Six lines is an index, not a dump. The CMS already orders projects by
+   * priority (0 = featured, then 1, 2…), then the Featured switch.
+   */
+  const projectIndex = useMemo(() => projects.slice(0, 6), [projects]);
 
   const targetOf = (entry: { navTarget?: string; slug: string }) =>
     entry.navTarget || entry.slug.replace('gateway-', '');
@@ -190,7 +182,7 @@ export default function Home({ setView }: HomeProps) {
             className="absolute inset-0 -z-10 overflow-hidden bg-canvas-deep"
             style={shouldParallax ? { y: heroImageY } : undefined}
           >
-            <HeroPlate />
+            <HeroPlate key={hero.src} hero={hero} />
             {/* Light where the sky is, dark where the type sits: a scrim along
                 the bottom for the name and the copy, a thin one along the top
                 for the header, and the photograph left at full strength between. */}

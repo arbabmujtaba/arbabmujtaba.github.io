@@ -2773,8 +2773,27 @@
       "filePath": "content/home/reel-home.md",
       "lastReviewedAt": "2026-10-13T20:56:34.743Z",
       "publishedAt": "2026-10-13T20:56:34.746Z"
+    },
+    {
+      "id": "home/hero",
+      "collection": "home",
+      "slug": "hero",
+      "title": "Hero photo",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-10-13T21:18:14.526Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-13T21:18:14.526Z",
+      "updatedAt": "2026-10-13T21:18:14.526Z",
+      "publishedAt": "2026-10-13T21:18:14.526Z",
+      "filePath": "content/home/hero.md"
     }
   ],
-  "lastUpdated": "2026-10-13T20:56:34.750Z",
+  "lastUpdated": "2026-10-13T21:18:14.535Z",
   "version": 1
 }

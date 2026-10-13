@@ -58,7 +58,10 @@ import {
   type WorkflowState,
 } from './model';
 import { StyleStudio } from './StyleStudio';
-import { ConfirmDialog, Field, Group, SavedTick, StandingBadge, TagInput, Toggle } from './ui';
+import { ConfirmDialog, Field, Group, SavedTick, Segmented, StandingBadge, TagInput, Toggle } from './ui';
+import { PRIORITY_QUICK_PICKS, parsePriority } from '../../lib/priority';
+import { TipBar } from './Guide';
+import { TAB_TIPS } from './guideContent';
 
 export type EditorMode =
   | { kind: 'edit'; collection: CollectionId; slug: string }
@@ -605,10 +608,11 @@ export function EntryEditor({
   const dest = destinationFor(form.collection);
   const styled = STYLED_COLLECTIONS.includes(form.collection);
   const reel = form.collection === 'home' && form.category === 'reel';
+  const hero = form.collection === 'home' && form.category === 'hero';
   const secret = form.collection === 'secrets';
   const secretKind = (form.category || 'note') as SecretKind;
   // A secret has no cover, no clip and no style studio — only an optional image.
-  const motion = MOTION_COLLECTIONS.includes(form.collection);
+  const motion = MOTION_COLLECTIONS.includes(form.collection) && !hero;
   const isConfig = isSnippetCollection(form.collection);
   const customization = form.customization;
   const setCustomization = (next: PostCustomization) => patch({ customization: next });
@@ -679,7 +683,7 @@ export function EntryEditor({
     <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
       <header className="flex flex-none flex-wrap items-center gap-3 border-b border-zinc-800 px-5 py-3">
-        <button type="button" className="st-btn st-btn-icon st-btn-ghost" onClick={leave} aria-label="Back to content">
+        <button type="button" className="st-btn st-btn-icon st-btn-ghost" onClick={leave} aria-label="Back to content" data-tip="Back to the content list. Unsaved edits stay in this browser and are offered back next time.">
           <ArrowLeft size={15} />
         </button>
         <div className="min-w-0 flex-1">
@@ -702,14 +706,14 @@ export function EntryEditor({
           )}
         </span>
         {!form.isNew && dest?.hasPage && (
-          <a className="st-btn st-btn-ghost" href={address} target="_blank" rel="noreferrer">
+          <a className="st-btn st-btn-ghost" href={address} target="_blank" rel="noreferrer" data-tip="Open the saved version of this page in a new tab.">
             <ExternalLink size={14} /> View
           </a>
         )}
-        <button type="button" className="st-btn" disabled={saving || !dirty} onClick={() => void save()} title="Ctrl/Cmd + S">
+        <button type="button" className="st-btn" disabled={saving || !dirty} onClick={() => void save()} data-tip="Save to this machine only (Ctrl/⌘ + S). The live site does not change until you publish.">
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save
         </button>
-        <button type="button" className="st-btn st-btn-primary" disabled={saving} onClick={() => setConfirm('publish')}>
+        <button type="button" className="st-btn st-btn-primary" disabled={saving} onClick={() => setConfirm('publish')} data-tip="Save, commit and push to GitHub — the live site updates in a minute or two. You confirm first.">
           <Rocket size={14} /> Save &amp; publish
         </button>
       </header>
@@ -746,7 +750,7 @@ export function EntryEditor({
         <div className="flex min-h-0 flex-col border-r border-zinc-800">
           <div className="flex flex-none gap-1 overflow-x-auto border-b border-zinc-800 px-4" role="tablist">
             {tabs.map((entry) => (
-              <button key={entry.id} type="button" role="tab" aria-selected={activeTab === entry.id} className="st-tab" onClick={() => setTab(entry.id)}>
+              <button key={entry.id} type="button" role="tab" aria-selected={activeTab === entry.id} className="st-tab" onClick={() => setTab(entry.id)} data-tip={TAB_TIPS[entry.id]}>
                 {entry.label}
               </button>
             ))}
@@ -795,6 +799,8 @@ export function EntryEditor({
                     )}
                   </div>
 
+                  {styled && <PriorityField form={form} patch={patch} />}
+
                   <Field label={excerptLabel} hint={['journal', 'tech'].includes(form.collection) ? 'Shown on cards and in search results.' : undefined}>
                     <textarea className="st-textarea" rows={3} value={form.excerpt} onChange={(event) => patch({ excerpt: event.target.value })} />
                   </Field>
@@ -818,13 +824,15 @@ export function EntryEditor({
               {activeTab === 'media' && (
                 <div className="space-y-6">
                   <MediaField
-                    label={secret ? 'Image (optional)' : coverLabel}
+                    label={secret ? 'Image (optional)' : hero ? 'Hero photograph' : coverLabel}
                     value={form.cover}
                     onChange={(cover) => patch({ cover })}
                     collection={form.collection}
                     notify={notify}
                     hint={
-                      reel
+                      hero
+                        ? 'The photograph behind your name on the Home page. The name is light type over it, so a darker frame — or one dark along the bottom — reads best. Empty = the default frame.'
+                        : reel
                         ? 'Optional — the poster below is used when this is empty.'
                         : secret
                           ? 'Shown with the note or the room, if the hidden layer has a place for it.'
@@ -832,8 +840,15 @@ export function EntryEditor({
                     }
                   />
 
-                  {styled && form.cover && !/\.(mp4|webm)(\?|$)/i.test(form.cover) && (
-                    <Group title="Crop & frame" description="Choose the shape, what stays in frame, and where the photo sits.">
+                  {(styled || hero) && form.cover && !/\.(mp4|webm)(\?|$)/i.test(form.cover) && (
+                    <Group
+                      title={hero ? 'Focal point' : 'Crop & frame'}
+                      description={
+                        hero
+                          ? 'Drag the focal point to what must stay in view — the hero fills the whole screen, so the edges are cut differently on a phone and a desktop. The shape is not used here.'
+                          : 'Choose the shape, what stays in frame, and where the photo sits.'
+                      }
+                    >
                       <ImageCropper
                         src={form.cover}
                         value={customization.image}
@@ -897,7 +912,7 @@ export function EntryEditor({
                       <Toggle checked={form.visible} onChange={(visible) => patch({ visible })} label={visibility.label} hint={visibility.hint} />
                     )}
                     {form.collection === 'portfolio' && (
-                      <Toggle checked={form.featured} onChange={(featured) => patch({ featured })} label="Featured" hint="Pinned to the top of the Portfolio." />
+                      <Toggle checked={form.featured} onChange={(featured) => patch({ featured })} label="Featured" hint="Listed before projects that are not. Priority (on the Content tab) decides the order on top of this — priority 0 counts as featured." />
                     )}
                     {!isConfig && form.collection !== 'journal' && form.collection !== 'portfolio' && (
                       <p className="text-[0.75rem] text-zinc-500">This entry shows on the site as soon as it is published.</p>
@@ -938,6 +953,7 @@ export function EntryEditor({
               )}
             </div>
           )}
+          <TipBar topic={`editor.${activeTab}`} />
         </div>
 
         {wide && <div className="min-h-0 min-w-0">{livePreview}</div>}
@@ -990,6 +1006,55 @@ function NumberField({ label, value, onChange, hint }: { label: string; value: n
   return (
     <Field label={label} hint={hint}>
       <input type="number" className="st-input" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10) || 0)} />
+    </Field>
+  );
+}
+
+/** Where priority 0 puts an entry, per collection — the hint under the picker. */
+const PRIORITY_PLACES: Partial<Record<FormState['collection'], string>> = {
+  journal: 'the lead on the Home desk and the hero of the Journal',
+  tech: 'the lead on the Home desk and the first log on Tech',
+  photography: 'the large first tile in the Home frames (it stays put) and the lead plate on Photography',
+  portfolio: 'the first line of the Home work index and the top of the Portfolio',
+};
+
+/**
+ * Editorial priority: 0 is featured, 1, 2… come straight after, and "none"
+ * leaves the entry in date order behind every prioritised one. Written to
+ * front-matter as `priority`; read by lib/cms.ts through lib/priority.ts.
+ */
+function PriorityField({ form, patch }: { form: FormState; patch: (next: Partial<FormState>) => void }) {
+  const current = parsePriority(form.priority);
+  const custom = current !== undefined && !(PRIORITY_QUICK_PICKS as readonly number[]).includes(current);
+  const options = [
+    { id: '', label: 'None', title: 'No priority — sorted by date' },
+    ...PRIORITY_QUICK_PICKS.map((n) => ({
+      id: String(n),
+      label: n === 0 ? '0 · Featured' : String(n),
+      title: n === 0 ? 'Priority 0 — featured' : `Priority ${n}`,
+    })),
+  ];
+  const hint =
+    current === undefined
+      ? 'No priority: the entry sits in date order, after every entry that has one.'
+      : current === 0
+        ? `Featured: ${PRIORITY_PLACES[form.collection] ?? 'first wherever it is shown'}. If several are featured, the newest wins.`
+        : `Shown after the featured entries${current > 1 ? ` and priorities 1–${current - 1}` : ''}, before anything without a priority.`;
+  return (
+    <Field label="Priority" hint={hint}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Segmented<string> value={custom ? undefined : form.priority} options={options} onChange={(priority) => patch({ priority })} label="Priority" />
+        <input
+          type="number"
+          min={0}
+          step={1}
+          className="st-input !w-20"
+          aria-label="Custom priority"
+          placeholder="6+"
+          value={custom ? form.priority : ''}
+          onChange={(event) => patch({ priority: event.target.value.replace(/\D/g, '') })}
+        />
+      </div>
     </Field>
   );
 }

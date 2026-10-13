@@ -5,6 +5,7 @@ import Lightbox, { type LightboxFrame } from '../Lightbox';
 import { getLocalWebpSources, ownerArchiveImage } from '../../lib/image';
 import { getCardImageStyle } from '../../lib/customization';
 import { useOpenEntry } from '../../lib/entryNavigation';
+import { isFeatured, sortByPriority } from '../../lib/priority';
 import type { PhotographyEntry } from '../../types';
 
 interface Frame {
@@ -14,6 +15,8 @@ interface Frame {
   slug: string;
   category: string;
   style?: React.CSSProperties;
+  /** A featured (priority 0) cover holds its tile instead of rotating out. */
+  pinned?: boolean;
 }
 
 interface PhotoShuffleProps {
@@ -109,13 +112,18 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
             category: entry.category,
             // The cover honours the author's focal point; gallery frames centre.
             style: i === 0 ? getCardImageStyle(entry.customization) : undefined,
+            pinned: i === 0 && isFeatured(entry),
           }));
       });
 
+    // Covers of entries given a priority in /admin open the sheet, in that
+    // order — priority 0 on the large first tile. Everything else is shuffled.
+    const prioritised = sortByPriority(entries.filter((e) => e.priority !== undefined));
+    const leads = prioritised.flatMap((entry) => toFrames([entry]).slice(0, 1));
     const favorites = shuffle(toFrames(entries.filter((e) => e.category === 'Favorites')));
     const rest = shuffle(toFrames(entries.filter((e) => e.category !== 'Favorites')));
     const unique = (list: Frame[]) => list.filter((f, i) => list.findIndex((g) => g.src === f.src) === i);
-    return unique(favorites.length >= TILE_SPANS.length + 4 ? favorites : [...favorites, ...rest]);
+    return unique([...leads, ...(favorites.length >= TILE_SPANS.length + 4 ? favorites : [...favorites, ...rest])]);
   }, [entries]);
 
   const tileCount = Math.min(TILE_SPANS.length, pool.length);
@@ -125,13 +133,17 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
   const swap = useCallback(async () => {
     const onScreen = new Set(tiles.map((t) => t.src));
     const candidates = pool.filter((f) => !onScreen.has(f.src));
-    if (candidates.length === 0) return;
-    let slot = Math.floor(Math.random() * tiles.length);
-    if (slot === lastSwapped.current && tiles.length > 1) slot = (slot + 1) % tiles.length;
+    // Featured covers stay put; only the other tiles rotate.
+    const slots = tiles.map((tile, i) => (tile.pinned ? -1 : i)).filter((i) => i >= 0);
+    if (candidates.length === 0 || slots.length === 0) return;
+    let pick = Math.floor(Math.random() * slots.length);
+    if (slots[pick] === lastSwapped.current && slots.length > 1) pick = (pick + 1) % slots.length;
+    const slot = slots[pick];
     const next = candidates[Math.floor(Math.random() * candidates.length)];
     await preload(next.src);
     lastSwapped.current = slot;
-    setTiles((current) => current.map((tile, i) => (i === slot ? next : tile)));
+    // A frame rotated in is never pinned, so the rotation cannot freeze itself.
+    setTiles((current) => current.map((tile, i) => (i === slot ? { ...next, pinned: false } : tile)));
   }, [pool, tiles]);
 
   const running = !shouldReduceMotion && inView && !hovering && lightbox === null && pool.length > tileCount;
