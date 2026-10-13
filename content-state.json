@@ -2852,8 +2852,40 @@
       "filePath": "content/photography/staryscape.md",
       "lastReviewedAt": "2026-10-13T21:44:01.141Z",
       "publishedAt": "2026-10-13T21:44:01.143Z"
+    },
+    {
+      "id": "photography/mp-forest",
+      "collection": "photography",
+      "slug": "mp-forest",
+      "title": "MP-Forest",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-10-13T22:00:58.105Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T22:00:58.324Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T22:00:58.326Z",
+          "commitHash": "ef5553ff939dacb9cf122f3a3a7569faeabbc7f8",
+          "notes": "Published via pipeline job pub-1791928858235-e7g3ml"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-13T22:00:58.107Z",
+      "updatedAt": "2026-10-13T22:00:58.326Z",
+      "filePath": "content/photography/mp-forest.md",
+      "lastReviewedAt": "2026-10-13T22:00:58.324Z",
+      "publishedAt": "2026-10-13T22:00:58.326Z"
     }
   ],
-  "lastUpdated": "2026-10-13T21:51:39.951Z",
+  "lastUpdated": "2026-10-13T22:00:58.331Z",
   "version": 1
 }
