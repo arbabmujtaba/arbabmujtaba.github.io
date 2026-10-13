@@ -2741,8 +2741,40 @@
       "filePath": "content/home/reel-dal-lake.md",
       "lastReviewedAt": "2026-10-13T20:54:02.207Z",
       "publishedAt": "2026-10-13T20:54:02.209Z"
+    },
+    {
+      "id": "home/reel-home",
+      "collection": "home",
+      "slug": "reel-home",
+      "title": "Home",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-10-13T20:56:34.519Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T20:56:34.743Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T20:56:34.746Z",
+          "commitHash": "10c1dc29ad0ba15ccf7510f56c8ed9f856002efc",
+          "notes": "Published via pipeline job pub-1791924994682-y0nzvi"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-13T20:56:34.523Z",
+      "updatedAt": "2026-10-13T20:56:34.746Z",
+      "filePath": "content/home/reel-home.md",
+      "lastReviewedAt": "2026-10-13T20:56:34.743Z",
+      "publishedAt": "2026-10-13T20:56:34.746Z"
     }
   ],
-  "lastUpdated": "2026-10-13T20:54:02.213Z",
+  "lastUpdated": "2026-10-13T20:56:34.750Z",
   "version": 1
 }
