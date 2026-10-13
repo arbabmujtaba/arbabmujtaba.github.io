@@ -2820,8 +2820,40 @@
       "updatedAt": "2026-10-13T21:18:14.526Z",
       "publishedAt": "2026-10-13T21:18:14.526Z",
       "filePath": "content/home/hero.md"
+    },
+    {
+      "id": "photography/staryscape",
+      "collection": "photography",
+      "slug": "staryscape",
+      "title": "StaryScape",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "draft",
+          "timestamp": "2026-10-13T21:44:00.943Z"
+        },
+        {
+          "version": 2,
+          "state": "review",
+          "timestamp": "2026-10-13T21:44:01.141Z"
+        },
+        {
+          "version": 3,
+          "state": "published",
+          "timestamp": "2026-10-13T21:44:01.143Z",
+          "commitHash": "2fbab12d370c6bbda7b963e67601d2109d189a6f",
+          "notes": "Published via pipeline job pub-1791927841069-gcotwy"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-10-13T21:44:00.945Z",
+      "updatedAt": "2026-10-13T21:44:01.143Z",
+      "filePath": "content/photography/staryscape.md",
+      "lastReviewedAt": "2026-10-13T21:44:01.141Z",
+      "publishedAt": "2026-10-13T21:44:01.143Z"
     }
   ],
-  "lastUpdated": "2026-10-13T21:35:19.405Z",
+  "lastUpdated": "2026-10-13T21:44:01.148Z",
   "version": 1
 }
