@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./fonts.css";
 
 /* ==========================================================================
    TOKEN LAYER — Midnight & Cobalt
@@ -211,6 +212,21 @@
 /* ==========================================================================
    BASE
    ========================================================================== */
+
+/* Clip overflow without becoming a scroll container. `overflow: hidden` on an
+   ancestor quietly breaks every `position: sticky` inside it (the element
+   sticks to that ancestor, which never scrolls), which is why the chapter
+   year strip and the Logs filter bar used to scroll away. `clip` cuts the
+   same overhang without that side effect; `hidden` stays as the fallback
+   for browsers without `clip` (Safari < 16). */
+.clip-x {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+.clip-xy {
+  overflow: hidden;
+  overflow: clip;
+}
 
 body {
   background-color: var(--bg);

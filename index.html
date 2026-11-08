@@ -8,14 +8,13 @@
       name="description"
       content="Arbab Mujtaba — an archive still being written. Engineering projects, essays, photography, and a working index of tools and references."
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <!-- Fonts load without blocking the first paint (display=swap already
-         covers the text); the stylesheet is applied the moment it arrives. -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Fragment+Mono:ital@0;1&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap" /></noscript>
+    <!-- Fonts are self-hosted (src/fonts.css): no third-party connections in
+         the critical path. The two faces every page sets above the fold —
+         the grotesk and the mono — are fetched with the HTML; the rest load
+         on first use with font-display: swap. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/host-grotesk-normal-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/fragment-mono-normal-latin.woff2" crossorigin />
     <script>
       // Day or night before the first paint, so the page never flashes the
       // wrong surface. Mirrors resolveTheme() in src/lib/magic.tsx.
