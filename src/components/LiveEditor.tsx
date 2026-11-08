@@ -18,7 +18,7 @@ import { getLiveEditBridgeScript } from '../lib/liveEditBridge';
 import { mapElementToContent, type ClickedElementPayload, type MappedElement, type ContentItem } from '../lib/elementMapper';
 import type { ToastType } from './Toast';
 import { ConfirmDialog } from './admin/ui';
-import { startPublish } from './admin/api';
+import { jsonHeaders, startPublish } from './admin/api';
 
 // Types
 interface CMSItem {
@@ -316,7 +316,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
       // path-based URL 404s and looks like a dead server.
       const saveRes = await fetch('/api/content', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({
           collection: mappedElement.collection,
           slug: mappedElement.slug,
@@ -417,7 +417,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
             <select
               value={currentPage}
               onChange={(e) => handlePageChange(e.target.value)}
-              className="appearance-none bg-zinc-900/60 border border-zinc-800 text-zinc-300 font-sans text-xs pl-3 pr-8 py-1.5 rounded-sm focus:outline-none focus:border-orange-500/40 cursor-pointer"
+              className="appearance-none bg-zinc-900/60 border border-zinc-800 text-zinc-300 font-sans text-xs pl-3 pr-8 py-1.5 rounded-sm focus:outline-none focus:border-accent/40 cursor-pointer"
             >
               {PAGE_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -431,7 +431,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
             onClick={toggleEditMode}
             className={`px-3 py-1.5 rounded-sm font-sans text-xs flex items-center gap-2 transition-all cursor-pointer ${
               editMode
-                ? 'bg-orange-500/15 border border-orange-500/40 text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.1)]'
+                ? 'bg-accent/15 border border-accent/40 text-accent-ink shadow-[0_0_8px_var(--accent-soft)]'
                 : 'bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
             }`}
           >
@@ -450,7 +450,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                 onClick={() => handleViewportChange(m)}
                 className={`px-2 py-1.5 rounded-sm transition-all flex items-center gap-1.5 cursor-pointer ${
                   viewportMode === m
-                    ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
+                    ? 'bg-accent/10 text-accent-ink border border-accent/20'
                     : 'text-zinc-500 hover:text-zinc-200 border border-transparent hover:bg-zinc-900'
                 }`}
                 title={VIEWPORT_CONFIGS[m].label}
@@ -514,7 +514,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
               {iframeLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-canvas z-10">
                   <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
+                    <Loader2 className="w-6 h-6 text-accent-ink animate-spin" />
                     <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Loading site...</span>
                   </div>
                 </div>
@@ -564,8 +564,8 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                 className="flex-grow flex items-center justify-center p-6"
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                    <Crosshair className="w-7 h-7 text-orange-500 animate-pulse" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center">
+                    <Crosshair className="w-7 h-7 text-accent-ink animate-pulse" />
                   </div>
                   <p className="font-sans text-sm text-zinc-300 font-light leading-relaxed mb-2">
                     Click on any element
@@ -587,7 +587,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                 {/* Panel Header */}
                 <div className="px-4 py-3 border-b border-zinc-900 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-2">
-                    <Eye className="w-3.5 h-3.5 text-orange-500" />
+                    <Eye className="w-3.5 h-3.5 text-accent-ink" />
                     <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
                       Element Inspector
                     </span>
@@ -635,7 +635,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                           <span className="font-sans text-xs text-emerald-400 font-medium">Content Identified</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[9px] px-2 py-0.5 bg-orange-500/10 text-orange-400 rounded uppercase tracking-wider">
+                          <span className="font-mono text-[9px] px-2 py-0.5 bg-accent/10 text-accent-ink rounded uppercase tracking-wider">
                             {mappedElement.collection}
                           </span>
                           <span className="font-sans text-xs text-zinc-300 truncate">
@@ -672,7 +672,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                             type="text"
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
-                            className="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-200 font-mono text-xs px-3 py-2 rounded-sm focus:outline-none focus:border-orange-500/40 transition-colors"
+                            className="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-200 font-mono text-xs px-3 py-2 rounded-sm focus:outline-none focus:border-accent/40 transition-colors"
                             placeholder="Image path..."
                           />
                         ) : mappedElement.field === 'body' ? (
@@ -680,7 +680,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
                             rows={8}
-                            className="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-200 font-sans text-xs px-3 py-2 rounded-sm focus:outline-none focus:border-orange-500/40 transition-colors resize-none custom-scrollbar"
+                            className="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-200 font-sans text-xs px-3 py-2 rounded-sm focus:outline-none focus:border-accent/40 transition-colors resize-none custom-scrollbar"
                             placeholder="Content body..."
                           />
                         ) : (
@@ -688,7 +688,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
                             rows={3}
-                            className="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-200 font-sans text-xs px-3 py-2 rounded-sm focus:outline-none focus:border-orange-500/40 transition-colors resize-none custom-scrollbar"
+                            className="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-200 font-sans text-xs px-3 py-2 rounded-sm focus:outline-none focus:border-accent/40 transition-colors resize-none custom-scrollbar"
                             placeholder={`Edit ${mappedElement.field}...`}
                           />
                         )}
@@ -699,7 +699,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                         <button
                           onClick={handleSave}
                           disabled={isSaving || !serverAvailable || mappedElement.field === 'unknown'}
-                          className="w-full px-3 py-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 hover:bg-orange-500/20 hover:border-orange-500/50 transition-all rounded-sm font-sans text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full px-3 py-2 bg-accent/10 border border-accent/30 text-accent-ink hover:bg-accent/20 hover:border-accent/50 transition-all rounded-sm font-sans text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSaving ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />

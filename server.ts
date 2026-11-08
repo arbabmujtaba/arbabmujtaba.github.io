@@ -6,6 +6,7 @@ import multer from 'multer';
 import matter from 'gray-matter';
 import { createServer as createViteServer } from 'vite';
 import http from 'http';
+import { randomBytes, timingSafeEqual } from 'crypto';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { transitionState, getItem, getAllItems, saveItem, createItem, deleteItem, initialize, reconcile, getStateStats, ContentState } from './src/lib/contentState';
@@ -141,15 +142,28 @@ function validateContentParams(req: Request, res: Response, next: NextFunction) 
 
 // Restrict CORS to the local authoring origins only — a wildcard lets any site
 // the browser visits drive this API while `npm run dev` is running.
-const ALLOWED_ORIGINS = [`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`];
+const ALLOWED_HOSTS = [`localhost:${PORT}`, `127.0.0.1:${PORT}`];
+const ALLOWED_ORIGINS = ALLOWED_HOSTS.map((host) => `http://${host}`);
+
+/**
+ * HOST CHECK — DNS rebinding.
+ * Binding to 127.0.0.1 keeps other machines out, but not other websites: a page
+ * on evil.example can re-point its own hostname at 127.0.0.1 and then talk to
+ * this server as if it were same-origin, reading responses CORS would otherwise
+ * hide. Such requests still carry `Host: evil.example`, so anything not
+ * addressed to this server by its local name is refused outright.
+ */
+app.use((req, res, next) => {
+  if (ALLOWED_HOSTS.includes(String(req.headers.host || '').toLowerCase())) return next();
+  res.status(403).type('text/plain').send('Forbidden: unknown Host header.');
+});
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   res.header('Vary', 'Origin');
-  res.header(
-    'Access-Control-Allow-Origin',
-    origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
-  );
+  // Only ever echo an allowed origin. A disallowed one gets no CORS headers at
+  // all, so the browser withholds the response from it.
+  if (origin && ALLOWED_ORIGINS.includes(origin)) res.header('Access-Control-Allow-Origin', origin);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Studio-Token');
   res.header('Access-Control-Expose-Headers', 'Content-Type, X-Content-Length, X-File-Name');
@@ -160,9 +174,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Enable robust JSON parsing for incoming editor requests
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Editor requests are markdown and front-matter; files go through multer, not
+// here. 2 MB is ~40x the largest entry in content/ and keeps a runaway client
+// from making the server buffer 50 MB of JSON.
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 /**
  * Respond 500 and leave a trace.
@@ -182,24 +198,52 @@ function fail(res: Response, error: unknown, context: string): void {
 
 /**
  * MUTATION GUARD
- * When STUDIO_TOKEN is set in the environment (.env is now loaded via dotenv), every
- * mutating /api request must present a matching x-studio-token header. When it is not
- * set, requests pass through and a single warning is emitted at startup so local
- * authoring stays frictionless while lockdown remains one env var away.
+ * Every mutating /api request — the ones that write content, upload files, or
+ * commit and push — must come from this server's own pages and carry the
+ * studio token.
+ *
+ * 1. Origin. Browsers attach `Origin` (and `Sec-Fetch-Site`) to cross-site
+ *    requests, and a plain form POST from another site needs no CORS
+ *    preflight, so CORS alone never stopped one from reaching a handler.
+ *    Anything that says it came from elsewhere is refused.
+ * 2. Token. STUDIO_TOKEN from .env when set; otherwise a fresh random one per
+ *    boot. The dev server writes it into the pages it serves (see
+ *    studioTokenPlugin), which only this origin can read, so the admin works
+ *    with no setup and nothing else can learn the token.
  */
-const STUDIO_TOKEN = process.env.STUDIO_TOKEN?.trim() || '';
+const STUDIO_TOKEN = process.env.STUDIO_TOKEN?.trim() || randomBytes(32).toString('hex');
+const STUDIO_TOKEN_FROM_ENV = Boolean(process.env.STUDIO_TOKEN?.trim());
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
+function tokenMatches(provided: unknown): boolean {
+  if (typeof provided !== 'string') return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(STUDIO_TOKEN);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 app.use((req, res, next) => {
-  if (!STUDIO_TOKEN) return next();
   if (!req.path.startsWith('/api/')) return next();
   if (!MUTATING_METHODS.has(req.method)) return next();
 
-  const provided = req.headers['x-studio-token'];
-  if (typeof provided === 'string' && provided === STUDIO_TOKEN) return next();
+  const origin = req.headers.origin;
+  const site = req.headers['sec-fetch-site'];
+  if ((origin && !ALLOWED_ORIGINS.includes(origin)) || site === 'cross-site' || site === 'same-site') {
+    return res.status(403).json({ error: 'Forbidden. Mutating requests must come from the local studio.' });
+  }
 
+  if (tokenMatches(req.headers['x-studio-token'])) return next();
   return res.status(401).json({ error: 'Unauthorized. A valid x-studio-token header is required for mutating requests.' });
 });
+
+/** Hands the token to the studio's own pages, as `<meta name="studio-token">`. */
+function studioTokenPlugin() {
+  return {
+    name: 'studio-token',
+    transformIndexHtml: (html: string) =>
+      html.replace('</head>', `    <meta name="studio-token" content="${STUDIO_TOKEN}" />\n  </head>`),
+  };
+}
 
 const CONTENT_DIR = path.join(process.cwd(), 'content');
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
@@ -1136,72 +1180,6 @@ app.delete('/api/content/:collection/:slug', validateContentParams, async (req, 
   }
 });
 
-// ============================================================
-// DECAP CMS GITHUB OAUTH AUTHENTICATION ENDPOINTS
-// ============================================================
-
-/**
- * POST /api/auth
- * Handles GitHub OAuth token exchange
- * Used by Decap CMS for secure GitHub authentication in production
- */
-app.post('/api/auth', async (req, res) => {
-  try {
-    const { code } = req.body;
-    
-    if (!code) {
-      return res.status(400).json({ error: 'Authorization code required' });
-    }
-
-    if (!process.env.VITE_GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
-      console.warn('GitHub OAuth credentials not configured. Set VITE_GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.');
-      return res.status(501).json({ error: 'OAuth not configured. Use Personal Access Token instead.' });
-    }
-
-    // Import axios dynamically to handle the HTTP request
-    const axios = await import('axios');
-    const response = await axios.default.post('https://github.com/login/oauth/access_token', {
-      client_id: process.env.VITE_GITHUB_CLIENT_ID,
-      client_secret: process.env.GITHUB_CLIENT_SECRET,
-      code,
-      redirect_uri: `${req.protocol}://${req.get('host')}/api/auth/callback`
-    }, {
-      headers: { Accept: 'application/json' }
-    });
-
-    const { access_token, error } = response.data;
-    
-    if (error) {
-      return res.status(401).json({ error: `GitHub OAuth error: ${error}` });
-    }
-
-    // Return token for Decap CMS to use
-    res.json({ token: access_token });
-  } catch (error: any) {
-    console.error('OAuth token exchange error:', error.message);
-    res.status(500).json({ error: 'Failed to exchange OAuth code for token' });
-  }
-});
-
-/**
- * GET /api/auth/callback
- * GitHub OAuth callback redirect handler
- * Redirects back to admin panel with authorization code
- */
-app.get('/api/auth/callback', (req, res) => {
-  const { code, error } = req.query;
-  
-  if (error) {
-    return res.redirect(`/admin?error=${error}`);
-  }
-  
-  if (code) {
-    res.redirect(`/admin?code=${code}`);
-  } else {
-    res.redirect('/admin?error=no_code');
-  }
-});
-
 // Configure Vite integration wrapper inside Express serving context
 async function startServer() {
   // Initialize content state registry on startup
@@ -1216,6 +1194,7 @@ async function startServer() {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
+      plugins: [studioTokenPlugin()],
     });
     app.use(vite.middlewares);
   } else {
@@ -1233,16 +1212,21 @@ async function startServer() {
    */
   app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) return next(error);
+    // Body-parser rejections (oversized or malformed JSON) carry their own 4xx.
+    const status = (error as { status?: unknown })?.status;
+    if (typeof status === 'number' && status >= 400 && status < 500) {
+      return res.status(status).json({ error: (error as Error).message });
+    }
     fail(res, error, `${req.method} ${req.originalUrl}`);
   });
 
   app.listen(PORT, HOST, () => {
     console.log(`Server is booted at http://localhost:${PORT} (bound to ${HOST} only)`);
-    if (STUDIO_TOKEN) {
-      console.log('[Security] STUDIO_TOKEN is set — mutating /api requests require the x-studio-token header.');
-    } else {
-      console.warn('[Security] STUDIO_TOKEN is not set — mutating /api requests are unauthenticated. Set STUDIO_TOKEN in .env to require an x-studio-token header.');
-    }
+    console.log(
+      STUDIO_TOKEN_FROM_ENV
+        ? '[Security] Mutating /api requests require the STUDIO_TOKEN from .env.'
+        : '[Security] Mutating /api requests require a per-boot studio token; the admin receives it automatically. Set STUDIO_TOKEN in .env for a fixed one (scripts, curl).'
+    );
   });
 }
 

@@ -93,23 +93,26 @@ than remembered. `src/services/ImageDerivativeService.ts` owns the whole contrac
 
 ## Authoring
 
-Two surfaces, both local:
+One surface, local only:
 
 - The React admin at `/admin` — the Editorial Hub (`src/pages/Admin.tsx` is the shell; the pieces are
   in `src/components/admin/`). It has a dashboard, a filterable content list, an entry editor, a reel
   publisher, the click-to-edit live editor and the deployment centre. SSR preview at
   `/preview/:collection/:slug`, and an 11-step publishing pipeline that commits and pushes via
   `simple-git`.
-- Decap CMS (`public/admin/`), loaded from a CDN.
 
 The **Secrets** workspace switches rooms, easter eggs and ink lines on and off (it writes `visible`
 to the file) and opens the editor for new hidden notes. Timeline chapters carry a `place`; home
 blocks of type *Thought* feed the random-thought drawer.
 
-Neither works on the deployed site: GitHub Pages cannot run `server.ts` or serve Decap's OAuth
-exchange. Editing happens on the machine that holds the repo; pushing to `main` deploys. `/admin` is
-dev-only and is not part of the built site. Set `STUDIO_TOKEN` to require an `x-studio-token` header
-on mutating API calls (the admin sends `localStorage.studio_token`).
+It does not run on the deployed site: GitHub Pages cannot run `server.ts`. Editing happens on the
+machine that holds the repo; pushing to `main` deploys. `/admin` is dev-only and is not part of the
+built site.
+
+Every mutating API call needs a studio token in the `x-studio-token` header, and is refused if it
+comes from another origin or another `Host`. Leave `STUDIO_TOKEN` unset and the server makes a fresh
+token each boot and writes it into the admin page, so nothing needs configuring. Set `STUDIO_TOKEN`
+in `.env` (see `.env.example`) only to call the API from scripts or curl.
 
 ### The entry editor
 

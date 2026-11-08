@@ -17,19 +17,27 @@ async function json<T>(res: Response, fallback: string): Promise<T> {
 }
 
 /**
- * When the server runs with STUDIO_TOKEN set, mutating calls need the token.
- * Store it once in the browser: localStorage.setItem('studio_token', '…').
+ * Every mutating call carries the studio token. server.ts writes it into the
+ * page it serves as `<meta name="studio-token">`; the admin's preview iframes
+ * are same-origin, so they read it from the top document. A token saved in
+ * localStorage under `studio_token` is still honoured as a fallback.
  */
-const studioToken = (): Record<string, string> => {
+function readStudioToken(): string {
+  const fromMeta = (doc: Document | undefined) =>
+    doc?.querySelector<HTMLMetaElement>('meta[name="studio-token"]')?.content || '';
   try {
-    const token = window.localStorage.getItem('studio_token');
-    return token ? { 'x-studio-token': token } : {};
+    return fromMeta(document) || fromMeta(window.top?.document) || window.localStorage.getItem('studio_token') || '';
   } catch {
-    return {};
+    return fromMeta(document);
   }
+}
+
+const studioToken = (): Record<string, string> => {
+  const token = readStudioToken();
+  return token ? { 'x-studio-token': token } : {};
 };
 
-const jsonHeaders = (): Record<string, string> => ({ 'Content-Type': 'application/json', ...studioToken() });
+export const jsonHeaders = (): Record<string, string> => ({ 'Content-Type': 'application/json', ...studioToken() });
 
 export async function listContent(): Promise<ListItem[]> {
   const res = await fetch('/api/content');

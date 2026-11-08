@@ -32,7 +32,7 @@ const Journal = lazy(() => import('./pages/Journal'));
 const Tech = lazy(() => import('./pages/Tech'));
 const Photography = lazy(() => import('./pages/Photography'));
 // The studio needs server.ts, which only exists on the authoring machine; keep
-// its 200 kB out of the production bundle. (/admin on Pages is Decap's page.)
+// its 200 kB out of the production bundle. On Pages, /admin renders NotFound.
 const Admin = import.meta.env.DEV ? lazy(() => import('./pages/Admin')) : null;
 const Entry = lazy(() => import('./pages/Entry'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -204,9 +204,9 @@ export default function App() {
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => setView('home')}
                 aria-label="Home"
-                className="font-display text-xl font-semibold uppercase tracking-[-0.04em] text-zinc-100 transition-colors hover:text-accent md:text-2xl"
+                className="font-display text-xl font-semibold uppercase tracking-[-0.04em] text-zinc-100 transition-colors hover:text-accent-ink md:text-2xl"
               >
-                AM<span className="text-accent">.</span>
+                AM<span className="text-accent-ink">.</span>
               </motion.button>
 
               <div className="hidden md:block">
