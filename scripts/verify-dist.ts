@@ -28,6 +28,7 @@ const distDir = path.join(projectRoot, 'dist');
 const BUDGET = {
   entryJsGzip: 112 * 1024,
   cssGzip: 26 * 1024,
+  contentChunkGzip: 32 * 1024,
   mediaFile: 6 * 1024 * 1024,
   uploadsTotal: 55 * 1024 * 1024,
 };
@@ -180,6 +181,16 @@ async function main(): Promise<void> {
     for (const css of indexHtml.matchAll(/href="\/assets\/([^"]+\.css)"/g)) {
       const gz = gzipSync(await readFile(path.join(assetsDir, css[1]))).length;
       check(gz <= BUDGET.cssGzip, `stylesheet ${css[1]} is ${kb(gz)} gzip, budget ${kb(BUDGET.cssGzip)}`);
+    }
+    // Every markdown file is inlined into this chunk (lib/cms.ts, eager globs),
+    // and every listing page loads it. Fine at today's size; past the budget,
+    // split the bodies out into per-entry lazy imports.
+    for (const file of readdirSync(assetsDir).filter((name) => /^cms-.*\.js$/.test(name))) {
+      const gz = gzipSync(await readFile(path.join(assetsDir, file))).length;
+      check(
+        gz <= BUDGET.contentChunkGzip,
+        `content chunk ${file} is ${kb(gz)} gzip, budget ${kb(BUDGET.contentChunkGzip)} — time to lazy-load entry bodies`
+      );
     }
 
     const uploads = path.join(distDir, 'uploads');
