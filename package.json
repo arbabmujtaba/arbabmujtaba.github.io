@@ -14,13 +14,12 @@
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
+    "lint:hooks": "eslint . --max-warnings=0",
     "test": "tsx tests/contentState.test.ts && tsx tests/crop.test.ts && tsx tests/frontmatter.test.ts && tsx tests/routing.test.ts && tsx tests/imageDerivatives.test.ts && tsx tests/safeImage.test.tsx && tsx tests/lightbox.test.tsx && tsx tests/hiddenLayer.test.ts && tsx tests/adminModel.test.ts && tsx tests/priority.test.ts && tsx tests/hero.test.ts && tsx tests/guide.test.ts && tsx tests/placement.test.ts && tsx tests/publishing.test.ts",
     "verify:dist": "tsx scripts/verify-dist.ts",
     "hero:image": "tsx scripts/hero-image.ts"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.14",
-    "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "fs-extra": "^11.3.5",
@@ -34,17 +33,22 @@
     "simple-git": "^3.36.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.14",
     "@types/express": "^4.17.21",
     "@types/fs-extra": "^11.0.4",
     "@types/multer": "^2.1.0",
     "@types/node": "^22.14.0",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^5.0.4",
     "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "sharp": "0.35.4",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
+    "typescript-eslint": "^8.72.1",
     "vite": "^6.2.3"
   }
 }

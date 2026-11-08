@@ -4,16 +4,18 @@ on:
   push:
     branches:
       - main
+  # Pull requests run every check but never deploy.
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# One Pages deployment at a time, never cancelled midway. Pull requests get
+# their own group, and a newer push to the same PR cancels the older run.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.ref) || 'pages' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -36,23 +38,31 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Lint (React hooks)
+        run: npm run lint:hooks
+
       - name: Test
         run: npm test
 
       - name: Build
         run: npm run build
 
-      # Asserts every public route has a shell GitHub Pages can serve. Without
-      # this, deep links can silently regress to 404 while the build stays green.
+      # Asserts every public route has a shell GitHub Pages can serve, and
+      # that the bundle and media stay inside their size budgets.
       - name: Verify dist
         run: npm run verify:dist
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
+    if: github.event_name != 'pull_request'
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

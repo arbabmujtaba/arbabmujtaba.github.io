@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Crop, Loader2, Move, RotateCcw, Scissors } from 'lucide-react';
 import { ASPECT_OPTIONS, aspectRatioOf } from '../../lib/customization';
 import { cropRect, focalFromCenter } from '../../lib/crop';
@@ -39,7 +39,7 @@ export function ImageCropper({
   collection: string;
   notify: Notify;
 }) {
-  const image = value ?? {};
+  const image = useMemo(() => value ?? {}, [value]);
   const imgRef = useRef<HTMLImageElement>(null);
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   const [dragging, setDragging] = useState(false);

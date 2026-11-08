@@ -14,14 +14,14 @@ import { parseMarkdown } from './frontmatter';
 import { FEATURED_PRIORITY, parsePriority, sortByPriority } from './priority';
 
 // Dynamically import all *.md content files at build time
-const journalGlob = (import.meta as any).glob('/content/journal/**/*.md', { query: '?raw', eager: true });
-const techGlob = (import.meta as any).glob('/content/tech/**/*.md', { query: '?raw', eager: true });
-const photographyGlob = (import.meta as any).glob('/content/photography/**/*.md', { query: '?raw', eager: true });
-const portfolioGlob = (import.meta as any).glob('/content/portfolio/**/*.md', { query: '?raw', eager: true });
-const gearGlob = (import.meta as any).glob('/content/gear/**/*.md', { query: '?raw', eager: true });
-const timelineGlob = (import.meta as any).glob('/content/timeline/**/*.md', { query: '?raw', eager: true });
-const favoritesGlob = (import.meta as any).glob('/content/favorites/**/*.md', { query: '?raw', eager: true });
-const homeGlob = (import.meta as any).glob('/content/home/**/*.md', { query: '?raw', eager: true });
+const journalGlob = import.meta.glob<string>('/content/journal/**/*.md', { query: '?raw', import: 'default', eager: true });
+const techGlob = import.meta.glob<string>('/content/tech/**/*.md', { query: '?raw', import: 'default', eager: true });
+const photographyGlob = import.meta.glob<string>('/content/photography/**/*.md', { query: '?raw', import: 'default', eager: true });
+const portfolioGlob = import.meta.glob<string>('/content/portfolio/**/*.md', { query: '?raw', import: 'default', eager: true });
+const gearGlob = import.meta.glob<string>('/content/gear/**/*.md', { query: '?raw', import: 'default', eager: true });
+const timelineGlob = import.meta.glob<string>('/content/timeline/**/*.md', { query: '?raw', import: 'default', eager: true });
+const favoritesGlob = import.meta.glob<string>('/content/favorites/**/*.md', { query: '?raw', import: 'default', eager: true });
+const homeGlob = import.meta.glob<string>('/content/home/**/*.md', { query: '?raw', import: 'default', eager: true });
 
 // Normalize listing maps to typed arrays
 /**
@@ -72,8 +72,7 @@ function parseVolume(raw: any): number | undefined {
 }
 
 export function getJournalEntries(): JournalEntry[] {
-  const entries = Object.entries(journalGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  const entries = Object.entries(journalGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     const body = content || "";
     // featuredImage is the canonical field; coverImage is the legacy alias.
@@ -115,8 +114,7 @@ export function getJournalEntries(): JournalEntry[] {
 }
 
 export function getTechEntries(): TechEntry[] {
-  const entries = Object.entries(techGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  const entries = Object.entries(techGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     return {
       title: data.title || "Untitled",
@@ -136,8 +134,7 @@ export function getTechEntries(): TechEntry[] {
 }
 
 export function getPhotographyEntries(): PhotographyEntry[] {
-  const entries = Object.entries(photographyGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  const entries = Object.entries(photographyGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     
     // Normalize galleryImages to clean array of strings
@@ -189,8 +186,7 @@ export function getPhotographyEntries(): PhotographyEntry[] {
 }
 
 export function getPortfolioProjects(): PortfolioProject[] {
-  const projects = Object.entries(portfolioGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  const projects = Object.entries(portfolioGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     
     let stack: string[] = [];
@@ -227,8 +223,7 @@ export function getPortfolioProjects(): PortfolioProject[] {
 }
 
 export function getGearItems(): GearItem[] {
-  return Object.entries(gearGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  return Object.entries(gearGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     
     let specs: string[] = [];
@@ -258,8 +253,7 @@ export function getGearItems(): GearItem[] {
 }
 
 export function getTimelineMilestones(): TimelineMilestone[] {
-  return Object.entries(timelineGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  return Object.entries(timelineGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     return {
       title: data.title || "Untitled",
@@ -276,8 +270,7 @@ export function getTimelineMilestones(): TimelineMilestone[] {
 }
 
 export function getFavoriteItems(): FavoriteItem[] {
-  return Object.entries(favoritesGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  return Object.entries(favoritesGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     return {
       title: data.title || "Untitled",
@@ -296,8 +289,7 @@ export function getFavoriteItems(): FavoriteItem[] {
 }
 
 export function getHomeConfig(): HomeConfigEntry[] {
-  return Object.entries(homeGlob).map(([filePath, module]: [string, any]) => {
-    const rawContent = module.default;
+  return Object.entries(homeGlob).map(([filePath, rawContent]) => {
     const { data, content } = parseMarkdown(rawContent);
     return {
       title: data.title || "Untitled",

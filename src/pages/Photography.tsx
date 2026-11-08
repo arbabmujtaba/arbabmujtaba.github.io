@@ -278,7 +278,7 @@ export default function Photography() {
     return map;
   }, [favorites, stories]);
 
-  const plateOf = (entry: PhotographyEntry) => plateNumbers.get(entry) ?? 1;
+  const plateOf = useCallback((entry: PhotographyEntry) => plateNumbers.get(entry) ?? 1, [plateNumbers]);
 
   /**
    * The lightbox set, in the order the plates appear on screen — lead, then
@@ -306,7 +306,7 @@ export default function Photography() {
         // as the quick look so the contact sheet is still behind it.
         onOpenStory: () => openEntry('photography', entry.slug),
       })),
-    [lightboxEntries, openEntry, plateNumbers]
+    [lightboxEntries, openEntry, plateOf]
   );
 
   /**

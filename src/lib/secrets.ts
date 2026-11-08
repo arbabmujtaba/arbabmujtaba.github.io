@@ -23,7 +23,7 @@ import {
   type SecretTrigger,
 } from '../types';
 
-const secretsGlob = (import.meta as any).glob('/content/secrets/**/*.md', { query: '?raw', eager: true });
+const secretsGlob = import.meta.glob<string>('/content/secrets/**/*.md', { query: '?raw', import: 'default', eager: true });
 
 function pick<T extends string>(value: unknown, allowed: readonly T[]): T | undefined {
   return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : undefined;
@@ -35,8 +35,8 @@ let cache: SecretEntry[] | null = null;
 export function getAllSecrets(): SecretEntry[] {
   if (cache) return cache;
   cache = Object.entries(secretsGlob)
-    .map(([filePath, module]: [string, any]) => {
-      const { data, content } = parseMarkdown(module.default);
+    .map(([filePath, raw]) => {
+      const { data, content } = parseMarkdown(raw);
       const kind = pick<SecretKind>(data.kind, SECRET_KINDS) ?? 'note';
       return {
         title: data.title || 'Untitled',

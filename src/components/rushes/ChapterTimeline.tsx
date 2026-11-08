@@ -103,9 +103,14 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
     .filter((m) => m.visible)
     .sort((a, b) => Number(a.year) - Number(b.year) || a.order - b.order);
 
-  // Which chapter is being read, for the year strip.
+  // Which chapter is being read, for the year strip. Keyed on the slugs, not
+  // the array, which is rebuilt on every render.
+  const chapterKey = chapters.map((c) => c.slug).join('|');
   useEffect(() => {
-    const nodes = chapters.map((c) => document.getElementById(`chapter-${c.slug}`)).filter(Boolean) as HTMLElement[];
+    const nodes = chapterKey
+      .split('|')
+      .map((slug) => document.getElementById(`chapter-${slug}`))
+      .filter(Boolean) as HTMLElement[];
     if (!nodes.length) return;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -115,7 +120,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
     );
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [chapters.map((c) => c.slug).join('|')]);
+  }, [chapterKey]);
 
   const jump = (slug: string) => {
     document.getElementById(`chapter-${slug}`)?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });

@@ -7,7 +7,7 @@
 
 import { PlacementSummary } from './admin/Placement';
 import type { ListItem } from './admin/model';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { m, AnimatePresence } from 'motion/react';
 import {
   MousePointerClick, Eye, Monitor, Tablet, Smartphone, RefreshCw,
@@ -209,14 +209,14 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
           }
           break;
         case 'element-clicked':
-          handleElementClicked(event.data.payload);
+          onElementClickedRef.current(event.data.payload);
           break;
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [editMode, contentItems]);
+  }, [editMode]);
 
   // Handle element click from iframe
   const handleElementClicked = (payload: ClickedElementPayload) => {
@@ -229,6 +229,13 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
       setEditValue(payload.textContent);
     }
   };
+
+  // The message listener above is bound once per edit-mode change; it calls
+  // the latest handler through this ref, so it always sees current content.
+  const onElementClickedRef = useRef(handleElementClicked);
+  useLayoutEffect(() => {
+    onElementClickedRef.current = handleElementClicked;
+  });
 
   // Toggle edit mode
   const toggleEditMode = () => {
