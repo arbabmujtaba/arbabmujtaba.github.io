@@ -1,3 +1,4 @@
+import Tilt from '../components/rushes/Tilt';
 import { getCardImageStyle } from '../lib/customization';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
@@ -422,69 +423,72 @@ export default function Photography() {
                 aria-label={leadIsPassage ? `${leadPhoto.title} — a passage behind the print` : undefined}
                 className="group block w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
-                <div className="image-frame w-full overflow-hidden aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]">
-                  <m.div
-                    className="absolute inset-0 overflow-hidden"
-                    style={shouldParallax ? { y: leadImageY } : undefined}
-                  >
-                    <SafeImage
-                      src={leadPhoto.coverImage}
-                      alt={leadPhoto.title}
-                      loading="eager"
-                      sizes="100vw"
-                      style={getCardImageStyle(leadPhoto.customization)}
-                      className={`w-full object-cover transition-transform duration-[1200ms] ease-out ${
-                        shouldParallax ? 'h-[112%]' : 'h-full'
-                      } ${shouldReduceMotion ? '' : 'group-hover:scale-[1.02]'}`}
-                      fallback={
-                        <div
-                          className="hairline-grid h-full w-full bg-canvas-deep"
-                          aria-hidden="true"
-                        />
-                      }
-                    />
-                  </m.div>
+                {/* The lead print leans a few degrees toward the pointer. */}
+                <Tilt className="w-full" max={3} perspective={2200}>
+                  <div className="image-frame w-full overflow-hidden aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]">
+                    <m.div
+                      className="absolute inset-0 overflow-hidden"
+                      style={shouldParallax ? { y: leadImageY } : undefined}
+                    >
+                      <SafeImage
+                        src={leadPhoto.coverImage}
+                        alt={leadPhoto.title}
+                        loading="eager"
+                        sizes="100vw"
+                        style={getCardImageStyle(leadPhoto.customization)}
+                        className={`w-full object-cover transition-transform duration-[1200ms] ease-out ${
+                          shouldParallax ? 'h-[112%]' : 'h-full'
+                        } ${shouldReduceMotion ? '' : 'group-hover:scale-[1.02]'}`}
+                        fallback={
+                          <div
+                            className="hairline-grid h-full w-full bg-canvas-deep"
+                            aria-hidden="true"
+                          />
+                        }
+                      />
+                    </m.div>
 
-                  {/* Under the wand, a seam of red light shows round the print's
-                      edge — the way into the darkroom. */}
-                  {leadIsPassage && (
-                    <m.span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 z-[5]"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 1.2 }}
-                      style={{ boxShadow: 'inset 0 0 0 1px rgba(194, 46, 31, 0.7), inset 0 0 90px rgba(194, 46, 31, 0.35)' }}
-                    />
-                  )}
-
-                  {/* Legibility band only — the frame itself stays unmuted. */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-canvas/90 via-canvas/25 to-transparent"
-                  />
-
-                  <div className="absolute inset-x-0 bottom-0 z-10 p-5 md:p-8 lg:p-10">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-300">
-                        {plateLabel(plateOf(leadPhoto))}
-                      </span>
-                      <TagChip tone="accent">{leadPhoto.category}</TagChip>
-                    </div>
-
-                    <h2 className="mt-4 font-display text-3xl font-medium leading-[0.95] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-6xl">
-                      {leadPhoto.title}
-                    </h2>
-
-                    {leadPhoto.description && (
-                      <p className="mt-3 line-clamp-2 max-w-xl text-sm font-light leading-relaxed text-zinc-300 sm:line-clamp-none">
-                        {leadPhoto.description}
-                      </p>
+                    {/* Under the wand, a seam of red light shows round the print's
+                        edge — the way into the darkroom. */}
+                    {leadIsPassage && (
+                      <m.span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 z-[5]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1.2 }}
+                        style={{ boxShadow: 'inset 0 0 0 1px rgba(194, 46, 31, 0.7), inset 0 0 90px rgba(194, 46, 31, 0.35)' }}
+                      />
                     )}
 
-                    <CaptureMeta entry={leadPhoto} className="mt-4" />
+                    {/* Legibility band only — the frame itself stays unmuted. */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-canvas/90 via-canvas/25 to-transparent"
+                    />
+
+                    <div className="absolute inset-x-0 bottom-0 z-10 p-5 md:p-8 lg:p-10">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-300">
+                          {plateLabel(plateOf(leadPhoto))}
+                        </span>
+                        <TagChip tone="accent">{leadPhoto.category}</TagChip>
+                      </div>
+
+                      <h2 className="mt-4 font-display text-3xl font-medium leading-[0.95] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-6xl">
+                        {leadPhoto.title}
+                      </h2>
+
+                      {leadPhoto.description && (
+                        <p className="mt-3 line-clamp-2 max-w-xl text-sm font-light leading-relaxed text-zinc-300 sm:line-clamp-none">
+                          {leadPhoto.description}
+                        </p>
+                      )}
+
+                      <CaptureMeta entry={leadPhoto} className="mt-4" />
+                    </div>
                   </div>
-                </div>
+                </Tilt>
               </a>
             </m.div>
           </section>

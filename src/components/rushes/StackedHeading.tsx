@@ -16,10 +16,11 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /**
  * StackedHeading — the two-line display heading: grotesk, then book italic.
  *
- * Each line wipes up from a clipped box. The clip animation is skipped under
- * prefers-reduced-motion (the text simply fades), and because the wipe uses
- * clip-path on a wrapper rather than the text node itself, descenders are never
- * cropped.
+ * Each line rises out of a clipped box and swings flat as it comes: it starts
+ * tipped back 70° on its baseline, with its own perspective, so the type reads
+ * as a card turning up toward you rather than a slide. Transform and opacity
+ * only. Under prefers-reduced-motion the text simply fades. The clip is on a
+ * wrapper, never the text node itself, so descenders are never cropped.
  */
 export default function StackedHeading({
   lines,
@@ -42,10 +43,11 @@ export default function StackedHeading({
               /* The second line is the manuscript voice: the book serif, in
                  italic, a step quieter. One pairing used on every page. */
               className={`block ${index === 1 ? 'font-book font-normal italic tracking-[-0.025em] text-zinc-400' : ''}`}
+              style={shouldReduceMotion ? undefined : { transformPerspective: 700, transformOrigin: '50% 100%' }}
               initial={
-                shouldReduceMotion ? { opacity: 0 } : { y: '105%', opacity: 0 }
+                shouldReduceMotion ? { opacity: 0 } : { y: '105%', rotateX: -70, opacity: 0 }
               }
-              whileInView={{ y: 0, opacity: 1 }}
+              whileInView={{ y: 0, rotateX: 0, opacity: 1 }}
               /* `some` rather than a ratio: the span starts translated fully out
                  of its clipping wrapper, so a percentage threshold can never be
                  satisfied and the heading would stay permanently hidden. */

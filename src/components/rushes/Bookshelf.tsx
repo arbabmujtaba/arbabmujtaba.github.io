@@ -109,8 +109,13 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: reduced ? 0.3 : 0.7, delay: reduced ? 0 : i * 0.06, ease: EASE }}
+              // Hovered, the volume turns on its spine toward you, as if
+              // being drawn off the shelf: a real 3D turn with its own
+              // perspective, on the compositor.
+              style={{ height: h, width: coarse ? Math.max(w, 44) : w, transformPerspective: 420 }}
+              whileHover={reduced || coarse ? undefined : { rotateY: -28, z: 18, transition: { duration: 0.5, ease: EASE } }}
+              whileFocus={reduced ? undefined : { rotateY: -28, z: 18 }}
               className={`group relative flex shrink-0 origin-bottom-left flex-col items-center gap-2 overflow-hidden rounded-t-[2px] border border-zinc-700 bg-canvas-raised px-1 pb-2 pt-2.5 transition-[translate,rotate,border-color,background-color,box-shadow] duration-500 hover:-translate-y-2 hover:border-accent focus-visible:-translate-y-2 focus-visible:border-accent focus-visible:outline-none ${lean}`}
-              style={{ height: h, width: coarse ? Math.max(w, 44) : w }}
             >
               <span className="h-px w-full shrink-0 bg-gilt/50" />
               <span className="min-h-0 flex-1 overflow-hidden whitespace-nowrap font-book text-[13px] italic leading-none text-zinc-300 [text-overflow:ellipsis] [writing-mode:vertical-rl] group-hover:text-zinc-50">

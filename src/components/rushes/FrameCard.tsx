@@ -1,6 +1,7 @@
 import { m, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import TagChip from './TagChip';
+import Tilt from './Tilt';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { getCardImageStyle } from '../../lib/customization';
 import type { PostCustomization } from '../../types';
@@ -58,30 +59,33 @@ export default function FrameCard({
 
   const body = (
     <>
-      <div className={`image-frame w-full overflow-hidden ${aspect}`}>
-        <SafeImage
-          src={image}
-          alt={title}
-          loading={priority ? 'eager' : 'lazy'}
-          style={getCardImageStyle(customization)}
-          className="h-full w-full object-cover opacity-90 transition-[opacity,transform,scale] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
-          fallback={
-            <div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />
-          }
-        />
-        {overlay && overlay.length > 0 && (
-          <span
-            aria-hidden="true"
-            className="reveal-on-hover pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-3 flex-wrap gap-1.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12 opacity-0 transition-[opacity,translate] duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
-          >
-            {overlay.map((label) => (
-              <span key={label} className="rounded-full border border-white/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/90">
-                {label}
-              </span>
-            ))}
-          </span>
-        )}
-      </div>
+      {/* The plate leans toward the pointer in 3D; the caption stays put. */}
+      <Tilt className="w-full">
+        <div className={`image-frame w-full overflow-hidden ${aspect}`}>
+          <SafeImage
+            src={image}
+            alt={title}
+            loading={priority ? 'eager' : 'lazy'}
+            style={getCardImageStyle(customization)}
+            className="h-full w-full object-cover opacity-90 transition-[opacity,transform,scale] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
+            fallback={
+              <div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />
+            }
+          />
+          {overlay && overlay.length > 0 && (
+            <span
+              aria-hidden="true"
+              className="reveal-on-hover pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-3 flex-wrap gap-1.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12 opacity-0 transition-[opacity,translate] duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+            >
+              {overlay.map((label) => (
+                <span key={label} className="rounded-full border border-white/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/90">
+                  {label}
+                </span>
+              ))}
+            </span>
+          )}
+        </div>
+      </Tilt>
 
       <div className="mt-4 flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -109,8 +113,11 @@ export default function FrameCard({
 
   return (
     <m.div
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      // Enters tipped back on its top edge and swings flat: a one-shot 3D
+      // entrance, cheap enough for phones too.
+      style={shouldReduceMotion ? undefined : { transformPerspective: 1100, transformOrigin: '50% 0%' }}
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26, rotateX: 16 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: shouldReduceMotion ? 0.3 : 0.85, ease: EASE }}
       className={className}

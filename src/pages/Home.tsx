@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
-import { m, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { m, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'motion/react';
 import Footer from '../components/Footer';
+import { Rise } from '../components/rushes/Depth';
+import { usePointerDepth, useScrollDepth } from '../lib/depth';
 import Constellation from '../components/magic/Constellation';
 import FullStop from '../components/magic/FullStop';
 import InkNote from '../components/magic/InkNote';
@@ -78,17 +80,23 @@ function Section({
   children,
   className = '',
   id,
+  flat = false,
 }: {
   children: React.ReactNode;
   className?: string;
   id?: string;
+  /** Skip the 3D rise — for sections holding sticky or fixed elements. */
+  flat?: boolean;
 }) {
   return (
     <section id={id} className={`relative z-20 border-t border-zinc-800 px-4 py-20 md:px-12 md:py-32 lg:px-16 ${className}`}>
-      {children}
+      {flat ? children : <Rise>{children}</Rise>}
     </section>
   );
 }
+
+/** The hero's lean: slow enough to feel like weight, quick enough to follow. */
+const LEAN = { stiffness: 60, damping: 20, mass: 0.8 };
 
 function SeeAll({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
@@ -116,6 +124,35 @@ export default function Home({ setView }: HomeProps) {
   const { scrollY } = useScroll();
   const heroImageY = useTransform(scrollY, [0, 900], ['0%', '14%']);
   const heroFade = useTransform(scrollY, [0, 520], [1, 0]);
+
+  // ---- the hero in depth (desktop, fine pointer, motion allowed) ----
+  // Three planes: the photograph far back, the sky's stars between, the name
+  // and copy in front. The pointer leans them apart in opposite directions,
+  // which is what reads as depth; scrolling tips the copy back on its base and
+  // dollies into the photograph. All of it is motion values on transforms.
+  const pointerDepth = usePointerDepth();
+  const scrollDepth = useScrollDepth();
+  const leanX = useMotionValue(0);
+  const leanY = useMotionValue(0);
+  const lx = useSpring(leanX, LEAN);
+  const ly = useSpring(leanY, LEAN);
+  const plateX = useTransform(lx, (v) => v * -28);
+  const plateY = useTransform(ly, (v) => v * -18);
+  const plateScale = useTransform(scrollY, [0, 900], [1.07, 1.16]);
+  const copyX = useTransform(lx, (v) => v * 16);
+  const copyRotateY = useTransform(lx, (v) => v * 7);
+  const copyTilt = useTransform(scrollY, [0, 650], [0, 18]);
+  const copyRotateX = useTransform([ly, copyTilt] as MotionValue<number>[], ([lean, tilt]: number[]) => lean * -5 + tilt);
+  const copyY = useTransform(scrollY, [0, 650], [0, -36]);
+  const onHeroPointer = (event: React.PointerEvent) => {
+    if (!pointerDepth || event.pointerType !== 'mouse') return;
+    leanX.set(event.clientX / window.innerWidth - 0.5);
+    leanY.set(event.clientY / window.innerHeight - 0.5);
+  };
+  const onHeroLeave = () => {
+    leanX.set(0);
+    leanY.set(0);
+  };
 
   // ---- content, all from the markdown archive ----
   const homeConfig = useMemo(
@@ -176,6 +213,8 @@ export default function Home({ setView }: HomeProps) {
         {/* ===================== HERO ===================== */}
         <section
           data-surface="ink"
+          onPointerMove={onHeroPointer}
+          onPointerLeave={onHeroLeave}
           className="relative flex min-h-[88vh] flex-col justify-end overflow-hidden px-4 pb-14 pt-28 text-zinc-100 md:min-h-[100vh] md:px-12 md:pb-20 md:pt-32 lg:min-h-[calc(100vh-4rem)] lg:px-16"
         >
           <m.div
@@ -183,7 +222,12 @@ export default function Home({ setView }: HomeProps) {
             className="absolute inset-0 -z-10 overflow-hidden bg-canvas-deep"
             style={shouldParallax ? { y: heroImageY } : undefined}
           >
-            <HeroPlate key={hero.src} hero={hero} />
+            <m.div
+              className="absolute inset-0"
+              style={pointerDepth ? { x: plateX, y: plateY, scale: scrollDepth ? plateScale : 1.07 } : undefined}
+            >
+              <HeroPlate key={hero.src} hero={hero} />
+            </m.div>
             {/* Light where the sky is, dark where the type sits: a scrim along
                 the bottom for the name and the copy, a thin one along the top
                 for the header, and the photograph left at full strength between. */}
@@ -199,58 +243,74 @@ export default function Home({ setView }: HomeProps) {
           <InkNote section="hero" className="absolute right-4 top-24 md:left-12 md:right-auto md:top-28 lg:left-16" />
 
           <m.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.2, ease: EASE }}
+            className="relative"
+            style={
+              pointerDepth
+                ? {
+                    x: copyX,
+                    rotateY: copyRotateY,
+                    rotateX: scrollDepth ? copyRotateX : 0,
+                    y: scrollDepth ? copyY : 0,
+                    transformPerspective: 1200,
+                    transformOrigin: '30% 100%',
+                  }
+                : undefined
+            }
           >
-            <RecLabel bright>sopore &rarr; indore</RecLabel>
-          </m.div>
-
-          <m.h1
-            data-levitate
-            className="mt-6 font-display text-[16vw] font-bold uppercase leading-[0.82] tracking-[-0.055em] text-bone md:text-[13vw]"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
-          >
-            Arbab
-            <FullStop />
-          </m.h1>
-
-          <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
             <m.div
-              className="max-w-md"
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.45, ease: EASE }}
+              transition={{ duration: 0.9, delay: 0.2, ease: EASE }}
             >
-              <p className="font-book text-2xl italic leading-tight text-zinc-50 md:text-3xl">An archive still being written.</p>
-              <p className="mt-4 text-sm font-light leading-relaxed text-zinc-300 md:text-base">
-                {profile?.description ||
-                  'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
-              </p>
+              <RecLabel bright>sopore &rarr; indore</RecLabel>
             </m.div>
 
-            <m.ul
-              className="space-y-1 md:text-right"
-              initial={{ opacity: 0, y: 18 }}
+            <m.h1
+              data-levitate
+              className="mt-6 font-display text-[16vw] font-bold uppercase leading-[0.82] tracking-[-0.055em] text-bone md:text-[13vw]"
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.6, ease: EASE }}
+              transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
             >
-              {gateways.map((gateway, index) => (
-                <li key={gateway.slug}>
-                  <button
-                    type="button"
-                    onClick={() => setView(targetOf(gateway))}
-                    className="group inline-flex min-h-[44px] items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 transition-colors hover:text-accent-ink md:text-xs"
-                  >
-                    <span className="text-zinc-500 group-hover:text-accent-ink">{String(index + 1).padStart(2, '0')}/</span>
-                    {gateway.title}
-                  </button>
-                </li>
-              ))}
-            </m.ul>
-          </div>
+              Arbab
+              <FullStop />
+            </m.h1>
+
+            <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+              <m.div
+                className="max-w-md"
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.45, ease: EASE }}
+              >
+                <p className="font-book text-2xl italic leading-tight text-zinc-50 md:text-3xl">An archive still being written.</p>
+                <p className="mt-4 text-sm font-light leading-relaxed text-zinc-300 md:text-base">
+                  {profile?.description ||
+                    'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
+                </p>
+              </m.div>
+
+              <m.ul
+                className="space-y-1 md:text-right"
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.6, ease: EASE }}
+              >
+                {gateways.map((gateway, index) => (
+                  <li key={gateway.slug}>
+                    <button
+                      type="button"
+                      onClick={() => setView(targetOf(gateway))}
+                      className="group inline-flex min-h-[44px] items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 transition-colors hover:text-accent-ink md:text-xs"
+                    >
+                      <span className="text-zinc-500 group-hover:text-accent-ink">{String(index + 1).padStart(2, '0')}/</span>
+                      {gateway.title}
+                    </button>
+                  </li>
+                ))}
+              </m.ul>
+            </div>
+          </m.div>
 
           {!isTouchDevice && (
             <m.div
@@ -373,7 +433,7 @@ export default function Home({ setView }: HomeProps) {
 
         {/* ===================== CHAPTERS ===================== */}
         {timeline.length > 0 && (
-          <Section id="chapters">
+          <Section id="chapters" flat>
             <RecLabel>chapters</RecLabel>
             <StackedHeading
               lines={['From Sopore', 'to Indore, so far']}
