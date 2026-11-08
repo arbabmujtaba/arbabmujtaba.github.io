@@ -26,7 +26,7 @@ const distDir = path.join(projectRoot, 'dist');
 
 /** Weight budgets, in bytes. Raise one only with a reason in the commit. */
 const BUDGET = {
-  entryJsGzip: 125 * 1024,
+  entryJsGzip: 112 * 1024,
   cssGzip: 26 * 1024,
   mediaFile: 6 * 1024 * 1024,
   uploadsTotal: 55 * 1024 * 1024,

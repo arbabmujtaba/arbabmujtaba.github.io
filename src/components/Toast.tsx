@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import { CheckCircle2, XCircle, AlertTriangle, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -49,7 +49,7 @@ function ToastNotification({ toast, onRemove }: { toast: ToastItem; onRemove: (i
   }, [toast.id, toast.duration, onRemove]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, x: 30, scale: 0.95 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 30, scale: 0.95 }}
@@ -64,6 +64,6 @@ function ToastNotification({ toast, onRemove }: { toast: ToastItem; onRemove: (i
       >
         <X className="w-3.5 h-3.5" />
       </button>
-    </motion.div>
+    </m.div>
   );
 }

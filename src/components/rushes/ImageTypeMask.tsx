@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { normalizeImagePath } from '../../lib/image';
 
 interface ImageTypeMaskProps {
@@ -31,7 +31,7 @@ export default function ImageTypeMask({
   const resolved = normalizeImagePath(image);
 
   return (
-    <motion.div
+    <m.div
       className={`w-full overflow-hidden ${className}`}
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -56,6 +56,6 @@ export default function ImageTypeMask({
       >
         {text}
       </span>
-    </motion.div>
+    </m.div>
   );
 }

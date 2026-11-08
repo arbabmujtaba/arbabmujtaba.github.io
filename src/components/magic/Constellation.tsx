@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { cue, useMagic } from '../../lib/magic';
 import { getEgg, isEggEnabled } from '../../lib/secrets';
 import { DECOYS, FIGURE_PATH, SEVEN, judgeTrace, type StarId } from '../../lib/constellation';
@@ -238,7 +238,7 @@ export default function Constellation({ className = '' }: { className?: string }
         {/* the figure's ghost, after a couple of misses */}
         <AnimatePresence>
           {ghost && !complete && (
-            <motion.path
+            <m.path
               key="ghost"
               d={FIGURE_PATH}
               fill="none"
@@ -260,7 +260,7 @@ export default function Constellation({ className = '' }: { className?: string }
             const from = AT.get(a)!;
             const to = AT.get(b)!;
             return (
-              <motion.line
+              <m.line
                 key={`${a}-${b}`}
                 x1={from.x}
                 y1={from.y}
@@ -300,7 +300,7 @@ export default function Constellation({ className = '' }: { className?: string }
               const to = AT.get(b);
               if (!from || !to) return null;
               return (
-                <motion.line
+                <m.line
                   key={`broken-${i}-${a}-${b}`}
                   x1={from.x}
                   y1={from.y}
@@ -320,7 +320,7 @@ export default function Constellation({ className = '' }: { className?: string }
         </AnimatePresence>
 
         {complete && (
-          <motion.path
+          <m.path
             d={FIGURE_PATH}
             fill="none"
             stroke="var(--gilt)"
@@ -360,7 +360,7 @@ export default function Constellation({ className = '' }: { className?: string }
             className="pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 touch-none select-none items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gilt disabled:cursor-default"
             style={{ left: `${star.x}%`, top: `${star.y}%` }}
           >
-            <motion.span
+            <m.span
               className={`block rounded-full transition-colors duration-300 ${wrong ? 'bg-alarm' : 'bg-starlight'}`}
               animate={{
                 width: on ? 6 : 3,
@@ -388,7 +388,7 @@ export default function Constellation({ className = '' }: { className?: string }
 
       <AnimatePresence>
         {broken && !complete && (
-          <motion.p
+          <m.p
             key="forget"
             className="absolute -bottom-8 right-0 font-book text-sm italic text-zinc-400"
             initial={{ opacity: 0 }}
@@ -396,10 +396,10 @@ export default function Constellation({ className = '' }: { className?: string }
             exit={{ opacity: 0 }}
           >
             {failures >= 2 ? 'not that shape — the sky forgets' : 'the sky forgets'}
-          </motion.p>
+          </m.p>
         )}
         {complete && (
-          <motion.p
+          <m.p
             key="name"
             className="absolute -bottom-8 right-0 font-book text-base italic text-gilt"
             initial={{ opacity: 0, y: 6 }}
@@ -407,7 +407,7 @@ export default function Constellation({ className = '' }: { className?: string }
             transition={{ duration: 1, delay: reduced ? 0 : 1.2 }}
           >
             Saptarishi
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
     </div>

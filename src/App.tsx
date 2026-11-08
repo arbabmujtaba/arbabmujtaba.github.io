@@ -4,11 +4,8 @@
  */
 
 import { lazy, Suspense, useState, useEffect, useCallback, useMemo } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m } from 'motion/react';
 import Navigation from './components/Navigation';
-import CursorWand from './components/CursorWand';
-import FloatingMagicalArrow from './components/FloatingMagicalArrow';
-import GlobalBackground from './components/GlobalBackground';
 import HeaderControls from './components/magic/HeaderControls';
 import { PillButton } from './components/rushes';
 import { MagicProvider } from './lib/magic';
@@ -43,6 +40,13 @@ const loadQuickLook = () => import('./components/QuickLook');
 const QuickLook = lazy(loadQuickLook);
 // The hidden layer: wand effects, spells, rooms, the ledger. Mounted on idle.
 const MagicLayer = lazy(() => import('./components/magic/MagicLayer'));
+// Atmosphere, not content: none of these is needed for the first paint, so
+// they are kept out of the entry bundle. The background starts loading at once
+// (the canvas colour underneath is the same, so there is nothing to flash);
+// the pointer follower and the scroll cue wait for the page to go quiet.
+const GlobalBackground = lazy(() => import('./components/GlobalBackground'));
+const CursorWand = lazy(() => import('./components/CursorWand'));
+const FloatingMagicalArrow = lazy(() => import('./components/FloatingMagicalArrow'));
 
 interface QuickLook {
   collection: DetailCollection;
@@ -175,11 +179,19 @@ export default function App() {
     <MagicProvider>
     <EntryNavigationProvider value={openEntry}>
       <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 overflow-x-hidden">
-        {!isAdmin && <GlobalBackground />}
+        {!isAdmin && (
+          <Suspense fallback={null}>
+            <GlobalBackground />
+          </Suspense>
+        )}
 
         {/* Pointer follower. Outside the framed layout so it can cross the frame,
             and skipped on the admin surface, where precision matters more. */}
-        {!isAdmin && <CursorWand />}
+        {!isAdmin && magicReady && (
+          <Suspense fallback={null}>
+            <CursorWand />
+          </Suspense>
+        )}
 
         {/* Outer Border Frame */}
         {/* The admin studio is a tool, not a page of the site: it takes the whole viewport. */}
@@ -197,7 +209,7 @@ export default function App() {
               data-surface={overHero ? 'ink' : undefined}
               className={`${overHero ? 'absolute inset-x-0 top-0' : 'relative'} z-30 flex w-full items-center justify-between gap-6 px-4 pt-5 md:px-12 md:pt-8 lg:px-16`}
             >
-              <motion.button
+              <m.button
                 type="button"
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -207,13 +219,13 @@ export default function App() {
                 className="font-display text-xl font-semibold uppercase tracking-[-0.04em] text-zinc-100 transition-colors hover:text-accent-ink md:text-2xl"
               >
                 AM<span className="text-accent-ink">.</span>
-              </motion.button>
+              </m.button>
 
               <div className="hidden md:block">
                 <Navigation activeView={route.view} setView={setView} />
               </div>
 
-              <motion.div
+              <m.div
                 className="flex items-center gap-2 md:gap-3"
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -225,7 +237,7 @@ export default function App() {
                 <span className="hidden sm:block">
                   <PillButton href="mailto:arbabandjones@gmail.com">get in touch</PillButton>
                 </span>
-              </motion.div>
+              </m.div>
             </header>
           )}
 
@@ -238,7 +250,7 @@ export default function App() {
 
           {/* Main Content Area Routing */}
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={viewKey}
               className="relative flex min-h-0 flex-1 flex-col"
               initial={isAdmin ? false : { opacity: 0, y: isTouchDevice ? 0 : 26 }}
@@ -264,7 +276,7 @@ export default function App() {
               </Suspense>
 
               {!isAdmin && (
-                <motion.div
+                <m.div
                   aria-hidden="true"
                   className="pointer-events-none fixed inset-0 z-[90]"
                   initial={{ opacity: isTouchDevice ? 0.24 : 0.45 }}
@@ -274,7 +286,7 @@ export default function App() {
                   style={{ backgroundColor: 'var(--bg-deep)' }}
                 />
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Quick-look overlay — one instance for every listing page */}
@@ -291,7 +303,11 @@ export default function App() {
             </AnimatePresence>
           </Suspense>
 
-          {!isAdmin && <FloatingMagicalArrow />}
+          {!isAdmin && magicReady && (
+            <Suspense fallback={null}>
+              <FloatingMagicalArrow />
+            </Suspense>
+          )}
 
           {!isAdmin && magicReady && (
             <Suspense fallback={null}>

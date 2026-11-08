@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
+import { m, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { useMagic } from '../lib/magic';
 
@@ -7,6 +7,7 @@ import { useMagic } from '../lib/magic';
 const TIP = { stiffness: 620, damping: 34, mass: 0.35 };
 /** Softer spring for the halo, so it trails behind and catches up. */
 const HALO = { stiffness: 130, damping: 18, mass: 0.7 };
+const INTERACTIVE = 'a[href], button, [role="button"], input, select, textarea';
 
 /**
  * CursorWand — a small cobalt dot that follows the pointer, with a slower halo
@@ -47,27 +48,41 @@ export default function CursorWand() {
   useEffect(() => {
     if (disabled) return;
 
+    // pointermove fires at the display's rate, so it only feeds the motion
+    // values. React state changes at most twice per visit (shown / hidden),
+    // and "over something clickable" is worked out on pointerover, which fires
+    // once per element entered rather than once per pixel moved.
+    let shown = false;
+    const show = (next: boolean) => {
+      if (shown === next) return;
+      shown = next;
+      setVisible(next);
+    };
+
     const handleMove = (event: PointerEvent) => {
       // Only follow a real mouse/pen; a touch point is transient.
       if (event.pointerType === 'touch') return;
       x.set(event.clientX);
       y.set(event.clientY);
-      setVisible(true);
-
-      const target = event.target as Element | null;
-      setOverInteractive(
-        !!target?.closest?.('a[href], button, [role="button"], input, select, textarea')
-      );
+      show(true);
     };
 
-    const handleLeave = () => setVisible(false);
-    const handleEnter = () => setVisible(true);
+    const handleOver = (event: PointerEvent) => {
+      if (event.pointerType === 'touch') return;
+      const target = event.target as Element | null;
+      setOverInteractive(!!target?.closest?.(INTERACTIVE));
+    };
+
+    const handleLeave = () => show(false);
+    const handleEnter = () => show(true);
 
     window.addEventListener('pointermove', handleMove, { passive: true });
+    window.addEventListener('pointerover', handleOver, { passive: true });
     document.addEventListener('pointerleave', handleLeave);
     document.addEventListener('pointerenter', handleEnter);
     return () => {
       window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerover', handleOver);
       document.removeEventListener('pointerleave', handleLeave);
       document.removeEventListener('pointerenter', handleEnter);
     };
@@ -78,7 +93,7 @@ export default function CursorWand() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[200] overflow-hidden">
       {/* Trailing halo */}
-      <motion.div
+      <m.div
         className="absolute rounded-full"
         style={{
           x: haloX,
@@ -99,7 +114,7 @@ export default function CursorWand() {
       />
 
       {/* Wand tip */}
-      <motion.div
+      <m.div
         className="absolute rounded-full bg-accent"
         style={{
           x: tipX,

@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 
 interface StackedHeadingProps {
   /** Two display lines. The second is rendered in a muted ink. */
@@ -38,7 +38,7 @@ export default function StackedHeading({
       >
         {lines.filter(Boolean).map((line, index) => (
           <span key={line} className="block overflow-hidden pb-[0.06em]">
-            <motion.span
+            <m.span
               /* The second line is the manuscript voice: the book serif, in
                  italic, a step quieter. One pairing used on every page. */
               className={`block ${index === 1 ? 'font-book font-normal italic tracking-[-0.025em] text-zinc-400' : ''}`}
@@ -57,13 +57,13 @@ export default function StackedHeading({
               }}
             >
               {line}
-            </motion.span>
+            </m.span>
           </span>
         ))}
       </Tag>
 
       {body && (
-        <motion.p
+        <m.p
           className="mt-6 max-w-lg text-sm font-light leading-relaxed text-zinc-400 md:text-base"
           initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -75,7 +75,7 @@ export default function StackedHeading({
           }}
         >
           {body}
-        </motion.p>
+        </m.p>
       )}
     </div>
   );

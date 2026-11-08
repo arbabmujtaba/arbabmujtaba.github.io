@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { X, Calendar, Tag, ArrowUpRight, Music, ExternalLink, Camera, Maximize2 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import SafeImage from './SafeImage';
@@ -210,7 +210,7 @@ function Block({
 
   if (plan.onScroll) {
     return (
-      <motion.div
+      <m.div
         className={className}
         variants={plan.item}
         custom={index}
@@ -219,14 +219,14 @@ function Block({
         viewport={{ once: true, amount: 0.12 }}
       >
         {children}
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div className={className} variants={plan.item} custom={index}>
+    <m.div className={className} variants={plan.item} custom={index}>
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -245,7 +245,7 @@ function TypedTitle({
   return (
     <h1 className={className} style={style} aria-label={text}>
       {Array.from(text).map((char, index) => (
-        <motion.span
+        <m.span
           key={index}
           aria-hidden="true"
           initial={{ opacity: 0 }}
@@ -253,7 +253,7 @@ function TypedTitle({
           transition={{ delay: 0.25 + index * step, duration: 0.01 }}
         >
           {char}
-        </motion.span>
+        </m.span>
       ))}
     </h1>
   );
@@ -651,10 +651,10 @@ export default function ContentModal({
     </>
   );
 
-  /** `motion.div` only when there is a reveal to run; a plain div otherwise. */
+  /** `m.div` only when there is a reveal to run; a plain div otherwise. */
   const canvas =
     reveal.enabled && !reveal.onScroll ? (
-      <motion.div
+      <m.div
         key={`${customization?.animation?.preset}-${customization?.animation?.speed}`}
         variants={reveal.container}
         initial="hidden"
@@ -663,7 +663,7 @@ export default function ContentModal({
         style={canvasStyle}
       >
         {canvasChildren}
-      </motion.div>
+      </m.div>
     ) : (
       <div className={canvasClass} style={canvasStyle}>
         {canvasChildren}
@@ -690,7 +690,7 @@ export default function ContentModal({
   return (
     <div className="fixed inset-0 z-[110] flex justify-end">
       {/* Backdrop overlay */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -699,7 +699,7 @@ export default function ContentModal({
       />
 
       {/* Main drawer container */}
-      <motion.div
+      <m.div
         ref={modalRef}
         initial={animVariants.initial}
         animate={animVariants.animate}
@@ -712,7 +712,7 @@ export default function ContentModal({
         {decorations}
         {header}
         {canvas}
-      </motion.div>
+      </m.div>
 
       {/* Above the drawer: the frame is the whole screen, not a panel inside it. */}
       {lightboxOverlay}

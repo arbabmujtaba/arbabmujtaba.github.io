@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import {
   Rocket, GitCommit, Globe, AlertTriangle, CheckCircle2, XCircle,
   Clock, Loader2, ExternalLink, RefreshCw, Activity, Layers,
@@ -332,7 +332,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
 
                   <AnimatePresence>
                     {expandedJob === job.id && (
-                      <motion.div
+                      <m.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -351,7 +351,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                             </div>
                           ))}
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>

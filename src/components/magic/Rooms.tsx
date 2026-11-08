@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft } from 'lucide-react';
 import Glyph from './Glyph';
@@ -70,7 +70,7 @@ const ENTER = 0.35;
 function NoteCard({ note, index }: { note: SecretEntry; index: number }) {
   const reduced = useReducedMotion();
   return (
-    <motion.article
+    <m.article
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18, rotate: index % 2 ? 0.8 : -0.8 }}
       animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, rotate: index % 2 ? 0.4 : -0.4 }}
       transition={{ duration: 0.8, delay: ENTER + 0.1 + index * 0.1, ease: EASE }}
@@ -81,7 +81,7 @@ function NoteCard({ note, index }: { note: SecretEntry; index: number }) {
         <ReactMarkdown>{note.body}</ReactMarkdown>
       </div>
       {note.description && <p className="mt-5 text-right font-book italic text-zinc-400">{note.description}</p>}
-    </motion.article>
+    </m.article>
   );
 }
 
@@ -118,7 +118,7 @@ function Threshold({ tone }: { tone: Tone }) {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[3] flex [perspective:1600px]">
       {[0, 1].map((side) => (
-        <motion.div
+        <m.div
           key={side}
           className="h-full w-1/2 border-zinc-700 bg-canvas-deep will-change-transform"
           style={{
@@ -174,7 +174,7 @@ function RoomShell({ room, tone, children }: { room: SecretRoomId; tone: Tone; c
   }, [room]);
 
   return (
-    <motion.div
+    <m.div
       data-surface="ink"
       className="fixed inset-0 z-[190] overflow-hidden"
       initial={{ opacity: 0 }}
@@ -186,7 +186,7 @@ function RoomShell({ room, tone, children }: { room: SecretRoomId; tone: Tone; c
           never shows through the light while it is still coming up. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] bg-canvas-deep" />
       {/* the light that comes through */}
-      <motion.div
+      <m.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{ background: BACKDROP[tone] }}
@@ -217,7 +217,7 @@ function RoomShell({ room, tone, children }: { room: SecretRoomId; tone: Tone; c
         </div>
 
         <div className="mx-auto max-w-5xl px-5 pb-24 md:px-10">
-          <motion.header
+          <m.header
             className="mt-10 text-center md:mt-14"
             initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -230,12 +230,12 @@ function RoomShell({ room, tone, children }: { room: SecretRoomId; tone: Tone; c
               <p className="mx-auto mt-4 max-w-xl text-sm font-light leading-relaxed text-zinc-400">{config.body.trim()}</p>
             )}
             <div className="fleuron mx-auto mt-8 max-w-xs text-xs text-gilt" aria-hidden="true">✦</div>
-          </motion.header>
+          </m.header>
 
           <div className="mt-14">{children}</div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -271,7 +271,7 @@ function RestrictedSection() {
           <p className="text-center font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-400">lines torn from the volumes</p>
           <ul className="mt-8 grid gap-5 md:grid-cols-2">
             {torn.map((line, i) => (
-              <motion.li
+              <m.li
                 key={line.id}
                 initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -287,7 +287,7 @@ function RestrictedSection() {
                     {line.source} →
                   </span>
                 </button>
-              </motion.li>
+              </m.li>
             ))}
           </ul>
         </section>
@@ -313,7 +313,7 @@ function Print({ entry, index, onDeveloped }: { entry: ReturnType<typeof getPhot
   const when = Number.isNaN(date.getTime()) ? entry.date : date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
   return (
-    <motion.li
+    <m.li
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: ENTER + 0.15 + (index % 6) * 0.06, ease: EASE }}
@@ -331,7 +331,7 @@ function Print({ entry, index, onDeveloped }: { entry: ReturnType<typeof getPhot
         aria-label={`${entry.title}. ${developed ? 'Turn the print over' : 'Develop the print'}`}
         className="relative block aspect-[4/5] w-full text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gilt"
       >
-        <motion.span
+        <m.span
           className="absolute inset-0 block [transform-style:preserve-3d]"
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: reduced ? 0 : 0.8, ease: EASE }}
@@ -360,9 +360,9 @@ function Print({ entry, index, onDeveloped }: { entry: ReturnType<typeof getPhot
             )}
             <span className="mt-4 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500">{entry.category}</span>
           </span>
-        </motion.span>
+        </m.span>
       </button>
-    </motion.li>
+    </m.li>
   );
 }
 
@@ -459,7 +459,7 @@ function RoomOfDetails() {
 
       <dl className="mx-auto mt-14 max-w-3xl divide-y divide-zinc-800 border-y border-zinc-800">
         {facts.map((fact, i) => (
-          <motion.div
+          <m.div
             key={fact.label}
             initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -468,7 +468,7 @@ function RoomOfDetails() {
           >
             <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gilt">{fact.label}</dt>
             <dd className="font-book text-xl leading-snug text-zinc-100">{fact.value}</dd>
-          </motion.div>
+          </m.div>
         ))}
       </dl>
 

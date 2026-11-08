@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import {
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -255,7 +255,7 @@ function TerrainCanvas({ live, style }: { live: boolean; style: Record<string, M
     };
   }, [contours, live]);
 
-  return <motion.canvas ref={ref} className="absolute inset-0 h-full w-full will-change-transform" style={style} />;
+  return <m.canvas ref={ref} className="absolute inset-0 h-full w-full will-change-transform" style={style} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -324,7 +324,7 @@ function Drift({
   return (
     <>
       {layers.map((layer, depth) => (
-        <motion.div
+        <m.div
           key={depth}
           className={`${className} absolute inset-x-0 top-0 h-[200%] will-change-transform`}
           style={{ y: live ? ys[depth] : 0 }}
@@ -371,7 +371,7 @@ function Drift({
                   );
                 }),
             )}
-        </motion.div>
+        </m.div>
       ))}
     </>
   );
@@ -440,7 +440,7 @@ export default function BackgroundLayer() {
   return (
     <div aria-hidden="true" className="film-grain pointer-events-none fixed inset-0 z-0 overflow-hidden bg-canvas">
       {/* pools of light, night */}
-      <motion.div
+      <m.div
         className="night-only absolute -right-48 -top-64 h-[52rem] w-[52rem] rounded-full will-change-transform"
         style={{
           x: live ? emberX : 0,
@@ -449,7 +449,7 @@ export default function BackgroundLayer() {
         }}
       />
       {!isTouchDevice && (
-        <motion.div
+        <m.div
           className="night-only absolute -bottom-72 -left-56 h-[48rem] w-[48rem] rounded-full will-change-transform"
           style={{
             x: live ? giltX : 0,
@@ -460,7 +460,7 @@ export default function BackgroundLayer() {
       )}
 
       {/* daylight through a window, top left */}
-      <motion.div
+      <m.div
         className="day-only absolute -left-40 -top-40 h-[52rem] w-[52rem] rounded-full will-change-transform"
         style={{
           y: live ? sunY : 0,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { useOpenEntry } from '../../lib/entryNavigation';
 import { cue, prefetchRooms, useMagic } from '../../lib/magic';
@@ -94,7 +94,7 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
           const lean = door && (near || pulled) && fromEnd < 2 ? (fromEnd === 0 ? '-rotate-[3deg]' : '-rotate-1') : '';
           const volume = String(entry.volume ?? i + 1).padStart(2, '0');
           return (
-            <motion.a
+            <m.a
               key={entry.slug}
               href={`/journal/${entry.slug}`}
               onClick={(event) => {
@@ -117,7 +117,7 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
                 {entry.title}
               </span>
               <span className="shrink-0 font-mono text-[9px] text-gilt">{volume}</span>
-            </motion.a>
+            </m.a>
           );
         })}
 
@@ -135,7 +135,7 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
             // 44px of target around a 30px book
             className="group relative ml-0.5 flex h-[140px] w-11 shrink-0 items-end justify-center focus-visible:outline-none"
           >
-            <motion.span
+            <m.span
               aria-hidden="true"
               className={`relative flex flex-col items-center overflow-hidden rounded-t-[2px] border bg-canvas-lift transition-[border-color,box-shadow] duration-700 group-focus-visible:ring-1 group-focus-visible:ring-gilt ${
                 lit ? 'border-gilt/60 shadow-[0_0_22px_-4px_var(--gilt)]' : 'border-zinc-700'
@@ -160,7 +160,7 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
               </svg>
               {/* one pass of light up the spine as the shelf comes into view */}
               {!reduced && (
-                <motion.span
+                <m.span
                   className="pointer-events-none absolute inset-x-0 h-1/2 bg-gradient-to-b from-transparent via-gilt/25 to-transparent"
                   initial={{ y: '210%' }}
                   whileInView={{ y: '-110%' }}
@@ -168,14 +168,14 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
                   transition={{ duration: 1.6, delay: shelf.length * 0.06 + 0.5, ease: EASE }}
                 />
               )}
-            </motion.span>
+            </m.span>
 
             {/* dust off the top of the book as it comes away */}
             <AnimatePresence>
               {pulled && !reduced && (
                 <span aria-hidden="true" className="pointer-events-none absolute bottom-[120px] left-1/2">
                   {DUST.map(([dx, rise, delay], k) => (
-                    <motion.span
+                    <m.span
                       key={k}
                       className="absolute h-1 w-1 rounded-full bg-gilt"
                       initial={{ opacity: 0, x: 0, y: 0, scale: 0.6 }}

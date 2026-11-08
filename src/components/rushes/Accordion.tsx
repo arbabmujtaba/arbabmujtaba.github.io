@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Plus } from 'lucide-react';
 import { resolveIcon } from '../../lib/icons';
 
@@ -76,19 +76,19 @@ export default function Accordion({ items, className = '' }: AccordionProps) {
                 </span>
               )}
 
-              <motion.span
+              <m.span
                 aria-hidden="true"
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas-lift text-zinc-300"
                 animate={{ rotate: isOpen ? 45 : 0 }}
                 transition={{ duration: 0.4, ease: EASE }}
               >
                 <Plus size={14} strokeWidth={1.75} />
-              </motion.span>
+              </m.span>
             </button>
 
             <AnimatePresence initial={false}>
               {isOpen && (item.body || item.href) && (
-                <motion.div
+                <m.div
                   id={panelId}
                   role="region"
                   aria-labelledby={triggerId}
@@ -123,7 +123,7 @@ export default function Accordion({ items, className = '' }: AccordionProps) {
                       </a>
                     )}
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>

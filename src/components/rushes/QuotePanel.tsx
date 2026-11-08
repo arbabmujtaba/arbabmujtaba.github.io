@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 
 export interface QuoteEntry {
   id: string;
@@ -41,7 +41,7 @@ export default function QuotePanel({
       className={`relative border border-zinc-800 bg-canvas-raised px-5 py-14 md:px-16 md:py-24 ${className}`}
     >
       <AnimatePresence mode="wait">
-        <motion.blockquote
+        <m.blockquote
           key={active.id}
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,7 +71,7 @@ export default function QuotePanel({
               )}
             </footer>
           )}
-        </motion.blockquote>
+        </m.blockquote>
       </AnimatePresence>
 
       {entries.length > 1 && (

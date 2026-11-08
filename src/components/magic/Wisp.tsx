@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { WAND_EVENT } from '../../lib/magic';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -182,7 +182,7 @@ export default function Wisp({ label, onCatch, onGone }: WispProps) {
   };
 
   return (
-    <motion.div
+    <m.div
       ref={layerRef}
       className="pointer-events-none fixed inset-0 z-[105]"
       initial={{ opacity: 0 }}
@@ -216,7 +216,7 @@ export default function Wisp({ label, onCatch, onGone }: WispProps) {
             className="wisp pointer-events-auto absolute left-0 top-0 h-12 w-12 cursor-pointer rounded-full focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-gilt"
             style={{ translate: '-200px -200px' }}
           >
-            <motion.span
+            <m.span
               aria-hidden="true"
               className="absolute inset-0"
               initial={{ scale: 0.3, opacity: 0 }}
@@ -227,14 +227,14 @@ export default function Wisp({ label, onCatch, onGone }: WispProps) {
                 <path d="M12 2.5c.5 4.6 1.9 6.9 9.5 9.5-7.6 2.6-9 4.9-9.5 9.5-.5-4.6-1.9-6.9-9.5-9.5 7.6-2.6 9-4.9 9.5-9.5z" />
               </svg>
               <span className="wisp-mote" />
-            </motion.span>
+            </m.span>
           </button>
         </>
       )}
 
       {burst && (
         <span aria-hidden="true" className="absolute" style={{ left: burst.x, top: burst.y }}>
-          <motion.span
+          <m.span
             className="absolute -ml-6 -mt-6 h-12 w-12 rounded-full border border-gilt"
             initial={{ scale: reduced ? 1 : 0.3, opacity: 0.9 }}
             animate={{ scale: reduced ? 1 : 2.6, opacity: 0 }}
@@ -242,7 +242,7 @@ export default function Wisp({ label, onCatch, onGone }: WispProps) {
           />
           {!reduced &&
             BURST.map((spark, i) => (
-              <motion.span
+              <m.span
                 key={i}
                 className="absolute rounded-full bg-gilt shadow-[0_0_6px_var(--gilt)]"
                 style={{ width: spark.size, height: spark.size, marginLeft: -spark.size / 2, marginTop: -spark.size / 2 }}
@@ -253,6 +253,6 @@ export default function Wisp({ label, onCatch, onGone }: WispProps) {
             ))}
         </span>
       )}
-    </motion.div>
+    </m.div>
   );
 }

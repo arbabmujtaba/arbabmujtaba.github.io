@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 
 /** Characters the label cycles through while it resolves — all in the mono face, so nothing changes width. */
 const NOISE = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#/+:';
@@ -101,7 +101,7 @@ export default function RecLabel({
           data-enchanted="safelight"
           className="-m-[18px] flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-alarm"
         >
-          <motion.span
+          <m.span
             aria-hidden="true"
             className="inline-block h-2 w-2 rounded-full bg-alarm"
             initial={{ opacity: 1 }}
@@ -111,7 +111,7 @@ export default function RecLabel({
         </button>
       )}
       {!quiet && !onDot && (
-        <motion.span
+        <m.span
           aria-hidden="true"
           className="inline-block h-2 w-2 shrink-0 rounded-full bg-alarm"
           initial={{ opacity: 1 }}

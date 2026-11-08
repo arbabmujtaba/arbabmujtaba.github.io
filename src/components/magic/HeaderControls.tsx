@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import Glyph from './Glyph';
 import { readFlag, useMagic, WAND_EVENT, WAND_TOUCHED, type ThemePref } from '../../lib/magic';
 
@@ -86,7 +86,7 @@ export default function HeaderControls() {
         {beckon > 0 && !wand && !reduced && (
           <span key={beckon} aria-hidden="true" className="pointer-events-none absolute inset-0">
             {[0, 1].map((ring) => (
-              <motion.span
+              <m.span
                 key={ring}
                 className="absolute inset-0 rounded-full border border-gilt"
                 initial={{ opacity: 0.8, scale: 0.8 }}
@@ -97,7 +97,7 @@ export default function HeaderControls() {
           </span>
         )}
         {wand && (
-          <motion.span
+          <m.span
             aria-hidden="true"
             className="absolute inset-0 rounded-full"
             initial={{ opacity: 0, scale: 0.7 }}
@@ -118,7 +118,7 @@ export default function HeaderControls() {
         className={`${iconButton} border-transparent hover:border-zinc-800`}
       >
         <AnimatePresence mode="wait" initial={false}>
-          <motion.span
+          <m.span
             key={theme}
             initial={{ opacity: 0, rotate: -40, scale: 0.7 }}
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
@@ -127,13 +127,13 @@ export default function HeaderControls() {
             className="flex"
           >
             <Glyph name={theme === 'day' ? 'sun' : 'moon'} size={17} />
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </button>
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
+          <m.div
             ref={menuRef}
             role="menu"
             aria-label="Light and sound"
@@ -190,7 +190,7 @@ export default function HeaderControls() {
                 />
               </span>
             </button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

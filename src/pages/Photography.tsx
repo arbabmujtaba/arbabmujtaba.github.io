@@ -2,7 +2,7 @@ import { getCardImageStyle } from '../lib/customization';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   AnimatePresence,
-  motion,
+  m,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -325,7 +325,7 @@ export default function Photography() {
 
 
   return (
-    <motion.div
+    <m.div
       key="photography"
       initial={{ opacity: 0, y: isTouchDevice ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
@@ -339,24 +339,24 @@ export default function Photography() {
       >
         {/* ===================== INTRO ===================== */}
         <div className="page-intro" data-mark="FRAMES">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
           >
             <RecLabel>frames</RecLabel>
-          </motion.div>
+          </m.div>
 
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.25, ease: EASE }}
             className="page-title mt-7"
           >
             Photography
-          </motion.h1>
+          </m.h1>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.35, ease: EASE }}
@@ -365,9 +365,9 @@ export default function Photography() {
             A collection of moments gathered over the years. This is less of a portfolio and
             more of a personal visual diary, focusing on memories, people, and the stories
             carried within light.
-          </motion.div>
+          </m.div>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
@@ -398,13 +398,13 @@ export default function Photography() {
             ) : (
               <span>darkroom closed</span>
             )}
-          </motion.p>
+          </m.p>
         </div>
 
         {/* ===================== LEAD PLATE ===================== */}
         {leadPhoto && (
           <section className="relative pb-16 md:pb-24">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
@@ -423,7 +423,7 @@ export default function Photography() {
                 className="group block w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 <div className="image-frame w-full overflow-hidden aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/9]">
-                  <motion.div
+                  <m.div
                     className="absolute inset-0 overflow-hidden"
                     style={shouldParallax ? { y: leadImageY } : undefined}
                   >
@@ -443,12 +443,12 @@ export default function Photography() {
                         />
                       }
                     />
-                  </motion.div>
+                  </m.div>
 
                   {/* Under the wand, a seam of red light shows round the print's
                       edge — the way into the darkroom. */}
                   {leadIsPassage && (
-                    <motion.span
+                    <m.span
                       aria-hidden="true"
                       className="pointer-events-none absolute inset-0 z-[5]"
                       initial={{ opacity: 0 }}
@@ -486,7 +486,7 @@ export default function Photography() {
                   </div>
                 </div>
               </a>
-            </motion.div>
+            </m.div>
           </section>
         )}
 
@@ -559,7 +559,7 @@ export default function Photography() {
             )}
 
             <AnimatePresence mode="wait" initial={false}>
-              <motion.p
+              <m.p
                 key={`caption-${activeCategory}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -568,11 +568,11 @@ export default function Photography() {
                 className="mt-6 max-w-lg text-sm font-light leading-relaxed text-zinc-400"
               >
                 {activeDescription}
-              </motion.p>
+              </m.p>
             </AnimatePresence>
 
             <AnimatePresence mode="wait" initial={false}>
-              <motion.div
+              <m.div
                 key={`plates-${activeCategory}`}
                 initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -585,7 +585,7 @@ export default function Photography() {
                   onSelect={handleOpen}
                   className="mt-12 md:mt-16"
                 />
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </Section>
         )}
@@ -604,7 +604,7 @@ export default function Photography() {
               {Object.entries(gearByCategory).map(([category, items], index) => {
                 const Icon = gearIcon(category);
                 return (
-                  <motion.div
+                  <m.div
                     key={category}
                     initial={{ opacity: 0, y: 22 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -629,7 +629,7 @@ export default function Photography() {
                         </li>
                       ))}
                     </ul>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>
@@ -645,6 +645,6 @@ export default function Photography() {
         onClose={() => setOpenFrame(null)}
         onNavigate={setOpenFrame}
       />
-    </motion.div>
+    </m.div>
   );
 }

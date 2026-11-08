@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import Footer from '../components/Footer';
 import {
   FrameCard,
@@ -73,7 +73,7 @@ export default function Portfolio() {
   );
 
   return (
-    <motion.div
+    <m.div
       key="portfolio"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -84,25 +84,25 @@ export default function Portfolio() {
       <div className="page-shell custom-scrollbar relative z-10 flex-grow overflow-y-auto pt-0">
         {/* ===================== INTRO ===================== */}
         <div className="page-intro" data-mark="WORK">
-          <motion.div
+          <m.div
             className="page-eyebrow"
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
           >
             <RecLabel>work</RecLabel>
-          </motion.div>
+          </m.div>
 
-          <motion.h1
+          <m.h1
             className="page-title"
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.25, ease: EASE }}
           >
             Portfolio
-          </motion.h1>
+          </m.h1>
 
-          <motion.div
+          <m.div
             className="page-description"
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,11 +112,11 @@ export default function Portfolio() {
               A collection of engineering case studies. Building with an emphasis on
               performance, precision, and robust architectures.
             </p>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* ===================== THE INDEX ===================== */}
-        <motion.section
+        <m.section
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
@@ -150,11 +150,11 @@ export default function Portfolio() {
               />
             ))}
           </div>
-        </motion.section>
+        </m.section>
 
         {/* ===================== IMAGE PLATES ===================== */}
         {plates.length > 0 && (
-          <motion.section
+          <m.section
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
@@ -187,11 +187,11 @@ export default function Portfolio() {
                 />
               ))}
             </div>
-          </motion.section>
+          </m.section>
         )}
 
         {/* ===================== TECHNICAL CONTEXT ===================== */}
-        <motion.section
+        <m.section
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
@@ -220,10 +220,10 @@ export default function Portfolio() {
               </div>
             ))}
           </div>
-        </motion.section>
+        </m.section>
 
         <Footer />
       </div>
-    </motion.div>
+    </m.div>
   );
 }

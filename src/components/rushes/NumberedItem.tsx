@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { normalizeImagePath } from '../../lib/image';
@@ -90,7 +90,7 @@ export default function NumberedItem({
   const shared = `group/item flex w-full flex-col gap-1 border-b border-zinc-800 py-8 text-left md:flex-row md:items-start md:gap-10 md:py-12 ${className}`;
 
   return (
-    <motion.div
+    <m.div
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
@@ -115,6 +115,6 @@ export default function NumberedItem({
       ) : (
         <div className={shared}>{content}</div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

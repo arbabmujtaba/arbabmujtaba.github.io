@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { useMagic } from '../../lib/magic';
 import { getEgg, isEggEnabled } from '../../lib/secrets';
 
@@ -30,7 +30,7 @@ export default function FullStop() {
       }}
       className="relative inline-block text-accent-ink focus-visible:outline-none"
     >
-      <motion.span
+      <m.span
         className="inline-block"
         animate={
           lifted && !reduced
@@ -41,7 +41,7 @@ export default function FullStop() {
         style={{ textShadow: lifted ? '0 0 24px color-mix(in srgb, var(--gilt) 80%, transparent)' : undefined }}
       >
         .
-      </motion.span>
+      </m.span>
     </button>
   );
 }

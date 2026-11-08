@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { X } from 'lucide-react';
 import Glyph from './Glyph';
 import {
@@ -285,7 +285,7 @@ function WandEffects() {
       )}
       <AnimatePresence>
         {lumos && (
-          <motion.div
+          <m.div
             ref={lightRef}
             aria-hidden="true"
             className="pointer-events-none fixed inset-0 z-[150] night-or-day"
@@ -312,7 +312,7 @@ function Spellbook() {
   return (
     <AnimatePresence>
       {wand && (
-        <motion.div
+        <m.div
           role="region"
           aria-label="Wand"
           initial={{ opacity: 0, y: 16 }}
@@ -351,7 +351,7 @@ function Spellbook() {
           >
             <X size={15} />
           </button>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -526,7 +526,7 @@ function WhisperToast() {
     <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-4 z-[230] flex justify-center px-3 md:top-6">
       <AnimatePresence>
         {whisper && (
-          <motion.div
+          <m.div
             key={whisper.id}
             initial={{ opacity: 0, y: -14, filter: 'blur(6px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -562,7 +562,7 @@ function WhisperToast() {
             >
               <X size={14} />
             </button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
@@ -602,7 +602,7 @@ function Ledger({ invited }: { invited: boolean }) {
 
   return (
     <>
-      <motion.button
+      <m.button
         type="button"
         onClick={() => setLedgerOpen(!ledgerOpen)}
         aria-expanded={ledgerOpen}
@@ -616,11 +616,11 @@ function Ledger({ invited }: { invited: boolean }) {
         <span className="font-mono text-[10px] tracking-[0.16em]">
           {foundHere.length}/{available.length}
         </span>
-      </motion.button>
+      </m.button>
 
       <AnimatePresence>
         {ledgerOpen && (
-          <motion.div
+          <m.div
             className="fixed inset-0 z-[180] flex items-end justify-start p-3 md:items-end md:p-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -632,7 +632,7 @@ function Ledger({ invited }: { invited: boolean }) {
               className="absolute inset-0 cursor-default bg-black/30"
               onClick={() => setLedgerOpen(false)}
             />
-            <motion.div
+            <m.div
               ref={panelRef}
               role="dialog"
               aria-modal="true"
@@ -717,8 +717,8 @@ function Ledger({ invited }: { invited: boolean }) {
               >
                 forget everything I found
               </button>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

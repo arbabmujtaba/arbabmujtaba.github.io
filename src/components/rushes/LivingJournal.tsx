@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
@@ -169,7 +169,7 @@ export default function LivingJournal({ journal, photography, tech, className = 
 
       <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-14">
         {/* the newest thing, open on the desk */}
-        <motion.div {...ink(lead, 0)} viewport={{ once: true, amount: 0.3 }}>
+        <m.div {...ink(lead, 0)} viewport={{ once: true, amount: 0.3 }}>
           {link(
             lead,
             'group block',
@@ -195,13 +195,13 @@ export default function LivingJournal({ journal, photography, tech, className = 
               {lead.line && <span className="mt-3 block max-w-lg font-book text-lg italic leading-snug text-zinc-400">{lead.line}</span>}
             </>
           )}
-        </motion.div>
+        </m.div>
 
         {/* the rest of the pile, and whatever stands behind it */}
         <div className="min-w-0">
           <ol className="border-t border-zinc-800">
           {rest.map((item, i) => (
-            <motion.li key={`${item.collection}/${item.slug}`} {...ink(item, i + 1)} viewport={{ once: true, amount: 0.5 }} className="border-b border-zinc-800">
+            <m.li key={`${item.collection}/${item.slug}`} {...ink(item, i + 1)} viewport={{ once: true, amount: 0.5 }} className="border-b border-zinc-800">
               {link(
                 item,
                 'group grid min-h-[64px] grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 py-5',
@@ -217,7 +217,7 @@ export default function LivingJournal({ journal, photography, tech, className = 
                   </span>
                 </>
               )}
-            </motion.li>
+            </m.li>
           ))}
           </ol>
           {children}

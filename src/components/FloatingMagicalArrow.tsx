@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { m, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronDown, Sparkle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useMediaQuery } from '../lib/useMediaQuery';
@@ -83,14 +83,14 @@ export default function FloatingMagicalArrow() {
   return (
     <AnimatePresence>
       {isScrollable && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 30, scale: 0.8 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="pointer-events-auto fixed bottom-6 right-6 z-[100] hidden md:bottom-10 md:right-10 md:block"
         >
-          <motion.button
+          <m.button
             type="button"
             onClick={scrollDown}
             aria-label={isAtBottom ? 'Back to the top' : 'Next section'}
@@ -100,21 +100,21 @@ export default function FloatingMagicalArrow() {
             whileHover="hover"
             animate="rest"
           >
-            <motion.div
+            <m.div
               className="pointer-events-none absolute h-24 w-24 rounded-full bg-accent/10 blur-2xl"
               variants={{ rest: { scale: 0.8, opacity: 0.35 }, hover: { scale: 1.15, opacity: 0.8 } }}
               transition={{ duration: 0.5 }}
             />
-            <motion.div
+            <m.div
               animate={{ rotate: isAtBottom ? 180 : 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
               className="pointer-events-none relative z-10 flex items-center justify-center text-accent-ink transition-colors duration-300 group-hover:text-zinc-50"
             >
               <Sparkle className="absolute -right-3 -top-2 h-3.5 w-3.5 opacity-60" />
               <ChevronDown className="h-10 w-10" strokeWidth={1} />
-            </motion.div>
-          </motion.button>
-        </motion.div>
+            </m.div>
+          </m.button>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import MotionPlate from './MotionPlate';
 import SafeImage from '../SafeImage';
@@ -41,7 +41,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
     <div className={className}>
       <div className="relative">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <m.div
             key={current.slug}
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, filter: 'blur(6px)' }}
             animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
@@ -56,7 +56,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
               mediaFilter={fx.filter}
               overlay={<MediaFxOverlays fx={fx} />}
             />
-          </motion.div>
+          </m.div>
         </AnimatePresence>
 
         {many && (
@@ -82,7 +82,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
       {/* Caption for the reel on screen */}
       <div className="mt-5 flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between md:gap-10">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <m.div
             key={current.slug}
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -98,7 +98,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                 {current.description}
               </p>
             )}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
         <p className="shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
           {current.label && <span className="text-zinc-300">{current.label}</span>}

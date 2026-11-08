@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
@@ -31,7 +31,7 @@ export default function ArchiveIndex({ doors, className = '' }: { doors: Archive
   return (
     <ol className={`border-t border-zinc-800 ${className}`}>
       {doors.map((door, i) => (
-        <motion.li
+        <m.li
           key={door.key}
           className="border-b border-zinc-800"
           initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
@@ -80,7 +80,7 @@ export default function ArchiveIndex({ doors, className = '' }: { doors: Archive
 
             <ArrowUpRight size={18} aria-hidden="true" className="text-zinc-500 transition-colors group-active:text-accent-ink" />
           </a>
-        </motion.li>
+        </m.li>
       ))}
     </ol>
   );

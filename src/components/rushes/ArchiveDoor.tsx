@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
 
@@ -23,7 +23,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 export default function ArchiveDoor({ title, image, index, role, description, href, onOpen, delay = 0 }: ArchiveDoorProps) {
   const reduced = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       initial={reduced ? { opacity: 0 } : { opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
@@ -66,6 +66,6 @@ export default function ArchiveDoor({ title, image, index, role, description, hr
         </span>
         {description && <span className="mt-4 block max-w-xs text-sm font-light leading-relaxed text-zinc-400">{description}</span>}
       </a>
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { m, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import Footer from '../components/Footer';
 import Constellation from '../components/magic/Constellation';
 import FullStop from '../components/magic/FullStop';
@@ -164,7 +164,7 @@ export default function Home({ setView }: HomeProps) {
     entry.navTarget || entry.slug.replace('gateway-', '');
 
   return (
-    <motion.div
+    <m.div
       key="home"
       initial={{ opacity: 0, y: isTouchDevice ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
@@ -178,7 +178,7 @@ export default function Home({ setView }: HomeProps) {
           data-surface="ink"
           className="relative flex min-h-[88vh] flex-col justify-end overflow-hidden px-4 pb-14 pt-28 text-zinc-100 md:min-h-[100vh] md:px-12 md:pb-20 md:pt-32 lg:min-h-[calc(100vh-4rem)] lg:px-16"
         >
-          <motion.div
+          <m.div
             aria-hidden="true"
             className="absolute inset-0 -z-10 overflow-hidden bg-canvas-deep"
             style={shouldParallax ? { y: heroImageY } : undefined}
@@ -190,7 +190,7 @@ export default function Home({ setView }: HomeProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/40 via-35% to-transparent" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-canvas/70 to-transparent" />
             <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_0%_100%,var(--bg)_0%,transparent_60%)] opacity-70" />
-          </motion.div>
+          </m.div>
 
           {/* once, after a while: something crossing the sky */}
           <span aria-hidden="true" className="night-only shooting-star left-[6%] top-[9%] md:left-[22%] md:top-[8%]" />
@@ -198,15 +198,15 @@ export default function Home({ setView }: HomeProps) {
           <Constellation className="absolute left-[8%] top-[13%] h-[26vw] max-h-[15rem] w-[44vw] max-w-[30rem] md:left-[27%] md:top-[15%]" />
           <InkNote section="hero" className="absolute right-4 top-24 md:left-12 md:right-auto md:top-28 lg:left-16" />
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: EASE }}
           >
             <RecLabel bright>sopore &rarr; indore</RecLabel>
-          </motion.div>
+          </m.div>
 
-          <motion.h1
+          <m.h1
             data-levitate
             className="mt-6 font-display text-[16vw] font-bold uppercase leading-[0.82] tracking-[-0.055em] text-bone md:text-[13vw]"
             initial={{ opacity: 0, y: 30 }}
@@ -215,10 +215,10 @@ export default function Home({ setView }: HomeProps) {
           >
             Arbab
             <FullStop />
-          </motion.h1>
+          </m.h1>
 
           <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
-            <motion.div
+            <m.div
               className="max-w-md"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -229,9 +229,9 @@ export default function Home({ setView }: HomeProps) {
                 {profile?.description ||
                   'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
               </p>
-            </motion.div>
+            </m.div>
 
-            <motion.ul
+            <m.ul
               className="space-y-1 md:text-right"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -249,17 +249,17 @@ export default function Home({ setView }: HomeProps) {
                   </button>
                 </li>
               ))}
-            </motion.ul>
+            </m.ul>
           </div>
 
           {!isTouchDevice && (
-            <motion.div
+            <m.div
               aria-hidden="true"
               className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 md:block"
               style={shouldParallax ? { opacity: heroFade } : undefined}
             >
               <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-500">scroll</span>
-            </motion.div>
+            </m.div>
           )}
         </section>
 
@@ -474,6 +474,6 @@ export default function Home({ setView }: HomeProps) {
 
         <Footer setView={setView} />
       </div>
-    </motion.div>
+    </m.div>
   );
 }

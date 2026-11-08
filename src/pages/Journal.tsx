@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import Footer from '../components/Footer';
 import JournalCard from '../components/JournalCard';
 import { RecLabel, StackedHeading } from '../components/rushes';
@@ -32,7 +32,7 @@ export default function Journal() {
   const archiveEntries = useMemo(() => entries.slice(1), [entries]);
 
   return (
-    <motion.div
+    <m.div
       key="journal"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -46,16 +46,16 @@ export default function Journal() {
             <header className="page-intro" data-mark="JOURNAL">
               <RecLabel>journal</RecLabel>
 
-              <motion.h1
+              <m.h1
                 initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: shouldReduceMotion ? 0.3 : 0.95, delay: 0.1, ease: EASE }}
                 className="page-title mt-7"
               >
                 Journal
-              </motion.h1>
+              </m.h1>
 
-              <motion.p
+              <m.p
                 initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: shouldReduceMotion ? 0.3 : 0.9, delay: 0.2, ease: EASE }}
@@ -64,10 +64,10 @@ export default function Journal() {
                 A personal archive of thoughts, late-night reflections, and milestones. Writing as a
                 tool for figuring things out and finding stability in the noise of creating something
                 real.
-              </motion.p>
+              </m.p>
 
               {entries.length > 0 && (
-                <motion.p
+                <m.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.35, ease: EASE }}
@@ -79,7 +79,7 @@ export default function Journal() {
                   </span>
                   <span aria-hidden="true" className="h-px w-5 bg-zinc-700" />
                   <span>{entries.some((e) => e.priority !== undefined) ? 'pinned first, then newest' : 'newest first'}</span>
-                </motion.p>
+                </m.p>
               )}
             </header>
 
@@ -129,6 +129,6 @@ export default function Journal() {
           <Footer />
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

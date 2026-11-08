@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import Glyph from './Glyph';
 import { castSpell, useMagic, type Spell, type ThemePref } from '../../lib/magic';
 import { navigate } from '../../lib/navigation';
@@ -192,7 +192,7 @@ export default function Palette({ onClose }: { onClose: () => void }) {
   let lastGroup: Group | null = null;
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[200] flex items-start justify-center px-3 pt-[10vh] md:pt-[14vh]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -200,7 +200,7 @@ export default function Palette({ onClose }: { onClose: () => void }) {
       transition={{ duration: 0.2 }}
     >
       <button type="button" aria-label="Close the index" tabIndex={-1} onClick={onClose} className="absolute inset-0 cursor-default bg-canvas-deep/75" />
-      <motion.div
+      <m.div
         role="dialog"
         aria-modal="true"
         aria-label="The index"
@@ -211,7 +211,7 @@ export default function Palette({ onClose }: { onClose: () => void }) {
       >
         {/* one scan down the panel as it opens */}
         {!reduced && (
-          <motion.span
+          <m.span
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-transparent via-accent/10 to-transparent"
             initial={{ y: '-100%' }}
@@ -295,7 +295,7 @@ export default function Palette({ onClose }: { onClose: () => void }) {
           <span>↵ open</span>
           <span>esc close</span>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

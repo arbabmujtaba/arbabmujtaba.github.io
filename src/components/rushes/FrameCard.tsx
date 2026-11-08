@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import TagChip from './TagChip';
 import { shouldInterceptClick } from '../../lib/navigation';
@@ -108,7 +108,7 @@ export default function FrameCard({
   const shell = 'group block w-full cursor-pointer text-left';
 
   return (
-    <motion.div
+    <m.div
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
@@ -134,6 +134,6 @@ export default function FrameCard({
       ) : (
         <div className="group block w-full">{body}</div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

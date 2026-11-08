@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 import InkNote from '../magic/InkNote';
 import { distanceKm, formatLat, PLACES } from '../../lib/places';
 import type { TimelineMilestone } from '../../types';
@@ -39,7 +39,7 @@ function Passage({ from, to }: { from: string; to: string }) {
         <div className="relative h-14" aria-hidden="true">
           <svg viewBox="0 0 400 56" preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
             <path d="M2 28 C 110 0, 290 56, 398 28" fill="none" stroke="var(--rule-strong)" strokeWidth="1" strokeDasharray="2 6" vectorEffect="non-scaling-stroke" />
-            <motion.path
+            <m.path
               d="M2 28 C 110 0, 290 56, 398 28"
               fill="none"
               stroke="var(--accent)"
@@ -50,7 +50,7 @@ function Passage({ from, to }: { from: string; to: string }) {
             />
           </svg>
           {!reduced && (
-            <motion.span
+            <m.span
               className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_14px_var(--accent)]"
               style={{ left: dot }}
             />
@@ -145,7 +145,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
 
       <ol ref={railRef} className="relative">
         <div aria-hidden="true" className="absolute bottom-0 left-[11px] top-0 w-px bg-zinc-800 md:left-[9.5rem]">
-          <motion.div
+          <m.div
             className="absolute inset-0 origin-top bg-gradient-to-b from-accent via-accent to-[var(--accent-soft)]"
             style={{ scaleY: reduced ? 1 : drawn }}
           />
@@ -158,7 +158,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
           return (
             <li key={chapter.slug} className="relative">
               {moved && <Passage from={previous.place!} to={chapter.place!} />}
-              <motion.article
+              <m.article
                 id={`chapter-${chapter.slug}`}
                 data-slug={chapter.slug}
                 className="relative grid grid-cols-1 gap-3 pb-16 pl-10 md:grid-cols-[9.5rem_1fr] md:gap-14 md:pb-24 md:pl-0"
@@ -197,7 +197,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                     <>
                       <AnimatePresence initial={false}>
                         {isOpen && (
-                          <motion.div
+                          <m.div
                             id={`chapter-body-${chapter.slug}`}
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
@@ -208,7 +208,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                             <p className="mt-5 border-l border-gilt/50 pl-5 font-book text-xl italic leading-relaxed text-zinc-200">
                               {chapter.body.trim()}
                             </p>
-                          </motion.div>
+                          </m.div>
                         )}
                       </AnimatePresence>
                       <button
@@ -226,7 +226,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                     </>
                   )}
                 </div>
-              </motion.article>
+              </m.article>
             </li>
           );
         })}

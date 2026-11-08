@@ -1,4 +1,5 @@
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
+import { MaxMotion } from '../lib/motion';
 
 const navItems = [
   { id: 'portfolio', num: '01', label: 'Work' },
@@ -23,14 +24,15 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  */
 export default function Navigation({ activeView, setView }: NavigationProps) {
   return (
-    <>
+    // The active-section underline glides between items (layoutId): domMax.
+    <MaxMotion>
       {/* Desktop */}
       <nav className="relative z-20 hidden items-center gap-7 font-mono text-[11px] uppercase tracking-[0.16em] md:flex">
         {navItems.map((item, index) => {
           const isActive = activeView === item.id;
 
           return (
-            <motion.button
+            <m.button
               key={item.id}
               type="button"
               initial={{ opacity: 0, y: -8 }}
@@ -48,12 +50,12 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
               </span>
 
               {isActive && (
-                <motion.span
+                <m.span
                   layoutId="nav-indicator"
                   className="absolute -bottom-1.5 left-0 right-0 h-px bg-accent"
                 />
               )}
-            </motion.button>
+            </m.button>
           );
         })}
       </nav>
@@ -99,6 +101,6 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
           })}
         </div>
       </nav>
-    </>
+    </MaxMotion>
   );
 }

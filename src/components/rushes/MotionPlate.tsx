@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import SafeImage from '../SafeImage';
 import { normalizeImagePath } from '../../lib/image';
@@ -164,7 +164,7 @@ export default function MotionPlate({
   const gifSource = gif && !playing && resolvedPoster ? resolvedPoster : resolvedSrc;
 
   return (
-    <motion.div
+    <m.div
       ref={containerRef}
       className={className}
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26 }}
@@ -260,6 +260,6 @@ export default function MotionPlate({
           {caption}
         </p>
       )}
-    </motion.div>
+    </m.div>
   );
 }

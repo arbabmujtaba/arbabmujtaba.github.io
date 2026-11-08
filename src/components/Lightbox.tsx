@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
 import { navigate, shouldInterceptClick } from '../lib/navigation';
 import { normalizeImagePath } from '../lib/image';
@@ -118,7 +118,7 @@ export default function Lightbox({ frames, openIndex, onClose, onNavigate }: Lig
   return (
     <AnimatePresence>
       {isOpen && frame && source && (
-        <motion.div
+        <m.div
           key="lightbox"
           role="dialog"
           aria-modal="true"
@@ -164,7 +164,7 @@ export default function Lightbox({ frames, openIndex, onClose, onNavigate }: Lig
               />
             )}
 
-            <motion.img
+            <m.img
               key={source}
               src={source}
               alt={frame.alt}
@@ -261,7 +261,7 @@ export default function Lightbox({ frames, openIndex, onClose, onNavigate }: Lig
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react';
-import { AnimatePresence, motion, useInView, useReducedMotion, type PanInfo, type Variants } from 'motion/react';
+import { AnimatePresence, m, useInView, useReducedMotion, type PanInfo, type Variants } from 'motion/react';
+import { MaxMotion } from '../../lib/motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 
@@ -99,6 +100,8 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
   };
 
   return (
+    // The top sheet is swiped away (drag): domMax.
+    <MaxMotion>
     <div
       ref={rootRef}
       className={`grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20 ${className}`}
@@ -120,7 +123,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
         />
 
         <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-          <motion.figure
+          <m.figure
             key={note.id}
             custom={direction}
             variants={sheet}
@@ -207,7 +210,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                 </figcaption>
               )}
             </blockquote>
-          </motion.figure>
+          </m.figure>
         </AnimatePresence>
       </div>
 
@@ -273,5 +276,6 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
         )}
       </div>
     </div>
+    </MaxMotion>
   );
 }

@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { useOpenEntry } from '../../lib/entryNavigation';
@@ -44,7 +44,7 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
       {items.map((item, index) => {
         const href = `/${item.collection}/${item.slug}`;
         return (
-          <motion.article
+          <m.article
             key={`${item.collection}/${item.slug}`}
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -61,7 +61,7 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
               className="group block focus-visible:outline-none"
             >
               <span aria-hidden="true" className="relative block h-px w-full bg-zinc-800">
-                <motion.span
+                <m.span
                   className="absolute inset-y-0 left-0 block w-full origin-left bg-accent"
                   initial={{ scaleX: shouldReduceMotion ? 1 : 0 }}
                   whileInView={{ scaleX: 1 }}
@@ -89,7 +89,7 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
                 <ArrowUpRight size={12} className="transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </span>
             </a>
-          </motion.article>
+          </m.article>
         );
       })}
     </div>

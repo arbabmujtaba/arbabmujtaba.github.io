@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import AppLink from '../components/AppLink';
 import ContentModal from '../components/ContentModal';
@@ -49,7 +49,7 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
   const indexLabel = COLLECTION_LABEL[collection];
 
   return (
-    <motion.div
+    <m.div
       key={`${collection}/${slug}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -151,6 +151,6 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
 
         <Footer setView={setView} />
       </div>
-    </motion.div>
+    </m.div>
   );
 }

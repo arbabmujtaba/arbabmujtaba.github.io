@@ -1,5 +1,6 @@
 import {StrictMode, lazy, Suspense} from 'react';
 import {createRoot} from 'react-dom/client';
+import {LazyMotion, domAnimation} from 'motion/react';
 import App from './App.tsx';
 import './index.css';
 
@@ -33,12 +34,19 @@ window.addEventListener('vite:preloadError', (event) => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {isPreviewFrame && PreviewHost ? (
-      <Suspense fallback={null}>
-        <PreviewHost />
-      </Suspense>
-    ) : (
-      <App />
-    )}
+    {/* Every animated element is an `m.*` component, which carries no features
+        of its own: this provider supplies animation, exit, hover/tap/focus and
+        in-view (domAnimation, ~15 kB gzip instead of the full ~34 kB). The two
+        that need drag or shared layout load domMax themselves (lib/motion).
+        `strict` makes a stray `motion.*` throw in development. */}
+    <LazyMotion features={domAnimation} strict={import.meta.env.DEV}>
+      {isPreviewFrame && PreviewHost ? (
+        <Suspense fallback={null}>
+          <PreviewHost />
+        </Suspense>
+      ) : (
+        <App />
+      )}
+    </LazyMotion>
   </StrictMode>,
 );

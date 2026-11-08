@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { useOpenEntry } from '../../lib/entryNavigation';
@@ -38,7 +38,7 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
         const href = `/portfolio/${project.slug}`;
         const stack = stackOf(project);
         return (
-          <motion.li
+          <m.li
             key={project.slug}
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -87,7 +87,7 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
                 <ArrowUpRight size={15} strokeWidth={1.6} />
               </span>
             </a>
-          </motion.li>
+          </m.li>
         );
       })}
     </ol>

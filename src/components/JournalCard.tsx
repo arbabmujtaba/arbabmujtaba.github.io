@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Disc3 } from 'lucide-react';
 import SafeImage from './SafeImage';
 import { TagChip } from './rushes';
@@ -70,7 +70,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
      line, the fore-edge corners softened, and the cover lifts on its spine on
      hover and swings open on click. */
   const plate = (
-    <motion.div
+    <m.div
       className="image-frame relative aspect-[4/3] w-full rounded-r-[4px] sm:aspect-[16/10]"
       style={{ transformOrigin: 'left center', transformPerspective: 1400 }}
       animate={shouldReduceMotion ? undefined : { rotateY: opening ? -32 : 0 }}
@@ -87,7 +87,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
         className="h-full w-full object-cover grayscale-[12%] transition-[transform,scale,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
         fallback={<div className="hairline-grid h-full w-full bg-well" aria-hidden="true" />}
       />
-    </motion.div>
+    </m.div>
   );
 
   /* Volume number as the numbered prefix. Display size keeps the accent well
@@ -133,7 +133,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
   );
 
   return (
-    <motion.article
+    <m.article
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: isFeatured ? 24 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
@@ -268,6 +268,6 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
           </div>
         )}
       </a>
-    </motion.article>
+    </m.article>
   );
 }

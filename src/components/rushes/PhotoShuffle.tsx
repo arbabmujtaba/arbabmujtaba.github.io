@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useInView, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import Lightbox, { type LightboxFrame } from '../Lightbox';
 import { getLocalWebpSources, ownerArchiveImage } from '../../lib/image';
@@ -180,7 +180,7 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
         className="grid grid-flow-dense auto-rows-[42vw] grid-cols-2 gap-2 sm:auto-rows-[30vw] md:auto-rows-[15vw] md:grid-cols-4 md:gap-3 xl:auto-rows-[13.5rem]"
       >
         {tiles.map((tile, index) => (
-          <motion.button
+          <m.button
             key={index}
             type="button"
             onClick={() => setLightbox(index)}
@@ -192,7 +192,7 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
             transition={{ duration: shouldReduceMotion ? 0.3 : 0.9, delay: shouldReduceMotion ? 0 : index * 0.07, ease: EASE }}
           >
             <AnimatePresence initial={false}>
-              <motion.span
+              <m.span
                 key={tile.src}
                 className="absolute inset-0 block"
                 /* The incoming frame wipes up over the outgoing one, which is
@@ -210,7 +210,7 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
                   className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.05]"
                   fallback={<span className="hairline-grid block h-full w-full bg-well" />}
                 />
-              </motion.span>
+              </m.span>
             </AnimatePresence>
 
             <span className="reveal-on-hover pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100" />
@@ -220,7 +220,7 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
               </span>
               <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/70">{tile.category}</span>
             </span>
-          </motion.button>
+          </m.button>
         ))}
       </div>
 

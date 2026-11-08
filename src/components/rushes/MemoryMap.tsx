@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { useMagic } from '../../lib/magic';
 import { distanceKm, formatLat, formatLon, PLACES, type Place } from '../../lib/places';
@@ -129,7 +129,7 @@ export default function MemoryMap({ chapters, photography, journal, reels, class
           {road && (
             <>
               <path d={road} fill="none" stroke="var(--rule-strong)" strokeWidth="1.4" strokeDasharray="3 9" strokeLinecap="round" />
-              <motion.path
+              <m.path
                 key={tracing}
                 d={road}
                 fill="none"
@@ -210,7 +210,7 @@ export default function MemoryMap({ chapters, photography, journal, reels, class
       <div aria-live="polite">
         <AnimatePresence mode="wait">
           {active && (
-            <motion.div
+            <m.div
               key={active.place.id}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -262,7 +262,7 @@ export default function MemoryMap({ chapters, photography, journal, reels, class
               <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 {places.length} places on file · choose one on the map
               </p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

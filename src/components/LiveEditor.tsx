@@ -8,7 +8,7 @@
 import { PlacementSummary } from './admin/Placement';
 import type { ListItem } from './admin/model';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, AnimatePresence } from 'motion/react';
 import {
   MousePointerClick, Eye, Monitor, Tablet, Smartphone, RefreshCw,
   Save, Sparkles, X, Type, Image, FileText, Loader2, ChevronDown,
@@ -495,7 +495,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
         )}
         {/* Left: Iframe Panel */}
         <div className="flex-grow flex items-start justify-center overflow-auto bg-zinc-950/30 p-4 custom-scrollbar">
-          <motion.div
+          <m.div
             key={`${viewportMode}-${iframeKey}`}
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -529,14 +529,14 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                 onLoad={handleIframeLoad}
               />
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Right: Editing Panel */}
         <div className="w-[340px] shrink-0 border-l border-zinc-900 bg-zinc-950/60 flex flex-col overflow-hidden">
           <AnimatePresence mode="wait">
             {!editMode ? (
-              <motion.div
+              <m.div
                 key="inactive"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -554,9 +554,9 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                     Click the "Click to Edit" button above, then click any element on the page to identify and edit its content.
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             ) : !selectedPayload ? (
-              <motion.div
+              <m.div
                 key="waiting"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -574,9 +574,9 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                     Hover over elements in the preview to highlight them. Click to select and edit the content.
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 key="selected"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -774,7 +774,7 @@ export default function LiveEditor({ content, onNavigateToEditor, onToast, onPub
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

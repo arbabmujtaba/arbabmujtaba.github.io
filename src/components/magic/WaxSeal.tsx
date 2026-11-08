@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { useMagic } from '../../lib/magic';
 import { getEgg, isEggEnabled } from '../../lib/secrets';
 
@@ -45,7 +45,7 @@ export default function WaxSeal() {
 
   return (
     <div className="flex items-center gap-5">
-      <motion.button
+      <m.button
         type="button"
         onClick={knock}
         aria-label={broken ? 'A broken wax seal' : 'A wax seal'}
@@ -78,17 +78,17 @@ export default function WaxSeal() {
             ))}
           </g>
         </svg>
-      </motion.button>
+      </m.button>
       <AnimatePresence>
         {broken && (
-          <motion.p
+          <m.p
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9 }}
             className="max-w-xs font-book text-lg italic leading-snug text-zinc-300"
           >
             {egg?.body?.trim() || 'An archive still being written.'}
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
     </div>

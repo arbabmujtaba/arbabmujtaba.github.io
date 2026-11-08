@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react';
+import { m, useReducedMotion } from 'motion/react';
 import AppLink from '../components/AppLink';
 import Footer from '../components/Footer';
 import { RecLabel } from '../components/rushes';
@@ -31,7 +31,7 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
     (typeof window !== 'undefined' ? window.location.pathname : '/');
 
   return (
-    <motion.div
+    <m.div
       key="notFound"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -99,6 +99,6 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
 
         <Footer setView={setView} />
       </div>
-    </motion.div>
+    </m.div>
   );
 }

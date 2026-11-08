@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import { shouldInterceptClick, navigate } from '../../lib/navigation';
 import { getArchiveThoughts, type Thought } from '../../lib/thoughts';
 
@@ -36,7 +36,7 @@ export default function ThoughtDrawer({ className = '' }: { className?: string }
     <div className={`grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] ${className}`}>
       <div className="relative min-h-[11rem]" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.figure
+          <m.figure
             key={thought.id}
             initial={reduced ? { opacity: 0 } : { opacity: 0, y: 26, rotate: -1.2 }}
             animate={{ opacity: 1, y: 0, rotate: -0.3 }}
@@ -62,7 +62,7 @@ export default function ThoughtDrawer({ className = '' }: { className?: string }
                 thought.source
               )}
             </figcaption>
-          </motion.figure>
+          </m.figure>
         </AnimatePresence>
       </div>
       <div className="flex flex-col items-start gap-3 md:items-end">
