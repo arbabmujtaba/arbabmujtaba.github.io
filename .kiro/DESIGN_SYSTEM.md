@@ -22,7 +22,8 @@ older code, this file wins. Verified against the reference screenshots in
 - **No horizontal overflow at 320px.** Oversized type must sit inside `overflow-hidden`, and any
   transform that scales or translates must be clipped by a parent.
 - **Touch targets ≥ 44px.** Interactive rows use `min-h-[44px]`.
-- Preserve existing mobile fixes: root `overflow-x-hidden`, `border-0 sm:border` on the frame, no
+- Preserve existing mobile fixes: root `clip-x` (never `overflow-x-hidden`: hidden/auto ancestors
+  break `position: sticky`; use `.clip-x` / `.clip-xy` from index.css), `border-0 sm:border` on the frame, no
   blur filters in page transitions, `aspect-[4/3] sm:aspect-[16/10]` style responsive aspects.
 
 ## 2. Colour utilities
@@ -78,6 +79,8 @@ below the floor, which is why the removed pages each carried a token correction.
 | `PillButton` | rounded CTAs | `tone: solid \| ghost`, `href` or `onClick` |
 | `QuotePanel` | interlude quotes in a raised panel | `entries`, `activeIndex`, `onSelect` |
 | `ImageTypeMask` | wordmark with a photo through the letters | `text`, `image`, `size` |
+| `Tilt` (`rushes/Tilt`) | a surface that leans toward the pointer in 3D, with glare | `max`, `perspective`, `glare`, `lift` |
+| `Rise` (`rushes/Depth`) | a block that swings up into place, scrubbed to scroll | `tilt` |
 
 Do not duplicate these. If a page needs a variant, extend the primitive with a prop.
 
@@ -111,6 +114,15 @@ Rules observed in the reference:
   `.hairline-grid`.
 
 ## 5. Motion
+
+- Import `m` from `motion/react`, never `motion`: the root `LazyMotion` (main.tsx) supplies
+  `domAnimation` and is `strict` in development, so a `motion.*` throws. Drag, pan and `layoutId`
+  need `domMax`: wrap the component in `<MaxMotion>` from `lib/motion`.
+- 3D: transforms and opacity only, values in motion values (never state), per-element
+  `transformPerspective` rather than `preserve-3d` (an `overflow-hidden` ancestor flattens 3D).
+  Pointer depth is gated by `usePointerDepth()`, scroll depth by `useScrollDepth()` (`lib/depth`);
+  both are off on touch, on narrow screens and under reduced motion. Don't wrap anything holding
+  `position: sticky` or `fixed` in `Rise` — a transformed ancestor re-anchors fixed children.
 
 - Single easing curve: `[0.16, 1, 0.3, 1]`, available in CSS as `var(--ease-rushes)`.
 - Entrances: `initial={{ opacity: 0, y: 18–26 }}` → `whileInView`, `viewport={{ once: true }}`,
