@@ -179,7 +179,7 @@ function Studio({ setView }: { setView: (view: string) => void }) {
       <aside className="flex flex-none flex-col border-b border-zinc-800 bg-[var(--bg-deep)] lg:w-[var(--studio-sidebar)] lg:border-b-0 lg:border-r">
         <div className="flex items-center gap-3 px-5 py-4 lg:py-6">
           <span className="st-title text-xl font-semibold uppercase tracking-[-0.04em]">
-            AM<span className="text-[var(--accent)]">.</span>
+            AM<span className="text-[var(--accent-ink)]">.</span>
           </span>
           <span className="st-eyebrow !text-[0.5625rem]">Editorial Hub</span>
         </div>
@@ -227,7 +227,7 @@ function Studio({ setView }: { setView: (view: string) => void }) {
             data-tip="Hover cards on buttons and the tip bar under each workspace."
           >
             <Lightbulb size={15} /> Tips
-            <span className={`ml-auto font-mono text-[10px] uppercase ${tips ? 'text-[var(--accent)]' : 'text-zinc-500'}`}>{tips ? 'on' : 'off'}</span>
+            <span className={`ml-auto font-mono text-[10px] uppercase ${tips ? 'text-[var(--accent-ink)]' : 'text-zinc-500'}`}>{tips ? 'on' : 'off'}</span>
           </button>
           <a className="st-nav" href="/" target="_blank" rel="noreferrer" data-tip="The site as it is on this machine, in a new tab — including saved but unpublished changes.">
             <ExternalLink size={15} /> Open the site

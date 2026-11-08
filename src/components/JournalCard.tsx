@@ -94,7 +94,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
      clear of the small-text contrast floor on the paper surface. */
   const prefix = (
     <span
-      className={`shrink-0 font-book italic leading-none tracking-[-0.02em] text-accent ${
+      className={`shrink-0 font-book italic leading-none tracking-[-0.02em] text-accent-ink ${
         isFeatured ? 'text-3xl md:text-5xl' : 'text-3xl'
       }`}
     >
@@ -207,7 +207,7 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
                     aria-hidden="true"
                     size={26}
                     strokeWidth={1}
-                    className="shrink-0 text-accent"
+                    className="shrink-0 text-accent-ink"
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-400">

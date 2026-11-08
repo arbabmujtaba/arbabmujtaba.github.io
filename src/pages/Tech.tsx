@@ -118,16 +118,16 @@ export default function Tech() {
         >
           <div className="min-w-0">
             <dt>entries</dt>
-            <dd className="mt-2 text-accent">{String(logs.length).padStart(2, '0')}</dd>
+            <dd className="mt-2 text-accent-ink">{String(logs.length).padStart(2, '0')}</dd>
           </div>
           <div className="min-w-0">
             <dt>categories</dt>
-            <dd className="mt-2 text-accent">{String(logGroups.length).padStart(2, '0')}</dd>
+            <dd className="mt-2 text-accent-ink">{String(logGroups.length).padStart(2, '0')}</dd>
           </div>
           {latestStamp && (
             <div className="min-w-0">
               <dt>last entry</dt>
-              <dd className="mt-2 text-accent">{latestStamp}</dd>
+              <dd className="mt-2 text-accent-ink">{latestStamp}</dd>
             </div>
           )}
         </motion.dl>
@@ -154,7 +154,7 @@ export default function Tech() {
             <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-800 bg-canvas/72 px-4 pb-4 pt-6 backdrop-blur-sm md:mx-0 md:px-0">
               <div className="flex items-baseline justify-between gap-4">
                 <h2 className="flex min-w-0 items-baseline gap-2.5 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-300">
-                  <span className="shrink-0 text-accent">
+                  <span className="shrink-0 text-accent-ink">
                     {String(groupIndex + 1).padStart(2, '0')}/
                   </span>
                   <span className="min-w-0 break-words">{group.category}</span>

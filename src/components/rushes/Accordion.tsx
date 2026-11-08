@@ -112,7 +112,7 @@ export default function Accordion({ items, className = '' }: AccordionProps) {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/link mt-4 inline-flex min-h-[44px] items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent"
+                        className="group/link mt-4 inline-flex min-h-[44px] items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent-ink"
                       >
                         reference
                         <ArrowUpRight

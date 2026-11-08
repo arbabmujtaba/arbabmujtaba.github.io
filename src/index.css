@@ -1,137 +1,155 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   RUSHES TOKEN LAYER
+   TOKEN LAYER — Midnight & Cobalt
    --------------------------------------------------------------------------
-   Two surfaces. Dark ("ink") is the default canvas; any subtree can opt into
-   the light ("bone") surface with data-surface="bone".
+   Midnight Black #030407 is the canvas; electric cobalt #1558c9 is the one
+   accent. Two themes (night is the default, [data-theme="day"] is paper) and
+   two opt-in surfaces (data-surface="ink" keeps a subtree dark, "bone" makes
+   it light).
 
    The raw palette below is never used directly by components. Components use
-   Tailwind utilities (text-zinc-*, border-zinc-*, text-orange-*) which are
-   re-pointed at the surface-aware slots in the `@theme inline` block. Because
-   the theme block is `inline`, utilities emit var(--ink-1) rather than
-   var(--color-zinc-100), so a data-surface override deeper in the tree is
-   picked up at the point of use.
+   Tailwind utilities (text-zinc-*, border-zinc-*, bg-accent, text-accent-ink)
+   which are re-pointed at the surface-aware slots in the `@theme inline`
+   block. Because the theme block is `inline`, utilities emit var(--ink-1)
+   rather than var(--color-zinc-100), so a data-surface override deeper in the
+   tree is picked up at the point of use.
+
+   Cobalt has two jobs, because #1558c9 is only 3.2:1 on Midnight:
+     --accent      the brand colour, exact. Fills, rules, rings, glows, and
+                   type set large (≥24px, or ≥18.5px bold), where 3:1 passes.
+     --accent-ink  cobalt for small type. The same hue lifted to 5.9:1 on the
+                   canvas at night; on paper the brand colour itself reads at
+                   5.8:1, so there the two are equal.
+     --on-accent   type that sits on a cobalt fill: white, 6.4:1. Midnight on
+                   cobalt is 3.2:1 and fails.
    ========================================================================== */
 
 :root {
-  /* Raw palette — sampled from the Rushes reference */
-  --rushes-ink: #1a1a18;        /* warm near-black — primary canvas */
-  --rushes-ink-deep: #0a0a0a;   /* true black — wells, gutters, letterboxing */
-  --rushes-ink-cool: #151519;   /* cool dark — secondary panels */
-  --rushes-surface: #232323;    /* raised dark surface */
-  --rushes-bone: #f4f2ed;       /* warm off-white — inverted surface */
-  --rushes-ember: #e2612f;      /* primary accent */
-  --rushes-signal: #e4fe00;     /* acid lime — REC / live signal only */
-  --rushes-alarm: #c22e1f;      /* destructive */
+  /* Raw palette */
+  --midnight: #030407;          /* Midnight Black — primary canvas */
+  --midnight-deep: #010203;     /* wells, gutters, letterboxing */
+  --midnight-raised: #0a0e17;   /* panels and cards — a cobalt-tinted lift */
+  --midnight-lift: #131a27;     /* inputs, icon buttons, chips */
+  --cobalt: #1558c9;            /* electric cobalt — the accent */
+  --cobalt-ink: #4f87ec;        /* cobalt for small type on midnight, 5.9:1 */
+  --rushes-bone: #eef1f6;       /* cool off-white — inverted surface */
+  --rushes-signal: #e4fe00;     /* acid lime — admin in-flight states only */
+  --rushes-alarm: #c22e1f;      /* destructive, the REC dot */
   --rushes-moss: #7fa654;       /* success / published */
-  --starlight: #fff6dc;         /* stars in the hero sky — the night's only white */
-  --rushes-grey-1: #9a9a9e;
-  --rushes-grey-2: #7d7d83;
-  --rushes-grey-3: #696969;
+  --starlight: #eef4ff;         /* stars in the hero sky — the night's only white */
+  --rushes-grey-1: #959cab;     /* 7.4:1 on midnight */
+  --rushes-grey-2: #7c8495;     /* 5.5:1 */
+  --rushes-grey-3: #6c7385;     /* 4.3:1 — faintest, decorative and large type */
 
-  /* ---- surface-aware slots: DARK (default) ----
-     Verified against reference screenshots: the canvas is near-black, and
-     panels/cards lift to a slightly cool dark rather than a warm one. */
-  --bg: var(--rushes-ink-deep);      /* #0a0a0a canvas */
-  --bg-deep: #050505;                /* letterboxing, wells, image backdrops */
-  --bg-raised: var(--rushes-ink-cool); /* #151519 panels and cards */
-  --bg-lift: var(--rushes-surface);  /* #232323 inputs, icon buttons, chips */
+  /* ---- surface-aware slots: NIGHT (default) ---- */
+  --bg: var(--midnight);
+  --bg-deep: var(--midnight-deep);
+  --bg-raised: var(--midnight-raised);
+  --bg-lift: var(--midnight-lift);
 
   --ink-0: #ffffff;                      /* max contrast display */
-  --ink-1: rgba(244, 242, 237, 0.94);    /* body strong */
-  --ink-2: rgba(244, 242, 237, 0.82);
-  --ink-3: rgba(244, 242, 237, 0.68);    /* body */
+  --ink-1: rgba(232, 237, 247, 0.94);    /* body strong */
+  --ink-2: rgba(232, 237, 247, 0.82);
+  --ink-3: rgba(232, 237, 247, 0.68);    /* body, 8:1 */
   --ink-4: var(--rushes-grey-1);         /* muted */
   --ink-5: var(--rushes-grey-2);         /* faint */
   --ink-6: var(--rushes-grey-3);         /* faintest */
 
-  --rule: rgba(255, 255, 255, 0.12);     /* hairline */
-  --rule-strong: rgba(255, 255, 255, 0.22);
-  --well: rgba(255, 255, 255, 0.04);     /* image/card backdrop */
+  --rule: rgba(200, 214, 240, 0.12);     /* hairline, a breath of blue */
+  --rule-strong: rgba(200, 214, 240, 0.22);
+  --well: rgba(160, 190, 255, 0.04);     /* image/card backdrop */
 
-  --accent: var(--rushes-ember);
-  --accent-soft: rgba(226, 97, 47, 0.16);
+  --accent: var(--cobalt);
+  --accent-ink: var(--cobalt-ink);
+  --on-accent: #ffffff;
+  --accent-soft: rgba(21, 88, 201, 0.24);
   --signal: var(--rushes-signal);
-  /* Old gold — the hidden layer's one colour: seals, stars, wand light. */
-  --gilt: #d9b46a;
+  /* Moonlight — the hidden layer's one colour: seals, stars, wand light, the
+     contour map. Kept apart from cobalt so the hidden layer still reads as its
+     own thing. (The token keeps its old name, `gilt`, so `text-gilt` and the
+     rest of the hidden layer did not have to be renamed.) */
+  --gilt: #9db7e6;
   color-scheme: dark;
 
   /* Motion — single source of truth */
   --ease-rushes: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ---- DAY: the whole site on paper ----
+/* ---- DAY: the whole site on cool paper ----
    Set on <html> by the inline boot script in index.html (before first paint)
    and by MagicProvider afterwards. Photographs keep dark plates through
    data-surface="ink", the way prints sit on black mounts in a photo book. */
 [data-theme="day"] {
-  --bg: #f3efe6;
-  --bg-deep: #e9e3d6;
-  --bg-raised: #fbf9f4;
-  --bg-lift: #e7e1d3;
+  --bg: #f1f3f7;
+  --bg-deep: #e6e9f0;
+  --bg-raised: #fbfcfe;
+  --bg-lift: #e3e7ef;
 
-  --ink-0: #14130f;
-  --ink-1: rgba(22, 20, 16, 0.94);
-  --ink-2: rgba(22, 20, 16, 0.84);
-  --ink-3: rgba(22, 20, 16, 0.76);
-  --ink-4: rgba(22, 20, 16, 0.66);
-  --ink-5: rgba(22, 20, 16, 0.6);   /* 4.6:1 on --bg — the bone surface's 0.44 failed AA */
-  --ink-6: rgba(22, 20, 16, 0.55);
+  --ink-0: #05070d;
+  --ink-1: rgba(5, 7, 13, 0.94);
+  --ink-2: rgba(5, 7, 13, 0.84);
+  --ink-3: rgba(5, 7, 13, 0.76);
+  --ink-4: rgba(5, 7, 13, 0.66);
+  --ink-5: rgba(5, 7, 13, 0.6);   /* 5.2:1 on --bg */
+  --ink-6: rgba(5, 7, 13, 0.55);
 
-  --rule: rgba(22, 20, 16, 0.14);
-  --rule-strong: rgba(22, 20, 16, 0.26);
-  --well: rgba(22, 20, 16, 0.045);
+  --rule: rgba(5, 7, 13, 0.14);
+  --rule-strong: rgba(5, 7, 13, 0.26);
+  --well: rgba(5, 7, 13, 0.045);
 
-  /* Ember at #e2612f is 3.1:1 on paper; this is the same hue, 4.7:1. */
-  --accent: #b4461a;
-  --accent-soft: rgba(180, 70, 26, 0.14);
-  --gilt: #8a6a2a;
+  /* Cobalt is 5.8:1 on this paper: the brand colour does both jobs. */
+  --accent: var(--cobalt);
+  --accent-ink: var(--cobalt);
+  --accent-soft: rgba(21, 88, 201, 0.14);
+  --gilt: #3d5a8a;
   color-scheme: light;
 }
 
 /* Back to the dark canvas inside a subtree — hero, reels, lightbox, the
    darkroom. A no-op at night. */
 [data-surface="ink"] {
-  --bg: var(--rushes-ink-deep);
-  --bg-deep: #050505;
-  --bg-raised: var(--rushes-ink-cool);
-  --bg-lift: var(--rushes-surface);
+  --bg: var(--midnight);
+  --bg-deep: var(--midnight-deep);
+  --bg-raised: var(--midnight-raised);
+  --bg-lift: var(--midnight-lift);
   --ink-0: #ffffff;
-  --ink-1: rgba(244, 242, 237, 0.94);
-  --ink-2: rgba(244, 242, 237, 0.82);
-  --ink-3: rgba(244, 242, 237, 0.68);
+  --ink-1: rgba(232, 237, 247, 0.94);
+  --ink-2: rgba(232, 237, 247, 0.82);
+  --ink-3: rgba(232, 237, 247, 0.68);
   --ink-4: var(--rushes-grey-1);
   --ink-5: var(--rushes-grey-2);
   --ink-6: var(--rushes-grey-3);
-  --rule: rgba(255, 255, 255, 0.12);
-  --rule-strong: rgba(255, 255, 255, 0.22);
-  --well: rgba(255, 255, 255, 0.04);
-  --accent: var(--rushes-ember);
-  --accent-soft: rgba(226, 97, 47, 0.16);
-  --gilt: #d9b46a;
+  --rule: rgba(200, 214, 240, 0.12);
+  --rule-strong: rgba(200, 214, 240, 0.22);
+  --well: rgba(160, 190, 255, 0.04);
+  --accent: var(--cobalt);
+  --accent-ink: var(--cobalt-ink);
+  --accent-soft: rgba(21, 88, 201, 0.24);
+  --gilt: #9db7e6;
   color-scheme: dark;
 }
 
 [data-surface="bone"] {
   --bg: var(--rushes-bone);
-  --bg-deep: #e8e4d9;
+  --bg-deep: #e2e6ee;
   --bg-raised: #ffffff;
-  --bg-lift: #ece8df;
+  --bg-lift: #e6eaf1;
 
-  --ink-0: var(--rushes-ink-deep);
-  --ink-1: rgba(26, 26, 24, 0.94);
-  --ink-2: rgba(26, 26, 24, 0.84);
-  --ink-3: rgba(26, 26, 24, 0.72);
-  --ink-4: rgba(26, 26, 24, 0.56);
-  --ink-5: rgba(26, 26, 24, 0.44);
-  --ink-6: rgba(26, 26, 24, 0.34);
+  --ink-0: var(--midnight);
+  --ink-1: rgba(5, 7, 13, 0.94);
+  --ink-2: rgba(5, 7, 13, 0.84);
+  --ink-3: rgba(5, 7, 13, 0.72);
+  --ink-4: rgba(5, 7, 13, 0.56);
+  --ink-5: rgba(5, 7, 13, 0.44);
+  --ink-6: rgba(5, 7, 13, 0.34);
 
-  --rule: rgba(26, 26, 24, 0.16);
-  --rule-strong: rgba(26, 26, 24, 0.28);
-  --well: rgba(26, 26, 24, 0.04);
+  --rule: rgba(5, 7, 13, 0.16);
+  --rule-strong: rgba(5, 7, 13, 0.28);
+  --well: rgba(5, 7, 13, 0.04);
 
-  --accent-soft: rgba(226, 97, 47, 0.14);
+  --accent-ink: var(--cobalt);
+  --accent-soft: rgba(21, 88, 201, 0.14);
 }
 
 @theme inline {
@@ -158,6 +176,8 @@
   --color-rule: var(--rule);
   --color-well: var(--well);
   --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-on-accent: var(--on-accent);
   --color-signal: var(--signal);
   --color-alarm: var(--rushes-alarm);
   /* The darkroom's lamp: alarm red let up to be readable on a near-black red. */
@@ -179,14 +199,15 @@
   --color-zinc-900: var(--well);
   --color-zinc-950: var(--bg-deep);
 
-  /* Legacy accent scale — all ember now, so ~300 orange-* usages retheme. */
+  /* Legacy accent scale. Nothing in src/ uses it any more (text-orange-* is
+     now text-accent-ink, the rest bg-/border-accent); it stays pointed at
+     cobalt so stray markup in content still themes. */
   --color-orange-200: var(--accent);
   --color-orange-300: var(--accent);
   --color-orange-400: var(--accent);
   --color-orange-500: var(--accent);
   --color-orange-600: var(--accent);
 }
-
 /* ==========================================================================
    BASE
    ========================================================================== */
@@ -287,8 +308,11 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
   --ink-6: rgba(42, 33, 22, 0.56);
   --rule: rgba(42, 33, 22, 0.16);
   --rule-strong: rgba(42, 33, 22, 0.28);
-  --accent: #a2401a;
-  --gilt: #85622a;
+  /* Fountain-pen cobalt on cream: 7:1. */
+  --accent: #17489f;
+  --accent-ink: #17489f;
+  --accent-soft: rgba(23, 72, 159, 0.14);
+  --gilt: #3d5a8a;
 }
 
 .font-book { font-family: var(--font-book); }
@@ -395,7 +419,7 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
   height: 9px;
   margin: -4.5px 0 0 -4.5px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff8e6 0%, var(--gilt) 70%);
+  background: radial-gradient(circle, #f4f8ff 0%, var(--gilt) 70%);
   box-shadow:
     0 0 10px 2px color-mix(in srgb, var(--gilt) 80%, transparent),
     0 0 34px 10px color-mix(in srgb, var(--gilt) 28%, transparent);
@@ -425,9 +449,9 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
   background: var(--gilt);
   box-shadow: 0 0 6px var(--gilt);
 }
-/* On paper a glow reads as a smudge: a firmer, warmer spark instead. */
+/* On paper a glow reads as a smudge: a firmer spark instead. */
 [data-theme="day"] .wisp-mote {
-  background: radial-gradient(circle, #f6e2a8 0%, var(--gilt) 75%);
+  background: radial-gradient(circle, #cfe0ff 0%, var(--gilt) 75%);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--gilt) 45%, transparent),
     0 0 16px 4px color-mix(in srgb, var(--gilt) 30%, transparent);
@@ -461,7 +485,7 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
   text-align: left;
   transition: border-color 300ms var(--ease-rushes), background-color 300ms var(--ease-rushes);
 }
-.ledger-door:hover, .ledger-door:focus-visible { border-color: var(--gilt); background: rgba(133, 98, 42, 0.08); outline: none; }
+.ledger-door:hover, .ledger-door:focus-visible { border-color: var(--gilt); background: rgba(61, 90, 138, 0.08); outline: none; }
 .ledger-door-final { border-color: var(--gilt); color: var(--gilt); }
 
 /* Hover is never the only way in. Phones and pens have no hover, so anything
@@ -674,7 +698,7 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
   letter-spacing: 0.22em;
   line-height: 1.2;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .page-title {
@@ -802,7 +826,7 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
 }
 .markdown-body code {
   background: var(--well);
-  color: var(--accent);
+  color: var(--accent-ink);
   @apply font-mono text-xs px-1.5 py-0.5;
 }
 .markdown-body pre code {
@@ -824,11 +848,11 @@ html[data-room-open] [data-marquee-track] { animation-play-state: paused !import
   .markdown-body li { font-size: var(--pfs, calc(1.0625rem * var(--pts, 1))); }
 }
 .markdown-body a {
-  color: var(--accent);
+  color: var(--accent-ink);
   text-decoration: underline;
   text-decoration-color: var(--accent-soft);
   transition: text-decoration-color 200ms var(--ease-rushes);
 }
 .markdown-body a:hover {
-  text-decoration-color: var(--accent);
+  text-decoration-color: var(--accent-ink);
 }

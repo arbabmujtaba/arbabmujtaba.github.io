@@ -221,7 +221,7 @@ export default function MotionPlate({
               type="button"
               onClick={togglePlay}
               aria-label={playing ? `Pause ${title}` : `Play ${title}`}
-              className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-canvas focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+              className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
             >
               {playing ? <Pause size={15} strokeWidth={1.8} /> : <Play size={15} strokeWidth={1.8} />}
             </button>
@@ -233,7 +233,7 @@ export default function MotionPlate({
                 type="button"
                 onClick={toggleMuted}
                 aria-label={muted ? `Unmute ${title}` : `Mute ${title}`}
-                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-canvas focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 {muted ? <VolumeX size={15} strokeWidth={1.8} /> : <Volume2 size={15} strokeWidth={1.8} />}
               </button>
@@ -242,7 +242,7 @@ export default function MotionPlate({
                 type="button"
                 onClick={restart}
                 aria-label={`Restart ${title}`}
-                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-canvas focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 <RotateCcw size={14} strokeWidth={1.8} />
               </button>

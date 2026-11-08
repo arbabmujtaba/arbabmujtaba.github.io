@@ -346,7 +346,7 @@ export function ContentList({
                 <div className="min-w-0">
                   <button
                     type="button"
-                    className="block max-w-full truncate text-left text-[0.875rem] font-medium text-zinc-100 hover:text-[var(--accent)]"
+                    className="block max-w-full truncate text-left text-[0.875rem] font-medium text-zinc-100 hover:text-[var(--accent-ink)]"
                     onClick={() => onEdit(item.collection, item.slug)}
                   >
                     {item.title || item.slug}
@@ -361,7 +361,7 @@ export function ContentList({
                     )}
                     {item.priority !== undefined && (
                       <span
-                        className={item.priority === 0 ? 'text-[var(--accent)]' : 'text-zinc-400'}
+                        className={item.priority === 0 ? 'text-[var(--accent-ink)]' : 'text-zinc-400'}
                         data-tip={
                           item.priority === 0
                             ? 'Priority 0 — featured: first on the Home page and at the top of its section.'

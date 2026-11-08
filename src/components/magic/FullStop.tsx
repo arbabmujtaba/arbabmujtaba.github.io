@@ -14,7 +14,7 @@ export default function FullStop() {
   const [lifted, setLifted] = useState(false);
 
   if (!wand || !isEggEnabled('fullstop')) {
-    return <span className="text-accent">.</span>;
+    return <span className="text-accent-ink">.</span>;
   }
 
   return (
@@ -28,7 +28,7 @@ export default function FullStop() {
         whisperOf(egg?.title || 'Not a full stop', egg?.body || 'It only looks like the end of the sentence.', 'quill');
         window.setTimeout(() => setLifted(false), reduced ? 1200 : 3200);
       }}
-      className="relative inline-block text-accent focus-visible:outline-none"
+      className="relative inline-block text-accent-ink focus-visible:outline-none"
     >
       <motion.span
         className="inline-block"

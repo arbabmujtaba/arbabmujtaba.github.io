@@ -70,7 +70,7 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
                 to="/"
                 className="group/item flex w-full items-baseline gap-5 border-b border-zinc-800 py-6"
               >
-                <span className="w-7 shrink-0 font-mono text-[11px] text-zinc-500 transition-colors group-hover/item:text-accent">
+                <span className="w-7 shrink-0 font-mono text-[11px] text-zinc-500 transition-colors group-hover/item:text-accent-ink">
                   00
                 </span>
                 <span className="font-display text-2xl font-medium capitalize tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 md:text-4xl">
@@ -85,7 +85,7 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
                   to={`/${collection}`}
                   className="group/item flex w-full items-baseline gap-5 border-b border-zinc-800 py-6"
                 >
-                  <span className="w-7 shrink-0 font-mono text-[11px] text-zinc-500 transition-colors group-hover/item:text-accent">
+                  <span className="w-7 shrink-0 font-mono text-[11px] text-zinc-500 transition-colors group-hover/item:text-accent-ink">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <span className="font-display text-2xl font-medium capitalize tracking-[-0.04em] text-zinc-500 transition-colors duration-500 group-hover/item:text-zinc-50 md:text-4xl">

@@ -221,7 +221,7 @@ function FontPicker({
             }}
           >
             {defaultLabel}
-            {!value && <Check size={13} className="text-[var(--accent)]" />}
+            {!value && <Check size={13} className="text-[var(--accent-ink)]" />}
           </button>
           {FONT_GROUPS.map((group) => (
             <div key={group}>
@@ -240,7 +240,7 @@ function FontPicker({
                   }}
                 >
                   {font.label}
-                  {value === font.id && <Check size={13} className="text-[var(--accent)]" />}
+                  {value === font.id && <Check size={13} className="text-[var(--accent-ink)]" />}
                 </button>
               ))}
             </div>
@@ -388,7 +388,7 @@ export function StyleStudio({
             >
               {item.label}
               {count > 0 && (
-                <span className="ml-1.5 rounded-full bg-[var(--accent-soft)] px-1.5 text-[9px] text-[var(--accent)]">{count}</span>
+                <span className="ml-1.5 rounded-full bg-[var(--accent-soft)] px-1.5 text-[9px] text-[var(--accent-ink)]">{count}</span>
               )}
             </button>
           );
@@ -701,7 +701,7 @@ export function StyleStudio({
                         />
                       )}
                     </span>
-                    <span className="block px-2 py-1.5 text-center text-[0.6875rem] text-zinc-300 group-aria-pressed:text-[var(--accent)]">
+                    <span className="block px-2 py-1.5 text-center text-[0.6875rem] text-zinc-300 group-aria-pressed:text-[var(--accent-ink)]">
                       {item.label}
                     </span>
                   </button>

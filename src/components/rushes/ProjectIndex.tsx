@@ -61,14 +61,14 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
                 className="pointer-events-none absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-[var(--accent-soft)] via-[var(--well)] to-transparent transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:scale-x-100 group-focus-visible/row:scale-x-100"
               />
 
-              <span className="relative font-mono text-[11px] text-zinc-500 transition-colors group-hover/row:text-accent">
+              <span className="relative font-mono text-[11px] text-zinc-500 transition-colors group-hover/row:text-accent-ink">
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               <span className="relative min-w-0 font-display text-2xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-100 transition-transform duration-500 ease-out group-hover/row:translate-x-2 md:text-4xl">
                 {project.title}
                 {project.featured && (
-                  <span className="ml-3 inline-block translate-y-[-0.4em] font-mono text-[9px] uppercase tracking-[0.2em] text-accent">
+                  <span className="ml-3 inline-block translate-y-[-0.4em] font-mono text-[9px] uppercase tracking-[0.2em] text-accent-ink">
                     featured
                   </span>
                 )}
@@ -83,7 +83,7 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
                 )}
               </span>
 
-              <span className="relative col-start-3 row-start-1 flex h-9 w-9 items-center justify-center self-center rounded-full border border-zinc-800 text-zinc-400 transition-all duration-500 group-hover/row:rotate-45 group-hover/row:border-accent group-hover/row:bg-accent group-hover/row:text-canvas md:col-start-4">
+              <span className="relative col-start-3 row-start-1 flex h-9 w-9 items-center justify-center self-center rounded-full border border-zinc-800 text-zinc-400 transition-all duration-500 group-hover/row:rotate-45 group-hover/row:border-accent group-hover/row:bg-accent group-hover/row:text-on-accent md:col-start-4">
                 <ArrowUpRight size={15} strokeWidth={1.6} />
               </span>
             </a>

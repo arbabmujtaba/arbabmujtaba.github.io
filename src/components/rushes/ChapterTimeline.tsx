@@ -74,7 +74,7 @@ function Passage({ from, to }: { from: string; to: string }) {
           event.preventDefault();
           target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
         }}
-        className="mx-auto mt-6 block w-fit font-mono text-[10px] uppercase tracking-[0.2em] text-accent underline-offset-4 hover:underline"
+        className="mx-auto mt-6 block w-fit font-mono text-[10px] uppercase tracking-[0.2em] text-accent-ink underline-offset-4 hover:underline"
       >
         see it on the map ↓
       </a>
@@ -133,7 +133,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                 onClick={() => jump(chapter.slug)}
                 aria-current={current === chapter.slug ? 'step' : undefined}
                 className={`rounded-full px-3 py-1.5 font-mono text-[11px] tracking-[0.08em] transition-colors ${
-                  current === chapter.slug ? 'bg-accent text-canvas' : 'text-zinc-500 hover:text-zinc-100'
+                  current === chapter.slug ? 'bg-accent text-on-accent' : 'text-zinc-500 hover:text-zinc-100'
                 }`}
               >
                 {chapter.year}
@@ -189,7 +189,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                     {chapter.title}
                   </h3>
                   {chapter.place && (
-                    <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-accent">{chapter.place}</p>
+                    <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-accent-ink">{chapter.place}</p>
                   )}
                   <p className="mt-4 text-[0.95rem] font-light leading-relaxed text-zinc-300 md:text-base">{chapter.description}</p>
 
@@ -216,7 +216,7 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                         aria-expanded={isOpen}
                         aria-controls={`chapter-body-${chapter.slug}`}
                         onClick={() => setOpen(isOpen ? null : chapter.slug)}
-                        className="mt-5 inline-flex min-h-[44px] items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent"
+                        className="mt-5 inline-flex min-h-[44px] items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent-ink"
                       >
                         <span aria-hidden="true" className={`inline-block transition-transform duration-500 ${isOpen ? 'rotate-90' : ''}`}>
                           ❧

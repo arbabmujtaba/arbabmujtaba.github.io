@@ -72,11 +72,11 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
               </span>
 
               <div className="mt-5 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.18em]">
-                <span className="text-accent">{item.kicker}</span>
+                <span className="text-accent-ink">{item.kicker}</span>
                 <span className="text-zinc-500">{formatDate(item.date)}</span>
               </div>
 
-              <h3 className="mt-6 font-display text-2xl font-medium leading-[1.08] tracking-[-0.035em] text-zinc-50 transition-colors group-hover:text-accent group-focus-visible:text-accent md:text-[1.75rem]">
+              <h3 className="mt-6 font-display text-2xl font-medium leading-[1.08] tracking-[-0.035em] text-zinc-50 transition-colors group-hover:text-accent-ink group-focus-visible:text-accent-ink md:text-[1.75rem]">
                 {item.title}
               </h3>
 
@@ -84,7 +84,7 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
                 <p className="mt-4 line-clamp-3 text-sm font-light leading-relaxed text-zinc-400">{item.excerpt}</p>
               )}
 
-              <span className="mt-6 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors group-hover:text-accent">
+              <span className="mt-6 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors group-hover:text-accent-ink">
                 {item.meta || 'read'}
                 <ArrowUpRight size={12} className="transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </span>

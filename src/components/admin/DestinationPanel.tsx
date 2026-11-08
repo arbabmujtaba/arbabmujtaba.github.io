@@ -116,7 +116,7 @@ export function DestinationPanel({
         </div>
         <div className="space-y-2 px-3 py-3 text-[0.75rem] leading-relaxed text-zinc-400">
           <p className="flex items-start gap-2">
-            <ArrowRight size={12} className="mt-1 flex-none text-[var(--accent)]" />
+            <ArrowRight size={12} className="mt-1 flex-none text-[var(--accent-ink)]" />
             <span>
               {dest.hasPage ? (
                 <>

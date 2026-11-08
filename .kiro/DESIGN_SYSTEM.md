@@ -27,23 +27,30 @@ older code, this file wins. Verified against the reference screenshots in
 
 ## 2. Colour utilities
 
+Palette: **Midnight Black `#030407`** canvas, **electric cobalt `#1558c9`** accent (Nov 2026; it
+replaced the warm ink + ember Rushes palette).
+
 | Utility | Meaning | Notes |
 |---|---|---|
-| `bg-canvas` | page background | near-black `#0a0a0a` |
-| `bg-canvas-deep` | wells, letterboxing, image backdrops | `#050505` |
-| `bg-canvas-raised` | panels and cards | `#151519` |
-| `bg-canvas-lift` | inputs, icon buttons, chips | `#232323` |
+| `bg-canvas` | page background | Midnight `#030407` |
+| `bg-canvas-deep` | wells, letterboxing, image backdrops | `#010203` |
+| `bg-canvas-raised` | panels and cards | `#0a0e17` |
+| `bg-canvas-lift` | inputs, icon buttons, chips | `#131a27` |
 | `text-zinc-50` | display headings, max contrast | |
 | `text-zinc-100` | strong body | |
 | `text-zinc-400` | muted body, eyebrow text | |
 | `text-zinc-500` | resting state of dim rows | must recover on hover/focus |
 | `border-zinc-800` | hairline rules | |
 | `border-zinc-700` | stronger rules, framing marks | |
-| `text-accent` / `bg-accent` | ember `#e2612f` — the one accent | |
+| `bg-accent` / `border-accent` / `ring-accent` | cobalt `#1558c9` — the one accent | fills, rules, rings, glows |
+| `text-accent-ink` | cobalt for small type | `#4f87ec` at night (5.9:1); `#1558c9` on paper (5.8:1) |
+| `text-on-accent` | type on a cobalt fill | white, 6.4:1. Never `text-canvas` on `bg-accent` (3.2:1). |
+| `text-accent` | brand cobalt as type | **display size only** (≥24px, or ≥18.5px bold) — 3.2:1 on Midnight |
 | `text-alarm` / `bg-alarm` | deep red `#c22e1f` — REC dot, destructive | |
 | `text-moss` | `#7fa654` — success / published | |
 | `text-signal` / `bg-signal` | acid lime `#e4fe00` | **admin in-flight states only.** Never on public pages — it appears nowhere in the reference. |
-| `bg-bone` | `#f4f2ed` | only via `data-surface="bone"` — **no page opts in today** |
+| `bg-bone` | `#eef1f6` | only via `data-surface="bone"` — **no page opts in today** |
+| `text-gilt` | moonlight `#9db7e6` (paper: `#3d5a8a`) | hidden layer only; the token kept its old name |
 
 Every `zinc-*` and `orange-*` utility is re-pointed at surface-aware slots, so adding
 `data-surface="bone"` to any wrapper inverts that whole subtree with no other changes. `orange-*` is
@@ -120,6 +127,7 @@ Rules observed in the reference:
 npm run lint          # tsc --noEmit, must be clean
 npm run build         # must succeed
 grep -rn "#0a0a09\|orange-[0-9]\|images.unsplash" src/   # must return nothing
+grep -rnE "(^|[^-])text-accent([^-]|$)" src/ --include=*.tsx  # only display-size type
 ```
 
 Plus: no `console` noise, no horizontal scrollbar at 320px, and every new interactive element

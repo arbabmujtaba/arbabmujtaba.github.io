@@ -82,7 +82,7 @@ export default function Navigation({ activeView, setView }: NavigationProps) {
                 />
                 <span
                   className={`font-mono text-[6.5px] leading-none tracking-[0.06em] min-[360px]:text-[7px] min-[390px]:text-[8px] ${
-                    isActive ? 'text-accent' : 'text-zinc-600'
+                    isActive ? 'text-accent-ink' : 'text-zinc-600'
                   }`}
                 >
                   {item.num}

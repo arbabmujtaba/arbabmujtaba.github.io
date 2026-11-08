@@ -31,9 +31,9 @@ export function getLiveEditBridgeScript(): string {
         transition: outline 0.15s ease;
       }
       .\${SELECTED_CLASS} {
-        outline: 2px solid rgba(249, 115, 22, 0.8) !important;
+        outline: 2px solid rgba(21, 88, 201, 0.85) !important;
         outline-offset: 2px !important;
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15) !important;
+        box-shadow: 0 0 0 4px rgba(21, 88, 201, 0.18) !important;
       }
       body *:not(input):not(textarea):not(select):not(button) { cursor: crosshair !important; }
     \`;

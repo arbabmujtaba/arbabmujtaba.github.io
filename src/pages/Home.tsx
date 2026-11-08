@@ -95,7 +95,7 @@ function SeeAll({ onClick, children }: { onClick: () => void; children: React.Re
     <button
       type="button"
       onClick={onClick}
-      className="group inline-flex min-h-[44px] items-center gap-2 self-start font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-accent md:self-auto"
+      className="group inline-flex min-h-[44px] items-center gap-2 self-start font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-400 transition-colors hover:text-accent-ink md:self-auto"
     >
       {children}
       <span aria-hidden="true" className="transition-transform duration-500 group-hover:translate-x-1">
@@ -242,9 +242,9 @@ export default function Home({ setView }: HomeProps) {
                   <button
                     type="button"
                     onClick={() => setView(targetOf(gateway))}
-                    className="group inline-flex min-h-[44px] items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 transition-colors hover:text-accent md:text-xs"
+                    className="group inline-flex min-h-[44px] items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 transition-colors hover:text-accent-ink md:text-xs"
                   >
-                    <span className="text-zinc-500 group-hover:text-accent">{String(index + 1).padStart(2, '0')}/</span>
+                    <span className="text-zinc-500 group-hover:text-accent-ink">{String(index + 1).padStart(2, '0')}/</span>
                     {gateway.title}
                   </button>
                 </li>
@@ -268,7 +268,7 @@ export default function Home({ setView }: HomeProps) {
           <Marquee duration={38}>
             {gateways.map((gateway, index) => (
               <span key={gateway.slug} className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-400">
-                <span className="text-accent">{String(index + 1).padStart(2, '0')}/</span>
+                <span className="text-accent-ink">{String(index + 1).padStart(2, '0')}/</span>
                 {gateway.label?.replace(/^\d+\s*\/\/\s*/, '') || gateway.title}
                 <span aria-hidden="true" className="text-zinc-700">
                   &mdash;
@@ -282,11 +282,11 @@ export default function Home({ setView }: HomeProps) {
         <Section>
           <RecLabel>the index</RecLabel>
           <p className="mt-8 max-w-5xl font-display text-3xl font-medium leading-[1.14] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-[3.6rem]">
-            So far: <CountUp value={projects.length} className="text-accent" /> things built and shipped,{' '}
-            <CountUp value={photography.length} className="text-accent" /> frames{' '}
+            So far: <CountUp value={projects.length} className="text-accent-ink" /> things built and shipped,{' '}
+            <CountUp value={photography.length} className="text-accent-ink" /> frames{' '}
             <span className="font-book font-normal italic tracking-[-0.02em] text-zinc-300">I keep going back to</span>,{' '}
-            <CountUp value={journal.length} className="text-accent" /> volumes of the journal, and{' '}
-            <CountUp value={favorites.length} className="text-accent" /> small notes{' '}
+            <CountUp value={journal.length} className="text-accent-ink" /> volumes of the journal, and{' '}
+            <CountUp value={favorites.length} className="text-accent-ink" /> small notes{' '}
             <span className="font-book font-normal italic tracking-[-0.02em] text-zinc-300">worth keeping</span>.
           </p>
           <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">

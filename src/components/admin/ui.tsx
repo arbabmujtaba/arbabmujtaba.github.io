@@ -201,7 +201,7 @@ export function Slider({
   );
 }
 
-const SWATCHES = ['#e2612f', '#f0b429', '#7fa654', '#3aa6a0', '#5b8def', '#9b6ef3', '#e5509a', '#f4f2ed', '#1a1a18'];
+const SWATCHES = ['#1558c9', '#e2612f', '#f0b429', '#7fa654', '#3aa6a0', '#9b6ef3', '#e5509a', '#eef1f6', '#030407'];
 
 /** A colour picker that accepts any valid CSS colour, with quick swatches. */
 export function ColorField({
@@ -220,7 +220,7 @@ export function ColorField({
   const [draft, setDraft] = useState(value ?? '');
   useEffect(() => setDraft(value ?? ''), [value]);
   const valid = !draft || isValidCSSColor(draft);
-  const hex = /^#[0-9a-f]{6}$/i.test(value ?? '') ? (value as string) : '#e2612f';
+  const hex = /^#[0-9a-f]{6}$/i.test(value ?? '') ? (value as string) : '#1558c9';
 
   const commit = (next: string) => {
     setDraft(next);
@@ -350,7 +350,7 @@ export function TagInput({
             <button
               key={suggestion}
               type="button"
-              className="st-chip cursor-pointer !bg-transparent transition-colors hover:!border-[var(--accent)] hover:!text-[var(--accent)]"
+              className="st-chip cursor-pointer !bg-transparent transition-colors hover:!border-[var(--accent)] hover:!text-[var(--accent-ink)]"
               onClick={() => onChange([...values, suggestion])}
             >
               <Plus size={10} />

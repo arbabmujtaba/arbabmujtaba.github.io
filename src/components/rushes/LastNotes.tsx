@@ -143,7 +143,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
             {/* tape — no backdrop blur: on a moving sheet it re-samples what's behind every frame */}
             <span
               aria-hidden="true"
-              className="absolute left-1/2 top-[-6px] h-7 w-28 -translate-x-1/2 rotate-[-2deg] bg-[rgba(226,97,47,0.22)]"
+              className="absolute left-1/2 top-[-6px] h-7 w-28 -translate-x-1/2 rotate-[-2deg] bg-accent/25"
               style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.06)' }}
             />
             {/* faint ruling */}
@@ -186,7 +186,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 220 14"
-                    className="mt-3 block h-3 w-44 text-accent"
+                    className="mt-3 block h-3 w-44 text-accent-ink"
                     fill="none"
                   >
                     <path
@@ -260,7 +260,7 @@ export default function LastNotes({ notes, className = '', duration = 9000, intr
                   type="button"
                   onClick={() => go(delta)}
                   aria-label={label}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-800 text-zinc-300 transition hover:border-accent hover:bg-accent hover:text-canvas focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-800 text-zinc-300 transition hover:border-accent hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                 >
                   <Icon size={17} strokeWidth={1.6} />
                 </button>

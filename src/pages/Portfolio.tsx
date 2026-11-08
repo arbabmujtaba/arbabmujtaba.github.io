@@ -209,7 +209,7 @@ export default function Portfolio() {
             {technicalSkills.map((section, index) => (
               <div key={section.category} className="min-w-0">
                 <h3 className="flex items-baseline gap-3 border-b border-zinc-800 pb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400">
-                  <span className="text-accent">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="text-accent-ink">{String(index + 1).padStart(2, '0')}</span>
                   <span className="min-w-0 break-words">{section.category}</span>
                 </h3>
                 <div className="mt-5 flex flex-wrap gap-2">

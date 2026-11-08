@@ -65,7 +65,7 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
         >
           <AppLink
             to={indexPath}
-            className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent"
+            className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-accent-ink"
           >
             <ArrowLeft
               size={13}

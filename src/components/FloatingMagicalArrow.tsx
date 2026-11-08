@@ -108,7 +108,7 @@ export default function FloatingMagicalArrow() {
             <motion.div
               animate={{ rotate: isAtBottom ? 180 : 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              className="pointer-events-none relative z-10 flex items-center justify-center text-accent transition-colors duration-300 group-hover:text-zinc-50"
+              className="pointer-events-none relative z-10 flex items-center justify-center text-accent-ink transition-colors duration-300 group-hover:text-zinc-50"
             >
               <Sparkle className="absolute -right-3 -top-2 h-3.5 w-3.5 opacity-60" />
               <ChevronDown className="h-10 w-10" strokeWidth={1} />

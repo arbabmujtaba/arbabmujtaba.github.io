@@ -9,7 +9,7 @@ const TIP = { stiffness: 620, damping: 34, mass: 0.35 };
 const HALO = { stiffness: 130, damping: 18, mass: 0.7 };
 
 /**
- * CursorWand — a small ember dot that follows the pointer, with a slower halo
+ * CursorWand — a small cobalt dot that follows the pointer, with a slower halo
  * trailing behind it.
  *
  * Two layers rather than one: the tip tracks tightly so it reads as attached to

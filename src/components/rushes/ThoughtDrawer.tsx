@@ -54,7 +54,7 @@ export default function ThoughtDrawer({ className = '' }: { className?: string }
                     event.preventDefault();
                     navigate(thought.href!);
                   }}
-                  className="underline-offset-4 hover:text-accent hover:underline"
+                  className="underline-offset-4 hover:text-accent-ink hover:underline"
                 >
                   {thought.source} →
                 </a>
@@ -69,7 +69,7 @@ export default function ThoughtDrawer({ className = '' }: { className?: string }
         <button
           type="button"
           onClick={pull}
-          className="inline-flex min-h-[48px] items-center gap-3 rounded-full border border-zinc-700 px-6 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-100 transition-colors hover:border-accent hover:bg-accent hover:text-canvas"
+          className="inline-flex min-h-[48px] items-center gap-3 rounded-full border border-zinc-700 px-6 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-100 transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
         >
           <span aria-hidden="true">❦</span> another thought
         </button>

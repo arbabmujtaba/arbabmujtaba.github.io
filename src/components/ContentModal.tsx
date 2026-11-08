@@ -133,7 +133,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
     return (
       <div className="border border-zinc-800/60 bg-zinc-950/60 rounded-lg overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800/40">
-          <Music className="w-3.5 h-3.5 text-orange-500" />
+          <Music className="w-3.5 h-3.5 text-accent-ink" />
           <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">Now Playing</span>
           {songTitle && <span className="font-sans text-xs text-zinc-400 ml-auto">{songTitle}</span>}
         </div>
@@ -162,7 +162,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <Music className="w-3 h-3 text-orange-500 shrink-0" />
+            <Music className="w-3 h-3 text-accent-ink shrink-0" />
             <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">Now Playing</span>
           </div>
           {songTitle && <p className="font-sans text-sm text-zinc-200 truncate">{songTitle}</p>}
@@ -173,7 +173,7 @@ function MusicPlayer({ music }: { music: NonNullable<PostCustomization['music']>
             href={songUrl}
             target="_blank"
             rel="noreferrer"
-            className="p-1.5 text-zinc-500 hover:text-orange-500 transition-colors shrink-0"
+            className="p-1.5 text-zinc-500 hover:text-accent-ink transition-colors shrink-0"
             title="Open link"
           >
             <ExternalLink className="w-3.5 h-3.5" />
@@ -388,7 +388,7 @@ export default function ContentModal({
       }`}
     >
       <div className="flex items-center gap-4">
-        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded">
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-accent-ink bg-accent/10 px-2.5 py-1 rounded">
           {category}
         </span>
         {date && (
@@ -538,7 +538,7 @@ export default function ContentModal({
                   <ol className="flex flex-wrap gap-x-5 gap-y-3">
                     {metadata.techStack.map((tech, idx) => (
                       <li key={tech} className="flex items-baseline gap-2">
-                        <span className="font-mono text-[10px] text-accent">{String(idx + 1).padStart(2, '0')}</span>
+                        <span className="font-mono text-[10px] text-accent-ink">{String(idx + 1).padStart(2, '0')}</span>
                         <span className="font-display text-lg font-medium tracking-[-0.02em] text-zinc-100">{tech}</span>
                       </li>
                     ))}
@@ -555,7 +555,7 @@ export default function ContentModal({
                     href={metadata.githubLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="group inline-flex min-h-[40px] items-center justify-between gap-3 border-b border-zinc-800 font-display text-base text-zinc-100 transition-colors hover:border-accent hover:text-accent"
+                    className="group inline-flex min-h-[40px] items-center justify-between gap-3 border-b border-zinc-800 font-display text-base text-zinc-100 transition-colors hover:border-accent hover:text-accent-ink"
                   >
                     Source on GitHub
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -566,7 +566,7 @@ export default function ContentModal({
                     href={metadata.liveLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="group inline-flex min-h-[40px] items-center justify-between gap-3 border-b border-zinc-800 font-display text-base text-zinc-100 transition-colors hover:border-accent hover:text-accent"
+                    className="group inline-flex min-h-[40px] items-center justify-between gap-3 border-b border-zinc-800 font-display text-base text-zinc-100 transition-colors hover:border-accent hover:text-accent-ink"
                   >
                     Open the live build
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />

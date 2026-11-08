@@ -1160,7 +1160,7 @@ function CollectionFields({
               <button
                 key={place}
                 type="button"
-                className="st-chip cursor-pointer !bg-transparent transition-colors hover:!border-[var(--accent)] hover:!text-[var(--accent)]"
+                className="st-chip cursor-pointer !bg-transparent transition-colors hover:!border-[var(--accent)] hover:!text-[var(--accent-ink)]"
                 onClick={() => patch({ place })}
               >
                 {place}

@@ -107,7 +107,7 @@ function WandEffects() {
           life: 0,
           max: 520 + Math.random() * 520,
           size: 0.6 + Math.random() * 1.6,
-          hue: 38 + Math.random() * 14,
+          hue: 212 + Math.random() * 14,
         });
       }
       if (!frame) frame = requestAnimationFrame(tick);
@@ -295,7 +295,7 @@ function WandEffects() {
             transition={{ duration: 0.8, ease: EASE }}
             style={{
               background:
-                'radial-gradient(circle 260px at var(--lx, 50%) var(--ly, 50%), color-mix(in srgb, var(--gilt) 14%, transparent) 0%, transparent 55%, rgba(8, 6, 3, 0.42) 100%)',
+                'radial-gradient(circle 260px at var(--lx, 50%) var(--ly, 50%), color-mix(in srgb, var(--gilt) 14%, transparent) 0%, transparent 55%, rgba(1, 2, 5, 0.42) 100%)',
             }}
           />
         )}
@@ -502,7 +502,7 @@ function SpellHandler() {
     // eslint-disable-next-line no-console
     console.log(
       `%c✦ ${title}%c\n${body}`,
-      'font: italic 16px Georgia, serif; color: #d9b46a; padding: 6px 0;',
+      'font: italic 16px Georgia, serif; color: #9db7e6; padding: 6px 0;',
       'font: 12px ui-monospace, monospace; color: #9a9a9e;'
     );
   }, []);

@@ -58,9 +58,9 @@ export default function WaxSeal() {
         <svg viewBox="0 0 40 40" className="h-full w-full" aria-hidden="true">
           <defs>
             <radialGradient id="wax" cx="38%" cy="32%" r="70%">
-              <stop offset="0%" stopColor="#c8532c" />
-              <stop offset="70%" stopColor="#8c2c14" />
-              <stop offset="100%" stopColor="#5e1a0b" />
+              <stop offset="0%" stopColor="#3f7ce0" />
+              <stop offset="70%" stopColor="#1558c9" />
+              <stop offset="100%" stopColor="#0a2f72" />
             </radialGradient>
           </defs>
           <g style={{ transformOrigin: '20px 20px', transform: broken ? 'rotate(-14deg) translate(-2px, 1px)' : undefined, transition: 'transform 0.8s' }}>
@@ -69,12 +69,12 @@ export default function WaxSeal() {
               transform="translate(0 6) scale(1 0.86)"
               fill="url(#wax)"
             />
-            <circle cx="20" cy="20" r="9" fill="none" stroke="#e7a17f" strokeOpacity="0.45" strokeWidth="0.8" />
-            <text x="20" y="23.4" textAnchor="middle" fontFamily="EB Garamond, Georgia, serif" fontStyle="italic" fontSize="9.5" fill="#f2c4a8" fillOpacity="0.85">
+            <circle cx="20" cy="20" r="9" fill="none" stroke="#9cc0ff" strokeOpacity="0.45" strokeWidth="0.8" />
+            <text x="20" y="23.4" textAnchor="middle" fontFamily="EB Garamond, Georgia, serif" fontStyle="italic" fontSize="9.5" fill="#d6e4ff" fillOpacity="0.85">
               AM
             </text>
             {CRACKS.slice(0, Math.max(0, knocks - 1)).map((d) => (
-              <path key={d} d={d} stroke="#2b0d05" strokeWidth="0.8" fill="none" strokeLinecap="round" />
+              <path key={d} d={d} stroke="#04112b" strokeWidth="0.8" fill="none" strokeLinecap="round" />
             ))}
           </g>
         </svg>

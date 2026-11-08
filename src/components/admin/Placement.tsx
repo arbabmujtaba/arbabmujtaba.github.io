@@ -25,7 +25,7 @@ function PriorityChip({ priority }: { priority?: number }) {
     <span
       className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
         featured
-          ? 'border-[var(--accent)] text-[var(--accent)]'
+          ? 'border-[var(--accent)] text-[var(--accent-ink)]'
           : priority === undefined
             ? 'border-zinc-700 text-zinc-500'
             : 'border-zinc-600 text-zinc-300'
@@ -47,7 +47,7 @@ function SpotList({ placement }: { placement: Placement }) {
           <span className="min-w-0">
             <span className="font-medium text-zinc-100">{spot.page}</span>
             <span className="text-zinc-500"> · {spot.where} — </span>
-            <span className={spot.prominent ? 'text-[var(--accent)]' : 'text-zinc-300'}>{spot.detail}</span>
+            <span className={spot.prominent ? 'text-[var(--accent-ink)]' : 'text-zinc-300'}>{spot.detail}</span>
           </span>
         </li>
       ))}
@@ -102,7 +102,7 @@ export function PlacementPanel({ form, items }: { form: FormState; items: ListIt
         onClick={toggle}
         data-tip="Where this entry will show on the site with the priority and date it has now — updates as you edit. Change it with Priority on the Content tab."
       >
-        <MapPin size={12} className="text-[var(--accent)]" aria-hidden />
+        <MapPin size={12} className="text-[var(--accent-ink)]" aria-hidden />
         <span className="st-eyebrow">Where it lands</span>
         <PriorityChip priority={placement.priority} />
         <span className="font-mono text-[10px] text-zinc-500">
@@ -128,7 +128,7 @@ export function PlacementSummary({ item, items }: { item: ListItem; items: ListI
   return (
     <div className="space-y-2 rounded-sm border border-zinc-800 bg-zinc-900/40 p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <MapPin size={12} className="text-[var(--accent)]" aria-hidden />
+        <MapPin size={12} className="text-[var(--accent-ink)]" aria-hidden />
         <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">Where it is</span>
         <PriorityChip priority={placement.priority} />
       </div>

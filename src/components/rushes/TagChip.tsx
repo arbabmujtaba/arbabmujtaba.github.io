@@ -7,7 +7,7 @@ interface TagChipProps {
 
 const TONES: Record<NonNullable<TagChipProps['tone']>, string> = {
   default: 'border-zinc-800 text-zinc-400',
-  accent: 'border-accent/40 text-accent',
+  accent: 'border-accent/40 text-accent-ink',
   signal: 'border-signal/40 text-signal',
 };
 

@@ -346,7 +346,7 @@ export default function PublishingModal({ isOpen, onClose, jobId }: PublishingMo
                         ) : isFailed ? (
                           <XCircle className="h-4 w-4 text-alarm" />
                         ) : isActive ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-accent" />
+                          <Loader2 className="h-4 w-4 animate-spin text-accent-ink" />
                         ) : (
                           <span className={`h-1.5 w-1.5 rounded-full ${isSkipped ? 'bg-zinc-600' : 'border border-zinc-700'}`} />
                         )}

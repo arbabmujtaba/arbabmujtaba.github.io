@@ -200,7 +200,7 @@ export default function MemoryMap({ chapters, photography, journal, reels, class
         <button
           type="button"
           onClick={() => setTracing((t) => t + 1)}
-          className="absolute bottom-4 left-4 min-h-[40px] rounded-full border border-[var(--rule-strong)] px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:border-accent hover:text-accent"
+          className="absolute bottom-4 left-4 min-h-[40px] rounded-full border border-[var(--rule-strong)] px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:border-accent hover:text-accent-ink"
         >
           trace the journey
         </button>
@@ -241,7 +241,7 @@ export default function MemoryMap({ chapters, photography, journal, reels, class
                           }}
                           className="group flex min-h-[48px] items-center justify-between gap-4 py-3"
                         >
-                          <span className="font-display text-lg tracking-[-0.02em] text-zinc-100 transition-colors group-hover:text-accent">{memory.title}</span>
+                          <span className="font-display text-lg tracking-[-0.02em] text-zinc-100 transition-colors group-hover:text-accent-ink">{memory.title}</span>
                           <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                             {memory.kind}
                             <ArrowUpRight size={12} />

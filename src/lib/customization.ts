@@ -306,6 +306,8 @@ export function getPostTheme(customization?: PostCustomization): PostTheme {
   const accent = getAccentColor(customization);
   if (accent) {
     vars['--accent'] = accent;
+    // A post's own accent is the owner's call: it colours small type too.
+    vars['--accent-ink'] = accent;
     vars['--accent-soft'] = `color-mix(in srgb, ${accent} 18%, transparent)`;
   }
 

@@ -184,12 +184,12 @@ export default function LivingJournal({ journal, photography, tech, className = 
                 </span>
               )}
               <span className="mt-5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                <span className="text-accent">{lead.kind}</span>
+                <span className="text-accent-ink">{lead.kind}</span>
                 <span aria-hidden="true">·</span>
                 <span>{when(lead.date)}</span>
                 {isNew(lead) && <span className="rounded-full border border-gilt/60 px-2 py-0.5 text-gilt">new</span>}
               </span>
-              <span className="mt-3 block font-display text-3xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-50 transition-colors group-hover:text-accent md:text-4xl">
+              <span className="mt-3 block font-display text-3xl font-medium leading-[1.05] tracking-[-0.04em] text-zinc-50 transition-colors group-hover:text-accent-ink md:text-4xl">
                 {lead.title}
               </span>
               {lead.line && <span className="mt-3 block max-w-lg font-book text-lg italic leading-snug text-zinc-400">{lead.line}</span>}
@@ -207,13 +207,13 @@ export default function LivingJournal({ journal, photography, tech, className = 
                 'group grid min-h-[64px] grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 py-5',
                 <>
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                    <span className="text-accent/90">{item.kind}</span>
+                    <span className="text-accent-ink/90">{item.kind}</span>
                     {isNew(item) && <span className="ml-2 text-gilt">· new</span>}
                   </span>
                   <span className="font-mono text-[10px] tracking-[0.12em] text-zinc-500">{when(item.date)}</span>
-                  <span className="col-span-2 flex items-center justify-between gap-4 font-display text-xl font-medium tracking-[-0.03em] text-zinc-100 transition-colors group-hover:text-accent">
+                  <span className="col-span-2 flex items-center justify-between gap-4 font-display text-xl font-medium tracking-[-0.03em] text-zinc-100 transition-colors group-hover:text-accent-ink">
                     {item.title}
-                    <ArrowUpRight size={15} className="shrink-0 text-zinc-500 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+                    <ArrowUpRight size={15} className="shrink-0 text-zinc-500 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-ink" />
                   </span>
                 </>
               )}

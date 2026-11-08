@@ -243,7 +243,7 @@ export default function Lightbox({ frames, openIndex, onClose, onNavigate }: Lig
                       if (frame.onOpenStory) frame.onOpenStory();
                       else navigate(frame.href!);
                     }}
-                    className="group inline-flex min-h-[44px] items-center gap-2 text-accent transition-colors hover:text-zinc-100"
+                    className="group inline-flex min-h-[44px] items-center gap-2 text-accent-ink transition-colors hover:text-zinc-100"
                   >
                     read the story
                     <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />

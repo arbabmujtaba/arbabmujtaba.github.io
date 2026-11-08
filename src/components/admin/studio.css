@@ -12,7 +12,7 @@
   --studio-sidebar: 15.5rem;
   --studio-radius: 6px;
   min-height: 100vh;
-  /* a little ember light in the far corner, so the workspace is not a flat slab */
+  /* a little cobalt light in the far corner, so the workspace is not a flat slab */
   background:
     radial-gradient(70rem 36rem at 100% -12%, var(--accent-soft), transparent 62%),
     radial-gradient(50rem 30rem at -10% 110%, color-mix(in srgb, var(--gilt) 6%, transparent), transparent 60%),

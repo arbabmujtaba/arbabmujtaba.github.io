@@ -227,7 +227,7 @@ export default function Palette({ onClose }: { onClose: () => void }) {
           <span>{results.length} found</span>
         </div>
         <label className="flex items-center gap-3 border-b border-zinc-800 px-4">
-          <span aria-hidden="true" className="font-mono text-sm text-accent">
+          <span aria-hidden="true" className="font-mono text-sm text-accent-ink">
             ›
           </span>
           <span className="sr-only">Search the archive, the spells and the light</span>
@@ -278,7 +278,7 @@ export default function Palette({ onClose }: { onClose: () => void }) {
                   <Glyph
                     name={item.glyph ?? 'door'}
                     size={15}
-                    className={item.group === 'spells' ? 'text-gilt' : isActive ? 'text-accent' : 'text-zinc-500'}
+                    className={item.group === 'spells' ? 'text-gilt' : isActive ? 'text-accent-ink' : 'text-zinc-500'}
                   />
                   <span className="min-w-0 flex-1 truncate text-sm">{item.label}</span>
                   {item.hint && (

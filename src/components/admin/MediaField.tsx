@@ -120,7 +120,7 @@ function Dropzone({
       />
       {busy ? (
         <>
-          <Loader2 size={20} className="animate-spin text-[var(--accent)]" />
+          <Loader2 size={20} className="animate-spin text-[var(--accent-ink)]" />
           <div className="w-40">{progress !== null && <ProgressBar value={progress} />}</div>
           <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
             {progress !== null && progress < 1 ? `uploading ${Math.round(progress * 100)}%` : 'processing…'}
@@ -207,7 +207,7 @@ export function MediaField({
             )}
             {busy && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70">
-                <Loader2 size={18} className="animate-spin text-[var(--accent)]" />
+                <Loader2 size={18} className="animate-spin text-[var(--accent-ink)]" />
                 <div className="w-32">{progress !== null && <ProgressBar value={progress} />}</div>
               </div>
             )}
@@ -351,7 +351,7 @@ export function ClipField({
               )}
               {clip.busy && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70">
-                  <Loader2 size={18} className="animate-spin text-[var(--accent)]" />
+                  <Loader2 size={18} className="animate-spin text-[var(--accent-ink)]" />
                   <div className="w-32">{clip.progress !== null && <ProgressBar value={clip.progress} />}</div>
                 </div>
               )}

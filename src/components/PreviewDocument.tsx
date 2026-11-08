@@ -46,7 +46,7 @@ export function PreviewDocument({ frontmatter, body, collection }: PreviewDocume
         {/* Category + Date badge */}
         <div className="flex items-center gap-4">
           {category && (
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-orange-500 bg-orange-500/10 px-2.5 py-1 rounded">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-accent-ink bg-accent/10 px-2.5 py-1 rounded">
               {category}
             </span>
           )}

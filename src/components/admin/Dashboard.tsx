@@ -112,7 +112,7 @@ export function Dashboard({
     { label: 'Live', value: stats.live, hint: 'Showing on the site', tone: 'text-emerald-400', go: { state: 'live' } },
     { label: 'Drafts', value: stats.draft + stats.review, hint: 'Saved, not published', tone: 'text-amber-400', go: { state: 'draft' } },
     { label: 'Hidden', value: stats.hidden, hint: 'Switched off', tone: 'text-zinc-400', go: { state: 'hidden' } },
-    { label: 'Reels', value: stats.reels, hint: 'On the Home page', tone: 'text-[var(--accent)]', go: { section: 'home', query: 'reel' } },
+    { label: 'Reels', value: stats.reels, hint: 'On the Home page', tone: 'text-[var(--accent-ink)]', go: { section: 'home', query: 'reel' } },
   ];
 
   return (
@@ -167,7 +167,7 @@ export function Dashboard({
                   onClick={() => onNew(collection)}
                   className="group bg-[var(--bg-raised)] p-4 text-left transition hover:bg-[var(--well)]"
                 >
-                  <Icon size={16} className="text-zinc-500 transition group-hover:text-[var(--accent)]" />
+                  <Icon size={16} className="text-zinc-500 transition group-hover:text-[var(--accent-ink)]" />
                   <p className="mt-3 text-[0.8125rem] text-zinc-100">{label}</p>
                   <p className="text-[0.6875rem] text-zinc-500">{blurb}</p>
                 </button>

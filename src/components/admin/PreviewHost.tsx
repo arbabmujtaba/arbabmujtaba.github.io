@@ -391,7 +391,7 @@ function TimelineCard({ payload }: { payload: PreviewPayload }) {
       <SectionLabel>Timeline chapter — on the Home page</SectionLabel>
       <div className="max-w-2xl border-l-2 border-[var(--accent)] pl-6">
         <p className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          <span className="text-[var(--accent)]">{payload.year || '––––'}</span>
+          <span className="text-[var(--accent-ink)]">{payload.year || '––––'}</span>
           {payload.place && (
             <>
               <span aria-hidden>·</span>
@@ -436,7 +436,7 @@ function TextBlockCard({ payload }: { payload: PreviewPayload }) {
           </div>
         )}
         {payload.label && (
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-accent">{payload.label}</p>
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-accent-ink">{payload.label}</p>
         )}
         <h3 className="font-display text-2xl font-medium leading-tight tracking-[-0.035em] text-zinc-100">
           {payload.title}

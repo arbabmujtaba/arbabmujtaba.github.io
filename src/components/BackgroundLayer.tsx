@@ -122,7 +122,7 @@ function paintMap(canvas: HTMLCanvasElement, contours: Contour[], t: number): bo
   const root = document.documentElement;
   const day = root.dataset.theme === 'day';
   const styles = getComputedStyle(root);
-  const ink = styles.getPropertyValue('--gilt').trim() || '#d9b46a';
+  const ink = styles.getPropertyValue('--gilt').trim() || '#9db7e6';
   const mono = styles.getPropertyValue('--font-mono').trim() || 'monospace';
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -381,13 +381,13 @@ function Drift({
  * BackgroundLayer — the atmosphere behind every page.
  *
  * A survey map of the journey: contour lines around two summits, Sopore and
- * Indore, in gilt at night and sepia ink on paper by day. The terrain draws
+ * Indore, in moonlight at night and blue-black ink on paper by day. The terrain draws
  * itself in once, then turns and settles slowly as the page is read, and
  * leans a little toward the cursor.
  *
- * Night adds the sky in three depths and two pools of light — ember and old
- * gold — that drift down the page as you scroll. Day keeps the warm window and
- * a little dust floating in it.
+ * Night adds the sky in three depths and two pools of light — cobalt and
+ * moonlight — that drift down the page as you scroll. Day keeps the window
+ * light and a little dust floating in it.
  *
  * Performance contract: after the draw-in, nothing here repaints. Every
  * per-frame change is a transform of an already-rasterised layer (the map is a
@@ -464,7 +464,7 @@ export default function BackgroundLayer() {
         className="day-only absolute -left-40 -top-40 h-[52rem] w-[52rem] rounded-full will-change-transform"
         style={{
           y: live ? sunY : 0,
-          background: 'radial-gradient(circle, rgba(255, 236, 196, 0.85) 0%, rgba(255, 236, 196, 0) 65%)',
+          background: 'radial-gradient(circle, rgba(214, 228, 255, 0.85) 0%, rgba(214, 228, 255, 0) 65%)',
         }}
       />
 

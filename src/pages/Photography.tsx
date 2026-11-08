@@ -374,13 +374,13 @@ export default function Photography() {
             className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
           >
             <span>
-              <span className="text-accent">{allPhotos.length}</span> plates
+              <span className="text-accent-ink">{allPhotos.length}</span> plates
             </span>
             <span aria-hidden="true" className="text-zinc-700">
               /
             </span>
             <span>
-              <span className="text-accent">{storyCategories.length + (favorites.length ? 1 : 0)}</span>{' '}
+              <span className="text-accent-ink">{storyCategories.length + (favorites.length ? 1 : 0)}</span>{' '}
               categories
             </span>
             <span aria-hidden="true" className="text-zinc-700">
@@ -612,7 +612,7 @@ export default function Photography() {
                     transition={{ duration: 0.8, delay: index * 0.08, ease: EASE }}
                     className="border border-zinc-800 bg-canvas-raised p-6"
                   >
-                    <div className="flex items-center gap-3 text-accent">
+                    <div className="flex items-center gap-3 text-accent-ink">
                       <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                       <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
                         {category}

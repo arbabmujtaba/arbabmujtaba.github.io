@@ -156,7 +156,7 @@ export default function HeaderControls() {
                     active ? 'bg-well text-zinc-50' : 'text-zinc-300 hover:bg-well hover:text-zinc-50'
                   }`}
                 >
-                  <Glyph name={option.glyph} size={16} className={active ? 'text-accent' : 'text-zinc-500'} />
+                  <Glyph name={option.glyph} size={16} className={active ? 'text-accent-ink' : 'text-zinc-500'} />
                   <span className="flex-1">
                     <span className="block text-sm">{option.label}</span>
                     <span className="block font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-500">{option.note}</span>

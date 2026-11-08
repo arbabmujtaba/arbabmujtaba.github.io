@@ -70,7 +70,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                 type="button"
                 onClick={() => step(delta)}
                 aria-label={label}
-                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-canvas/60 text-zinc-100 opacity-70 backdrop-blur-sm transition hover:bg-accent hover:text-canvas hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-canvas/60 text-zinc-100 opacity-70 backdrop-blur-sm transition hover:bg-accent hover:text-on-accent hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 <Icon size={18} strokeWidth={1.6} />
               </button>
@@ -145,7 +145,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                       <span className="absolute inset-0 flex items-center justify-center">
                         <span
                           className={`flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition ${
-                            selected ? 'bg-accent text-canvas' : 'bg-canvas/60 text-zinc-100 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
+                            selected ? 'bg-accent text-on-accent' : 'bg-canvas/60 text-zinc-100 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
                           }`}
                         >
                           {selected ? (
@@ -167,7 +167,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                       </span>
                     </span>
                     <span className="mt-3 flex items-baseline gap-2.5">
-                      <span className={`font-mono text-[10px] ${selected ? 'text-accent' : 'text-zinc-500'}`}>
+                      <span className={`font-mono text-[10px] ${selected ? 'text-accent-ink' : 'text-zinc-500'}`}>
                         R{String(index + 1).padStart(2, '0')}
                       </span>
                       <span

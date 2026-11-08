@@ -354,7 +354,7 @@ export function ReelPublisher({
                         : 'border-zinc-800 bg-[var(--bg-deep)] hover:border-zinc-600'
                     }`}
                   >
-                    <Icon size={16} className={active ? 'text-[var(--accent)]' : 'text-zinc-500'} />
+                    <Icon size={16} className={active ? 'text-[var(--accent-ink)]' : 'text-zinc-500'} />
                     <p className="mt-2.5 text-[0.8125rem] font-medium text-zinc-100">{name}</p>
                     <p className="mt-1 text-[0.6875rem] leading-snug text-zinc-500">{blurb}</p>
                   </button>
@@ -441,7 +441,7 @@ export function ReelPublisher({
                         </span>
                       </span>
                       <StandingBadge item={item} />
-                      {active && <Check size={14} className="text-[var(--accent)]" />}
+                      {active && <Check size={14} className="text-[var(--accent-ink)]" />}
                     </button>
                   );
                 })}
@@ -508,13 +508,13 @@ export function ReelPublisher({
             <p className="mt-1.5 text-[0.8125rem] text-zinc-200">
               {target === 'reel' && (
                 <>
-                  Home page › <span className="text-[var(--accent)]">Frames that keep moving</span>
+                  Home page › <span className="text-[var(--accent-ink)]">Frames that keep moving</span>
                 </>
               )}
-              {target === 'attach' && (pickedItem ? <>On the page of <span className="text-[var(--accent)]">{pickedItem.title}</span></> : 'Pick an entry to see where.')}
+              {target === 'attach' && (pickedItem ? <>On the page of <span className="text-[var(--accent-ink)]">{pickedItem.title}</span></> : 'Pick an entry to see where.')}
               {target === 'post' && (
                 <>
-                  A new <span className="text-[var(--accent)]">{destinationFor(kind)?.label.toLowerCase()}</span> on{' '}
+                  A new <span className="text-[var(--accent-ink)]">{destinationFor(kind)?.label.toLowerCase()}</span> on{' '}
                   {destinationFor(kind)?.listPath}
                 </>
               )}

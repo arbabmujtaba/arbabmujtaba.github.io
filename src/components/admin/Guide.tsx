@@ -294,7 +294,7 @@ function GuideDrawer({ onClose, onGo }: { onClose: () => void; onGo: (view: Guid
       >
         <header className="flex-none border-b border-zinc-800 px-5 py-4">
           <div className="flex items-center gap-3">
-            <BookOpen size={16} className="text-[var(--accent)]" aria-hidden />
+            <BookOpen size={16} className="text-[var(--accent-ink)]" aria-hidden />
             <h2 id="studio-guide-title" className="st-title flex-1 text-lg">
               Everything the hub can do
             </h2>
@@ -327,7 +327,7 @@ function GuideDrawer({ onClose, onGo }: { onClose: () => void; onGo: (view: Guid
                   {section.title}
                 </h3>
                 {section.view && (
-                  <button type="button" className="inline-flex items-center gap-1 text-[0.6875rem] text-[var(--accent)] hover:underline" onClick={() => onGo(section.view!)}>
+                  <button type="button" className="inline-flex items-center gap-1 text-[0.6875rem] text-[var(--accent-ink)] hover:underline" onClick={() => onGo(section.view!)}>
                     Go there <ArrowRight size={11} />
                   </button>
                 )}

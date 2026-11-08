@@ -27,7 +27,7 @@ export default function EndOfVolume() {
 
   return (
     <div ref={ref} className="mt-16 pb-4 text-center">
-      <div className="fleuron mx-auto max-w-xs text-sm text-accent" aria-hidden="true">
+      <div className="fleuron mx-auto max-w-xs text-sm text-accent-ink" aria-hidden="true">
         ❦
       </div>
       <p className="mt-4 font-book text-lg italic text-zinc-400">end of the volume</p>

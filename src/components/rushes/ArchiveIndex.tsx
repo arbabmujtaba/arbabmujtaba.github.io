@@ -68,7 +68,7 @@ export default function ArchiveIndex({ doors, className = '' }: { doors: Archive
                   <span className="truncate font-mono text-[9px] uppercase tracking-[0.2em] text-gilt">{door.role}</span>
                 )}
               </span>
-              <span className="mt-1 block font-book text-[1.75rem] italic leading-none text-zinc-50 transition-colors group-active:text-accent group-focus-visible:text-accent">
+              <span className="mt-1 block font-book text-[1.75rem] italic leading-none text-zinc-50 transition-colors group-active:text-accent-ink group-focus-visible:text-accent-ink">
                 {door.title}
               </span>
               {door.description && (
@@ -78,7 +78,7 @@ export default function ArchiveIndex({ doors, className = '' }: { doors: Archive
               )}
             </span>
 
-            <ArrowUpRight size={18} aria-hidden="true" className="text-zinc-500 transition-colors group-active:text-accent" />
+            <ArrowUpRight size={18} aria-hidden="true" className="text-zinc-500 transition-colors group-active:text-accent-ink" />
           </a>
         </motion.li>
       ))}

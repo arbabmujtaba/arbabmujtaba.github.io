@@ -65,7 +65,7 @@ export default function NumberedItem({
         </span>
       )}
 
-      <span className="w-7 shrink-0 pt-2 font-mono text-[11px] leading-none text-zinc-500 transition-colors group-hover/item:text-accent">
+      <span className="w-7 shrink-0 pt-2 font-mono text-[11px] leading-none text-zinc-500 transition-colors group-hover/item:text-accent-ink">
         {number}
       </span>
 
@@ -80,7 +80,7 @@ export default function NumberedItem({
       )}
 
       {meta && (
-        <span className="shrink-0 font-display text-xl font-medium text-accent md:text-3xl">
+        <span className="shrink-0 font-display text-xl font-medium text-accent-ink md:text-3xl">
           {meta}
         </span>
       )}

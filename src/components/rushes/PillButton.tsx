@@ -29,8 +29,8 @@ export default function PillButton({
     'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-6 font-mono text-[11px] uppercase tracking-[0.16em] transition-all duration-300';
 
   const tones = {
-    solid: 'bg-accent text-canvas hover:brightness-110',
-    ghost: 'border border-zinc-700 text-zinc-200 hover:border-accent hover:text-accent',
+    solid: 'bg-accent text-on-accent hover:brightness-110',
+    ghost: 'border border-zinc-700 text-zinc-200 hover:border-accent hover:text-accent-ink',
   } as const;
 
   const classes = `${base} ${tones[tone]} ${className}`;

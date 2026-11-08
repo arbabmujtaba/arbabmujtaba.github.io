@@ -100,7 +100,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
     switch (s) {
       case 'success': return 'text-green-400';
       case 'failed': return 'text-red-400';
-      case 'building': return 'text-accent';
+      case 'building': return 'text-accent-ink';
       default: return 'text-zinc-400';
     }
   };
@@ -118,7 +118,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
     switch (s) {
       case 'success': return <CheckCircle2 className="w-5 h-5 text-green-400" />;
       case 'failed': return <XCircle className="w-5 h-5 text-red-400" />;
-      case 'building': return <Loader2 className="w-5 h-5 text-accent animate-spin" />;
+      case 'building': return <Loader2 className="w-5 h-5 text-accent-ink animate-spin" />;
       default: return <Clock className="w-5 h-5 text-zinc-400" />;
     }
   };
@@ -127,7 +127,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
     return (
       <div className="flex items-center justify-center h-full">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[var(--accent-ink)] animate-spin" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Loading deployment data…</span>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
       {/* Header */}
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-3">
-          <Rocket className="w-6 h-6 text-[var(--accent)]" aria-hidden />
+          <Rocket className="w-6 h-6 text-[var(--accent-ink)]" aria-hidden />
           <h1 className="st-title text-[2.25rem] leading-tight">Deployment Center</h1>
         </div>
         <p className="font-sans text-xs text-zinc-500 font-light max-w-lg">
@@ -185,7 +185,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
           <span className="st-eyebrow block mb-3">Pending</span>
           <span className="st-title text-3xl font-medium text-zinc-100">{status?.stats.pendingCount || 0}</span>
           {(status?.stats.pendingCount ?? 0) > 0 && (
-            <Loader2 className="w-4 h-4 text-[var(--accent)] animate-spin mt-2" />
+            <Loader2 className="w-4 h-4 text-[var(--accent-ink)] animate-spin mt-2" />
           )}
         </div>
 
@@ -243,7 +243,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                         <p className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] text-zinc-500">
                           <span>order {reel.order ?? 0}</span>
                           <span aria-hidden>·</span>
-                          <span className={isMain ? 'text-[var(--accent)]' : ''}>{isMain ? 'main plate' : 'strip'}</span>
+                          <span className={isMain ? 'text-[var(--accent-ink)]' : ''}>{isMain ? 'main plate' : 'strip'}</span>
                           {!reel.video && <span className="text-amber-400">no clip attached</span>}
                         </p>
                       </div>
@@ -311,7 +311,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {job.status === 'running' ? (
-                        <Loader2 className="w-4 h-4 text-accent animate-spin" />
+                        <Loader2 className="w-4 h-4 text-accent-ink animate-spin" />
                       ) : job.status === 'success' ? (
                         <CheckCircle2 className="w-4 h-4 text-green-400" />
                       ) : (
@@ -344,7 +344,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                             <div key={step.step} className="flex items-center gap-3">
                               {step.status === 'success' && <CheckCircle2 className="w-3 h-3 text-green-400 shrink-0" />}
                               {step.status === 'error' && <XCircle className="w-3 h-3 text-red-400 shrink-0" />}
-                              {step.status === 'running' && <Loader2 className="w-3 h-3 text-accent animate-spin shrink-0" />}
+                              {step.status === 'running' && <Loader2 className="w-3 h-3 text-accent-ink animate-spin shrink-0" />}
                               {step.status === 'pending' && <div className="w-3 h-3 rounded-full border border-zinc-700 shrink-0" />}
                               <span className="font-mono text-[10px] text-zinc-400 uppercase">{step.step}</span>
                               <span className="font-sans text-[10px] text-zinc-500 flex-1">{step.message}</span>
@@ -373,7 +373,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                   rel="noreferrer"
                   className="flex items-center gap-3 text-zinc-400 hover:text-white transition-colors group"
                 >
-                  <Globe className="w-4 h-4 text-zinc-500 group-hover:text-[var(--accent)] transition-colors" />
+                  <Globe className="w-4 h-4 text-zinc-500 group-hover:text-[var(--accent-ink)] transition-colors" />
                   <span className="font-sans text-xs">Website</span>
                   <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
                 </a>
@@ -385,7 +385,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
                   rel="noreferrer"
                   className="flex items-center gap-3 text-zinc-400 hover:text-white transition-colors group"
                 >
-                  <GitCommit className="w-4 h-4 text-zinc-500 group-hover:text-[var(--accent)] transition-colors" />
+                  <GitCommit className="w-4 h-4 text-zinc-500 group-hover:text-[var(--accent-ink)] transition-colors" />
                   <span className="font-sans text-xs">Repository</span>
                   <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
                 </a>
@@ -405,7 +405,7 @@ export default function DeploymentCenter({ items = [], onEditReel, onPublishReel
               )}
               {commits.map((commit) => (
                 <div key={commit.hash} className="flex items-start gap-3">
-                  <span className="font-mono text-[10px] text-[var(--accent)] bg-[var(--accent-soft)] px-1.5 py-0.5 rounded mt-0.5">
+                  <span className="font-mono text-[10px] text-[var(--accent-ink)] bg-[var(--accent-soft)] px-1.5 py-0.5 rounded mt-0.5">
                     {commit.hash}
                   </span>
                   <div className="min-w-0">
