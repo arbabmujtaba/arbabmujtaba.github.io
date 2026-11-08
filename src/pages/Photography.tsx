@@ -331,11 +331,11 @@ export default function Photography() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: isTouchDevice ? 0 : -18 }}
       transition={{ duration: isTouchDevice ? 0.2 : 0.8, ease: EASE }}
-      className="relative flex flex-grow flex-col overflow-hidden"
+      className="relative flex flex-grow flex-col clip-xy"
     >
       <div
         ref={containerRef}
-        className="page-shell custom-scrollbar relative z-10 flex-grow overflow-y-auto pt-0"
+        className="page-shell custom-scrollbar relative z-10 flex-grow pt-0"
       >
         {/* ===================== INTRO ===================== */}
         <div className="page-intro" data-mark="FRAMES">

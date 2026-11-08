@@ -38,9 +38,9 @@ export default function Journal() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: shouldReduceMotion || isTouchDevice ? 0.2 : 0.8, ease: EASE }}
-      className="relative flex h-full flex-grow flex-col overflow-hidden"
+      className="relative flex h-full flex-grow flex-col clip-xy"
     >
-      <div className="custom-scrollbar relative z-10 w-full flex-grow overflow-y-auto">
+      <div className="custom-scrollbar relative z-10 w-full flex-grow">
         <div className="flex min-h-full flex-col">
           <div className="page-shell">
             <header className="page-intro" data-mark="JOURNAL">

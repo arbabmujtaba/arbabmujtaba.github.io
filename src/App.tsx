@@ -178,7 +178,7 @@ export default function App() {
   return (
     <MagicProvider>
     <EntryNavigationProvider value={openEntry}>
-      <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 overflow-x-hidden">
+      <div className="min-h-screen bg-canvas text-zinc-100 flex flex-col relative box-border selection:bg-accent/30 clip-x">
         {!isAdmin && (
           <Suspense fallback={null}>
             <GlobalBackground />

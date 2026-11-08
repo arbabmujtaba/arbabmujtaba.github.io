@@ -72,9 +72,9 @@ export default function Tech() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: flatten ? 0.25 : 0.8, ease: EASE }}
-      className="relative flex flex-grow flex-col overflow-hidden"
+      className="relative flex flex-grow flex-col clip-xy"
     >
-      <div className="page-shell custom-scrollbar relative z-10 flex-grow overflow-y-auto pt-0">
+      <div className="page-shell custom-scrollbar relative z-10 flex-grow pt-0">
         {/* ===================== INTRO ===================== */}
         <div className="page-intro" data-mark="LOGS">
           <m.div

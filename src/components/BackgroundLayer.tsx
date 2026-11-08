@@ -437,8 +437,15 @@ export default function BackgroundLayer() {
     ? { x: leanX, y: mapTy, rotate: mapRotate, scale: mapScale }
     : { scale: 1.06 };
 
+  // Sticky, not fixed: a full-viewport plate pinned to the top of the window
+  // that takes no room in the flow (the negative margin cancels its height).
+  // It looks identical to `fixed inset-0`, but it stays in the page's own
+  // stacking order, so tools that snapshot the DOM — and anything else that
+  // treats fixed elements as an overlay — draw it behind the content instead
+  // of over it. `lvh` covers the largest viewport, so the plate never shows a
+  // gap while a phone's address bar collapses.
   return (
-    <div aria-hidden="true" className="film-grain pointer-events-none fixed inset-0 z-0 overflow-hidden bg-canvas">
+    <div aria-hidden="true" className="film-grain pointer-events-none sticky top-0 z-0 -mb-[100lvh] h-[100lvh] w-full shrink-0 overflow-hidden bg-canvas">
       {/* pools of light, night */}
       <m.div
         className="night-only absolute -right-48 -top-64 h-[52rem] w-[52rem] rounded-full will-change-transform"
