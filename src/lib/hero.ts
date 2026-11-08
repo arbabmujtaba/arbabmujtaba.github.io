@@ -15,7 +15,7 @@ import { getLocalWebpSources, ownerArchiveImage } from './image';
 import type { PostCustomization } from '../types';
 
 /** Assigned in `.kiro/IMAGE_MAP.md`: the darkest large photograph in the archive. */
-export const DEFAULT_HERO_IMAGE = '/uploads/photography/1785134270800-642096424.jpeg';
+export const DEFAULT_HERO_IMAGE = '/uploads/photography/1785134270800-642096424.webp';
 
 /**
  * The default frame is a portrait; `npm run hero:image` bakes a 3:2 band out of

@@ -3,7 +3,7 @@ title: "June's Unseen Symphony"
 slug: junes-unseen-symphony
 category: Thoughts
 date: '2026-06-28'
-featuredImage: /uploads/journal/1782633878697-150215554.jpg
+featuredImage: /uploads/journal/1782633878697-150215554.webp
 excerpt: Unconditional.
 volume: 2
 tags: ["Memory", "Longing"]

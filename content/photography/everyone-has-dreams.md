@@ -3,7 +3,7 @@ title: Everyone Has Dreams
 category: Favorites
 date: '2026-06-30'
 excerpt: Some capture them
-coverImage: /uploads/photography/1782815272929-728856687.jpg
+coverImage: /uploads/photography/1782815272929-728856687.webp
 galleryImages: []
 description: Some capture them
 gear: []

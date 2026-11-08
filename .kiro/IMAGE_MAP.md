@@ -20,8 +20,8 @@ Columns used throughout:
 
 | Slot | File | Dimensions | Orient | Size | lum / sdev / mid% | Why this one |
 |---|---|---|---|---|---|---|
-| Hero backdrop (Home) | `/uploads/photography/1785134270800-642096424.jpeg` | 4032×3024 stored → **3024×4032 displayed** | portrait (EXIF 6) | 1.23 MB | 50 / 57 / 32% | lum 50 makes it the darkest large photograph in the archive, so the bone hero type stays legible at full strength (the `opacity-70` wash was removed on 2026-10-07; scrims sit only under the type and the header). Landscape screens get `optimized/home/hero-dusk-wide-{1280,1920,2560}.webp`, a 3024×2016 crop from y=520 (`npm run hero:image`). A dusk poplar field with the sun low in haze — atmosphere, no subject competing with the wordmark. It displays portrait, but 3024 px on its horizontal axis is ample for `object-cover` to crop a full-bleed 16:9 band. |
-| Footer wordmark mask | `/uploads/photography/1781674009809-689730206.jpeg` | 640×480 | landscape | 0.03 MB | 68 / 82 / 37% | Two clean bands — ember sky over a black ridge — so sdev 82 with almost no fine detail, exactly what `background-clip: text` needs. Verified by rendering the wordmark as a stencil over a wide crop of each candidate: this is the only one where every letter stays legible; the desk and poplar-field frames lose their opening letters into black. `ImageTypeMask` loads the **original** as a CSS background with no derivative, so its 30 KB is the deciding factor. |
+| Hero backdrop (Home) | `/uploads/photography/1785134270800-642096424.webp` | 4032×3024 stored → **3024×4032 displayed** | portrait (EXIF 6) | 1.23 MB | 50 / 57 / 32% | lum 50 makes it the darkest large photograph in the archive, so the bone hero type stays legible at full strength (the `opacity-70` wash was removed on 2026-10-07; scrims sit only under the type and the header). Landscape screens get `optimized/home/hero-dusk-wide-{1280,1920,2560}.webp`, a 3024×2016 crop from y=520 (`npm run hero:image`). A dusk poplar field with the sun low in haze — atmosphere, no subject competing with the wordmark. It displays portrait, but 3024 px on its horizontal axis is ample for `object-cover` to crop a full-bleed 16:9 band. |
+| Footer wordmark mask | `/uploads/photography/1781674009809-689730206.webp` | 640×480 | landscape | 0.03 MB | 68 / 82 / 37% | Two clean bands — ember sky over a black ridge — so sdev 82 with almost no fine detail, exactly what `background-clip: text` needs. Verified by rendering the wordmark as a stencil over a wide crop of each candidate: this is the only one where every letter stays legible; the desk and poplar-field frames lose their opening letters into black. `ImageTypeMask` loads the **original** as a CSS background with no derivative, so its 30 KB is the deciding factor. |
 | `gateway-portfolio` (01 // Builder) | `/uploads/photography/1783414461952-773184125.jpeg` | 6048×6172 | square | 6.07 MB | 66 / 66 / 30% | The owner's own desk — laptop, handwritten notes, keys under lamp light — is the builder's workbench. Highest-resolution asset in the archive, and it is served through a WebP derivative so the 6 MB original never reaches a browser. |
 | `gateway-journal` (02 // Thinker) | `/uploads/photography/1785133951737-704347293.jpeg` | 2618×4656 | portrait | 0.83 MB | 114 / 59 / 47% | Friends around a bonfire at dusk carries "the human side of learning, building, and becoming" better than any object shot, and the fire's warmth sits in the same register as the ember accent. |
 | `gateway-tech` (03 // Engineer) | `/uploads/photography/1782620995136-322083290.jpg` | 1242×2208 | portrait | 0.37 MB | 82 / 62 / 44% | A gear flat-lay (headphones, tablet, earbuds, cable) is the literal "living lab" bench — one clear subject, dark surround, and a small file at usable resolution. |
@@ -49,7 +49,7 @@ in for a screenshot the owner does not have.
 
 ### Caveats on the above
 
-- **EXIF orientation.** `photography/1785134270800-642096424.jpeg` is the only file in the archive
+- **EXIF orientation.** `photography/1785134270800-642096424.webp` is the only file in the archive
   with a non-identity orientation tag (EXIF 6 = rotate 90° CW); every other original is 1 or absent.
   Its stored pixels are 4032×3024 but a browser draws it 3024×4032. `scripts/optimize-images.ts`
   therefore calls `.rotate()` before resizing, which bakes the orientation into the WebP. Without
@@ -125,7 +125,7 @@ Near-duplicates — keep one of each pair, the rest are redundant rather than un
 | `journal/1782982647621-174289348.jpg` | `journal/1782984265762-288170011.jpg` |
 | `photography/1781678396113-768213974.jpeg` | `photography/1781678427211-537920670.jpeg` |
 | `photography/1781681817440-553513022.jpeg` | `public/portrait.jpg` (same frame, same stats) |
-| `photography/1781674009809-689730206.jpeg` | `photography/1781673990936-229008787.jpeg`, `general/1781673971324-74949928.jpeg`, `general/1787997044894-947072143.jpeg` (same ridge at 640×480 / 640×480 / 480×360) |
+| `photography/1781674009809-689730206.webp` | `photography/1781673990936-229008787.jpeg`, `general/1781673971324-74949928.jpeg`, `general/1787997044894-947072143.jpeg` (same ridge at 640×480 / 640×480 / 480×360) |
 
 ## Regenerating derivatives
 

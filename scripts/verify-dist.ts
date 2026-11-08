@@ -14,14 +14,35 @@
  * Usage: npx tsx scripts/verify-dist.ts   (`npm run verify:dist`)
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { gzipSync } from 'node:zlib';
 import { collectRoutes, SITE_ORIGIN } from './routes';
 
 const projectRoot = path.resolve(import.meta.dirname, '..');
 const distDir = path.join(projectRoot, 'dist');
+
+/** Weight budgets, in bytes. Raise one only with a reason in the commit. */
+const BUDGET = {
+  entryJsGzip: 125 * 1024,
+  cssGzip: 26 * 1024,
+  mediaFile: 6 * 1024 * 1024,
+  uploadsTotal: 55 * 1024 * 1024,
+};
+
+const kb = (bytes: number) => `${(bytes / 1024).toFixed(1)} kB`;
+const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+
+function* walk(dir: string): Generator<string> {
+  if (!existsSync(dir)) return;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const absolute = path.join(dir, entry.name);
+    if (entry.isDirectory()) yield* walk(absolute);
+    else if (entry.isFile()) yield absolute;
+  }
+}
 
 const failures: string[] = [];
 let checks = 0;
@@ -143,6 +164,38 @@ async function main(): Promise<void> {
       robots.includes(`${SITE_ORIGIN}/sitemap.xml`),
       'robots.txt does not point at the sitemap'
     );
+  }
+
+  // ---------------------------------------------------------------------- budgets
+  // The site's weight is guarded here, not by memory: each limit sits ~10%
+  // above what the build measured when it was set, so a regression fails CI.
+  {
+    const assetsDir = path.join(distDir, 'assets');
+    const indexHtml = await readFile(path.join(distDir, 'index.html'), 'utf8');
+    const entry = indexHtml.match(/<script type="module"[^>]+src="\/assets\/(index-[^"]+\.js)"/)?.[1];
+    if (entry) {
+      const gz = gzipSync(await readFile(path.join(assetsDir, entry))).length;
+      check(gz <= BUDGET.entryJsGzip, `entry bundle ${entry} is ${kb(gz)} gzip, budget ${kb(BUDGET.entryJsGzip)}`);
+    }
+    for (const css of indexHtml.matchAll(/href="\/assets\/([^"]+\.css)"/g)) {
+      const gz = gzipSync(await readFile(path.join(assetsDir, css[1]))).length;
+      check(gz <= BUDGET.cssGzip, `stylesheet ${css[1]} is ${kb(gz)} gzip, budget ${kb(BUDGET.cssGzip)}`);
+    }
+
+    const uploads = path.join(distDir, 'uploads');
+    let total = 0;
+    for (const file of walk(uploads)) {
+      const size = statSync(file).size;
+      total += size;
+      const rel = path.relative(distDir, file);
+      check(size <= BUDGET.mediaFile, `${rel} is ${mb(size)}, budget ${mb(BUDGET.mediaFile)} per file`);
+      check(
+        !/\.(jpe?g|png)$/i.test(file),
+        `${rel} is a raw JPEG/PNG — run \`npm run convert:uploads\``
+      );
+    }
+    check(total <= BUDGET.uploadsTotal, `uploads total ${mb(total)}, budget ${mb(BUDGET.uploadsTotal)}`);
+    check(!existsSync(path.join(distDir, 'admin')), 'dist/admin exists — the studio must not ship');
   }
 
   // ----------------------------------------------------------------------- report

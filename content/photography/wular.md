@@ -3,7 +3,7 @@ title: Wular
 category: Life
 date: '2026-06-30'
 excerpt: ''
-coverImage: /uploads/photography/1782815464492-610162115.jpg
+coverImage: /uploads/photography/1782815464492-610162115.webp
 galleryImages: []
 description: ''
 gear: []

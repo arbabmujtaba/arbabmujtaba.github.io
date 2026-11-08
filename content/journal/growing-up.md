@@ -3,7 +3,7 @@ title: "Growing Up, Figuring Out"
 slug: "growing-up"
 date: "2024-12-01"
 category: "Thoughts"
-featuredImage: "/uploads/home/1781841191101-361910064.jpeg"
+featuredImage: "/uploads/home/1781841191101-361910064.webp"
 excerpt: "There's a strange dichotomy in being an engineering student. On one hand, you're constantly building systems—learning how to create structure, logic, and predictability out of thin air. On the other, your twenties feel like the exact opposite: unstructured, chaotic, and deeply unpredictable."
 readingTime: "3 min read"
 volume: 1

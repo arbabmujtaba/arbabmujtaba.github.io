@@ -3,7 +3,7 @@ title: The Missed Train
 category: Thoughts
 date: '2026-07-02'
 excerpt: Be there on time.
-featuredImage: /uploads/journal/1782984265762-288170011.jpg
+featuredImage: /uploads/journal/1782984265762-288170011.webp
 tags:
   - Reflection of Her
 published: true

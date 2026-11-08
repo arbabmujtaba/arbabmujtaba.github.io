@@ -22,7 +22,7 @@ import { mkdirSync, statSync } from 'node:fs';
 import sharp from 'sharp';
 
 const ROOT = process.cwd();
-const SOURCE = path.join(ROOT, 'public/uploads/photography/1785134270800-642096424.jpeg');
+const SOURCE = path.join(ROOT, 'public/uploads/photography/1785134270800-642096424.webp');
 const OUT_DIR = path.join(ROOT, 'public/uploads/optimized/home');
 export const HERO_WIDE_WIDTHS = [1280, 1920, 2560] as const;
 

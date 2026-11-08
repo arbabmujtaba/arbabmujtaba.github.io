@@ -3,7 +3,7 @@ title: Friends
 category: Favorites
 date: '2026-07-02'
 excerpt: ''
-coverImage: /uploads/photography/1782991257761-7854002.jpeg
+coverImage: /uploads/photography/1782991257761-7854002.webp
 galleryImages: []
 description: ''
 gear:

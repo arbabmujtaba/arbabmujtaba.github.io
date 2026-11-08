@@ -3,7 +3,7 @@ title: Isolated
 category: Travel
 date: '2026-06-30'
 excerpt: ''
-coverImage: /uploads/photography/1782815357385-880416972.jpg
+coverImage: /uploads/photography/1782815357385-880416972.webp
 galleryImages: []
 description: ''
 gear: []

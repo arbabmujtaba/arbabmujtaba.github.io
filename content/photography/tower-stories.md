@@ -3,7 +3,7 @@ title: Tower Stories
 category: Favorites
 date: '2026-06-28'
 excerpt: ''
-coverImage: /uploads/photography/1782620527269-148542884.jpg
+coverImage: /uploads/photography/1782620527269-148542884.webp
 galleryImages: []
 description: ''
 gear:

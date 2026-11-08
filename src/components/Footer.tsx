@@ -46,10 +46,10 @@ interface FooterProps {
  * two clean bands — ember sky over a black ridge — so contrast is high with
  * almost no fine detail, and it is the only frame where every letter stays
  * legible. `ImageTypeMask` loads the original as a CSS background with no
- * derivative, so its 33 kB matters; a larger file would be fetched at full size
+ * derivative, so its size matters (11 kB as WebP); a larger file would be fetched at full size
  * and the softness through the letterforms is the intended effect.
  */
-const WORDMARK_IMAGE = '/uploads/photography/1781674009809-689730206.jpeg';
+const WORDMARK_IMAGE = '/uploads/photography/1781674009809-689730206.webp';
 
 const SECTIONS = [
   { id: 'portfolio', label: 'Work' },
@@ -92,7 +92,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
                 href={href}
                 aria-label={label}
                 {...linkProps(href)}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-canvas-lift text-zinc-300 transition-colors duration-300 hover:bg-accent hover:text-canvas"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-canvas-lift text-zinc-300 transition-colors duration-300 hover:bg-accent hover:text-on-accent"
               >
                 <Icon size={16} strokeWidth={1.6} />
               </a>
@@ -146,7 +146,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
                     <button
                       type="button"
                       onClick={() => setView?.(section.id)}
-                      className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent"
+                      className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
                     >
                       {section.label}
                     </button>
@@ -164,7 +164,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
                   <a
                     href={SOCIAL_LINKS.readcv}
                     {...linkProps(SOCIAL_LINKS.readcv)}
-                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent"
+                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
                   >
                     Résumé
                   </a>
@@ -172,7 +172,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
                 <li>
                   <a
                     href={SOCIAL_LINKS.email}
-                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent"
+                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
                   >
                     Email
                   </a>
@@ -180,7 +180,7 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
                 <li>
                   <a
                     href={SOCIAL_LINKS.phone}
-                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent"
+                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
                   >
                     Phone
                   </a>

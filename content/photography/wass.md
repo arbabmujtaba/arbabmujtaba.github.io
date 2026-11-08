@@ -3,7 +3,7 @@ title: Wass
 category: Travel
 date: '2026-06-28'
 excerpt: ''
-coverImage: /uploads/photography/1782621113178-876797976.jpg
+coverImage: /uploads/photography/1782621113178-876797976.webp
 galleryImages: []
 description: ''
 gear:

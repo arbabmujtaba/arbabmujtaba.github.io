@@ -3,7 +3,7 @@ title: Gulmarg
 category: Travel
 date: '2026-06-28'
 excerpt: ''
-coverImage: /uploads/photography/1782620609532-894300443.jpg
+coverImage: /uploads/photography/1782620609532-894300443.webp
 galleryImages: []
 description: ''
 gear:

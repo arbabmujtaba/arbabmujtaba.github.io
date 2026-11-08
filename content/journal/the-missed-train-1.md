@@ -3,7 +3,7 @@ title: The Missed Train
 category: Thoughts
 date: '2026-07-27'
 excerpt: When Understanding Slowly Turned Into Distance
-featuredImage: /uploads/journal/1785132719371-487191611.jpg
+featuredImage: /uploads/journal/1785132719371-487191611.webp
 tags:
   - Reflections of her
 published: true

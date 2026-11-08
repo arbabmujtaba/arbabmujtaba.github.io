@@ -3,7 +3,7 @@ title: That 5 TeaBerg Guys
 category: Favorites
 date: '2026-07-27'
 excerpt: ''
-coverImage: /uploads/photography/1785133951737-704347293.jpeg
+coverImage: /uploads/photography/1785133951737-704347293.webp
 galleryImages: []
 description: ''
 gear:
