@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { m, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'motion/react';
 import Footer from '../components/Footer';
 import { Rise } from '../components/rushes/Depth';
@@ -7,17 +7,12 @@ import Constellation from '../components/magic/Constellation';
 import FullStop from '../components/magic/FullStop';
 import InkNote from '../components/magic/InkNote';
 import {
-  ArchiveDoor,
-  ArchiveIndex,
   Bookshelf,
-  ChapterTimeline,
   CountUp,
   LastNotes,
   LivingJournal,
   Marquee,
-  MemoryMap,
   PhotoShuffle,
-  ProjectIndex,
   RecLabel,
   ReelShowcase,
   StackedHeading,
@@ -34,7 +29,16 @@ import {
   getTimelineMilestones,
 } from '../lib/cms';
 import { useMagic } from '../lib/magic';
-import { resolveHero, type HeroImage } from '../lib/hero';
+import { pickHeroBlock, resolveHero } from '../lib/hero';
+import { buildMosaic } from '../lib/mosaic';
+import { scrollToElement } from '../lib/scroll';
+import HeroMosaic from '../components/home/HeroMosaic';
+import IntroStatement from '../components/home/IntroStatement';
+import BigCards from '../components/home/BigCards';
+import ChapterRoute from '../components/home/ChapterRoute';
+import WorkColumn from '../components/home/WorkColumn';
+import StorySection from '../components/home/StorySection';
+import Principles from '../components/home/Principles';
 import { isRoomEnabled } from '../lib/secrets';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -44,37 +48,8 @@ interface HomeProps {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-/**
- * Hero backdrop — the photograph behind the name. Chosen in /admin as a Home
- * block of type "Hero photo"; `src/lib/hero.ts` resolves it (and falls back to
- * the default frame from `.kiro/IMAGE_MAP.md`). The hero is an ink plate at
- * any hour (data-surface="ink"), so pick a darker frame for the bone type.
- * index.html preloads the same sources through the plugin in vite.config.ts.
- */
-function HeroPlate({ hero }: { hero: HeroImage }) {
-  // A missing derivative makes the whole <picture> fail; fall back to the original.
-  const [failed, setFailed] = useState(false);
-  const img = (
-    <img
-      src={hero.src}
-      alt=""
-      loading="eager"
-      decoding="async"
-      fetchPriority="high"
-      onError={() => setFailed(true)}
-      style={{ objectPosition: hero.objectPosition }}
-      className="hero-plate h-[114%] w-full object-cover"
-    />
-  );
-  if (failed) return img;
-  return (
-    <picture>
-      {hero.wideSrcSet && <source media="(orientation: landscape)" type="image/webp" srcSet={hero.wideSrcSet} sizes="100vw" />}
-      {hero.tallSrcSet && <source type="image/webp" srcSet={hero.tallSrcSet} sizes="100vw" />}
-      {img}
-    </picture>
-  );
-}
+/** The italic line under the name when the lead Hero block has no label of its own. */
+const DEFAULT_TAGLINE = 'An archive still being written.';
 
 function Section({
   children,
@@ -124,6 +99,8 @@ export default function Home({ setView }: HomeProps) {
   const { scrollY } = useScroll();
   const heroImageY = useTransform(scrollY, [0, 900], ['0%', '14%']);
   const heroFade = useTransform(scrollY, [0, 520], [1, 0]);
+  // The wall sinks into the dark as the page leaves it.
+  const heroDim = useTransform(scrollY, [0, 760], [0, 0.65]);
 
   // ---- the hero in depth (desktop, fine pointer, motion allowed) ----
   // Three planes: the photograph far back, the sky's stars between, the name
@@ -138,7 +115,7 @@ export default function Home({ setView }: HomeProps) {
   const ly = useSpring(leanY, LEAN);
   const plateX = useTransform(lx, (v) => v * -28);
   const plateY = useTransform(ly, (v) => v * -18);
-  const plateScale = useTransform(scrollY, [0, 900], [1.07, 1.16]);
+  const plateScale = useTransform(scrollY, [0, 900], [1.02, 1.1]);
   const copyX = useTransform(lx, (v) => v * 16);
   const copyRotateY = useTransform(lx, (v) => v * 7);
   const copyTilt = useTransform(scrollY, [0, 650], [0, 18]);
@@ -165,6 +142,7 @@ export default function Home({ setView }: HomeProps) {
 
   // Every hero block, visible or not — resolveHero skips the hidden ones.
   const hero = useMemo(() => resolveHero(getHomeConfig()), []);
+  const tagline = useMemo(() => pickHeroBlock(getHomeConfig())?.label?.trim() || DEFAULT_TAGLINE, []);
   const gateways = homeConfig.filter((entry) => entry.configType === 'gateway');
   const profile = homeConfig.find((entry) => entry.configType === 'profile');
   const reels = homeConfig.filter((entry) => entry.configType === 'reel' && !!entry.video);
@@ -182,6 +160,10 @@ export default function Home({ setView }: HomeProps) {
     [homeConfig]
   );
 
+  const intro = homeConfig.find((entry) => entry.configType === 'intro');
+  const story = homeConfig.find((entry) => entry.configType === 'story');
+  const principles = homeConfig.filter((entry) => entry.configType === 'principle');
+
   const projects = useMemo(() => getPortfolioProjects(), []);
   const photography = useMemo(() => getPhotographyEntries(), []);
   const journal = useMemo(() => getJournalEntries(), []);
@@ -197,6 +179,30 @@ export default function Home({ setView }: HomeProps) {
    */
   const projectIndex = useMemo(() => projects.slice(0, 6), [projects]);
 
+  /** The big cards: the archive's photographs, by priority (0 = featured first). */
+  const selectedFrames = useMemo(() => photography.filter((entry) => entry.coverImage).slice(0, 8), [photography]);
+
+  /** The wall behind the name: the lead Hero photo in the centre, then the archive. */
+  const mosaic = useMemo(
+    () =>
+      buildMosaic(
+        hero,
+        getHomeConfig(),
+        photography.map((entry) => ({ image: entry.coverImage, customization: entry.customization })),
+        journal.map((entry) => ({ image: entry.featuredImage || entry.coverImage, customization: entry.customization })),
+        homeConfig
+          .filter((entry) => entry.configType === 'gateway')
+          .map((entry) => ({ image: entry.image, customization: entry.customization }))
+      ),
+    [hero, photography, journal, homeConfig]
+  );
+
+  /** "Builder · Thinker · Engineer · Witness", from the archive doors' labels. */
+  const roles = gateways
+    .map((gateway) => gateway.label?.replace(/^\d+\s*\/\/\s*/, '').trim())
+    .filter(Boolean)
+    .join(' · ');
+
   const targetOf = (entry: { navTarget?: string; slug: string }) =>
     entry.navTarget || entry.slug.replace('gateway-', '');
 
@@ -210,12 +216,15 @@ export default function Home({ setView }: HomeProps) {
       className="relative flex flex-grow flex-col overflow-clip"
     >
       <div className="relative z-10 w-full flex-grow">
-        {/* ===================== HERO ===================== */}
+        {/* ===================== HERO =====================
+            A wall of photographs behind the name. The lead Hero photo from
+            /admin is the centre tile (and the one index.html preloads); the
+            other Hero photos and the archive's covers fill the rest. */}
         <section
           data-surface="ink"
           onPointerMove={onHeroPointer}
           onPointerLeave={onHeroLeave}
-          className="relative flex min-h-[88vh] flex-col justify-end overflow-hidden px-4 pb-14 pt-28 text-zinc-100 md:min-h-[100vh] md:px-12 md:pb-20 md:pt-32 lg:min-h-[calc(100vh-4rem)] lg:px-16"
+          className="relative flex min-h-[100svh] flex-col overflow-hidden px-4 pb-10 pt-24 text-zinc-100 md:px-12 md:pb-12 md:pt-28 lg:min-h-[calc(100vh-4rem)] lg:px-16"
         >
           <m.div
             aria-hidden="true"
@@ -224,16 +233,16 @@ export default function Home({ setView }: HomeProps) {
           >
             <m.div
               className="absolute inset-0"
-              style={pointerDepth ? { x: plateX, y: plateY, scale: scrollDepth ? plateScale : 1.07 } : undefined}
+              style={pointerDepth ? { x: plateX, y: plateY, scale: scrollDepth ? plateScale : 1.02 } : undefined}
             >
-              <HeroPlate key={hero.src} hero={hero} />
+              <HeroMosaic tiles={mosaic} scrollY={scrollY} parallax={shouldParallax} />
             </m.div>
-            {/* Light where the sky is, dark where the type sits: a scrim along
-                the bottom for the name and the copy, a thin one along the top
-                for the header, and the photograph left at full strength between. */}
-            <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/40 via-35% to-transparent" />
-            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-canvas/70 to-transparent" />
-            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_0%_100%,var(--bg)_0%,transparent_60%)] opacity-70" />
+            {/* Dark where the type sits: a pool behind the name, a scrim along
+                the bottom for the copy and one along the top for the header. */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(58%_46%_at_50%_50%,color-mix(in_srgb,var(--bg-deep)_78%,transparent)_0%,transparent_100%)]" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-canvas via-canvas/70 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-canvas/80 to-transparent" />
+            <m.div className="pointer-events-none absolute inset-0 bg-canvas-deep" style={shouldParallax ? { opacity: heroDim } : { opacity: 0 }} />
           </m.div>
 
           {/* once, after a while: something crossing the sky */}
@@ -243,7 +252,7 @@ export default function Home({ setView }: HomeProps) {
           <InkNote section="hero" className="absolute right-4 top-24 md:left-12 md:right-auto md:top-28 lg:left-16" />
 
           <m.div
-            className="relative"
+            className="pointer-events-none relative flex flex-1 flex-col"
             style={
               pointerDepth
                 ? {
@@ -252,49 +261,74 @@ export default function Home({ setView }: HomeProps) {
                     rotateX: scrollDepth ? copyRotateX : 0,
                     y: scrollDepth ? copyY : 0,
                     transformPerspective: 1200,
-                    transformOrigin: '30% 100%',
+                    transformOrigin: '50% 60%',
                   }
                 : undefined
             }
           >
             <m.div
+              className="flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.2, ease: EASE }}
+              transition={{ duration: 0.9, delay: 0.5, ease: EASE }}
             >
               <RecLabel bright>sopore &rarr; indore</RecLabel>
+              {roles && <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-300 md:text-[11px]">{roles}</p>}
             </m.div>
 
-            <m.h1
-              data-levitate
-              className="mt-6 font-display text-[16vw] font-bold uppercase leading-[0.82] tracking-[-0.055em] text-bone md:text-[13vw]"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.3, ease: EASE }}
-            >
-              Arbab
-              <FullStop />
-            </m.h1>
+            <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
+              <h1
+                data-levitate
+                className="pointer-events-auto flex items-baseline font-book text-[26vw] font-medium leading-[0.8] tracking-[-0.045em] text-bone [text-shadow:0_4px_60px_rgba(0,0,0,0.5)] md:text-[17vw] lg:text-[15vw]"
+              >
+                <span className="flex overflow-hidden pb-[0.1em]">
+                  {'Arbab'.split('').map((letter, index) => (
+                    <m.span
+                      key={index}
+                      className="inline-block"
+                      initial={shouldReduceMotion ? { opacity: 0 } : { y: '105%' }}
+                      animate={shouldReduceMotion ? { opacity: 1 } : { y: '0%' }}
+                      transition={{ duration: 1.25, delay: 0.35 + index * 0.07, ease: EASE }}
+                    >
+                      {letter}
+                    </m.span>
+                  ))}
+                </span>
+                <m.span
+                  className="inline-block"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.9, ease: EASE }}
+                >
+                  <FullStop />
+                </m.span>
+              </h1>
+              <m.p
+                className="mt-4 font-book text-2xl italic leading-tight text-zinc-50 md:mt-2 md:text-4xl"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.8, ease: EASE }}
+              >
+                {tagline}
+              </m.p>
+            </div>
 
-            <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
-              <m.div
-                className="max-w-md"
+            <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+              <m.p
+                className="max-w-sm text-sm font-light leading-relaxed text-zinc-300 md:text-base"
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.45, ease: EASE }}
+                transition={{ duration: 0.9, delay: 0.95, ease: EASE }}
               >
-                <p className="font-book text-2xl italic leading-tight text-zinc-50 md:text-3xl">An archive still being written.</p>
-                <p className="mt-4 text-sm font-light leading-relaxed text-zinc-300 md:text-base">
-                  {profile?.description ||
-                    'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
-                </p>
-              </m.div>
+                {profile?.description ||
+                  'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
+              </m.p>
 
               <m.ul
-                className="space-y-1 md:text-right"
+                className="pointer-events-auto space-y-1 md:text-right"
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.6, ease: EASE }}
+                transition={{ duration: 0.9, delay: 1.05, ease: EASE }}
               >
                 {gateways.map((gateway, index) => (
                   <li key={gateway.slug}>
@@ -315,10 +349,13 @@ export default function Home({ setView }: HomeProps) {
           {!isTouchDevice && (
             <m.div
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 md:block"
+              className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
               style={shouldParallax ? { opacity: heroFade } : undefined}
             >
               <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-500">scroll</span>
+              <span className="relative h-10 w-px overflow-hidden bg-zinc-800">
+                <span className="scroll-cue absolute inset-x-0 top-0 h-1/2 bg-zinc-300" />
+              </span>
             </m.div>
           )}
         </section>
@@ -338,17 +375,119 @@ export default function Home({ setView }: HomeProps) {
           </Marquee>
         </div>
 
+        {/* ===================== INTRO ===================== */}
+        {intro?.title && (
+          <Section className="md:py-40">
+            <IntroStatement label={intro.label || 'intro'} text={intro.title} />
+          </Section>
+        )}
+
+        {/* ===================== SELECTED FRAMES — the big cards =====================
+            The photographs, large, in the order the archive ranks them
+            (priority in /admin). The projects follow later, as a quiet list. */}
+        {selectedFrames.length > 0 && (
+          <Section>
+            <InkNote section="frames" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
+            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+              <div>
+                <RecLabel onDot={darkroom ? () => openRoom('darkroom') : undefined} dotLabel="A red safelight">
+                  selected frames
+                </RecLabel>
+                <StackedHeading
+                  lines={['Light I couldn’t', 'quite let go of']}
+                  className="mt-7"
+                  body="Skies over home, friends around a fire, the long light of ordinary evenings. Open any frame to see it whole."
+                />
+              </div>
+              <SeeAll onClick={() => setView('photography')}>all {photography.length} frames</SeeAll>
+            </div>
+            <BigCards
+              collection="photography"
+              parallax={shouldParallax}
+              className="mt-16 md:mt-24"
+              items={selectedFrames.map((entry) => ({
+                slug: entry.slug,
+                title: entry.title,
+                image: entry.coverImage,
+                customization: entry.customization,
+                meta: [entry.category, entry.date?.slice(0, 4)].filter(Boolean).join(' · '),
+              }))}
+            />
+          </Section>
+        )}
+
+        {/* ===================== STORY ===================== */}
+        {story?.title && (
+          <Section id="story" flat>
+            <StorySection
+              story={{
+                label: story.label || 'my story',
+                heading: story.title,
+                lead: story.description,
+                body: story.body,
+                image: story.image,
+                customization: story.customization,
+              }}
+              parallax={shouldParallax}
+              footer={
+                timeline.length > 0 ? (
+                  <SeeAll
+                    onClick={() => {
+                      const chapters = document.getElementById('chapters');
+                      if (chapters) scrollToElement(chapters, -24);
+                    }}
+                  >
+                    read it in chapters
+                  </SeeAll>
+                ) : undefined
+              }
+            />
+          </Section>
+        )}
+
+        {/* ===================== WORK — one narrow column =====================
+            No label, no headline: a line of italic on one side, the projects
+            as a single quiet column on the other. */}
+        {projectIndex.length > 0 && (
+          <Section className="md:py-24">
+            <InkNote section="work" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
+            <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+              <div className="md:sticky md:top-28 md:self-start">
+                <p className="max-w-xs font-book text-2xl italic leading-snug text-zinc-300 md:text-3xl">
+                  And a few things I built, to understand them.
+                </p>
+                <div className="mt-6">
+                  <SeeAll onClick={() => setView('portfolio')}>all {projects.length} projects</SeeAll>
+                </div>
+              </div>
+              <WorkColumn projects={projectIndex} />
+            </div>
+          </Section>
+        )}
+
         {/* ===================== THE INDEX ===================== */}
         <Section>
           <RecLabel>the index</RecLabel>
-          <p className="mt-8 max-w-5xl font-display text-3xl font-medium leading-[1.14] tracking-[-0.045em] text-zinc-50 md:text-5xl lg:text-[3.6rem]">
-            So far: <CountUp value={projects.length} className="text-accent-ink" /> things built and shipped,{' '}
-            <CountUp value={photography.length} className="text-accent-ink" /> frames{' '}
-            <span className="font-book font-normal italic tracking-[-0.02em] text-zinc-300">I keep going back to</span>,{' '}
-            <CountUp value={journal.length} className="text-accent-ink" /> volumes of the journal, and{' '}
-            <CountUp value={favorites.length} className="text-accent-ink" /> small notes{' '}
-            <span className="font-book font-normal italic tracking-[-0.02em] text-zinc-300">worth keeping</span>.
-          </p>
+          <dl className="mt-12 grid grid-cols-2 border-t border-zinc-800 md:grid-cols-4">
+            {[
+              { value: projects.length, label: 'things built and shipped' },
+              { value: photography.length, label: 'frames I keep going back to' },
+              { value: journal.length, label: 'volumes of the journal' },
+              { value: favorites.length, label: 'small notes worth keeping' },
+            ].map((count, index) => (
+              <div
+                key={count.label}
+                className={`flex flex-col-reverse gap-3 border-b border-zinc-800 py-8 md:border-b-0 md:py-12 ${
+                  index % 2 === 0 ? 'pr-4' : 'pl-4 md:pl-0'
+                } md:px-8 md:first:pl-0 ${index < 3 ? 'md:border-r' : ''}`}
+              >
+                <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{count.label}</dt>
+                <dd className="font-book text-6xl leading-none tracking-[-0.03em] text-zinc-50 md:text-8xl">
+                  <CountUp value={count.value} />
+                </dd>
+              </div>
+            ))}
+          </dl>
           <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
             counted from the archive itself · {timeline.length} chapters since {timeline[0]?.year || '2019'}
           </p>
@@ -394,16 +533,13 @@ export default function Home({ setView }: HomeProps) {
         {/* ===================== FRAMES ===================== */}
         {photography.length > 0 && (
           <Section>
-            <InkNote section="frames" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
             <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
               <div>
-                <RecLabel onDot={darkroom ? () => openRoom('darkroom') : undefined} dotLabel="A red safelight">
-                  frames
-                </RecLabel>
+                <RecLabel>the contact sheet</RecLabel>
                 <StackedHeading
-                  lines={['Light I couldn’t', 'quite let go of']}
+                  lines={['Every frame,', 'shuffled']}
                   className="mt-7"
-                  body="Pictures I keep coming back to — skies over home, friends around a fire, the long light of ordinary evenings. The shelf reshuffles itself while you look; open any frame to see it whole."
+                  body="The whole shelf, reshuffling itself while you look."
                 />
               </div>
               <SeeAll onClick={() => setView('photography')}>all {photography.length} frames</SeeAll>
@@ -412,43 +548,37 @@ export default function Home({ setView }: HomeProps) {
           </Section>
         )}
 
-        {/* ===================== WORK ===================== */}
-        {projectIndex.length > 0 && (
+        {/* ===================== PRINCIPLES ===================== */}
+        {principles.length > 0 && (
           <Section>
-            <InkNote section="work" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
-            <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
-              <div>
-                <RecLabel>work</RecLabel>
-                <StackedHeading
-                  lines={['Things I built', 'to understand them']}
-                  className="mt-7"
-                  body="Every project here began as a question I couldn't leave alone — how packets find their way, how a login stays safe, how a machine might learn a language from home."
-                />
-              </div>
-              <SeeAll onClick={() => setView('portfolio')}>all {projects.length} projects</SeeAll>
-            </div>
-            <ProjectIndex projects={projectIndex} className="mt-14" />
+            <RecLabel>principles</RecLabel>
+            <StackedHeading lines={['What I keep to,', 'whatever I make']} className="mt-7" />
+            <Principles
+              items={principles.map((entry) => ({
+                slug: entry.slug,
+                label: entry.label,
+                title: entry.title,
+                description: entry.description,
+              }))}
+              className="mt-14 md:mt-20"
+            />
           </Section>
         )}
 
-        {/* ===================== CHAPTERS ===================== */}
+        {/* ===================== CHAPTERS =====================
+            The timeline and the map as one line: the road from Sopore to
+            Indore with a year for every chapter. */}
         {timeline.length > 0 && (
-          <Section id="chapters" flat>
-            <RecLabel>chapters</RecLabel>
-            <StackedHeading
-              lines={['From Sopore', 'to Indore, so far']}
-              className="mt-7"
-              body={`${timeline.length} years, ${timeline.length} chapters — school, the long pursuit, leaving home, and everything I've been learning since. Turn a page to read a little more.`}
-            />
-            <ChapterTimeline milestones={timeline} className="mt-16 md:mt-20" />
-
-            <div className="mt-8 border-t border-zinc-800 pt-14 md:pt-20">
-              <RecLabel quiet>the map of it</RecLabel>
-              <p className="mt-5 max-w-lg font-book text-2xl italic leading-snug text-zinc-200 md:text-3xl">
-                Two cities, a valley, and the long road between them.
-              </p>
-              <MemoryMap chapters={timeline} photography={photography} journal={journal} reels={reels} className="mt-10" />
+          <Section id="chapters" className="md:py-24">
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <RecLabel>chapters</RecLabel>
+                <p className="mt-6 max-w-lg font-book text-2xl italic leading-snug text-zinc-300 md:text-3xl">
+                  {timeline.length} years, one long road between two cities.
+                </p>
+              </div>
             </div>
+            <ChapterRoute chapters={timeline} photography={photography} journal={journal} className="mt-14" />
           </Section>
         )}
 
@@ -479,6 +609,7 @@ export default function Home({ setView }: HomeProps) {
         {/* ===================== KIT ===================== */}
         {gear.length > 0 && (
           <Section className="py-14 md:py-20">
+            <InkNote section="archive" className="absolute right-4 top-6 text-right md:right-12 lg:right-16" />
             <RecLabel>kit</RecLabel>
             <div className="mt-8">
               <Marquee duration={30} reverse>
@@ -491,46 +622,6 @@ export default function Home({ setView }: HomeProps) {
             </div>
           </Section>
         )}
-
-        {/* ===================== WAYS IN ===================== */}
-        <Section>
-          <InkNote section="archive" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
-          <RecLabel>sections</RecLabel>
-          <StackedHeading
-            lines={['Ways into', 'the archive']}
-            className="mt-7"
-            body={profile?.body || 'Part portfolio, part journal, part visual memory bank.'}
-          />
-          {/* Phones: a compact index of the doors. Wider screens: the arched doors. */}
-          <ArchiveIndex
-            className="mt-10 md:hidden"
-            doors={gateways.map((gateway, index) => ({
-              key: gateway.slug,
-              title: gateway.title,
-              image: gateway.image,
-              index: `${String(index + 1).padStart(2, '0')}/`,
-              role: gateway.label?.replace(/^\d+\s*\/\/\s*/, ''),
-              description: gateway.description,
-              href: `/${targetOf(gateway)}`,
-              onOpen: () => setView(targetOf(gateway)),
-            }))}
-          />
-          <div className="mt-14 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-4">
-            {gateways.map((gateway, index) => (
-              <ArchiveDoor
-                key={gateway.slug}
-                title={gateway.title}
-                image={gateway.image}
-                index={`${String(index + 1).padStart(2, '0')}/`}
-                role={gateway.label?.replace(/^\d+\s*\/\/\s*/, '')}
-                description={gateway.description}
-                href={`/${targetOf(gateway)}`}
-                onOpen={() => setView(targetOf(gateway))}
-                delay={index * 0.08}
-              />
-            ))}
-          </div>
-        </Section>
 
         <Footer setView={setView} />
       </div>

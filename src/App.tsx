@@ -47,6 +47,8 @@ const MagicLayer = lazy(() => import('./components/magic/MagicLayer'));
 const GlobalBackground = lazy(() => import('./components/GlobalBackground'));
 const CursorWand = lazy(() => import('./components/CursorWand'));
 const FloatingMagicalArrow = lazy(() => import('./components/FloatingMagicalArrow'));
+// Inertial wheel scrolling (Lenis). Desktop pointers only, mounted on idle.
+const SmoothScroll = lazy(() => import('./components/SmoothScroll'));
 
 interface QuickLook {
   collection: DetailCollection;
@@ -77,6 +79,7 @@ function resolveLocation(): { route: Route; quickLook: QuickLook | null } {
 export default function App() {
   const [{ route, quickLook }, setLocation] = useState(resolveLocation);
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
+  const canSmoothScroll = useMediaQuery('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
 
   const setView = useCallback((newView: string) => {
     navigate(VIEW_TO_PATH[newView as ListView] ?? '/');
@@ -160,7 +163,37 @@ export default function App() {
    * frame. It is over an ink plate there, so it takes the ink surface (light
    * type) even in daylight.
    */
-  const overHero = route.kind === 'list' && route.view === 'home';
+  const isHome = route.kind === 'list' && route.view === 'home';
+
+  /**
+   * The header stays with the reader (sticky, on every page). It is clear at
+   * the top; once the page has moved it gets a blurred plate so the sections
+   * stay readable over anything. On the home page it keeps the ink surface
+   * while it is still over the hero photographs.
+   */
+  const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
+  useEffect(() => {
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      setPastHero(y > window.innerHeight * 0.82);
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+  const overHero = isHome && !pastHero;
 
   // Mount the hidden layer once the page is quiet.
   const [magicReady, setMagicReady] = useState(false);
@@ -193,6 +226,12 @@ export default function App() {
           </Suspense>
         )}
 
+        {!isAdmin && magicReady && canSmoothScroll && (
+          <Suspense fallback={null}>
+            <SmoothScroll />
+          </Suspense>
+        )}
+
         {/* Outer Border Frame */}
         {/* The admin studio is a tool, not a page of the site: it takes the whole viewport. */}
         <div
@@ -205,9 +244,16 @@ export default function App() {
 
           {/* Header: mark left, sections centre, standing invitation right */}
           {!isAdmin && (
+            /* Home: a zero-height sticky rail, so the header floats over the
+               hero instead of pushing it down. Elsewhere it takes its room. */
+            <div className={`sticky top-0 z-30 ${isHome ? 'h-0' : ''}`}>
             <header
               data-surface={overHero ? 'ink' : undefined}
-              className={`${overHero ? 'absolute inset-x-0 top-0' : 'relative'} z-30 flex w-full items-center justify-between gap-6 px-4 pt-5 md:px-12 md:pt-8 lg:px-16`}
+              className={`${isHome ? 'absolute inset-x-0 top-0' : 'relative'} flex w-full items-center justify-between gap-6 px-4 transition-[padding,background-color,border-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:px-12 lg:px-16 ${
+                scrolled
+                  ? `py-3 md:py-4 border-b ${overHero ? 'border-transparent bg-transparent' : 'border-zinc-800 bg-canvas/80 backdrop-blur-md'}`
+                  : 'border-b border-transparent pt-5 md:pt-8'
+              }`}
             >
               <m.button
                 type="button"
@@ -239,6 +285,7 @@ export default function App() {
                 </span>
               </m.div>
             </header>
+            </div>
           )}
 
           {/* Mobile bottom bar lives outside the header */}

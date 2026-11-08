@@ -146,8 +146,8 @@ export const WEBSITE_STRUCTURE: Section[] = [
       {
         collection: 'home',
         label: 'Home block',
-        blurb: 'The hero photo behind your name, archive doors, notes, principles, the profile and reels on the landing page.',
-        categories: ['hero', 'gateway', 'quote', 'principle', 'profile', 'section', 'reel', 'thought'],
+        blurb: 'The photo mosaic behind your name, the intro line, your story, archive doors, notes, principles, the profile and reels on the landing page.',
+        categories: ['hero', 'intro', 'story', 'gateway', 'quote', 'principle', 'profile', 'section', 'reel', 'thought'],
         categoryLabel: 'Block type',
         listPath: '/',
         hasPage: false,
@@ -217,7 +217,9 @@ export const isSnippetCollection = (collection: string): boolean =>
  * should read instead (the raw value is still what gets written).
  */
 export const HOME_BLOCK_LABELS: Record<string, string> = {
-  hero: 'Hero photo (behind your name)',
+  hero: 'Hero photo (the mosaic behind your name)',
+  intro: 'Intro line',
+  story: 'Story',
   gateway: 'Archive door',
   quote: 'Note (last notes)',
   principle: 'Principle',
@@ -229,10 +231,12 @@ export const HOME_BLOCK_LABELS: Record<string, string> = {
 
 /** Plain-words description of where a home block appears. */
 export const HOME_BLOCK_WHERE: Record<string, string> = {
-  hero: 'the photograph behind your name at the top of the home page',
-  gateway: 'the archive doors that lead to the other pages',
+  hero: 'the photo mosaic behind your name at the top of the home page — the lowest order is the lead tile in the centre, the others join the mosaic, and your photography covers fill the rest',
+  intro: 'the large statement that lights up word by word under the hero',
+  story: 'the story section: a portrait beside a heading and a few paragraphs',
+  principle: 'the numbered “what I keep to” list',
+  gateway: 'the page links under your name, the moving ticker and the role line above your name (its image joins the hero mosaic)',
   quote: 'the “last notes” band',
-  principle: 'the principles list',
   profile: 'the profile section',
   reel: 'the “frames that keep moving” strip',
   thought: 'the random-thought drawer',
@@ -284,12 +288,12 @@ export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
 
 export const INK_SECTION_LABELS: Record<InkSection, string> = {
   hero: 'Hero — the opening screen',
-  frames: 'Frames — the photography strip',
-  work: 'Work — the project index',
+  frames: 'Frames — the big photo cards',
+  work: 'Work — the quiet project list',
   writing: 'Writing — the desk and the shelf',
-  timeline: 'Timeline — the chapters',
+  timeline: 'Timeline — the chapter route',
   notes: 'Notes — the last-notes band',
-  archive: 'Archive — the doors at the foot of the page',
+  archive: 'Archive — the kit strip at the foot of the page',
 };
 
 /** What the `visible` switch does, in the author's words, per collection and kind. */

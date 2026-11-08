@@ -241,6 +241,14 @@ html {
   background-color: var(--bg);
 }
 
+/* Lenis (components/SmoothScroll.tsx). It animates the scroll itself, so the
+   browser's own smooth scrolling must not run on top of it; nested scroll
+   areas keep their overscroll to themselves. */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+
 /* Theme change cross-fades instead of snapping. Scoped to colour properties
    so it never slows a transform. */
 html.theme-fade, html.theme-fade * {
@@ -374,6 +382,16 @@ html[data-lumos="on"][data-pointer="coarse"] .invisible-ink {
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-plate { animation: none; }
+}
+
+/* The hero's scroll cue: a short bead of light running down a hairline. */
+@keyframes scroll-cue {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.scroll-cue { animation: scroll-cue 2.2s var(--ease-rushes) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue { animation: none; }
 }
 
 /* One shooting star crosses the hero sky, once, a while after arrival.

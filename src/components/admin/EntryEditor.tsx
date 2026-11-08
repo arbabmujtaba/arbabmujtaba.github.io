@@ -641,7 +641,11 @@ export function EntryEditor({
     : form.collection === 'home'
       ? form.category === 'quote' || form.category === 'thought'
         ? 'The line itself'
-        : 'Title (internal name)'
+        : form.category === 'intro'
+          ? 'The statement'
+          : form.category === 'story'
+            ? 'Heading'
+            : 'Title (internal name)'
       : 'Title';
 
   const excerptLabel = secret
@@ -658,7 +662,9 @@ export function EntryEditor({
         ? 'Excerpt'
         : form.collection === 'home' && (form.category === 'quote' || form.category === 'thought')
           ? 'Source / aside'
-          : 'Description';
+          : form.collection === 'home' && form.category === 'story'
+            ? 'Opening paragraph'
+            : 'Description';
 
   const bodyLabel = secret
     ? secretKind === 'ink'
@@ -670,11 +676,13 @@ export function EntryEditor({
           : 'The note'
     : form.collection === 'photography'
       ? 'Story'
-      : isConfig
+      : form.collection === 'home' && form.category === 'story'
+        ? 'The rest of the story (blank line between paragraphs, **bold** for emphasis)'
+        : isConfig
         ? 'Details (optional)'
         : 'Body';
 
-  const coverLabel = form.collection === 'portfolio' ? 'Project image' : form.collection === 'photography' ? 'Cover photograph' : 'Cover image';
+  const coverLabel = form.collection === 'home' && form.category === 'story' ? 'Portrait' : form.collection === 'portfolio' ? 'Project image' : form.collection === 'photography' ? 'Cover photograph' : 'Cover image';
   const visibility = visibilityLabel(form.collection, form.category);
 
   const address = publicPath(form.collection, form.slug || '…');
@@ -1197,8 +1205,14 @@ function CollectionFields({
               form.category === 'reel'
                 ? 'Shown under the reel on the Home page.'
                 : form.category === 'gateway'
-                  ? 'The small line above the door, e.g. “02 // Thinker”.'
-                  : undefined
+                  ? 'The small line above the door, e.g. “02 // Thinker”. The part after “//” also joins the line above your name.'
+                  : form.category === 'hero'
+                    ? 'Optional. The italic line under your name — read from the lead hero photo (lowest order) only.'
+                    : form.category === 'intro'
+                      ? 'The small eyebrow beside the statement, e.g. “intro”.'
+                      : form.category === 'story'
+                        ? 'The small eyebrow above the heading, e.g. “my story”.'
+                        : undefined
             }
           >
             <input className="st-input" value={form.label} onChange={(event) => patch({ label: event.target.value })} />

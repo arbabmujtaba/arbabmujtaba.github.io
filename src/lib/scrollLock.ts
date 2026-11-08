@@ -14,6 +14,22 @@
 let locks = 0;
 let saved: { overflow: string; paddingRight: string } | null = null;
 
+/**
+ * Told when the page goes from free to frozen and back. The smooth scroller
+ * (components/SmoothScroll.tsx) listens, because it moves the window with
+ * `scrollTo`, which `overflow: hidden` does not stop.
+ */
+const listeners = new Set<(locked: boolean) => void>();
+
+export function onScrollLockChange(listener: (locked: boolean) => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+export const isScrollLocked = (): boolean => locks > 0;
+
 export function lockScroll(): () => void {
   if (typeof document === 'undefined') return () => {};
   const body = document.body;
@@ -22,6 +38,7 @@ export function lockScroll(): () => void {
     saved = { overflow: body.style.overflow, paddingRight: body.style.paddingRight };
     body.style.overflow = 'hidden';
     if (gap > 0) body.style.paddingRight = `${gap}px`;
+    listeners.forEach((listener) => listener(true));
   }
   locks += 1;
 
@@ -34,6 +51,7 @@ export function lockScroll(): () => void {
       body.style.overflow = saved.overflow;
       body.style.paddingRight = saved.paddingRight;
       saved = null;
+      listeners.forEach((listener) => listener(false));
     }
   };
 }

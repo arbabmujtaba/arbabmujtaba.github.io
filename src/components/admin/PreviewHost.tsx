@@ -146,26 +146,86 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** The top of the Home page, roughly: the photograph, the scrim and the name over it. */
+/** The top of the Home page, roughly: the mosaic, the lead frame in the centre, and the name over it. */
 function HeroCard({ payload }: { payload: PreviewPayload }) {
   const hero = resolveHero([
     { configType: 'hero', image: payload.coverImage, visible: true, customization: payload.customization },
   ]);
   return (
     <div>
-      <SectionLabel>Hero — the photograph behind your name at the top of the Home page</SectionLabel>
-      <div data-surface="ink" className="relative flex aspect-[16/10] flex-col justify-end overflow-hidden rounded-[3px] bg-canvas-deep p-6 text-zinc-100 md:p-10">
-        <img src={hero.src} alt="" style={{ objectPosition: hero.objectPosition }} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/40 via-35% to-transparent" />
-        <p className="relative font-display text-[13vw] font-bold uppercase leading-[0.82] tracking-[-0.055em] text-bone md:text-[8vw]">Arbab.</p>
-        <p className="relative mt-4 font-book text-xl italic text-zinc-50">An archive still being written.</p>
+      <SectionLabel>Hero — the photo mosaic behind your name at the top of the Home page</SectionLabel>
+      <div data-surface="ink" className="relative flex aspect-[16/10] flex-col items-center justify-center overflow-hidden rounded-[3px] bg-canvas-deep p-6 text-zinc-100 md:p-10">
+        <div aria-hidden="true" className="absolute inset-[-6%] grid grid-cols-5 items-center gap-2">
+          {Array.from({ length: 5 }, (_, column) => (
+            <div key={column} className="flex flex-col gap-2" style={{ marginTop: ['-14%', '-4%', '-9%', '-1%', '-12%'][column] }}>
+              {Array.from({ length: 3 }, (_, row) =>
+                column === 2 && row === 1 ? (
+                  <img key={row} src={hero.src} alt="" style={{ objectPosition: hero.objectPosition }} className="aspect-[3/4] w-full object-cover" />
+                ) : (
+                  <div key={row} className="hairline-grid aspect-[3/4] w-full bg-well opacity-60" />
+                )
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(58%_46%_at_50%_50%,color-mix(in_srgb,var(--bg-deep)_70%,transparent)_0%,transparent_100%)]" />
+        <p className="relative font-book text-[13vw] font-medium leading-[0.8] tracking-[-0.045em] text-bone md:text-[8vw]">Arbab.</p>
+        <p className="relative mt-3 font-book text-xl italic text-zinc-50">{payload.label?.trim() || 'An archive still being written.'}</p>
       </div>
+      <p className="mt-4 max-w-xl text-xs leading-relaxed text-zinc-500">
+        The Hero photo with the lowest order is the centre tile; every other visible Hero photo joins the wall, and your
+        photography and journal covers fill the dashed tiles.
+      </p>
       {!payload.coverImage && (
         <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">no photo chosen — the default frame is shown</p>
       )}
       {payload.visible === false && (
-        <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">switched off — the site uses the default frame</p>
+        <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">switched off — not part of the mosaic</p>
       )}
+    </div>
+  );
+}
+
+/** The Intro line: the large statement under the hero. */
+function IntroCard({ payload }: { payload: PreviewPayload }) {
+  return (
+    <div>
+      <SectionLabel>Intro — the statement that lights up word by word under the hero</SectionLabel>
+      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,4fr)]">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">{payload.label || 'intro'}</p>
+        <p className="font-book text-4xl leading-[1.05] tracking-[-0.02em] text-zinc-50 md:text-5xl">{payload.title}</p>
+      </div>
+    </div>
+  );
+}
+
+/** The Story section: a portrait beside the heading and the paragraphs. */
+function StoryCard({ payload }: { payload: PreviewPayload }) {
+  const paragraphs = (payload.body || '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  return (
+    <div>
+      <SectionLabel>Story — the portrait and the words beside it on the Home page</SectionLabel>
+      <div className="grid gap-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div className="relative aspect-[4/5] overflow-hidden bg-canvas-deep">
+          {payload.coverImage ? (
+            <img src={payload.coverImage} alt="" style={getCardImageStyle(payload.customization)} className="h-full w-full object-cover" />
+          ) : (
+            <div className="hairline-grid absolute inset-0" />
+          )}
+        </div>
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">{payload.label || 'my story'}</p>
+          <p className="mt-5 font-book text-4xl leading-[1.02] tracking-[-0.025em] text-zinc-50">“{payload.title}”</p>
+          {payload.excerpt && <p className="mt-6 text-lg font-light leading-relaxed text-zinc-200">{payload.excerpt}</p>}
+          <div className="mt-5 space-y-4">
+            {paragraphs.map((paragraph, index) => (
+              <p key={index} className="text-sm font-light leading-relaxed text-zinc-400">
+                {paragraph.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1')}
+              </p>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -218,6 +278,10 @@ function CardPreview({ payload }: { payload: PreviewPayload }) {
     card = <ReelCard payload={payload} />;
   } else if (payload.collection === 'home' && payload.category === 'hero') {
     card = <HeroCard payload={payload} />;
+  } else if (payload.collection === 'home' && payload.category === 'intro') {
+    card = <IntroCard payload={payload} />;
+  } else if (payload.collection === 'home' && payload.category === 'story') {
+    card = <StoryCard payload={payload} />;
   } else if (['portfolio', 'tech', 'photography'].includes(payload.collection)) {
     card = (
       <div>

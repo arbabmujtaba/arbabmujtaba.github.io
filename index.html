@@ -31,14 +31,14 @@
     </script>
 
     <script>
-      // The home hero is the largest paint, but it is only discovered after the
-      // app and the home chunk have loaded. Start fetching it now — home only,
-      // and the same sources HeroPlate in src/pages/Home.tsx renders (a wide
-      // set on landscape screens, a tall one otherwise), so it is one request
-      // either way. __HERO_PRELOAD__ is written by the hero-preload plugin in
+      // The lead tile of the home hero mosaic is only discovered after the app
+      // and the home chunk have loaded. Start fetching it now — home only, with
+      // the same srcset and sizes the centre tile in src/pages/Home.tsx renders
+      // (MOSAIC_TILE_SIZES in src/lib/mosaic.ts), so it is one request.
+      // __HERO_PRELOAD__ is written by the hero-preload plugin in
       // vite.config.ts from the Hero photo chosen in /admin (src/lib/hero.ts).
       var heroSets = __HERO_PRELOAD__;
-      var set = matchMedia('(orientation: landscape)').matches ? heroSets.wide : heroSets.tall;
+      var set = heroSets.tall || heroSets.wide;
       if (location.pathname === '/' && set) {
         var hero = document.createElement('link');
         hero.rel = 'preload';
@@ -46,7 +46,7 @@
         hero.type = 'image/webp';
         hero.setAttribute('fetchpriority', 'high');
         hero.setAttribute('imagesrcset', set);
-        hero.setAttribute('imagesizes', '100vw');
+        hero.setAttribute('imagesizes', '(min-width: 768px) 20vw, 34vw');
         document.head.appendChild(hero);
       }
     </script>

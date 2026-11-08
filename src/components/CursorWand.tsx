@@ -8,6 +8,8 @@ const TIP = { stiffness: 620, damping: 34, mass: 0.35 };
 /** Softer spring for the halo, so it trails behind and catches up. */
 const HALO = { stiffness: 130, damping: 18, mass: 0.7 };
 const INTERACTIVE = 'a[href], button, [role="button"], input, select, textarea';
+/** An element can ask for a word in the halo instead, e.g. `data-cursor-label="view"`. */
+const LABELLED = '[data-cursor-label]';
 
 /**
  * CursorWand — a small cobalt dot that follows the pointer, with a slower halo
@@ -33,6 +35,7 @@ export default function CursorWand() {
   const isTouchDevice = useMediaQuery('(pointer: coarse)');
   const [visible, setVisible] = useState(false);
   const [overInteractive, setOverInteractive] = useState(false);
+  const [label, setLabel] = useState<string | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -71,6 +74,7 @@ export default function CursorWand() {
       if (event.pointerType === 'touch') return;
       const target = event.target as Element | null;
       setOverInteractive(!!target?.closest?.(INTERACTIVE));
+      setLabel(target?.closest?.(LABELLED)?.getAttribute('data-cursor-label') || null);
     };
 
     const handleLeave = () => show(false);
@@ -107,11 +111,24 @@ export default function CursorWand() {
           filter: 'blur(2px)',
         }}
         animate={{
-          opacity: visible ? (overInteractive ? 0.95 : 0.6) : 0,
+          opacity: visible && !label ? (overInteractive ? 0.95 : 0.6) : 0,
           scale: overInteractive ? 1.9 : 1,
         }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       />
+
+      {/* A word in place of the halo, over anything that asks for one */}
+      <m.div
+        className="absolute left-0 top-0"
+        style={{ x: haloX, y: haloY }}
+        initial={false}
+        animate={{ opacity: visible && label ? 1 : 0, scale: visible && label ? 1 : 0.4 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <span className="flex h-[4.5rem] w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent font-mono text-[10px] uppercase tracking-[0.18em] text-on-accent shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_45%,transparent)]">
+          {label}
+        </span>
+      </m.div>
 
       {/* Wand tip */}
       <m.div
@@ -126,7 +143,7 @@ export default function CursorWand() {
           boxShadow: '0 0 12px color-mix(in srgb, var(--accent) 65%, transparent)',
         }}
         animate={{
-          opacity: visible ? 1 : 0,
+          opacity: visible && !label ? 1 : 0,
           scale: overInteractive ? 0.45 : 1,
         }}
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}

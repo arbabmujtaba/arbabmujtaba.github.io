@@ -303,7 +303,7 @@ export interface HomeConfigEntry {
    * `reel` is a short clip on the home page — the one block that moves on its
    * own. Everything else is a still composition.
    */
-  configType: "gateway" | "quote" | "principle" | "profile" | "section" | "reel" | "thought";
+  configType: "hero" | "intro" | "story" | "gateway" | "quote" | "principle" | "profile" | "section" | "reel" | "thought";
   /** For interlude blocks (configType "quote"): which visual template to render. */
   variant?: "quote" | "statement" | "marquee" | "stat";
   label?: string;
