@@ -1,6 +1,7 @@
 import { m, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
+import { LANDED, lift } from '../../lib/motion';
 
 interface ArchiveDoorProps {
   title: string;
@@ -24,8 +25,8 @@ export default function ArchiveDoor({ title, image, index, role, description, hr
   const reduced = useReducedMotion();
   return (
     <m.div
-      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 26 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduced ? { opacity: 0 } : lift(26)}
+      whileInView={LANDED}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: reduced ? 0.3 : 0.9, delay: reduced ? 0 : delay, ease: EASE }}
       data-levitate

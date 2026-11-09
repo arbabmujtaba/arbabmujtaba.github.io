@@ -34,21 +34,40 @@ function Tile({ tile, delay, reduced }: { tile: MosaicTile; delay: number; reduc
     />
   );
 
+  const transition = { duration: reduced ? 0.4 : 1.5, delay: reduced ? 0 : delay, ease: EASE };
+
+  // The tile develops from a window in its middle while the whole tile
+  // settles from a 1.12 zoom. That used to be an animated clip-path
+  // (inset 14% 10%, under scale 1.12), which repaints every tile on the main
+  // thread for every frame of the 1.5 s entrance — 25 tiles at once, right
+  // while the page is loading. The same picture is drawn with transforms
+  // only: the frame scales to the window it used to clip to (0.8 × 1.12 by
+  // 0.72 × 1.12), and the photograph inside is counter-scaled so its net size
+  // is still the 1.12 zoom. Written as whole `transform` strings so motion
+  // hands them to the browser (WAAPI) and they run off the main thread; the
+  // individual scaleX / scaleY values would be stepped in JS every frame.
   return (
     <m.div
       className={`group/tile relative aspect-[3/4] w-full overflow-hidden bg-canvas-deep ${tile.lead ? 'z-10' : ''}`}
-      initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 1.12, clipPath: 'inset(14% 10% 14% 10%)' }}
-      animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, clipPath: 'inset(0% 0% 0% 0%)' }}
-      transition={{ duration: reduced ? 0.4 : 1.5, delay: reduced ? 0 : delay, ease: EASE }}
+      initial={reduced ? { opacity: 0 } : { opacity: 0, transform: `scale(${0.8 * 1.12}, ${0.72 * 1.12})` }}
+      animate={reduced ? { opacity: 1 } : { opacity: 1, transform: 'scale(1, 1)' }}
+      transition={transition}
     >
-      {tile.srcSet && !plain ? (
-        <picture>
-          <source type="image/webp" srcSet={tile.srcSet} sizes={MOSAIC_TILE_SIZES} />
-          {img}
-        </picture>
-      ) : (
-        img
-      )}
+      <m.div
+        className="h-full w-full"
+        initial={reduced ? false : { transform: `scale(${1 / 0.8}, ${1 / 0.72})` }}
+        animate={reduced ? undefined : { transform: 'scale(1, 1)' }}
+        transition={transition}
+      >
+        {tile.srcSet && !plain ? (
+          <picture>
+            <source type="image/webp" srcSet={tile.srcSet} sizes={MOSAIC_TILE_SIZES} />
+            {img}
+          </picture>
+        ) : (
+          img
+        )}
+      </m.div>
       {/* The rest of the wall stays a step down so the lead frame and the name carry the screen. */}
       {!tile.lead && (
         <div className="pointer-events-none absolute inset-0 bg-[var(--bg-deep)] opacity-45 transition-opacity duration-700 group-hover/tile:opacity-0" />

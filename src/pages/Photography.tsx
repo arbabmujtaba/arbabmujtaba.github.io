@@ -22,6 +22,7 @@ import { useMagic } from '../lib/magic';
 import { isFeatured } from '../lib/priority';
 import { isRoomEnabled } from '../lib/secrets';
 import type { GearItem, PhotographyEntry } from '../types';
+import { LANDED, lift } from '../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -406,8 +407,8 @@ export default function Photography() {
         {leadPhoto && (
           <section className="relative pb-16 md:pb-24">
             <m.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={lift(24)}
+              whileInView={LANDED}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.9, ease: EASE }}
             >
@@ -610,8 +611,8 @@ export default function Photography() {
                 return (
                   <m.div
                     key={category}
-                    initial={{ opacity: 0, y: 22 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={lift(22)}
+                    whileInView={LANDED}
                     viewport={{ once: true, amount: 0.25 }}
                     transition={{ duration: 0.8, delay: index * 0.08, ease: EASE }}
                     className="border border-zinc-800 bg-canvas-raised p-6"

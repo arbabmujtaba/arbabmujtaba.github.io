@@ -14,6 +14,7 @@ import { useOpenEntry } from '../lib/entryNavigation';
 import { ownerArchiveImage } from '../lib/image';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import type { PortfolioProject } from '../types';
+import { LANDED, lift } from '../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -117,8 +118,8 @@ export default function Portfolio() {
 
         {/* ===================== THE INDEX ===================== */}
         <m.section
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={lift(shouldReduceMotion ? 0 : 22)}
+          whileInView={LANDED}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
           className="border-t border-zinc-800 pt-7"
@@ -155,8 +156,8 @@ export default function Portfolio() {
         {/* ===================== IMAGE PLATES ===================== */}
         {plates.length > 0 && (
           <m.section
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={lift(shouldReduceMotion ? 0 : 22)}
+            whileInView={LANDED}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
             className="mt-24 border-t border-zinc-800 pt-7 md:mt-32"
@@ -192,8 +193,8 @@ export default function Portfolio() {
 
         {/* ===================== TECHNICAL CONTEXT ===================== */}
         <m.section
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={lift(shouldReduceMotion ? 0 : 22)}
+          whileInView={LANDED}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
           className="mt-24 border-t border-zinc-800 pb-24 pt-7 md:mt-32 md:pb-32"

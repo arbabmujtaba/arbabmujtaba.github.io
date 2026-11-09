@@ -18,10 +18,11 @@ export default function SafeImage({
   fallback,
   className = '',
   style,
+  sizes,
   ...props
 }: SafeImageProps) {
   const normalized = normalizeImagePath(src);
-  const webpSources = getLocalWebpSources(normalized);
+  const webpSources = getLocalWebpSources(normalized, sizes);
 
   /**
    * Three stages, because a `<source>` and an `<img>` fail differently.
@@ -61,6 +62,7 @@ export default function SafeImage({
       <img
         src={normalized}
         alt={alt}
+        sizes={sizes}
         className={className}
         style={style}
         onError={() => setStage(useWebpSources ? 'original' : 'failed')}

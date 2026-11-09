@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { useOpenEntry } from '../../lib/entryNavigation';
 import type { DetailCollection } from '../../lib/collections';
+import { LANDED, lift } from '../../lib/motion';
 
 export interface NotebookItem {
   collection: DetailCollection;
@@ -46,8 +47,8 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
         return (
           <m.article
             key={`${item.collection}/${item.slug}`}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : lift(24)}
+            whileInView={LANDED}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: shouldReduceMotion ? 0.3 : 0.85, delay: shouldReduceMotion ? 0 : index * 0.1, ease: EASE }}
           >
@@ -63,8 +64,8 @@ export default function Notebook({ items, className = '' }: NotebookProps) {
               <span aria-hidden="true" className="relative block h-px w-full bg-zinc-800">
                 <m.span
                   className="absolute inset-y-0 left-0 block w-full origin-left bg-accent"
-                  initial={{ scaleX: shouldReduceMotion ? 1 : 0 }}
-                  whileInView={{ scaleX: 1 }}
+                  initial={{ transform: shouldReduceMotion ? 'scaleX(1)' : 'scaleX(0)' }}
+                  whileInView={{ transform: 'scaleX(1)' }}
                   viewport={{ once: true }}
                   transition={{ duration: 1.2, delay: 0.2 + index * 0.12, ease: EASE }}
                   style={{ opacity: 0.55 }}

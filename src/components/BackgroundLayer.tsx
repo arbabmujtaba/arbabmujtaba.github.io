@@ -3,7 +3,6 @@ import {
   m,
   useMotionValue,
   useReducedMotion,
-  useScroll,
   useSpring,
   useTransform,
   type MotionValue,
@@ -362,8 +361,11 @@ function Drift({
                         height: d,
                         marginLeft: -d / 2,
                         marginTop: -d / 2,
-                        opacity: m.o,
-                        ['--o' as string]: m.o,
+                        // The star's own brightness lives in its colour, so the
+                        // keyframes can be constants: a keyframe that reads a
+                        // CSS variable is not run on the compositor, and eight
+                        // of them kept the main thread restyling every frame.
+                        background: `color-mix(in srgb, var(--gilt) ${Math.round(m.o * 100)}%, transparent)`,
                         animationDuration: `${6 + m.delay}s`,
                         animationDelay: `${m.delay}s`,
                       }}
@@ -403,8 +405,14 @@ export default function BackgroundLayer() {
   const dust = useMemo(() => field(isTouchDevice ? 14 : 28, 1906, 60), [isTouchDevice]);
 
   // --- scroll ---------------------------------------------------------------
-  const { scrollY, scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, { stiffness: 60, damping: 24, mass: 0.8 });
+  // The plate no longer moves with the scroll. It covers the whole viewport
+  // and carries the grain, the map canvas, the light pools and the stars;
+  // moving any of it on every scroll frame made the browser recomposite the
+  // full screen per frame, which on a software or weak GPU compositor (common
+  // on Linux) was the mid-page stutter. Held at rest (progress 0) instead, so
+  // every pose below is its first-screen pose. The pointer lean still moves it.
+  const scrollY = useMotionValue(0);
+  const progress = useMotionValue(0);
 
   const mapRotate = useTransform(progress, [0, 1], [0, 9]);
   const mapScale = useTransform(progress, [0, 1], [1.06, 1.18]);

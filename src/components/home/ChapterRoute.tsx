@@ -106,8 +106,8 @@ export default function ChapterRoute({
         <m.div
           aria-hidden="true"
           className="absolute inset-x-0 top-[7px] h-px origin-left bg-zinc-700"
-          initial={{ scaleX: reduced ? 1 : 0 }}
-          whileInView={{ scaleX: 1 }}
+          initial={{ transform: reduced ? 'scaleX(1)' : 'scaleX(0)' }}
+          whileInView={{ transform: 'scaleX(1)' }}
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: reduced ? 0 : 1.8, ease: [0.65, 0, 0.35, 1] }}
         />

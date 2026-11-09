@@ -59,7 +59,7 @@ const LIST_META: Record<string, { title: string; description: string }> = {
   '/': {
     title: 'Arbab Mujtaba — Archive',
     description:
-      'An archive still being written. Engineering projects, essays, photography, and a working index of tools and references.',
+      'Fascinated by the invisible architecture of everything. Engineering projects, essays, photography, and a working index of tools and references.',
   },
   '/portfolio': {
     title: 'Work — Arbab Mujtaba',

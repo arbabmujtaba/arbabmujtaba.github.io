@@ -104,7 +104,9 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
               }}
               title={entry.title}
               aria-label={`Vol. ${volume} — ${entry.title}`}
-              // the volumes settle onto the shelf one after another, once
+              // the volumes settle onto the shelf one after another, once.
+              // (motion's y, not lib/motion's lift: the hover turn below is
+              // built from motion's own transform values on this element.)
               initial={reduced ? { opacity: 0 } : { opacity: 0, y: -14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.6 }}
@@ -167,8 +169,8 @@ export default function Bookshelf({ volumes, className = '' }: { volumes: Journa
               {!reduced && (
                 <m.span
                   className="pointer-events-none absolute inset-x-0 h-1/2 bg-gradient-to-b from-transparent via-gilt/25 to-transparent"
-                  initial={{ y: '210%' }}
-                  whileInView={{ y: '-110%' }}
+                  initial={{ transform: 'translateY(210%)' }}
+                  whileInView={{ transform: 'translateY(-110%)' }}
                   viewport={{ once: true, amount: 0.8 }}
                   transition={{ duration: 1.6, delay: shelf.length * 0.06 + 0.5, ease: EASE }}
                 />

@@ -7,6 +7,7 @@ import { detailPath } from '../lib/collections';
 import { useOpenEntry } from '../lib/entryNavigation';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import type { TechEntry, FavoriteItem } from '../types';
+import { LANDED, lift } from '../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -110,8 +111,8 @@ export default function Tech() {
 
         {/* ===================== SPEC RULE ===================== */}
         <m.dl
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={lift(shouldReduceMotion ? 0 : 14)}
+          whileInView={LANDED}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: shouldReduceMotion ? 0.35 : 0.8, ease: EASE }}
           className="grid grid-cols-2 gap-y-6 border-y border-zinc-800 py-6 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:grid-cols-3"
@@ -134,8 +135,8 @@ export default function Tech() {
 
         {/* ===================== LOG INDEX ===================== */}
         <m.div
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={lift(shouldReduceMotion ? 0 : 22)}
+          whileInView={LANDED}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
           className="mt-20 md:mt-28"
@@ -185,8 +186,8 @@ export default function Tech() {
         {/* ===================== THINGS I LIKE ===================== */}
         {Object.keys(thingsILikeByGroup).length > 0 && (
           <m.section
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={lift(shouldReduceMotion ? 0 : 22)}
+            whileInView={LANDED}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
             className="mt-24 border-t border-zinc-800 pb-24 pt-7 md:mt-32 md:pb-32"

@@ -2361,7 +2361,7 @@
       "id": "secrets/egg-fullstop",
       "collection": "secrets",
       "slug": "egg-fullstop",
-      "title": "Not a full stop",
+      "title": "Not the last letter",
       "state": "published",
       "versions": [
         {
@@ -2884,8 +2884,46 @@
       "filePath": "content/photography/mp-forest.md",
       "lastReviewedAt": "2026-10-13T22:00:58.324Z",
       "publishedAt": "2026-10-13T22:00:58.326Z"
+    },
+    {
+      "id": "home/intro",
+      "collection": "home",
+      "slug": "intro",
+      "title": "I build things to understand them, and photograph things so I don't forget them.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-11-09T12:38:27.473Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-11-09T12:38:27.473Z",
+      "updatedAt": "2026-11-09T12:38:27.473Z",
+      "publishedAt": "2026-11-09T12:38:27.473Z",
+      "filePath": "content/home/intro.md"
+    },
+    {
+      "id": "home/story",
+      "collection": "home",
+      "slug": "story",
+      "title": "Born in Sopore. Learning in Indore. Still keeping notes.",
+      "state": "published",
+      "versions": [
+        {
+          "version": 1,
+          "state": "published",
+          "timestamp": "2026-11-09T12:38:27.473Z"
+        }
+      ],
+      "unsavedChanges": false,
+      "createdAt": "2026-11-09T12:38:27.473Z",
+      "updatedAt": "2026-11-09T12:38:27.473Z",
+      "publishedAt": "2026-11-09T12:38:27.473Z",
+      "filePath": "content/home/story.md"
     }
   ],
-  "lastUpdated": "2026-10-13T22:02:33.067Z",
+  "lastUpdated": "2026-11-09T12:38:27.488Z",
   "version": 1
 }

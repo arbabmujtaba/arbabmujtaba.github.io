@@ -169,8 +169,8 @@ function HeroCard({ payload }: { payload: PreviewPayload }) {
           ))}
         </div>
         <div className="absolute inset-0 bg-[radial-gradient(58%_46%_at_50%_50%,color-mix(in_srgb,var(--bg-deep)_70%,transparent)_0%,transparent_100%)]" />
-        <p className="relative font-book text-[13vw] font-medium leading-[0.8] tracking-[-0.045em] text-bone md:text-[8vw]">Arbab.</p>
-        <p className="relative mt-3 font-book text-xl italic text-zinc-50">{payload.label?.trim() || 'An archive still being written.'}</p>
+        <p className="relative font-book text-[13vw] font-medium leading-[0.8] tracking-[-0.045em] text-bone md:text-[8vw]">Arbab</p>
+        <p className="relative mt-3 font-book text-xl italic text-zinc-50">{payload.label?.trim() || 'Fascinated by the invisible architecture of everything.'}</p>
       </div>
       <p className="mt-4 max-w-xl text-xs leading-relaxed text-zinc-500">
         The Hero photo with the lowest order is the centre tile; every other visible Hero photo joins the wall, and your

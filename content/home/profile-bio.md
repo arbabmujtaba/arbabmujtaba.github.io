@@ -3,7 +3,7 @@ title: Profile Bio
 slug: profile-bio
 configType: profile
 label: "Identity // Personal Index"
-description: "Computer Engineering student at IET DAVV, Indore. Based between code, cameras, Jammu & Kashmir, and the small mysteries that make ordinary days worth documenting."
+description: ""
 order: 1
 visible: true
 ---

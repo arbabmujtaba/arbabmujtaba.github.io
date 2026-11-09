@@ -4,6 +4,7 @@ import { RecLabel } from '../rushes';
 import { getCardImageStyle } from '../../lib/customization';
 import { getLocalWebpSources, ownerArchiveImage } from '../../lib/image';
 import type { PostCustomization } from '../../types';
+import { LANDED, lift } from '../../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const PORTRAIT_SIZES = '(min-width: 1024px) 38vw, 92vw';
@@ -109,8 +110,8 @@ export default function StorySection({
     .filter(Boolean);
 
   const rise = (delay: number) => ({
-    initial: { opacity: 0, y: reduced ? 0 : 22 },
-    whileInView: { opacity: 1, y: 0 },
+    initial: lift(reduced ? 0 : 22),
+    whileInView: LANDED,
     viewport: { once: true, amount: 0.4 },
     transition: { duration: 0.9, delay, ease: EASE },
   });

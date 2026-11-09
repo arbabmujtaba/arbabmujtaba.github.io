@@ -5,6 +5,7 @@ import Tilt from './Tilt';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { getCardImageStyle } from '../../lib/customization';
 import type { PostCustomization } from '../../types';
+import { landed, lift } from '../../lib/motion';
 
 interface FrameCardProps {
   title: string;
@@ -114,10 +115,11 @@ export default function FrameCard({
   return (
     <m.div
       // Enters tipped back on its top edge and swings flat: a one-shot 3D
-      // entrance, cheap enough for phones too.
-      style={shouldReduceMotion ? undefined : { transformPerspective: 1100, transformOrigin: '50% 0%' }}
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26, rotateX: 16 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      // entrance, cheap enough for phones too. One transform string, its
+      // perspective included, so the compositor plays it (see lib/motion).
+      style={shouldReduceMotion ? undefined : { transformOrigin: '50% 0%' }}
+      initial={shouldReduceMotion ? { opacity: 0 } : lift(26, 'rotateX(16deg)', 1100)}
+      whileInView={landed('rotateX(0deg)', 1100)}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: shouldReduceMotion ? 0.3 : 0.85, ease: EASE }}
       className={className}

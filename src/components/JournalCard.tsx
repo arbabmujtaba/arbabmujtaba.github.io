@@ -7,6 +7,7 @@ import { detailPath } from '../lib/collections';
 import { shouldInterceptClick } from '../lib/navigation';
 import { getCardImageStyle } from '../lib/customization';
 import { JournalEntry } from '../types';
+import { LANDED, lift } from '../lib/motion';
 
 /**
  * Default cover used when an entry has no uploaded image.
@@ -134,8 +135,8 @@ export default function JournalCard({ entry, variant, onOpen, index = 0 }: Journ
 
   return (
     <m.article
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: isFeatured ? 24 : 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : lift(isFeatured ? 24 : 20)}
+      whileInView={LANDED}
       viewport={{ once: true, amount: 0.15 }}
       transition={{
         duration: shouldReduceMotion ? 0.3 : isFeatured ? 0.95 : 0.8,

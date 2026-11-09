@@ -3,6 +3,7 @@ import { m, useReducedMotion } from 'motion/react';
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import SafeImage from '../SafeImage';
 import { normalizeImagePath } from '../../lib/image';
+import { LANDED, lift } from '../../lib/motion';
 
 interface MotionPlateProps {
   /** `/uploads/...` path to an .mp4, .webm or .gif. */
@@ -106,7 +107,24 @@ export default function MotionPlate({
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Start buffering a screen ahead, so the clip is not fetched and its
+    // decoder spun up in the middle of a scroll the moment it comes into view.
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        const video = videoRef.current;
+        if (!entry.isIntersecting || !video) return;
+        if (wantsPlayRef.current && video.preload !== 'auto') video.preload = 'auto';
+        near.disconnect();
+      },
+      { rootMargin: '100% 0px' }
+    );
+    near.observe(node);
+
+    return () => {
+      observer.disconnect();
+      near.disconnect();
+    };
   }, [gif]);
 
   const togglePlay = useCallback(() => {
@@ -167,8 +185,8 @@ export default function MotionPlate({
     <m.div
       ref={containerRef}
       className={className}
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 26 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : lift(26)}
+      whileInView={LANDED}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: shouldReduceMotion ? 0.3 : 0.85, ease: EASE }}
     >
@@ -221,7 +239,7 @@ export default function MotionPlate({
               type="button"
               onClick={togglePlay}
               aria-label={playing ? `Pause ${title}` : `Play ${title}`}
-              className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+              className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
             >
               {playing ? <Pause size={15} strokeWidth={1.8} /> : <Play size={15} strokeWidth={1.8} />}
             </button>
@@ -233,7 +251,7 @@ export default function MotionPlate({
                 type="button"
                 onClick={toggleMuted}
                 aria-label={muted ? `Unmute ${title}` : `Mute ${title}`}
-                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 {muted ? <VolumeX size={15} strokeWidth={1.8} /> : <Volume2 size={15} strokeWidth={1.8} />}
               </button>
@@ -242,7 +260,7 @@ export default function MotionPlate({
                 type="button"
                 onClick={restart}
                 aria-label={`Restart ${title}`}
-                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 backdrop-blur-sm transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                className="pointer-events-auto flex h-[44px] w-[44px] items-center justify-center rounded-full bg-canvas/80 text-zinc-100 transition-colors hover:bg-accent hover:text-on-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 <RotateCcw size={14} strokeWidth={1.8} />
               </button>

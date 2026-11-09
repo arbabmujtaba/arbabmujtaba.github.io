@@ -3,6 +3,7 @@ import { AnimatePresence, m, useInView, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import Lightbox, { type LightboxFrame } from '../Lightbox';
 import { getLocalWebpSources, ownerArchiveImage } from '../../lib/image';
+import { landed, lift } from '../../lib/motion';
 import { getCardImageStyle } from '../../lib/customization';
 import { useOpenEntry } from '../../lib/entryNavigation';
 import { isFeatured, sortByPriority } from '../../lib/priority';
@@ -54,13 +55,18 @@ function shuffle<T>(list: T[]): T[] {
   return copy;
 }
 
+/** Rendered width of each tile, so the browser picks the right WebP candidate. */
+function tileSizes(slot: number): string {
+  return TILE_SPANS[slot]?.startsWith('col-span-2') ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 25vw, 50vw';
+}
+
 /** Warm the browser cache with the exact candidate the tile will pick. */
-function preload(src: string): Promise<void> {
+function preload(src: string, sizes: string): Promise<void> {
   return new Promise((resolve) => {
     const img = new Image();
     const sources = getLocalWebpSources(src);
     if (sources) {
-      img.sizes = '(min-width: 768px) 25vw, 50vw';
+      img.sizes = sizes;
       img.srcset = sources.srcSet;
     }
     img.src = src;
@@ -140,7 +146,7 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
     if (slots[pick] === lastSwapped.current && slots.length > 1) pick = (pick + 1) % slots.length;
     const slot = slots[pick];
     const next = candidates[Math.floor(Math.random() * candidates.length)];
-    await preload(next.src);
+    await preload(next.src, tileSizes(slot));
     lastSwapped.current = slot;
     // A frame rotated in is never pinned, so the rotation cannot freeze itself.
     setTiles((current) => current.map((tile, i) => (i === slot ? { ...next, pinned: false } : tile)));
@@ -186,30 +192,45 @@ export default function PhotoShuffle({ entries, className = '', interval = 3400 
             onClick={() => setLightbox(index)}
             aria-label={`Open ${tile.title} at full size`}
             className={`group relative overflow-hidden rounded-[3px] bg-well focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent ${TILE_SPANS[index]}`}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 30, scale: 0.97 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : lift(30, 'scale(0.97)')}
+            whileInView={landed('scale(1)')}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: shouldReduceMotion ? 0.3 : 0.9, delay: shouldReduceMotion ? 0 : index * 0.07, ease: EASE }}
           >
             <AnimatePresence initial={false}>
+              {/* The incoming frame wipes up over the outgoing one, which is
+                  held (and kept underneath) until the wipe has finished. The
+                  wipe is two opposed translates — the plate rises, the picture
+                  inside it counter-moves — rather than an animated clip-path:
+                  clip-path repaints on the main thread every frame, and with a
+                  swap every few seconds that was a regular hitch while
+                  scrolling past the reels into this grid. Both are transform
+                  strings, not motion's y/scale, so the browser plays them on
+                  the compositor (see lib/motion). */}
               <m.span
                 key={tile.src}
-                className="absolute inset-0 block"
-                /* The incoming frame wipes up over the outgoing one, which is
-                   held (and kept underneath) until the wipe has finished. */
+                className="absolute inset-0 block overflow-hidden"
                 style={{ zIndex: 2 }}
-                initial={{ clipPath: 'inset(100% 0% 0% 0%)', scale: 1.12 }}
-                animate={{ clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }}
+                initial={{ transform: 'translateY(100%)' }}
+                animate={{ transform: 'translateY(0%)' }}
                 exit={{ zIndex: 1, opacity: 0.999, transition: { duration: 1.1 } }}
                 transition={{ duration: 1.1, ease: EASE }}
               >
-                <SafeImage
-                  src={tile.src}
-                  alt={tile.title}
-                  style={tile.style}
-                  className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.05]"
-                  fallback={<span className="hairline-grid block h-full w-full bg-well" />}
-                />
+                <m.span
+                  className="absolute inset-0 block"
+                  initial={{ transform: 'translateY(-100%) scale(1.12)' }}
+                  animate={{ transform: 'translateY(0%) scale(1)' }}
+                  transition={{ duration: 1.1, ease: EASE }}
+                >
+                  <SafeImage
+                    src={tile.src}
+                    alt={tile.title}
+                    style={tile.style}
+                    sizes={tileSizes(index)}
+                    className="h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.05]"
+                    fallback={<span className="hairline-grid block h-full w-full bg-well" />}
+                  />
+                </m.span>
               </m.span>
             </AnimatePresence>
 

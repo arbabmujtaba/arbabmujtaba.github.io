@@ -24,6 +24,18 @@ interface RiseProps {
  */
 export function Rise({ children, className = '', tilt = 10 }: RiseProps) {
   const enabled = useScrollDepth();
+  // Flat is a plain wrapper with no scroll tracking at all: on phones and
+  // tablets every section used to register a useScroll target anyway, which
+  // measures layout on scroll and resize for an effect that never ran.
+  if (!enabled) return <div className={className}>{children}</div>;
+  return (
+    <RiseTilt className={className} tilt={tilt}>
+      {children}
+    </RiseTilt>
+  );
+}
+
+function RiseTilt({ children, className, tilt }: Required<Omit<RiseProps, 'children'>> & { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   // 0 when the block's top meets the bottom of the window, 1 when it reaches 70% up.
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'start 0.7'] });
@@ -32,12 +44,6 @@ export function Rise({ children, className = '', tilt = 10 }: RiseProps) {
   const y = useTransform(progress, [0, 1], [48, 0]);
   const scale = useTransform(progress, [0, 1], [0.96, 1]);
 
-  if (!enabled)
-    return (
-      <div ref={ref} className={className}>
-        {children}
-      </div>
-    );
   return (
     <m.div
       ref={ref}

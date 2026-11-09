@@ -5,6 +5,7 @@ import { useOpenEntry } from '../../lib/entryNavigation';
 import { usePointerDepth } from '../../lib/depth';
 import { getLocalWebpSources, ownerArchiveImage } from '../../lib/image';
 import type { PortfolioProject } from '../../types';
+import { LANDED, lift } from '../../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const FOLLOW = { stiffness: 260, damping: 28, mass: 0.6 };
@@ -53,8 +54,8 @@ export default function WorkColumn({ projects, className = '' }: { projects: Por
         {projects.map((project, index) => (
           <m.li
             key={project.slug}
-            initial={{ opacity: 0, y: reduced ? 0 : 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={lift(reduced ? 0 : 12)}
+            whileInView={LANDED}
             viewport={{ once: true, amount: 0.8 }}
             transition={{ duration: 0.7, delay: reduced ? 0 : index * 0.06, ease: EASE }}
             className="border-b border-zinc-800 first:border-t"

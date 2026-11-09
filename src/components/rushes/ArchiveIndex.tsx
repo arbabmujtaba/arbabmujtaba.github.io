@@ -2,6 +2,7 @@ import { m, useReducedMotion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
+import { LANDED, lift } from '../../lib/motion';
 
 export interface ArchiveIndexDoor {
   key: string;
@@ -34,8 +35,8 @@ export default function ArchiveIndex({ doors, className = '' }: { doors: Archive
         <m.li
           key={door.key}
           className="border-b border-zinc-800"
-          initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={reduced ? { opacity: 0 } : lift(14)}
+          whileInView={LANDED}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduced ? 0.3 : 0.7, delay: reduced ? 0 : i * 0.06, ease: EASE }}
         >

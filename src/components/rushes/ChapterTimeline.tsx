@@ -3,6 +3,7 @@ import { AnimatePresence, m, useReducedMotion, useScroll, useSpring, useTransfor
 import InkNote from '../magic/InkNote';
 import { distanceKm, formatLat, PLACES } from '../../lib/places';
 import type { TimelineMilestone } from '../../types';
+import { LANDED, lift } from '../../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
@@ -167,8 +168,8 @@ export default function ChapterTimeline({ milestones, className = '' }: ChapterT
                 id={`chapter-${chapter.slug}`}
                 data-slug={chapter.slug}
                 className="relative grid grid-cols-1 gap-3 pb-16 pl-10 md:grid-cols-[9.5rem_1fr] md:gap-14 md:pb-24 md:pl-0"
-                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 26 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={reduced ? { opacity: 0 } : lift(26)}
+                whileInView={LANDED}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: reduced ? 0.3 : 0.9, ease: EASE }}
               >

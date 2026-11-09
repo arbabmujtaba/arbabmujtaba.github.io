@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { AnimatePresence, m, useReducedMotion } from 'motion/react';
+import { useRef, useState } from 'react';
+import { AnimatePresence, m, useInView, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import MotionPlate from './MotionPlate';
 import SafeImage from '../SafeImage';
@@ -29,6 +29,10 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProps) {
   const shouldReduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
+  // The "now playing" bars loop forever; only run them while the strip is on
+  // screen, so they cost nothing for the rest of the page.
+  const stripRef = useRef<HTMLUListElement>(null);
+  const stripInView = useInView(stripRef);
 
   if (reels.length === 0) return null;
   const current = reels[Math.min(active, reels.length - 1)];
@@ -41,11 +45,13 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
     <div className={className}>
       <div className="relative">
         <AnimatePresence mode="wait" initial={false}>
+          {/* No blur in this swap: a filter left on the wrapper (even blur(0px))
+              forces the playing video through a filter layer every frame. */}
           <m.div
             key={current.slug}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.01, filter: 'blur(4px)' }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.01 }}
             transition={{ duration: shouldReduceMotion ? 0.2 : 0.6, ease: EASE }}
           >
             <MotionPlate
@@ -70,7 +76,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                 type="button"
                 onClick={() => step(delta)}
                 aria-label={label}
-                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-canvas/60 text-zinc-100 opacity-70 backdrop-blur-sm transition hover:bg-accent hover:text-on-accent hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-canvas/80 text-zinc-100 opacity-70 transition hover:bg-accent hover:text-on-accent hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 <Icon size={18} strokeWidth={1.6} />
               </button>
@@ -115,6 +121,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
         <div className="mt-10 border-t border-zinc-800 pt-6">
           <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">more reels</p>
           <ul
+            ref={stripRef}
             className="custom-scrollbar -mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-3"
             aria-label="Choose a reel"
           >
@@ -137,6 +144,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                       <SafeImage
                         src={reel.videoPoster || reel.image}
                         alt=""
+                        sizes="(min-width: 768px) 17rem, 14rem"
                         className={`h-full w-full object-cover transition-[transform,scale,opacity,filter] duration-700 ease-out group-hover:scale-[1.04] ${
                           selected ? 'opacity-100' : 'opacity-60 grayscale-[40%] group-hover:opacity-100 group-hover:grayscale-0'
                         }`}
@@ -155,7 +163,7 @@ export default function ReelShowcase({ reels, className = '' }: ReelShowcaseProp
                               {[0, 1, 2].map((bar) => (
                                 <span
                                   key={bar}
-                                  className={`block h-3 w-[2px] origin-bottom bg-current ${shouldReduceMotion ? 'scale-y-[0.67]' : 'eq-bar'}`}
+                                  className={`block h-3 w-[2px] origin-bottom bg-current ${shouldReduceMotion || !stripInView ? 'scale-y-[0.67]' : 'eq-bar'}`}
                                   style={shouldReduceMotion ? undefined : { animationDelay: `${bar * 0.18}s` }}
                                 />
                               ))}

@@ -47,8 +47,6 @@ const MagicLayer = lazy(() => import('./components/magic/MagicLayer'));
 const GlobalBackground = lazy(() => import('./components/GlobalBackground'));
 const CursorWand = lazy(() => import('./components/CursorWand'));
 const FloatingMagicalArrow = lazy(() => import('./components/FloatingMagicalArrow'));
-// Inertial wheel scrolling (Lenis). Desktop pointers only, mounted on idle.
-const SmoothScroll = lazy(() => import('./components/SmoothScroll'));
 
 interface QuickLook {
   collection: DetailCollection;
@@ -79,7 +77,6 @@ function resolveLocation(): { route: Route; quickLook: QuickLook | null } {
 export default function App() {
   const [{ route, quickLook }, setLocation] = useState(resolveLocation);
   const isTouchDevice = useMediaQuery('(pointer: coarse), (max-width: 767px)');
-  const canSmoothScroll = useMediaQuery('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
 
   const setView = useCallback((newView: string) => {
     navigate(VIEW_TO_PATH[newView as ListView] ?? '/');
@@ -226,11 +223,13 @@ export default function App() {
           </Suspense>
         )}
 
-        {!isAdmin && magicReady && canSmoothScroll && (
-          <Suspense fallback={null}>
-            <SmoothScroll />
-          </Suspense>
-        )}
+        {/* Lenis smooth scrolling is deliberately not mounted. It moves the
+            page from JavaScript, so every scroll frame waits on the main
+            thread, and any busy frame (a scroll-linked animation, an image
+            decode, a style recalc) showed up as a visible stutter. Native
+            scrolling runs on the compositor and stays smooth when the main
+            thread is busy. components/SmoothScroll.tsx is kept, unmounted,
+            should it ever come back. */}
 
         {/* Outer Border Frame */}
         {/* The admin studio is a tool, not a page of the site: it takes the whole viewport. */}

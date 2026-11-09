@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import { Rise } from '../components/rushes/Depth';
 import { usePointerDepth, useScrollDepth } from '../lib/depth';
 import Constellation from '../components/magic/Constellation';
-import FullStop from '../components/magic/FullStop';
+import LastLetter from '../components/magic/LastLetter';
 import InkNote from '../components/magic/InkNote';
 import {
   Bookshelf,
@@ -48,7 +48,7 @@ interface HomeProps {
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /** The italic line under the name when the lead Hero block has no label of its own. */
-const DEFAULT_TAGLINE = 'An archive still being written.';
+const DEFAULT_TAGLINE = 'Fascinated by the invisible architecture of everything.';
 
 function Section({
   children,
@@ -143,7 +143,6 @@ export default function Home({ setView }: HomeProps) {
   const hero = useMemo(() => resolveHero(getHomeConfig()), []);
   const tagline = useMemo(() => pickHeroBlock(getHomeConfig())?.label?.trim() || DEFAULT_TAGLINE, []);
   const gateways = homeConfig.filter((entry) => entry.configType === 'gateway');
-  const profile = homeConfig.find((entry) => entry.configType === 'profile');
   const reels = homeConfig.filter((entry) => entry.configType === 'reel' && !!entry.video);
 
   const notes = useMemo(
@@ -280,7 +279,7 @@ export default function Home({ setView }: HomeProps) {
                 className="pointer-events-auto flex items-baseline font-book text-[26vw] font-medium leading-[0.8] tracking-[-0.045em] text-bone [text-shadow:0_4px_60px_rgba(0,0,0,0.5)] md:text-[17vw] lg:text-[15vw]"
               >
                 <span className="flex overflow-hidden pb-[0.1em]">
-                  {'Arbab'.split('').map((letter, index) => (
+                  {'Arbab'.split('').map((letter, index, letters) => (
                     <m.span
                       key={index}
                       className="inline-block"
@@ -288,18 +287,10 @@ export default function Home({ setView }: HomeProps) {
                       animate={shouldReduceMotion ? { opacity: 1 } : { y: '0%' }}
                       transition={{ duration: 1.25, delay: 0.35 + index * 0.07, ease: EASE }}
                     >
-                      {letter}
+                      {index === letters.length - 1 ? <LastLetter>{letter}</LastLetter> : letter}
                     </m.span>
                   ))}
                 </span>
-                <m.span
-                  className="inline-block"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.9, ease: EASE }}
-                >
-                  <FullStop />
-                </m.span>
               </h1>
               <m.p
                 className="mt-4 font-book text-2xl italic leading-tight text-zinc-50 md:mt-2 md:text-4xl"
@@ -323,16 +314,6 @@ export default function Home({ setView }: HomeProps) {
                 <RecLabel bright>sopore &rarr; indore</RecLabel>
                 {roles && <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-400">{roles}</p>}
               </m.div>
-              <m.p
-                className="max-w-sm text-[13px] font-light leading-relaxed text-zinc-300 md:text-base"
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.95, ease: EASE }}
-              >
-                {profile?.description ||
-                  'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
-              </m.p>
-
             </div>
           </m.div>
 
@@ -349,21 +330,6 @@ export default function Home({ setView }: HomeProps) {
             </m.div>
           )}
         </section>
-
-        {/* ===================== ROLE TICKER ===================== */}
-        <div className="relative z-20 border-y border-zinc-800 py-5">
-          <Marquee duration={38}>
-            {gateways.map((gateway, index) => (
-              <span key={gateway.slug} className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-400">
-                <span className="text-accent-ink">{String(index + 1).padStart(2, '0')}/</span>
-                {gateway.label?.replace(/^\d+\s*\/\/\s*/, '') || gateway.title}
-                <span aria-hidden="true" className="text-zinc-700">
-                  &mdash;
-                </span>
-              </span>
-            ))}
-          </Marquee>
-        </div>
 
         {/* ===================== INTRO ===================== */}
         {intro?.title && (
@@ -505,21 +471,6 @@ export default function Home({ setView }: HomeProps) {
           </LivingJournal>
         </Section>
 
-        {/* ===================== REELS ===================== */}
-        {reels.length > 0 && (
-          <Section>
-            <RecLabel>reels</RecLabel>
-            <StackedHeading
-              lines={['Frames that', 'keep moving']}
-              className="mt-7"
-              body="Short clips from the same archive — the parts a still photograph cannot hold."
-            />
-            <div data-surface="ink" className="mt-14">
-              <ReelShowcase reels={reels} />
-            </div>
-          </Section>
-        )}
-
         {/* ===================== FRAMES ===================== */}
         {photography.length > 0 && (
           <Section>
@@ -535,6 +486,23 @@ export default function Home({ setView }: HomeProps) {
               <SeeAll onClick={() => setView('photography')}>all {photography.length} frames</SeeAll>
             </div>
             <PhotoShuffle entries={photography} className="mt-14" />
+          </Section>
+        )}
+
+        {/* ===================== REELS =====================
+            Flat: the 3D rise would re-rasterise a playing video on every scroll
+            frame, which is what made this stretch of the page stutter. */}
+        {reels.length > 0 && (
+          <Section flat>
+            <RecLabel>reels</RecLabel>
+            <StackedHeading
+              lines={['Frames that', 'keep moving']}
+              className="mt-7"
+              body="Short clips from the same archive — the parts a still photograph cannot hold."
+            />
+            <div data-surface="ink" className="mt-14">
+              <ReelShowcase reels={reels} />
+            </div>
           </Section>
         )}
 

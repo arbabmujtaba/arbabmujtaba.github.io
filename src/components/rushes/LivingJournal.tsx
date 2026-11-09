@@ -8,6 +8,7 @@ import { ownerArchiveImage } from '../../lib/image';
 import type { DetailCollection } from '../../lib/collections';
 import { comparePriority } from '../../lib/priority';
 import type { JournalEntry, PhotographyEntry, TechEntry } from '../../types';
+import { LANDED, lift } from '../../lib/motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const LAST_VISIT = 'archive.lastVisit';
@@ -148,12 +149,20 @@ export default function LivingJournal({ journal, photography, tech, className = 
     isNew(item) && !reduced
       ? {
           initial: { opacity: 0, filter: 'blur(10px)', clipPath: 'inset(0 100% 0 0)' },
-          whileInView: { opacity: 1, filter: 'blur(0px)', clipPath: 'inset(0 0% 0 0)' },
+          // Once the ink has dried, drop the filter and the clip: left at
+          // blur(0px) they keep every desk item on its own filter layer,
+          // re-rasterised on each scroll frame while the section tilts in.
+          whileInView: {
+            opacity: 1,
+            filter: 'blur(0px)',
+            clipPath: 'inset(0 0% 0 0)',
+            transitionEnd: { filter: 'none', clipPath: 'none' },
+          },
           transition: { duration: 1.4, delay: 0.15 + index * 0.12, ease: EASE },
         }
       : {
-          initial: reduced ? { opacity: 0 } : { opacity: 0, y: 18 },
-          whileInView: { opacity: 1, y: 0 },
+          initial: reduced ? { opacity: 0 } : lift(18),
+          whileInView: LANDED,
           transition: { duration: reduced ? 0.3 : 0.8, delay: reduced ? 0 : index * 0.07, ease: EASE },
         };
 

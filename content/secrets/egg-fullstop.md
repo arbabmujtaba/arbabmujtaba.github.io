@@ -1,9 +1,9 @@
 ---
-title: "Not a full stop"
+title: "Not the last letter"
 kind: egg
 trigger: fullstop
 description: "An archive still being written."
 order: 3
 visible: true
 ---
-It only looks like the end of the sentence.
+The name is still being written, like the archive.

@@ -2,6 +2,7 @@ import { m, useReducedMotion } from 'motion/react';
 import SafeImage from '../SafeImage';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { normalizeImagePath } from '../../lib/image';
+import { LANDED, lift } from '../../lib/motion';
 
 interface NumberedItemProps {
   /** Position in the list; rendered zero-padded. */
@@ -91,8 +92,8 @@ export default function NumberedItem({
 
   return (
     <m.div
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : lift(18)}
+      whileInView={LANDED}
       viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: shouldReduceMotion ? 0.3 : 0.7, ease: EASE }}
     >

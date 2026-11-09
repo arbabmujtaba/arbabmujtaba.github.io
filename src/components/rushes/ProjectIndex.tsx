@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { shouldInterceptClick } from '../../lib/navigation';
 import { useOpenEntry } from '../../lib/entryNavigation';
 import type { PortfolioProject } from '../../types';
+import { LANDED, lift } from '../../lib/motion';
 
 interface ProjectIndexProps {
   projects: PortfolioProject[];
@@ -40,8 +41,8 @@ export default function ProjectIndex({ projects, className = '' }: ProjectIndexP
         return (
           <m.li
             key={project.slug}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : lift(16)}
+            whileInView={LANDED}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: shouldReduceMotion ? 0.3 : 0.7, delay: shouldReduceMotion ? 0 : (index % 4) * 0.05, ease: EASE }}
             className="border-b border-zinc-800"

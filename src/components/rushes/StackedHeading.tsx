@@ -1,4 +1,5 @@
 import { m, useReducedMotion } from 'motion/react';
+import { LANDED, lift } from '../../lib/motion';
 
 interface StackedHeadingProps {
   /** Two display lines. The second is rendered in a muted ink. */
@@ -38,20 +39,37 @@ export default function StackedHeading({
         className={`font-display font-medium leading-[0.94] tracking-[-0.055em] text-zinc-50 ${size}`}
       >
         {lines.filter(Boolean).map((line, index) => (
-          <span key={line} className="block overflow-hidden pb-[0.06em]">
+          /* The wrapper is what is watched for visibility, not the line. The
+             line starts translated fully out of this clipping box, and an
+             IntersectionObserver clips by overflow ancestors, so watching the
+             line itself never fired: the headings stayed invisible and left
+             blank gaps in every section. The wrapper sits in the layout, so
+             it intersects normally and hands the state down by variant. */
+          <m.span
+            key={line}
+            className="block overflow-hidden pb-[0.06em]"
+            initial="hidden"
+            whileInView="shown"
+            viewport={{ once: true, amount: 'some' }}
+          >
             <m.span
               /* The second line is the manuscript voice: the book serif, in
-                 italic, a step quieter. One pairing used on every page. */
-              className={`block ${index === 1 ? 'font-book font-normal italic tracking-[-0.025em] text-zinc-400' : ''}`}
-              style={shouldReduceMotion ? undefined : { transformPerspective: 700, transformOrigin: '50% 100%' }}
-              initial={
-                shouldReduceMotion ? { opacity: 0 } : { y: '105%', rotateX: -70, opacity: 0 }
-              }
-              whileInView={{ y: 0, rotateX: 0, opacity: 1 }}
-              /* `some` rather than a ratio: the span starts translated fully out
-                 of its clipping wrapper, so a percentage threshold can never be
-                 satisfied and the heading would stay permanently hidden. */
-              viewport={{ once: true, amount: 'some' }}
+                 italic, a step quieter. One pairing used on every page.
+                 The tilt is one transform string, perspective included, so
+                 the browser plays it on the compositor (see lib/motion). */
+              className={`block origin-bottom ${index === 1 ? 'font-book font-normal italic tracking-[-0.025em] text-zinc-400' : ''}`}
+              variants={{
+                hidden: shouldReduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, transform: 'perspective(700px) translateY(105%) rotateX(-70deg)' },
+                shown: shouldReduceMotion
+                  ? { opacity: 1 }
+                  : {
+                      opacity: 1,
+                      transform: 'perspective(700px) translateY(0%) rotateX(0deg)',
+                      transitionEnd: { transform: 'none' },
+                    },
+              }}
               transition={{
                 duration: shouldReduceMotion ? 0.3 : 0.95,
                 delay: shouldReduceMotion ? 0 : index * 0.12,
@@ -60,15 +78,15 @@ export default function StackedHeading({
             >
               {line}
             </m.span>
-          </span>
+          </m.span>
         ))}
       </Tag>
 
       {body && (
         <m.p
           className="mt-6 max-w-lg text-sm font-light leading-relaxed text-zinc-400 md:text-base"
-          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={shouldReduceMotion ? { opacity: 0 } : lift(14)}
+          whileInView={LANDED}
           viewport={{ once: true, amount: 'some' }}
           transition={{
             duration: shouldReduceMotion ? 0.3 : 0.8,

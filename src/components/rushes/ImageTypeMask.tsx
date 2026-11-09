@@ -1,5 +1,6 @@
 import { m, useReducedMotion } from 'motion/react';
 import { normalizeImagePath } from '../../lib/image';
+import { LANDED, lift } from '../../lib/motion';
 
 interface ImageTypeMaskProps {
   /** The word to render. Kept short — this is a wordmark treatment. */
@@ -33,8 +34,8 @@ export default function ImageTypeMask({
   return (
     <m.div
       className={`w-full overflow-hidden ${className}`}
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : lift(40)}
+      whileInView={LANDED}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 1.1, ease: EASE }}
     >
