@@ -38,7 +38,6 @@ import BigCards from '../components/home/BigCards';
 import ChapterRoute from '../components/home/ChapterRoute';
 import WorkColumn from '../components/home/WorkColumn';
 import StorySection from '../components/home/StorySection';
-import Principles from '../components/home/Principles';
 import { isRoomEnabled } from '../lib/secrets';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -64,7 +63,7 @@ function Section({
   flat?: boolean;
 }) {
   return (
-    <section id={id} className={`relative z-20 border-t border-zinc-800 px-4 py-20 md:px-12 md:py-32 lg:px-16 ${className}`}>
+    <section id={id} className={`relative z-20 border-t border-zinc-800 px-5 py-16 md:px-12 md:py-28 lg:px-16 ${className}`}>
       {flat ? children : <Rise>{children}</Rise>}
     </section>
   );
@@ -162,7 +161,6 @@ export default function Home({ setView }: HomeProps) {
 
   const intro = homeConfig.find((entry) => entry.configType === 'intro');
   const story = homeConfig.find((entry) => entry.configType === 'story');
-  const principles = homeConfig.filter((entry) => entry.configType === 'principle');
 
   const projects = useMemo(() => getPortfolioProjects(), []);
   const photography = useMemo(() => getPhotographyEntries(), []);
@@ -180,7 +178,7 @@ export default function Home({ setView }: HomeProps) {
   const projectIndex = useMemo(() => projects.slice(0, 6), [projects]);
 
   /** The big cards: the archive's photographs, by priority (0 = featured first). */
-  const selectedFrames = useMemo(() => photography.filter((entry) => entry.coverImage).slice(0, 8), [photography]);
+  const selectedFrames = useMemo(() => photography.filter((entry) => entry.coverImage).slice(0, 4), [photography]);
 
   /** The wall behind the name: the lead Hero photo in the centre, then the archive. */
   const mosaic = useMemo(
@@ -224,7 +222,7 @@ export default function Home({ setView }: HomeProps) {
           data-surface="ink"
           onPointerMove={onHeroPointer}
           onPointerLeave={onHeroLeave}
-          className="relative flex min-h-[100svh] flex-col overflow-hidden px-4 pb-10 pt-24 text-zinc-100 md:px-12 md:pb-12 md:pt-28 lg:min-h-[calc(100vh-4rem)] lg:px-16"
+          className="relative flex min-h-[100svh] flex-col overflow-hidden px-5 pb-24 pt-24 text-zinc-100 md:px-12 md:pb-12 md:pt-28 lg:min-h-[calc(100vh-4rem)] lg:px-16"
         >
           <m.div
             aria-hidden="true"
@@ -248,8 +246,8 @@ export default function Home({ setView }: HomeProps) {
           {/* once, after a while: something crossing the sky */}
           <span aria-hidden="true" className="night-only shooting-star left-[6%] top-[9%] md:left-[22%] md:top-[8%]" />
           {/* the sky above the name, after dark */}
-          <Constellation className="absolute left-[8%] top-[13%] h-[26vw] max-h-[15rem] w-[44vw] max-w-[30rem] md:left-[27%] md:top-[15%]" />
-          <InkNote section="hero" className="absolute right-4 top-24 md:left-12 md:right-auto md:top-28 lg:left-16" />
+          <Constellation className="absolute left-[10%] top-[11%] h-[30vw] max-h-[15rem] w-[52vw] max-w-[30rem] md:left-[27%] md:top-[15%] md:h-[26vw] md:w-[44vw]" />
+          <InkNote section="hero" className="absolute right-5 top-[30%] text-right md:left-12 md:right-auto md:top-28 md:text-left lg:left-16" />
 
           <m.div
             className="pointer-events-none relative flex flex-1 flex-col"
@@ -267,7 +265,7 @@ export default function Home({ setView }: HomeProps) {
             }
           >
             <m.div
-              className="flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left"
+              className="hidden md:flex md:flex-row md:items-center md:justify-between"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.5, ease: EASE }}
@@ -276,7 +274,7 @@ export default function Home({ setView }: HomeProps) {
               {roles && <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-300 md:text-[11px]">{roles}</p>}
             </m.div>
 
-            <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center pb-8 pt-16 text-center md:py-12">
               <h1
                 data-levitate
                 className="pointer-events-auto flex items-baseline font-book text-[26vw] font-medium leading-[0.8] tracking-[-0.045em] text-bone [text-shadow:0_4px_60px_rgba(0,0,0,0.5)] md:text-[17vw] lg:text-[15vw]"
@@ -313,9 +311,20 @@ export default function Home({ setView }: HomeProps) {
               </m.p>
             </div>
 
-            <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+              {/* On phones the place and the roles sit down here, so the sky
+                  above the name stays clear for the constellation. */}
+              <m.div
+                className="flex flex-col gap-2 md:hidden"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.9, ease: EASE }}
+              >
+                <RecLabel bright>sopore &rarr; indore</RecLabel>
+                {roles && <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-400">{roles}</p>}
+              </m.div>
               <m.p
-                className="max-w-sm text-sm font-light leading-relaxed text-zinc-300 md:text-base"
+                className="max-w-sm text-[13px] font-light leading-relaxed text-zinc-300 md:text-base"
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9, delay: 0.95, ease: EASE }}
@@ -324,25 +333,6 @@ export default function Home({ setView }: HomeProps) {
                   'Computer Engineering student at IET DAVV, Indore. Based between code, cameras, and the small mysteries that make ordinary days worth documenting.'}
               </m.p>
 
-              <m.ul
-                className="pointer-events-auto space-y-1 md:text-right"
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 1.05, ease: EASE }}
-              >
-                {gateways.map((gateway, index) => (
-                  <li key={gateway.slug}>
-                    <button
-                      type="button"
-                      onClick={() => setView(targetOf(gateway))}
-                      className="group inline-flex min-h-[44px] items-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300 transition-colors hover:text-accent-ink md:text-xs"
-                    >
-                      <span className="text-zinc-500 group-hover:text-accent-ink">{String(index + 1).padStart(2, '0')}/</span>
-                      {gateway.title}
-                    </button>
-                  </li>
-                ))}
-              </m.ul>
             </div>
           </m.div>
 
@@ -377,7 +367,7 @@ export default function Home({ setView }: HomeProps) {
 
         {/* ===================== INTRO ===================== */}
         {intro?.title && (
-          <Section className="md:py-40">
+          <Section className="py-20 md:py-40">
             <IntroStatement label={intro.label || 'intro'} text={intro.title} />
           </Section>
         )}
@@ -404,7 +394,7 @@ export default function Home({ setView }: HomeProps) {
             <BigCards
               collection="photography"
               parallax={shouldParallax}
-              className="mt-16 md:mt-24"
+              className="mt-10 md:mt-24"
               items={selectedFrames.map((entry) => ({
                 slug: entry.slug,
                 title: entry.title,
@@ -545,23 +535,6 @@ export default function Home({ setView }: HomeProps) {
               <SeeAll onClick={() => setView('photography')}>all {photography.length} frames</SeeAll>
             </div>
             <PhotoShuffle entries={photography} className="mt-14" />
-          </Section>
-        )}
-
-        {/* ===================== PRINCIPLES ===================== */}
-        {principles.length > 0 && (
-          <Section>
-            <RecLabel>principles</RecLabel>
-            <StackedHeading lines={['What I keep to,', 'whatever I make']} className="mt-7" />
-            <Principles
-              items={principles.map((entry) => ({
-                slug: entry.slug,
-                label: entry.label,
-                title: entry.title,
-                description: entry.description,
-              }))}
-              className="mt-14 md:mt-20"
-            />
           </Section>
         )}
 

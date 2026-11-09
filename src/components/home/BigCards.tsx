@@ -19,63 +19,115 @@ export interface BigCardItem {
   flag?: string;
 }
 
-const EASE = [0.16, 1, 0.3, 1] as const;
 const CARD_SIZES = '(min-width: 768px) 46vw, 92vw';
 
-function Plate({ item, parallax }: { item: BigCardItem; parallax: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], ['-7%', '7%']);
+/**
+ * One card, revealed by the scroll itself.
+ *
+ * While the card travels from the bottom of the screen to its upper third,
+ * the frame opens from a small window in the middle to its full size and the
+ * photograph inside settles from a zoom to rest — so it develops at whatever
+ * pace the reader scrolls, and runs backwards if they scroll back. On wide
+ * screens the photograph then keeps drifting gently inside its frame. Only
+ * clip-path, transform and opacity move. Under reduced motion it is still.
+ */
+function Card({
+  item,
+  index,
+  collection,
+  parallax,
+}: {
+  item: BigCardItem;
+  index: number;
+  collection: DetailCollection;
+  parallax: boolean;
+}) {
+  const ref = useRef<HTMLLIElement>(null);
+  const reduced = !!useReducedMotion();
+  const openEntry = useOpenEntry();
   const [stage, setStage] = useState<'webp' | 'original' | 'failed'>('webp');
+
+  // The reveal: card top at the bottom edge → card top at 30% of the screen.
+  const { scrollYProgress: enter } = useScroll({ target: ref, offset: ['start end', 'start 0.3'] });
+  const clipPath = useTransform(enter, [0, 1], ['inset(24% 18% 24% 18%)', 'inset(0% 0% 0% 0%)']);
+  const zoom = useTransform(enter, [0, 1], [1.4, 1]);
+  const captionOpacity = useTransform(enter, [0.55, 1], [0, 1]);
+  const captionY = useTransform(enter, [0.55, 1], [18, 0]);
+
+  // The drift, over the card's whole pass through the screen (desktop only).
+  const { scrollYProgress: pass } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const drift = useTransform(pass, [0, 1], ['-6%', '6%']);
 
   const src = ownerArchiveImage(item.image);
   const sources = src ? getLocalWebpSources(src, CARD_SIZES) : undefined;
 
   return (
-    // Observed on an unclipped wrapper: a box clipped to nothing never counts
-    // as "in view", so the wipe would wait forever.
-    <m.div ref={ref} initial="hidden" whileInView="shown" viewport={{ once: true, amount: 0.15 }}>
-    <m.div
-      className="relative aspect-[4/5] w-full overflow-hidden bg-canvas-deep"
-      variants={{
-        hidden: reduced ? { opacity: 0 } : { clipPath: 'inset(100% 0% 0% 0%)' },
-        shown: reduced ? { opacity: 1 } : { clipPath: 'inset(0% 0% 0% 0%)' },
-      }}
-      transition={{ duration: reduced ? 0.4 : 1.3, ease: EASE }}
-    >
-      {src && stage !== 'failed' ? (
-        <m.div className="absolute inset-x-0 -top-[8%] h-[116%]" style={parallax ? { y } : undefined}>
-          <picture key={stage}>
-            {sources && stage === 'webp' && <source type="image/webp" srcSet={sources.srcSet} sizes={sources.sizes} />}
-            <img
-              src={src}
-              alt={item.title}
-              loading="lazy"
-              decoding="async"
-              onError={() => setStage(stage === 'webp' && sources ? 'original' : 'failed')}
-              style={getCardImageStyle(item.customization)}
-              className="h-full w-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/card:scale-[1.05]"
-            />
-          </picture>
+    <li ref={ref} className={index % 2 === 1 ? 'md:translate-y-40' : ''}>
+      <a
+        href={`/${collection}/${item.slug}`}
+        data-cursor-label="view"
+        onClick={(event) => {
+          if (!shouldInterceptClick(event)) return;
+          event.preventDefault();
+          openEntry(collection, item.slug);
+        }}
+        className="group/card block focus-visible:outline-none"
+      >
+        <m.div
+          className="relative aspect-[4/5] w-full overflow-hidden bg-canvas-deep"
+          style={reduced ? undefined : { clipPath }}
+        >
+          {src && stage !== 'failed' ? (
+            <m.div className="absolute inset-x-0 -top-[7%] h-[114%]" style={parallax ? { y: drift } : undefined}>
+              <m.div className="h-full w-full" style={reduced ? undefined : { scale: zoom }}>
+                <picture key={stage}>
+                  {sources && stage === 'webp' && <source type="image/webp" srcSet={sources.srcSet} sizes={sources.sizes} />}
+                  <img
+                    src={src}
+                    alt={item.title}
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => setStage(stage === 'webp' && sources ? 'original' : 'failed')}
+                    style={getCardImageStyle(item.customization)}
+                    className="h-full w-full object-cover transition-[filter] duration-700 group-hover/card:brightness-110"
+                  />
+                </picture>
+              </m.div>
+            </m.div>
+          ) : (
+            <div className="hairline-grid absolute inset-0 flex items-end p-6">
+              <span className="font-book text-4xl italic text-zinc-500">{item.title}</span>
+            </div>
+          )}
         </m.div>
-      ) : (
-        <div className="hairline-grid absolute inset-0 flex items-end p-6">
-          <span className="font-book text-4xl italic text-zinc-500">{item.title}</span>
-        </div>
-      )}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas-deep/60 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover/card:opacity-100" />
-    </m.div>
-    </m.div>
+
+        <m.div
+          className="mt-5 flex items-start justify-between gap-6 border-t border-zinc-800 pt-5"
+          style={reduced ? undefined : { opacity: captionOpacity, y: captionY }}
+        >
+          <div className="min-w-0">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+              {String(index + 1).padStart(2, '0')}
+              {item.flag && <span className="ml-3 text-accent-ink">{item.flag}</span>}
+            </p>
+            <h3 className="mt-3 font-book text-3xl leading-[1.02] tracking-[-0.02em] text-zinc-50 transition-colors duration-500 group-hover/card:text-accent-ink group-focus-visible/card:text-accent-ink md:text-[2.6rem]">
+              {item.title}
+            </h3>
+            {item.meta && <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">{item.meta}</p>}
+          </div>
+          <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-800 text-zinc-400 transition-all duration-500 group-hover/card:rotate-45 group-hover/card:border-accent group-hover/card:bg-accent group-hover/card:text-on-accent">
+            <ArrowUpRight size={16} strokeWidth={1.6} />
+          </span>
+        </m.div>
+      </a>
+    </li>
   );
 }
 
 /**
- * BigCards — large photographs in two staggered columns (one on phones).
- *
- * Each plate is wiped up into view once, drifts slightly against the scroll on
- * desktop, and zooms on hover; the cursor reads "view". Every card is a real
- * link to the entry, and a plain click opens it as a quick look over the page.
+ * BigCards — a few large photographs, two staggered columns on wider screens
+ * (the right one sits lower) and one on phones. Every card is a real link to
+ * the entry; a plain click opens it as a quick look over the page.
  */
 export default function BigCards({
   items,
@@ -88,47 +140,10 @@ export default function BigCards({
   parallax: boolean;
   className?: string;
 }) {
-  const openEntry = useOpenEntry();
-  const reduced = useReducedMotion();
-
   return (
-    <ol className={`grid gap-x-6 gap-y-16 md:grid-cols-2 md:pb-40 lg:gap-x-10 lg:gap-y-24 ${className}`}>
+    <ol className={`grid gap-x-6 gap-y-14 md:grid-cols-2 md:gap-y-24 md:pb-40 lg:gap-x-10 ${className}`}>
       {items.map((item, index) => (
-        <li key={item.slug} className={index % 2 === 1 ? 'md:translate-y-40' : ''}>
-          <a
-            href={`/${collection}/${item.slug}`}
-            data-cursor-label="view"
-            onClick={(event) => {
-              if (!shouldInterceptClick(event)) return;
-              event.preventDefault();
-              openEntry(collection, item.slug);
-            }}
-            className="group/card block focus-visible:outline-none"
-          >
-            <Plate item={item} parallax={parallax} />
-            <m.div
-              className="mt-5 flex items-start justify-between gap-6 border-t border-zinc-800 pt-5"
-              initial={{ opacity: 0, y: reduced ? 0 : 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.8, delay: 0.15, ease: EASE }}
-            >
-              <div className="min-w-0">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                  {String(index + 1).padStart(2, '0')}
-                  {item.flag && <span className="ml-3 text-accent-ink">{item.flag}</span>}
-                </p>
-                <h3 className="mt-3 font-book text-3xl leading-[1.02] tracking-[-0.02em] text-zinc-50 transition-colors duration-500 group-hover/card:text-accent-ink group-focus-visible/card:text-accent-ink md:text-[2.6rem]">
-                  {item.title}
-                </h3>
-                {item.meta && <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">{item.meta}</p>}
-              </div>
-              <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-800 text-zinc-400 transition-all duration-500 group-hover/card:rotate-45 group-hover/card:border-accent group-hover/card:bg-accent group-hover/card:text-on-accent">
-                <ArrowUpRight size={16} strokeWidth={1.6} />
-              </span>
-            </m.div>
-          </a>
-        </li>
+        <Card key={item.slug} item={item} index={index} collection={collection} parallax={parallax} />
       ))}
     </ol>
   );

@@ -234,7 +234,7 @@ export const HOME_BLOCK_WHERE: Record<string, string> = {
   hero: 'the photo mosaic behind your name at the top of the home page — the lowest order is the lead tile in the centre, the others join the mosaic, and your photography covers fill the rest',
   intro: 'the large statement that lights up word by word under the hero',
   story: 'the story section: a portrait beside a heading and a few paragraphs',
-  principle: 'the numbered “what I keep to” list',
+  principle: 'nowhere at the moment — principles are kept but not shown on the home page',
   gateway: 'the page links under your name, the moving ticker and the role line above your name (its image joins the hero mosaic)',
   quote: 'the “last notes” band',
   profile: 'the profile section',
