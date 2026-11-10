@@ -80,8 +80,10 @@ export default function NumberedItem({
         </span>
       )}
 
+      {/* A fixed minimum width on desktop, so a short word ("AI") and a long one
+          ("Node.js") leave the descriptions ending on the same line. */}
       {meta && (
-        <span className="shrink-0 font-display text-xl font-medium text-accent-ink md:text-3xl">
+        <span className="shrink-0 font-display text-xl font-medium text-accent-ink md:min-w-[7rem] md:text-right md:text-3xl">
           {meta}
         </span>
       )}

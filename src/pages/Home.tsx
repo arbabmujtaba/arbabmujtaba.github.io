@@ -517,9 +517,10 @@ export default function Home({ setView }: HomeProps) {
         )}
 
         {/* ===================== NOTES ===================== */}
+        {/* Last section: no bottom padding, the footer's top margin is the gap. */}
         {notes.length > 0 && (
-          <Section className="overflow-hidden">
-            <InkNote section="notes" className="absolute bottom-10 left-4 md:left-12 lg:left-16" />
+          <Section className="overflow-hidden pb-0 md:pb-0">
+            <InkNote section="notes" className="absolute right-4 top-10 text-right md:right-12 lg:right-16" />
             <LastNotes
               notes={notes}
               intro={

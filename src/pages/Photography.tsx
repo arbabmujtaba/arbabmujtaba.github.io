@@ -597,7 +597,7 @@ export default function Photography() {
 
         {/* ===================== KIT ===================== */}
         {Object.keys(gearByCategory).length > 0 && (
-          <Section>
+          <Section className="pb-0 md:pb-0">
             <RecLabel>kit</RecLabel>
             <StackedHeading
               lines={['the tools', 'in the bag']}

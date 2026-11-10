@@ -124,9 +124,9 @@ export default function Journal() {
                 </div>
               </section>
             )}
-          </div>
 
-          <Footer />
+            <Footer />
+          </div>
         </div>
       </div>
     </m.div>

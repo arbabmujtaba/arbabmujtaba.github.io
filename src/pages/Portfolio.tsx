@@ -197,7 +197,7 @@ export default function Portfolio() {
           whileInView={LANDED}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: shouldReduceMotion ? 0.35 : 0.85, ease: EASE }}
-          className="mt-24 border-t border-zinc-800 pb-24 pt-7 md:mt-32 md:pb-32"
+          className="mt-24 border-t border-zinc-800 pt-7 md:mt-32"
         >
           <RecLabel>stack</RecLabel>
           <StackedHeading
