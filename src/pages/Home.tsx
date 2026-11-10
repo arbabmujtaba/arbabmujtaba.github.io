@@ -3,7 +3,6 @@ import { m, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform
 import Footer from '../components/Footer';
 import { Rise } from '../components/rushes/Depth';
 import { usePointerDepth, useScrollDepth } from '../lib/depth';
-import Constellation from '../components/magic/Constellation';
 import LastLetter from '../components/magic/LastLetter';
 import InkNote from '../components/magic/InkNote';
 import {
@@ -11,7 +10,6 @@ import {
   CountUp,
   LastNotes,
   LivingJournal,
-  Marquee,
   PhotoShuffle,
   RecLabel,
   ReelShowcase,
@@ -20,7 +18,6 @@ import {
 } from '../components/rushes';
 import {
   getFavoriteItems,
-  getGearItems,
   getHomeConfig,
   getJournalEntries,
   getPhotographyEntries,
@@ -165,7 +162,6 @@ export default function Home({ setView }: HomeProps) {
   const photography = useMemo(() => getPhotographyEntries(), []);
   const journal = useMemo(() => getJournalEntries(), []);
   const tech = useMemo(() => getTechEntries(), []);
-  const gear = useMemo(() => getGearItems(), []);
   const favorites = useMemo(() => getFavoriteItems(), []);
   const timeline = useMemo(() => getTimelineMilestones().filter((m) => m.visible), []);
   const darkroom = useMemo(() => isRoomEnabled('darkroom'), []);
@@ -244,8 +240,6 @@ export default function Home({ setView }: HomeProps) {
 
           {/* once, after a while: something crossing the sky */}
           <span aria-hidden="true" className="night-only shooting-star left-[6%] top-[9%] md:left-[22%] md:top-[8%]" />
-          {/* the sky above the name, after dark */}
-          <Constellation className="absolute left-[10%] top-[11%] h-[30vw] max-h-[15rem] w-[52vw] max-w-[30rem] md:left-[27%] md:top-[15%] md:h-[26vw] md:w-[44vw]" />
           <InkNote section="hero" className="absolute right-5 top-[30%] text-right md:left-12 md:right-auto md:top-28 md:text-left lg:left-16" />
 
           <m.div
@@ -303,8 +297,7 @@ export default function Home({ setView }: HomeProps) {
             </div>
 
             <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              {/* On phones the place and the roles sit down here, so the sky
-                  above the name stays clear for the constellation. */}
+              {/* On phones the place and the roles sit down here. */}
               <m.div
                 className="flex flex-col gap-2 md:hidden"
                 initial={{ opacity: 0, y: 14 }}
@@ -434,7 +427,7 @@ export default function Home({ setView }: HomeProps) {
               <div
                 key={count.label}
                 className={`flex flex-col-reverse gap-3 border-b border-zinc-800 py-8 md:border-b-0 md:py-12 ${
-                  index % 2 === 0 ? 'pr-4' : 'pl-4 md:pl-0'
+                  index % 2 === 0 ? 'pr-4' : 'pl-4'
                 } md:px-8 md:first:pl-0 ${index < 3 ? 'md:border-r' : ''}`}
               >
                 <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{count.label}</dt>
@@ -547,24 +540,7 @@ export default function Home({ setView }: HomeProps) {
           </Section>
         )}
 
-        {/* ===================== KIT ===================== */}
-        {gear.length > 0 && (
-          <Section className="py-14 md:py-20">
-            <InkNote section="archive" className="absolute right-4 top-6 text-right md:right-12 lg:right-16" />
-            <RecLabel>kit</RecLabel>
-            <div className="mt-8">
-              <Marquee duration={30} reverse>
-                {gear.map((item) => (
-                  <span key={item.slug} className="font-display text-2xl font-medium tracking-[-0.03em] text-zinc-500 md:text-4xl">
-                    {item.title}
-                  </span>
-                ))}
-              </Marquee>
-            </div>
-          </Section>
-        )}
-
-        <Footer setView={setView} />
+        <Footer />
       </div>
     </m.div>
   );

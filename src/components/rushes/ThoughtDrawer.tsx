@@ -34,7 +34,10 @@ export default function ThoughtDrawer({ className = '' }: { className?: string }
 
   return (
     <div className={`grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] ${className}`}>
-      <div className="relative min-h-[11rem]" aria-live="polite">
+      {/* The reserved height keeps the page from jumping as thoughts of different
+          lengths turn over; the sheet sits centred in it so the slack is shared
+          above and below instead of all piling up underneath. */}
+      <div className="relative flex min-h-[11rem] flex-col justify-center md:min-h-[9rem]" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
           <m.figure
             key={thought.id}

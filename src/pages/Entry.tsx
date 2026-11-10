@@ -149,7 +149,7 @@ export default function Entry({ collection, slug, setView }: EntryProps) {
           </nav>
         )}
 
-        <Footer setView={setView} />
+        <Footer />
       </div>
     </m.div>
   );

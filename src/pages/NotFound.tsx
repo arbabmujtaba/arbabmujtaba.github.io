@@ -97,7 +97,7 @@ export default function NotFound({ setView, requestedPath }: NotFoundProps) {
           </ul>
         </div>
 
-        <Footer setView={setView} />
+        <Footer />
       </div>
     </m.div>
   );

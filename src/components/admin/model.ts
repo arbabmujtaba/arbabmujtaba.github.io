@@ -267,7 +267,6 @@ export const SECRET_ROOM_LABELS: Record<SecretRoomId, string> = {
 /** How a visitor sets each easter egg off. Shown next to the trigger picker. */
 export const SECRET_TRIGGER_LABELS: Record<SecretTrigger, string> = {
   seal: 'Wax seal — seven clicks',
-  constellation: 'Constellation — seven stars',
   fullstop: 'The last letter of the name',
   lumos: 'Lumos — casting light',
   alohomora: 'Alohomora — the hidden shelf',
@@ -277,7 +276,6 @@ export const SECRET_TRIGGER_LABELS: Record<SecretTrigger, string> = {
 
 export const SECRET_TRIGGER_HELP: Record<SecretTrigger, string> = {
   seal: 'Clicking the wax seal in the footer seven times.',
-  constellation: 'Connecting the seven bright stars in the hero sky, in night mode.',
   fullstop: 'Clicking the last letter of the name with the wand.',
   lumos: 'Casting light with the wand, or typing “lumos”.',
   alohomora: 'Typing “alohomora”, which opens the hidden shelf.',

@@ -21,8 +21,8 @@ const roundTrip = (collection: Parameters<typeof formFromDoc>[0], data: Record<s
   serializeForm(formFromDoc(collection, String(data.slug || 'x'), data, body));
 
 console.log('secrets');
-const egg = roundTrip('secrets', { title: 'Sealed', kind: 'egg', trigger: 'constellation', description: 'd', order: 2, visible: false }, 'Body.');
-check('egg keeps kind + trigger', egg.data.kind === 'egg' && egg.data.trigger === 'constellation', JSON.stringify(egg.data));
+const egg = roundTrip('secrets', { title: 'Sealed', kind: 'egg', trigger: 'seal', description: 'd', order: 2, visible: false }, 'Body.');
+check('egg keeps kind + trigger', egg.data.kind === 'egg' && egg.data.trigger === 'seal', JSON.stringify(egg.data));
 check('egg keeps visible:false', egg.data.visible === false);
 check('egg does not carry a room or section', egg.data.room === undefined && egg.data.section === undefined);
 check('egg keeps its body', egg.body === 'Body.');

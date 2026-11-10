@@ -22,12 +22,11 @@ import type { SecretRoomId } from '../types';
 export type ThemePref = 'auto' | 'day' | 'night';
 export type Theme = 'day' | 'night';
 
-/** The seven things a visitor can find. Order is the order of the ledger. */
+/** The things a visitor can find. Order is the order of the ledger. */
 export const COLLECTIBLES = [
   { id: 'lantern', name: 'The lantern', hint: 'Light the margins.', where: 'Cast Lumos with the wand' },
   { id: 'key', name: 'The key', hint: 'One book on the shelf behind the desk is not like the others.', where: 'Opened the Restricted Section' },
   { id: 'lens', name: 'The lens', hint: 'Every frame section has a red light. One of them is a safelight.', where: 'Developed a print in the darkroom' },
-  { id: 'star', name: 'The seventh star', hint: 'After dark, the sky above the name is not empty.', where: 'Connected the Saptarishi' },
   { id: 'seal', name: 'The wax seal', hint: 'Knock at the very end of the page. Keep knocking.', where: 'Broke the seal' },
   { id: 'compass', name: 'The compass', hint: 'Walk from one city to the other.', where: 'Traced Sopore to Indore' },
   { id: 'quill', name: 'The quill', hint: 'Read a journal volume to its last line.', where: 'Finished a volume' },

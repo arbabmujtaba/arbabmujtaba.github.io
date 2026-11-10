@@ -1,11 +1,10 @@
-import { Github, Instagram, Linkedin, Mail, Twitter } from 'lucide-react';
+import { ArrowUpRight, FileText, Github, Instagram, Linkedin, Mail, Twitter } from 'lucide-react';
 import { ImageTypeMask, RecLabel } from './rushes';
 import WaxSeal from './magic/WaxSeal';
 
 /* ------------------------------------------------------------------ */
 /*  SOCIAL LINKS CONFIG                                                */
-/*  Web profiles: full https URLs.                                     */
-/*  email: keep the "mailto:" prefix. phone: keep the "tel:" prefix.   */
+/*  Web profiles: full https URLs. email: keep the "mailto:" prefix.   */
 /* ------------------------------------------------------------------ */
 const SOCIAL_LINKS = {
   github: 'https://github.com/arbabmujtaba',
@@ -13,10 +12,9 @@ const SOCIAL_LINKS = {
   instagram:
     'https://www.instagram.com/arbabmujtabaaaa?igsh=MTFzOGl4MnN1dzc2dQ%3D%3D&utm_source=qr',
   twitter: 'https://x.com/arbabmujtaba2?s=11',
-  readcv:
+  resume:
     'https://drive.google.com/file/d/1lXNv_xrS5nXPg0JRB_uenNjZPVqQdmGk/view?usp=drivesdk',
   email: 'mailto:arbabandjones@gmail.com',
-  phone: 'tel:+919149829297',
 };
 
 const isExternal = (url: string) => /^https?:\/\//i.test(url);
@@ -38,7 +36,6 @@ interface FooterProps {
    * only the one page that happened to pass a prop.
    */
   wordmarkImage?: string;
-  setView?: (view: string) => void;
 }
 
 /**
@@ -51,23 +48,16 @@ interface FooterProps {
  */
 const WORDMARK_IMAGE = '/uploads/photography/1781674009809-689730206.webp';
 
-const SECTIONS = [
-  { id: 'portfolio', label: 'Work' },
-  { id: 'journal', label: 'Journal' },
-  { id: 'tech', label: 'Logs' },
-  { id: 'photography', label: 'Frames' },
-];
-
 /**
  * Footer — the closing plate.
  *
  * Oversized wordmark with a photograph showing through it, the standing
- * invitation, icon links, and a section index. There is no newsletter field: the
+ * invitation, icon links, and the wax seal. There is no newsletter field: the
  * site is statically hosted and nothing can receive a submission, so the
  * previous non-functional email input has been replaced with real mailto and
  * profile links.
  */
-export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: FooterProps) {
+export default function Footer({ wordmarkImage = WORDMARK_IMAGE }: FooterProps) {
   return (
     <footer className="relative z-10 mt-32 w-full border-t border-zinc-800 bg-transparent">
       <div className="px-4 pt-20 md:px-12 md:pt-28 lg:px-16">
@@ -98,6 +88,22 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
               </a>
             ))}
           </div>
+
+          <a
+            href={SOCIAL_LINKS.resume}
+            {...linkProps(SOCIAL_LINKS.resume)}
+            className="group mt-6 inline-flex h-14 items-center gap-3 rounded-full border border-zinc-700 bg-canvas-lift pl-5 pr-6 text-zinc-100 transition-colors duration-300 hover:border-accent hover:bg-accent hover:text-on-accent"
+          >
+            <FileText size={18} strokeWidth={1.6} aria-hidden="true" />
+            <span className="font-mono text-xs uppercase tracking-[0.2em]">Résumé</span>
+            <ArrowUpRight
+              size={16}
+              strokeWidth={1.6}
+              aria-hidden="true"
+              className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
         </div>
       </div>
 
@@ -110,84 +116,13 @@ export default function Footer({ wordmarkImage = WORDMARK_IMAGE, setView }: Foot
       </div>
 
       <div className="px-4 pb-10 md:px-12 lg:px-16">
-        <div className="grid grid-cols-1 gap-12 border-t border-zinc-800 pt-12 md:grid-cols-12">
-          <div className="md:col-span-6">
-            <p className="max-w-sm font-book text-3xl italic leading-[1.05] tracking-[-0.01em] text-zinc-100 md:text-4xl">
-              An archive still
-              <br />
-              being written.
-            </p>
-            <div className="mt-8">
-              <WaxSeal />
-            </div>
-
-            <div className="mt-10 space-y-1.5 font-mono text-[10px] lowercase tracking-[0.08em] text-zinc-400">
-              <p>© {new Date().getFullYear()} arbab mujtaba. all rights reserved.</p>
-              <p>computer engineering, iet davv — sopore &amp; indore.</p>
-              {/* Release mark. Bump alongside the version in package.json and the git tag. */}
-              <p className="flex items-center gap-2 pt-1 text-zinc-500">
-                <span
-                  aria-hidden="true"
-                  className="inline-block h-1 w-1 rounded-full bg-accent"
-                />
-                version 2.0
-              </p>
-            </div>
-          </div>
-
-          <nav className="grid grid-cols-2 gap-8 md:col-span-6 md:justify-items-end">
-            <div>
-              <h3 className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
-                Sections
-              </h3>
-              <ul className="space-y-3.5">
-                {SECTIONS.map((section) => (
-                  <li key={section.id}>
-                    <button
-                      type="button"
-                      onClick={() => setView?.(section.id)}
-                      className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
-                    >
-                      {section.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
-                Elsewhere
-              </h3>
-              <ul className="space-y-3.5">
-                <li>
-                  <a
-                    href={SOCIAL_LINKS.readcv}
-                    {...linkProps(SOCIAL_LINKS.readcv)}
-                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
-                  >
-                    Résumé
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={SOCIAL_LINKS.email}
-                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
-                  >
-                    Email
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={SOCIAL_LINKS.phone}
-                    className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-accent-ink"
-                  >
-                    Phone
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </nav>
+        <div className="flex items-end justify-between gap-8 border-t border-zinc-800 pt-12">
+          <p className="max-w-sm font-book text-3xl italic leading-[1.05] tracking-[-0.01em] text-zinc-100 md:text-4xl">
+            An archive still
+            <br />
+            being written.
+          </p>
+          <WaxSeal align="end" />
         </div>
       </div>
     </footer>

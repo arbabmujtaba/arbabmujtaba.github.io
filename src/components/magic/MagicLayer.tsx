@@ -39,7 +39,6 @@ export function availableCollectibles() {
     lantern: isEggEnabled('lumos'),
     key: isRoomEnabled('library'),
     lens: isRoomEnabled('darkroom'),
-    star: isEggEnabled('constellation'),
     seal: isEggEnabled('seal'),
     compass: true,
     quill: true,

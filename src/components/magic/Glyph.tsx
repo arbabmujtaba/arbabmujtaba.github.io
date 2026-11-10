@@ -1,5 +1,5 @@
 /**
- * Glyph — the hidden layer's small line drawings: the seven collectibles plus
+ * Glyph — the hidden layer's small line drawings: the collectibles plus
  * the wand. Hand-drawn in SVG so they inherit currentColor and cost nothing.
  */
 

@@ -2339,25 +2339,6 @@
       "filePath": "content/secrets/egg-console.md"
     },
     {
-      "id": "secrets/egg-constellation",
-      "collection": "secrets",
-      "slug": "egg-constellation",
-      "title": "Saptarishi",
-      "state": "published",
-      "versions": [
-        {
-          "version": 1,
-          "state": "published",
-          "timestamp": "2026-10-02T04:20:17.604Z"
-        }
-      ],
-      "unsavedChanges": false,
-      "createdAt": "2026-10-02T04:20:17.604Z",
-      "updatedAt": "2026-10-02T04:20:17.604Z",
-      "publishedAt": "2026-10-02T04:20:17.604Z",
-      "filePath": "content/secrets/egg-constellation.md"
-    },
-    {
       "id": "secrets/egg-fullstop",
       "collection": "secrets",
       "slug": "egg-fullstop",

@@ -19,8 +19,12 @@ const CRACKS = [
  * The wax seal at the very end of every page. It does nothing on the first
  * knock, and visibly not quite nothing on the second: a hairline crack. The
  * seventh breaks it, and what was under it is the `seal` easter egg's copy.
+ *
+ * `align="end"` pins the seal to the right edge: the message opens to its left,
+ * so the seal itself does not move when it breaks.
  */
-export default function WaxSeal() {
+export default function WaxSeal({ align = 'start' }: { align?: 'start' | 'end' }) {
+  const end = align === 'end';
   const { collect, whisperOf } = useMagic();
   const reduced = useReducedMotion();
   const [knocks, setKnocks] = useState(0);
@@ -44,7 +48,7 @@ export default function WaxSeal() {
   };
 
   return (
-    <div className="flex items-center gap-5">
+    <div className={`flex items-center gap-5 ${end ? 'flex-row-reverse text-right' : ''}`}>
       <m.button
         type="button"
         onClick={knock}
@@ -82,7 +86,7 @@ export default function WaxSeal() {
       <AnimatePresence>
         {broken && (
           <m.p
-            initial={{ opacity: 0, x: -8 }}
+            initial={{ opacity: 0, x: end ? 8 : -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9 }}
             className="max-w-xs font-book text-lg italic leading-snug text-zinc-300"
